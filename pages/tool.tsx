@@ -101,8 +101,8 @@ const FrameWrapper = styled.div`
 `;
 
 const FrameSize = styled.div<{ width: string; height: string }>`
-  width: ${({ width }) => width};
-  height: ${({ height }) => height};
+  width: ${({ width }) => `${+width.replace('px', '') / 5}px`};
+  height: ${({ height }) => `${+height.replace('px', '') / 5}px`};
   border: 1px solid #333;
   position: relative;
 `;
