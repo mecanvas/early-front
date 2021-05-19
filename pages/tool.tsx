@@ -25,6 +25,12 @@ const ImageWrapper = styled.div`
   justify-content: center;
   align-items: center;
   position: relative;
+
+  .cropped-img {
+    position: absolute;
+    transform: scale(1.1);
+    border: 3px solid #333;
+  }
 `;
 
 const FakeCanvas = styled.canvas`
@@ -167,13 +173,55 @@ const Tool = () => {
   const [imgHeight, setImgHeight] = useState(0);
   const [imgSrc, setImgSrc] = useState<string | null>(null);
 
+  const youSelectedFrameRef = useRef<HTMLDivElement>(null);
+
+  //   액자를 사진 속에 눌렀을떄 이미지 크롭
+  const insertFrameToCanvas = useCallback(() => {
+    if (imgHeight && imgWidth && youSelectedFrameRef.current && fakeCanvasRef.current) {
+      // 현재 액자의 사이즈
+      const { width: frameWidth, height: frameHeight } = youSelectedFrameRef.current.getBoundingClientRect();
+      const { width, height, left, top } = fakeCanvasRef.current.getBoundingClientRect();
+
+      const canvas = document.createElement('canvas');
+      canvas.classList.add('cropped-img');
+      canvas.width = frameWidth;
+      canvas.height = frameHeight;
+      canvas.style.left = `${cursorX - frameWidth / 2}px`;
+      canvas.style.top = `${cursorY - frameHeight / 2 - 50}px`;
+      const ctx = canvas.getContext('2d');
+
+      const cropX = cursorX - left;
+      const cropY = cursorY - top;
+      const imgWidth = width;
+      const imgHeight = height;
+      const img = new Image(imgWidth, imgHeight);
+      img.src = imgUrl;
+      img.onload = () => {
+        ctx?.drawImage(
+          img,
+          cropX < 0 ? 0 : cropX - frameWidth / 2,
+          cropY < 0 ? 0 : cropY - frameHeight / 2,
+          frameWidth,
+          frameHeight,
+          0,
+          0,
+          frameWidth,
+          frameHeight,
+        );
+        const imgWrapper = document.getElementById('img-box');
+        imgWrapper?.prepend(canvas);
+      };
+    }
+  }, [cursorX, cursorY, imgUrl, imgWidth, imgHeight, youSelectedFrameRef, fakeCanvasRef]);
+
   //   따라다니는 액자를 재클릭하면 사라짐.
   const handleFrameRelease = useCallback(() => {
     if (!selectedFrame) return;
+    insertFrameToCanvas();
     setSelectedFrame(() => false);
     setSelectedFrameInfo(() => null);
     setSelectedFramePosition(() => null);
-  }, [selectedFrame]);
+  }, [selectedFrame, insertFrameToCanvas]);
 
   //   액자를 클릭하묜?
   const handleFrameSelect = useCallback(
@@ -224,6 +272,7 @@ const Tool = () => {
     <ToolContainer>
       {selectedFrame && selectedFrameInfo && selectedFramePosition && (
         <YouSelectedFrame
+          ref={youSelectedFrameRef}
           onClick={handleFrameRelease}
           {...selectedFrameInfo.size}
           {...selectedFramePosition}
