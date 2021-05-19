@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { useGetCursorPosition } from '../hooks';
 
@@ -24,6 +24,12 @@ const ImageWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+`;
+
+const FakeCanvas = styled.canvas`
+  position: absolute;
+  z-index: 1;
 `;
 
 const VersatileWrapper = styled.div`
@@ -155,6 +161,13 @@ const Tool = () => {
   const [selectedFramePosition, setSelectedFramePosition] = useState<FramePosition | null>(null); // top, letf 위치 조절
   const [cursorX, cursorY] = useGetCursorPosition(selectedFrame);
 
+  const imgNode = useRef<HTMLImageElement>(null);
+  const fakeCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [imgWidth, setImgWidth] = useState(0);
+  const [imgHeight, setImgHeight] = useState(0);
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
+
+  //   따라다니는 액자를 재클릭하면 사라짐.
   const handleFrameRelease = useCallback(() => {
     if (!selectedFrame) return;
     setSelectedFrame(() => false);
@@ -184,6 +197,29 @@ const Tool = () => {
     }
   }, [selectedFrame, selectedFrameInfo, cursorX, cursorY]);
 
+  useEffect(() => {
+    if (fakeCanvasRef.current && imgSrc) {
+      const { current: canvas } = fakeCanvasRef;
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.src = imgSrc;
+      img.onload = () => {
+        ctx?.drawImage(img, 0, 0);
+      };
+    }
+  }, [fakeCanvasRef, imgSrc]);
+
+  useEffect(() => {
+    if (imgNode.current) {
+      const el = imgNode.current;
+      const { src } = el;
+      const { width, height } = el.getBoundingClientRect();
+      setImgWidth(width);
+      setImgHeight(height);
+      setImgSrc(src);
+    }
+  }, [imgNode]);
+
   return (
     <ToolContainer>
       {selectedFrame && selectedFrameInfo && selectedFramePosition && (
@@ -194,9 +230,8 @@ const Tool = () => {
         ></YouSelectedFrame>
       )}
       <ImageWrapper id="img-box">
-        <div>
-          <img src={imgUrl} alt="샘플이미지" />
-        </div>
+        <img ref={imgNode} src={imgUrl} alt="샘플이미지" />
+        <FakeCanvas ref={fakeCanvasRef} width={imgWidth} height={imgHeight} />
       </ImageWrapper>
 
       <VersatileWrapper>
