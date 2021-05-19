@@ -231,7 +231,9 @@ const Tool = () => {
       )}
       <ImageWrapper id="img-box">
         <img ref={imgNode} src={imgUrl} alt="샘플이미지" />
-        <FakeCanvas ref={fakeCanvasRef} width={imgWidth} height={imgHeight} />
+        {selectedFrame && selectedFrameInfo && selectedFramePosition && (
+          <FakeCanvas ref={fakeCanvasRef} width={imgWidth} height={imgHeight} />
+        )}
       </ImageWrapper>
 
       <VersatileWrapper>
