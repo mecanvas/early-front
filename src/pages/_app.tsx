@@ -1,7 +1,7 @@
 import { AppProps } from 'next/dist/next-server/lib/router/router';
-import AppLayout from '../components/layouts/AppLayout';
 import '../styles/globals.css';
 import styled from '@emotion/styled';
+import AppLayout from 'src/layouts/AppLayout';
 
 const AppContainer = styled.main`
   width: 100%;

@@ -1,139 +1,25 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled from '@emotion/styled';
-import { useGetCursorPosition } from '../hooks';
-import { dataURLtoFile } from '../util/dataURLtoFile';
-import { resizeFile } from '../util/resizeFile';
-
-const ToolContainer = styled.div`
-  width: 100%;
-  margin: 0 auto;
-  display: flex;
-`;
-
-const ImageGoBack = styled.button`
-  position: absolute;
-  top: 55px;
-  left: 12px;
-  z-index: 4;
-`;
-
-const YouSelectedFrame = styled.div<{ width: string; height: string; left: string; top: string }>`
-  width: ${({ width }) => width};
-  height: ${({ height }) => height};
-  top: ${({ top }) => top};
-  left: ${({ left }) => left};
-  border: 1px solid #333;
-  position: absolute;
-  cursor: pointer;
-  z-index: 2;
-`;
-
-const ImageWrapper = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-
-  .cropped-img {
-    position: absolute;
-    border: 1.5px solid #333;
-  }
-`;
-
-const VersatileWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  z-index: 3;
-  background: #fff;
-`;
-
-const Versatile = styled.div`
-  width: 275px;
-  border: 1px solid #dbdbdb;
-  margin-right: 8px;
-`;
-
-const Factory = styled.div`
-  padding: 6px 8px;
-  display: flex;
-  flex-direction: column;
-`;
-
-const FactoryTitle = styled.div`
-  width: 100%;
-  display: flex;
-  padding: 0 4px;
-  margin-bottom: 3px;
-  font-size: 18px;
-  div {
-    margin-left: auto;
-  }
-`;
-
-const ImageToolWrapper = styled.div`
-  display: flex;
-  margin-bottom: 8px;
-`;
-
-const ImageResize = styled.button`
-  padding: 8px 12px;
-  border-radius: 6px;
-  background-color: aliceblue;
-`;
-
-const ColorPaletteWrapper = styled.div`
-  display: flex;
-  margin-bottom: 12px;
-
-  div + div {
-    margin-left: 8px;
-    cursor: pointer;
-  }
-`;
-
-const ColorPalette = styled.div<{ color?: string }>`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: ${({ color }) => {
-    return color || 'antiquewhite';
-  }};
-`;
-
-const FrameWrapper = styled.div`
-  display: flex;
-  margin-bottom: 12px;
-
-  div {
-    cursor: pointer;
-  }
-
-  div + div {
-    margin-left: 8px;
-  }
-`;
-
-const FrameSize = styled.div<{ width: string; height: string }>`
-  width: ${({ width }) => `${+width.replace('px', '') / 5}px`};
-  height: ${({ height }) => `${+height.replace('px', '') / 5}px`};
-  border: 1px solid #333;
-  position: relative;
-`;
-
-const FrameSizeName = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-`;
-
-const BillInfomation = styled.div`
-  display: flex;
-  padding: 6px 8px;
-  border-bottom: 1px solid #dbdbdb;
-  margin-top: 8px;
-`;
+import { useGetCursorPosition } from 'src/hooks';
+import { dataURLtoFile } from '../../util/dataURLtoFile';
+import { resizeFile } from '../../util/resizeFile';
+import {
+  ImageGoBack,
+  ToolContainer,
+  YouSelectedFrame,
+  ImageWrapper,
+  VersatileWrapper,
+  ImageToolWrapper,
+  ImageToolBtn,
+  Versatile,
+  Factory,
+  FactoryTitle,
+  ColorPaletteWrapper,
+  ColorPalette,
+  FrameWrapper,
+  FrameSize,
+  FrameSizeName,
+  BillInfomation,
+} from './toolStyle';
 
 interface PaperSize {
   name: string;
@@ -198,6 +84,8 @@ const Tool = () => {
   const imgWrapperRef = useRef<HTMLDivElement>(null);
 
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
+
+  const [isPreview, setIsPreview] = useState(false);
 
   // canvas로 이미지의 너비,높이를 바꿔야 이미지의 크기가 바뀐다. (액자로 자를 시 natural size를 사용하기 때문)
   const resizeImageSrc = useCallback(() => {
@@ -278,6 +166,10 @@ const Tool = () => {
 
   const handleImgResizing = useCallback(() => {
     setIsResize((prev) => !prev);
+  }, []);
+
+  const handleImageToolBtn = useCallback(() => {
+    setIsPreview((prev) => !prev);
   }, []);
 
   const handleImgGoBack = useCallback(() => {
@@ -361,7 +253,7 @@ const Tool = () => {
         )}
         <ImageWrapper id="img-box" ref={imgWrapperRef}>
           {imgUploadUrl ? (
-            <img ref={imgNode} src={imgUploadUrl} alt="샘플이미지" />
+            isPreview || <img ref={imgNode} src={imgUploadUrl} alt="샘플이미지" />
           ) : (
             <input type="file" accept="image/*" onChange={handleImgUpload} />
           )}
@@ -369,7 +261,8 @@ const Tool = () => {
 
         <VersatileWrapper>
           <ImageToolWrapper>
-            <ImageResize onClick={handleImgResizing}>이미지 리사이징</ImageResize>
+            <ImageToolBtn onClick={handleImgResizing}>이미지 리사이징</ImageToolBtn>
+            <ImageToolBtn onClick={handleImageToolBtn}>미리보기</ImageToolBtn>
           </ImageToolWrapper>
           <Versatile>
             <Factory>
