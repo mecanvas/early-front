@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useGetCursorPosition } from 'src/hooks';
+import { useGetCursorPosition, useGetScollPosition } from 'src/hooks';
 import { dataURLtoFile } from '../../util/dataURLtoFile';
 import { resizeFile } from '../../util/resizeFile';
 import {
@@ -72,6 +72,7 @@ const Tool = () => {
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<PaperSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
   const [selectedFramePosition, setSelectedFramePosition] = useState<FramePosition | null>(null); // top, letf 위치 조절
   const [cursorX, cursorY] = useGetCursorPosition(selectedFrame);
+  const [scrollX, scrollY] = useGetScollPosition();
 
   const imgNode = useRef<HTMLImageElement>(null);
   const [imgUploadUrl, setImgUploadUrl] = useState('');
@@ -118,8 +119,8 @@ const Tool = () => {
       canvas.classList.add('cropped-img');
       canvas.width = frameWidth;
       canvas.height = frameHeight;
-      canvas.style.left = `${cursorX - frameWidth / 2}px`;
-      canvas.style.top = `${cursorY - frameHeight / 2 - 50}px`;
+      canvas.style.left = `${cursorX + scrollX - frameWidth / 2}px`;
+      canvas.style.top = `${cursorY + scrollY - frameHeight / 2 - 50}px`;
       const cropX = cursorX - left;
       const cropY = cursorY - top;
 
@@ -142,7 +143,7 @@ const Tool = () => {
         imgWrapperRef?.current?.prepend(canvas);
       };
     }
-  }, [selectedFrameInfo, framePrice, cursorX, cursorY, resizeNewImgSrc, imgUploadUrl]);
+  }, [selectedFrameInfo, framePrice, cursorX, scrollX, cursorY, scrollY, resizeNewImgSrc, imgUploadUrl]);
 
   //   따라다니는 액자를 재클릭하면 insert하고 사라짐.
   const handleFrameRelease = useCallback(() => {
@@ -199,11 +200,11 @@ const Tool = () => {
       const {
         size: { width, height },
       } = selectedFrameInfo;
-      const x = cursorX - +width.replace('px', '') / 2;
-      const y = cursorY - +height.replace('px', '') / 2;
+      const x = cursorX + scrollX - +width.replace('px', '') / 2;
+      const y = cursorY + scrollY - +height.replace('px', '') / 2;
       setSelectedFramePosition({ left: `${x}px`, top: `${y}px` });
     }
-  }, [selectedFrame, selectedFrameInfo, cursorX, cursorY]);
+  }, [selectedFrame, selectedFrameInfo, cursorX, cursorY, scrollX, scrollY]);
 
   useEffect(() => {
     if (imgNode.current && imgUploadUrl) {
