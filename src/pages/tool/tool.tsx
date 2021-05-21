@@ -169,7 +169,7 @@ const Tool = () => {
     setIsResize((prev) => !prev);
   }, []);
 
-  const handleImageToolBtn = useCallback(() => {
+  const handleImgPreview = useCallback(() => {
     setIsPreview((prev) => !prev);
   }, []);
 
@@ -177,12 +177,17 @@ const Tool = () => {
     if (imgWrapperRef.current) {
       const { current: imgBox } = imgWrapperRef;
       if (imgBox.childNodes.length <= 1) {
-        return console.log('존재하는 액자가 없습니다.');
+        if (!isPreview) {
+          return console.log('존재하는 액자가 없습니다.');
+        }
+        if (imgBox.childNodes.length === 0) {
+          return console.log('존재하는 액자가 없습니다.');
+        }
       }
       imgBox?.removeChild(imgBox.childNodes[0]);
       setFramePrice(framePrice.slice(1));
     }
-  }, [framePrice]);
+  }, [framePrice, isPreview]);
 
   const handleImgUpload = async (e: React.ChangeEventHandler<HTMLInputElement> | any) => {
     try {
@@ -194,7 +199,7 @@ const Tool = () => {
     }
   };
 
-  // TODO: 스크롤? 에 따라 반영이 안되보임
+  // 액자 클릭시 움직이는 로직
   useEffect(() => {
     if (selectedFrame && selectedFrameInfo) {
       const {
@@ -263,7 +268,7 @@ const Tool = () => {
         <VersatileWrapper>
           <ImageToolWrapper>
             <ImageToolBtn onClick={handleImgResizing}>이미지 리사이징</ImageToolBtn>
-            <ImageToolBtn onClick={handleImageToolBtn}>미리보기</ImageToolBtn>
+            <ImageToolBtn onClick={handleImgPreview}>미리보기</ImageToolBtn>
           </ImageToolWrapper>
           <Versatile>
             <Factory>

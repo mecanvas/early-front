@@ -34,6 +34,10 @@ export const ImageWrapper = styled.div`
   .cropped-img {
     position: absolute;
     border: 1px inset #333;
+
+    &.position {
+      left: 0 !important;
+    }
   }
 `;
 
