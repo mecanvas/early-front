@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { useGetCursorPosition } from '../hooks';
-import Resizer from 'react-image-file-resizer';
 import { dataURLtoFile } from '../util/dataURLtoFile';
+import { resizeFile } from '../util/resizeFile';
 
 const ToolContainer = styled.div`
   width: 100%;
@@ -134,6 +134,7 @@ interface PaperSize {
     width: string;
     height: string;
   };
+  price: number;
 }
 
 interface FramePosition {
@@ -149,6 +150,7 @@ const Tool = () => {
         width: '210px',
         height: '297px',
       },
+      price: 30000,
     },
     {
       name: 'A5',
@@ -156,6 +158,7 @@ const Tool = () => {
         width: '148px',
         height: '210px',
       },
+      price: 45000,
     },
     {
       name: 'A6',
@@ -163,6 +166,7 @@ const Tool = () => {
         width: '105px',
         height: '148px',
       },
+      price: 55000,
     },
   ]);
 
@@ -170,25 +174,6 @@ const Tool = () => {
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<PaperSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
   const [selectedFramePosition, setSelectedFramePosition] = useState<FramePosition | null>(null); // top, letf 위치 조절
   const [cursorX, cursorY] = useGetCursorPosition(selectedFrame);
-
-  const resizeFile = useCallback(
-    (file: File) =>
-      new Promise((resolve) => {
-        Resizer.imageFileResizer(
-          file,
-          1000,
-          1000,
-          'JPEG',
-          100,
-          0,
-          (uri) => {
-            resolve(uri);
-          },
-          'base64',
-        );
-      }),
-    [],
-  );
 
   const imgNode = useRef<HTMLImageElement>(null);
   const [imgUploadUrl, setImgUploadUrl] = useState('');
