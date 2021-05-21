@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { useGetCursorPosition } from '../hooks';
+import Resizer from 'react-image-file-resizer';
+import { dataURLtoFile } from '../util/dataURLtoFile';
 
 const ToolContainer = styled.div`
   width: 100%;
@@ -158,39 +160,72 @@ const Tool = () => {
   const [selectedFramePosition, setSelectedFramePosition] = useState<FramePosition | null>(null); // top, letf 위치 조절
   const [cursorX, cursorY] = useGetCursorPosition(selectedFrame);
 
-  const imgNode = useRef<HTMLImageElement>(null);
-  const [imgUrl] = useState(
-    'https://assets-kormelon.s3.ap-northeast-2.amazonaws.com/img/8155e5fbb9f8bc67f5c0c390b74342bc',
+  const resizeFile = useCallback(
+    (file: File) =>
+      new Promise((resolve) => {
+        Resizer.imageFileResizer(
+          file,
+          1000,
+          1000,
+          'JPEG',
+          100,
+          0,
+          (uri) => {
+            resolve(uri);
+          },
+          'base64',
+        );
+      }),
+    [],
   );
+
+  const imgNode = useRef<HTMLImageElement>(null);
+  const [imgUploadUrl, setImgUploadUrl] = useState('');
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
-  const [imgSrc, setImgSrc] = useState<string | null>(imgUrl);
-
-  const [sizeChange, setSizeChange] = useState(false);
+  const [resizeNewImgSrc, setResizeNewImgSrc] = useState('');
+  const [isResize, setIsResize] = useState(false);
 
   const youSelectedFrameRef = useRef<HTMLDivElement>(null);
+  const imgWrapperRef = useRef<HTMLDivElement>(null);
+
+  // canvas -> dataUrl로 바꿔야 이미지의 크기가 바뀐다. (canvas가 natural img에 따라 사용하기 때문)
+  const resizeImageSrc = useCallback(() => {
+    const img = new Image(imgWidth, imgHeight);
+    img.src = imgUploadUrl;
+    img.crossOrigin = 'Anonymous';
+    const canvas = document.createElement('canvas');
+    img.onload = () => {
+      canvas.width = imgWidth;
+      canvas.height = imgHeight;
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(img, 0, 0, imgWidth, imgHeight);
+      (() => setResizeNewImgSrc(canvas.toDataURL('image/png', 1.0)))();
+    };
+  }, [imgHeight, imgUploadUrl, imgWidth]);
 
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
-  const insertFrameToCanvas = useCallback(() => {
-    if (youSelectedFrameRef.current && imgNode.current && imgSrc) {
+  const insertFrameToCanvas = useCallback(async () => {
+    if (youSelectedFrameRef.current && imgNode.current) {
       // 현재 액자의 사이즈
       const { width: frameWidth, height: frameHeight } = youSelectedFrameRef.current.getBoundingClientRect();
-
-      // 전체 이미지의 크기
+      // 현재 이미지의 크기에 따른 여백의 크기
       const { left, top } = imgNode.current.getBoundingClientRect();
-      // 크롭된 이미지를 담을 액자
+
+      // 크롭된 이미지를 담을 액자 생성
       const canvas = document.createElement('canvas');
       canvas.classList.add('cropped-img');
       canvas.width = frameWidth;
       canvas.height = frameHeight;
       canvas.style.left = `${cursorX - frameWidth / 2}px`;
       canvas.style.top = `${cursorY - frameHeight / 2 - 50}px`;
-      const ctx = canvas.getContext('2d');
       const cropX = cursorX - left;
       const cropY = cursorY - top;
 
+      const ctx = canvas.getContext('2d');
       const img = new Image();
-      img.src = imgSrc;
+      // 사이즈를 바꿨으면 resizeNewImg 아니면 업로드 이미지
+      img.src = resizeNewImgSrc || imgUploadUrl;
       img.onload = () => {
         ctx?.drawImage(
           img,
@@ -203,11 +238,10 @@ const Tool = () => {
           frameWidth,
           frameHeight,
         );
-        const imgWrapper = document.getElementById('img-box');
-        imgWrapper?.prepend(canvas);
+        imgWrapperRef?.current?.prepend(canvas);
       };
     }
-  }, [cursorX, cursorY, youSelectedFrameRef, imgNode, imgSrc]);
+  }, [cursorX, cursorY, youSelectedFrameRef, imgNode, resizeNewImgSrc, imgUploadUrl]);
 
   //   따라다니는 액자를 재클릭하면 insert하고 사라짐.
   const handleFrameRelease = useCallback(() => {
@@ -242,37 +276,47 @@ const Tool = () => {
   }, [selectedFrame, selectedFrameInfo, cursorX, cursorY]);
 
   useEffect(() => {
-    if (imgNode.current && imgSrc) {
+    if (imgNode.current && imgUploadUrl) {
       const el = imgNode.current;
-      el.src = imgSrc;
+      el.src = imgUploadUrl;
       const { width, height } = el.getBoundingClientRect();
       if (!imgWidth && !imgHeight) {
         setImgWidth(width);
         setImgHeight(height);
       }
     }
-  }, [imgNode, imgSrc, imgWidth, imgHeight]);
+  }, [imgNode, imgUploadUrl, imgWidth, imgHeight]);
 
-  // 이미지 너비 관리하는 곳
+  // 리사이즈를 하겠다는 표시가 뜨면 함수 실행 (canvas -> data:base64로 변경하기 위해서임)
   useEffect(() => {
-    if (sizeChange && imgUrl) {
-      const img = new Image(imgWidth, imgHeight);
-      img.src = `${imgUrl}?${new Date().getTime()}`;
-      img.crossOrigin = 'Anonymous';
-      const canvas = document.createElement('canvas');
-      img.onload = () => {
-        canvas.width = imgWidth;
-        canvas.height = imgHeight;
-        const ctx = canvas.getContext('2d');
-        ctx?.drawImage(img, 0, 0, imgWidth, imgHeight);
-        (() => {
-          const newImg = canvas.toDataURL('image/png', 1.0);
-          setImgSrc(newImg);
-        })();
-        setSizeChange(false);
-      };
+    if (isResize) {
+      resizeImageSrc();
     }
-  }, [sizeChange, imgUrl, imgWidth, imgHeight]);
+  }, [isResize, resizeImageSrc]);
+
+  useEffect(() => {
+    if (isResize && imgNode.current) {
+      imgNode.current.width = 100;
+      imgNode.current.height = 100;
+      setImgWidth(100);
+      setImgHeight(100);
+    }
+  }, [imgWidth, imgHeight, imgNode, isResize]);
+
+  const handleImgUpload = async (e: React.ChangeEventHandler<HTMLInputElement> | any) => {
+    try {
+      const file = e.target.files[0];
+      const image = await resizeFile(file);
+      setImgUploadUrl(typeof image === 'string' ? image : '');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    const g = dataURLtoFile(imgUploadUrl, 'img');
+    console.log(g);
+  }, [imgUploadUrl]);
 
   return (
     <ToolContainer>
@@ -284,12 +328,16 @@ const Tool = () => {
           {...selectedFramePosition}
         ></YouSelectedFrame>
       )}
-      <ImageWrapper id="img-box">
-        <img ref={imgNode} src={imgUrl} alt="샘플이미지" />
+      <ImageWrapper id="img-box" ref={imgWrapperRef}>
+        {imgUploadUrl ? (
+          <img ref={imgNode} src={imgUploadUrl} alt="샘플이미지" />
+        ) : (
+          <input type="file" accept="image/*" onChange={handleImgUpload} />
+        )}
       </ImageWrapper>
       <button
         onClick={() => {
-          setSizeChange(true);
+          setIsResize(true);
           setImgWidth(100);
         }}
       >
@@ -297,7 +345,6 @@ const Tool = () => {
       </button>
       <button
         onClick={() => {
-          setSizeChange(true);
           setImgHeight(100);
         }}
       >
