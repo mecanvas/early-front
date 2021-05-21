@@ -10,6 +10,13 @@ const ToolContainer = styled.div`
   display: flex;
 `;
 
+const ImageGoBack = styled.button`
+  position: absolute;
+  top: 55px;
+  left: 12px;
+  z-index: 4;
+`;
+
 const YouSelectedFrame = styled.div<{ width: string; height: string; left: string; top: string }>`
   width: ${({ width }) => width};
   height: ${({ height }) => height};
@@ -137,6 +144,11 @@ interface PaperSize {
   price: number;
 }
 
+interface FramePrice {
+  name: string;
+  price: number;
+}
+
 interface FramePosition {
   left: string;
   top: string;
@@ -150,7 +162,7 @@ const Tool = () => {
         width: '210px',
         height: '297px',
       },
-      price: 30000,
+      price: 55000,
     },
     {
       name: 'A5',
@@ -158,7 +170,7 @@ const Tool = () => {
         width: '148px',
         height: '210px',
       },
-      price: 45000,
+      price: 40000,
     },
     {
       name: 'A6',
@@ -166,7 +178,7 @@ const Tool = () => {
         width: '105px',
         height: '148px',
       },
-      price: 55000,
+      price: 30000,
     },
   ]);
 
@@ -185,6 +197,8 @@ const Tool = () => {
   const youSelectedFrameRef = useRef<HTMLDivElement>(null);
   const imgWrapperRef = useRef<HTMLDivElement>(null);
 
+  const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
+
   // canvas로 이미지의 너비,높이를 바꿔야 이미지의 크기가 바뀐다. (액자로 자를 시 natural size를 사용하기 때문)
   const resizeImageSrc = useCallback(() => {
     const img = new Image(imgWidth, imgHeight);
@@ -202,7 +216,10 @@ const Tool = () => {
 
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
   const insertFrameToCanvas = useCallback(async () => {
-    if (youSelectedFrameRef.current && imgNode.current) {
+    if (youSelectedFrameRef.current && imgNode.current && selectedFrameInfo) {
+      //  액자의 가격을 price에 넣기
+      const { name, price } = selectedFrameInfo;
+      setFramePrice([{ name, price }, ...framePrice]);
       // 현재 액자의 사이즈
       const { width: frameWidth, height: frameHeight } = youSelectedFrameRef.current.getBoundingClientRect();
       // 현재 이미지의 크기에 따른 여백의 크기
@@ -237,7 +254,7 @@ const Tool = () => {
         imgWrapperRef?.current?.prepend(canvas);
       };
     }
-  }, [cursorX, cursorY, youSelectedFrameRef, imgNode, resizeNewImgSrc, imgUploadUrl]);
+  }, [selectedFrameInfo, framePrice, cursorX, cursorY, resizeNewImgSrc, imgUploadUrl]);
 
   //   따라다니는 액자를 재클릭하면 insert하고 사라짐.
   const handleFrameRelease = useCallback(() => {
@@ -262,6 +279,17 @@ const Tool = () => {
   const handleImgResizing = useCallback(() => {
     setIsResize((prev) => !prev);
   }, []);
+
+  const handleImgGoBack = useCallback(() => {
+    if (imgWrapperRef.current) {
+      const { current: imgBox } = imgWrapperRef;
+      if (imgBox.childNodes.length <= 1) {
+        return console.log('존재하는 액자가 없습니다.');
+      }
+      imgBox?.removeChild(imgBox.childNodes[0]);
+      setFramePrice(framePrice.slice(1));
+    }
+  }, [framePrice]);
 
   const handleImgUpload = async (e: React.ChangeEventHandler<HTMLInputElement> | any) => {
     try {
@@ -320,54 +348,57 @@ const Tool = () => {
   }, [imgUploadUrl]);
 
   return (
-    <ToolContainer>
-      {selectedFrame && selectedFrameInfo && selectedFramePosition && (
-        <YouSelectedFrame
-          ref={youSelectedFrameRef}
-          onClick={handleFrameRelease}
-          {...selectedFrameInfo.size}
-          {...selectedFramePosition}
-        ></YouSelectedFrame>
-      )}
-      <ImageWrapper id="img-box" ref={imgWrapperRef}>
-        {imgUploadUrl ? (
-          <img ref={imgNode} src={imgUploadUrl} alt="샘플이미지" />
-        ) : (
-          <input type="file" accept="image/*" onChange={handleImgUpload} />
+    <>
+      <ImageGoBack onClick={handleImgGoBack}>뒤로 가기</ImageGoBack>
+      <ToolContainer>
+        {selectedFrame && selectedFrameInfo && selectedFramePosition && (
+          <YouSelectedFrame
+            ref={youSelectedFrameRef}
+            onClick={handleFrameRelease}
+            {...selectedFrameInfo.size}
+            {...selectedFramePosition}
+          ></YouSelectedFrame>
         )}
-      </ImageWrapper>
+        <ImageWrapper id="img-box" ref={imgWrapperRef}>
+          {imgUploadUrl ? (
+            <img ref={imgNode} src={imgUploadUrl} alt="샘플이미지" />
+          ) : (
+            <input type="file" accept="image/*" onChange={handleImgUpload} />
+          )}
+        </ImageWrapper>
 
-      <VersatileWrapper>
-        <ImageToolWrapper>
-          <ImageResize onClick={handleImgResizing}>이미지 리사이징</ImageResize>
-        </ImageToolWrapper>
-        <Versatile>
-          <Factory>
-            <FactoryTitle>색상</FactoryTitle>
-            <ColorPaletteWrapper>
-              <ColorPalette />
-              <ColorPalette color="blue" />
-              <ColorPalette color="green" />
-              <ColorPalette color="yellow" />
-            </ColorPaletteWrapper>
+        <VersatileWrapper>
+          <ImageToolWrapper>
+            <ImageResize onClick={handleImgResizing}>이미지 리사이징</ImageResize>
+          </ImageToolWrapper>
+          <Versatile>
+            <Factory>
+              <FactoryTitle>색상</FactoryTitle>
+              <ColorPaletteWrapper>
+                <ColorPalette />
+                <ColorPalette color="blue" />
+                <ColorPalette color="green" />
+                <ColorPalette color="yellow" />
+              </ColorPaletteWrapper>
 
-            <FactoryTitle>액자크기</FactoryTitle>
-            <FrameWrapper>
-              {paperSize.map((paper, index) => (
-                <FrameSize key={index} data-value={paper.name} {...paper.size} onClick={handleFrameSelect}>
-                  <FrameSizeName>{paper.name}</FrameSizeName>
-                </FrameSize>
-              ))}
-            </FrameWrapper>
-          </Factory>
-        </Versatile>
-        <BillInfomation>
-          <FactoryTitle>
-            예상 가격 <div>86,000원 </div>
-          </FactoryTitle>
-        </BillInfomation>
-      </VersatileWrapper>
-    </ToolContainer>
+              <FactoryTitle>액자크기</FactoryTitle>
+              <FrameWrapper>
+                {paperSize.map((paper, index) => (
+                  <FrameSize key={index} data-value={paper.name} {...paper.size} onClick={handleFrameSelect}>
+                    <FrameSizeName>{paper.name}</FrameSizeName>
+                  </FrameSize>
+                ))}
+              </FrameWrapper>
+            </Factory>
+          </Versatile>
+          <BillInfomation>
+            <FactoryTitle>
+              예상 가격 <div>{framePrice.reduce((acc, cur) => (acc += cur.price), 0).toLocaleString()}원</div>
+            </FactoryTitle>
+          </BillInfomation>
+        </VersatileWrapper>
+      </ToolContainer>
+    </>
   );
 };
 
