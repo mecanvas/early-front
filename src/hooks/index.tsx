@@ -20,3 +20,24 @@ export const useGetCursorPosition = (isSelected: boolean) => {
 
   return [windowX, windowY];
 };
+
+export const useGetScollPosition = () => {
+  const [scrollX, setScrollX] = useState(0);
+  const [scrollY, setScrollY] = useState(0);
+
+  const handleGetScrollPosition = useCallback(() => {
+    setScrollX(window.scrollX);
+    setScrollY(window.scrollY);
+  }, []);
+
+  useEffect(() => {
+    if (window) {
+      document.addEventListener('scroll', handleGetScrollPosition);
+    }
+    return () => {
+      document.addEventListener('scroll', handleGetScrollPosition);
+    };
+  }, [handleGetScrollPosition]);
+
+  return [scrollX, scrollY];
+};
