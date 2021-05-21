@@ -64,6 +64,17 @@ const FactoryTitle = styled.div`
   }
 `;
 
+const ImageToolWrapper = styled.div`
+  display: flex;
+  margin-bottom: 8px;
+`;
+
+const ImageResize = styled.button`
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: aliceblue;
+`;
+
 const ColorPaletteWrapper = styled.div`
   display: flex;
   margin-bottom: 12px;
@@ -189,7 +200,7 @@ const Tool = () => {
   const youSelectedFrameRef = useRef<HTMLDivElement>(null);
   const imgWrapperRef = useRef<HTMLDivElement>(null);
 
-  // canvas -> dataUrl로 바꿔야 이미지의 크기가 바뀐다. (canvas가 natural img에 따라 사용하기 때문)
+  // canvas로 이미지의 너비,높이를 바꿔야 이미지의 크기가 바뀐다. (액자로 자를 시 natural size를 사용하기 때문)
   const resizeImageSrc = useCallback(() => {
     const img = new Image(imgWidth, imgHeight);
     img.src = imgUploadUrl;
@@ -263,6 +274,20 @@ const Tool = () => {
     [paperSize],
   );
 
+  const handleImgResizing = useCallback(() => {
+    setIsResize((prev) => !prev);
+  }, []);
+
+  const handleImgUpload = async (e: React.ChangeEventHandler<HTMLInputElement> | any) => {
+    try {
+      const file = e.target.files[0];
+      const image = await resizeFile(file);
+      setImgUploadUrl(typeof image === 'string' ? image : '');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   // TODO: 스크롤? 에 따라 반영이 안되보임
   useEffect(() => {
     if (selectedFrame && selectedFrameInfo) {
@@ -303,19 +328,10 @@ const Tool = () => {
     }
   }, [imgWidth, imgHeight, imgNode, isResize]);
 
-  const handleImgUpload = async (e: React.ChangeEventHandler<HTMLInputElement> | any) => {
-    try {
-      const file = e.target.files[0];
-      const image = await resizeFile(file);
-      setImgUploadUrl(typeof image === 'string' ? image : '');
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
+  // 이미지 업로드시 file로 변환 TODO: 이걸로 formData 만들어서 서버에 보내기
   useEffect(() => {
-    const g = dataURLtoFile(imgUploadUrl, 'img');
-    console.log(g);
+    const file = dataURLtoFile(imgUploadUrl, 'img');
+    console.log(file);
   }, [imgUploadUrl]);
 
   return (
@@ -335,23 +351,11 @@ const Tool = () => {
           <input type="file" accept="image/*" onChange={handleImgUpload} />
         )}
       </ImageWrapper>
-      <button
-        onClick={() => {
-          setIsResize(true);
-          setImgWidth(100);
-        }}
-      >
-        클릭하면 너비가 100으로
-      </button>
-      <button
-        onClick={() => {
-          setImgHeight(100);
-        }}
-      >
-        클릭하면 높이가가 100으로
-      </button>
 
       <VersatileWrapper>
+        <ImageToolWrapper>
+          <ImageResize onClick={handleImgResizing}>이미지 리사이징</ImageResize>
+        </ImageToolWrapper>
         <Versatile>
           <Factory>
             <FactoryTitle>색상</FactoryTitle>
