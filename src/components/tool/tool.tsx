@@ -272,6 +272,7 @@ const Tool = () => {
   // 이미지 업로드시 file로 변환 TODO: 이걸로 formData 만들어서 서버에 보내기
   useEffect(() => {
     const file = dataURLtoFile(imgUploadUrl, 'img');
+    console.log(file);
   }, [imgUploadUrl]);
 
   // 리사이즈시에도 동일하게 움직일 수 있도록 설정

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "NODE_ENV=production next build",
     "start": "next start",
     "prettier": "prettier --write --config ./.prettierrc './src/**/*.{ts,tsx,css,json}'",
     "lint:fix": "eslint --fix './src/**/*.{ts,tsx,css}'"
