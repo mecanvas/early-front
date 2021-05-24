@@ -40,6 +40,12 @@ interface FramePosition {
   top: string;
 }
 
+interface CanvasFramePositionList {
+  id: number;
+  left: number;
+  top: number;
+}
+
 const Tool = () => {
   const [paperSize] = useState<PaperSize[]>([
     {
@@ -80,6 +86,7 @@ const Tool = () => {
   const [imgHeight, setImgHeight] = useState(0);
   const [resizeNewImgSrc, setResizeNewImgSrc] = useState('');
   const [isResize, setIsResize] = useState(false);
+  const [canvasFramePositionList, setCanvasFramePositionList] = useState<CanvasFramePositionList[]>([]);
 
   const youSelectedFrameRef = useRef<HTMLDivElement>(null);
   const imgWrapperRef = useRef<HTMLDivElement>(null);
@@ -119,12 +126,22 @@ const Tool = () => {
       canvas.classList.add('cropped-img');
       canvas.width = frameWidth;
       canvas.height = frameHeight;
-      canvas.style.left = `${cursorX + scrollX - frameWidth / 2}px`;
-      canvas.style.top = `${cursorY + scrollY - frameHeight / 2 - 50}px`;
-      const cropX = cursorX - left;
-      const cropY = cursorY - top;
+      const canvasLeftPosition = cursorX + scrollX - frameWidth / 2;
+      const canvasTopPosition = cursorY + scrollY - frameHeight / 2 - 50;
+      canvas.style.left = `${canvasLeftPosition}px`;
+      canvas.style.top = `${canvasTopPosition}px`;
+      canvas.setAttribute('data-originleft', `${canvasLeftPosition - left}`);
+      canvas.setAttribute('data-origintop', `${canvasTopPosition - top}`);
+      canvas.id = Date.now().toString();
+      setCanvasFramePositionList([
+        ...canvasFramePositionList,
+        { left: canvasLeftPosition, top: canvasTopPosition, id: Date.now() },
+      ]);
 
       const ctx = canvas.getContext('2d');
+      (ctx as CanvasRenderingContext2D).imageSmoothingQuality = 'high';
+      const cropX = cursorX - left;
+      const cropY = cursorY - top;
       const img = new Image();
       // 사이즈를 바꿨으면 resizeNewImg 아니면 업로드 이미지
       img.src = resizeNewImgSrc || imgUploadUrl;
@@ -143,7 +160,17 @@ const Tool = () => {
         imgWrapperRef?.current?.prepend(canvas);
       };
     }
-  }, [selectedFrameInfo, framePrice, cursorX, scrollX, cursorY, scrollY, resizeNewImgSrc, imgUploadUrl]);
+  }, [
+    selectedFrameInfo,
+    framePrice,
+    cursorX,
+    scrollX,
+    cursorY,
+    scrollY,
+    resizeNewImgSrc,
+    imgUploadUrl,
+    canvasFramePositionList,
+  ]);
 
   //   따라다니는 액자를 재클릭하면 insert하고 사라짐.
   const handleFrameRelease = useCallback(() => {
@@ -184,10 +211,12 @@ const Tool = () => {
           return console.log('존재하는 액자가 없습니다.');
         }
       }
+      const imgBoxId = +(imgBox.childNodes[0] as any).id;
       imgBox?.removeChild(imgBox.childNodes[0]);
       setFramePrice(framePrice.slice(1));
+      setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== imgBoxId));
     }
-  }, [framePrice, isPreview]);
+  }, [framePrice, isPreview, canvasFramePositionList]);
 
   const handleImgUpload = async (e: React.ChangeEventHandler<HTMLInputElement> | any) => {
     try {
@@ -242,8 +271,33 @@ const Tool = () => {
   // 이미지 업로드시 file로 변환 TODO: 이걸로 formData 만들어서 서버에 보내기
   useEffect(() => {
     const file = dataURLtoFile(imgUploadUrl, 'img');
-    console.log(file);
   }, [imgUploadUrl]);
+
+  // 리사이즈시에도 동일하게 움직일 수 있도록 설정
+  const handleFramePositionReletive = useCallback(() => {
+    if (imgNode.current) {
+      const { left: imgLeft, top: imgTop } = imgNode.current.getBoundingClientRect();
+      const cropImg = document.querySelectorAll('.cropped-img');
+      cropImg.forEach((node) => {
+        if (!node) return;
+        const { originleft, origintop } = (node as HTMLCanvasElement).dataset;
+        if (originleft && origintop) {
+          const left = `${+originleft + imgLeft}px`;
+          const top = `${+origintop + imgTop}px`;
+          node.setAttribute('style', `left: ${left}; top: ${top};`);
+        }
+      });
+    }
+  }, [imgNode]);
+
+  useEffect(() => {
+    if (window) {
+      window.addEventListener('resize', handleFramePositionReletive);
+    }
+    return () => {
+      window.removeEventListener('resize', handleFramePositionReletive);
+    };
+  }, [handleFramePositionReletive]);
 
   return (
     <>
