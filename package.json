@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "NODE_ENV=production next build",
     "start": "next start",
     "postbuild": "next-on-netlify",
     "prettier": "prettier --write --config ./.prettierrc './src/**/*.{ts,tsx,css,json}'",
