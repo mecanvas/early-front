@@ -197,8 +197,9 @@ const Tool = () => {
   }, []);
 
   const handleImgPreview = useCallback(() => {
+    if (!imgUploadUrl) return;
     setIsPreview((prev) => !prev);
-  }, []);
+  }, [imgUploadUrl]);
 
   const handleImgGoBack = useCallback(() => {
     if (imgWrapperRef.current) {
