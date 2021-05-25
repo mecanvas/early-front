@@ -30,6 +30,7 @@ export const ImageWrapper = styled.div`
   justify-content: center;
   align-items: center;
   position: relative;
+  height: calc(100vh - 50px);
 
   .cropped-img {
     position: absolute;

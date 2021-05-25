@@ -232,15 +232,20 @@ const Tool = () => {
     }
   }, [framePrice, isPreview, canvasFramePositionList]);
 
-  const handleImgUpload = async (e: React.ChangeEventHandler<HTMLInputElement> | any) => {
-    try {
-      const file = e.target.files[0];
-      const image = await resizeFile(file);
-      setImgUploadUrl(typeof image === 'string' ? image : '');
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const handleImgUpload = useCallback(
+    async (e: React.ChangeEventHandler<HTMLInputElement> | any) => {
+      try {
+        if (imgWrapperRef.current) {
+          const file = e.target.files[0];
+          const image = await resizeFile(file, imgWrapperRef.current?.getBoundingClientRect().height);
+          setImgUploadUrl(typeof image === 'string' ? image : '');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [imgWrapperRef],
+  );
 
   // 액자 클릭시 움직이는 로직
   useEffect(() => {
