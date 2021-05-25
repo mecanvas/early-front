@@ -153,6 +153,19 @@ const Tool = () => {
       const cropX = cursorX - left;
       const cropY = cursorY - top;
 
+      const sampleImg = document.createElement('img');
+      sampleImg.setAttribute(
+        'style',
+        `
+        position: absolute; left: ${canvasLeftPosition}px; top: ${canvasTopPosition}px;
+        background-image : url(${imgUploadUrl}); background-size: ${imgWidth}px ${imgHeight}px; 
+  background-position-x: -${canvasLeftPosition - left}px; background-position-y: -${canvasTopPosition - top + 50}px;
+        width: ${frameWidth}px; height: ${frameHeight}px;
+      `,
+      );
+
+      imgWrapperRef.current?.prepend(sampleImg);
+
       ctx?.drawImage(
         resizeNewImgSrc,
         cropX - frameWidth / 2,
@@ -247,7 +260,7 @@ const Tool = () => {
           fd.append('image', file);
 
           await axios
-            .post('/post/img', fd, { baseURL: 'http://localhost:4000' })
+            .post('/post/img', fd, { baseURL: 'https://api.kormelon.com' })
             .then((res) => setImgUploadUrl(res.data || ''));
         }
       } catch (err) {
