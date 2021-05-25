@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useGetCursorPosition, useGetScollPosition } from 'src/hooks';
 import { dataURLtoFile } from '../../util/dataURLtoFile';
 import { resizeFile } from '../../util/resizeFile';
@@ -47,32 +47,35 @@ interface CanvasFramePositionList {
 }
 
 const Tool = () => {
-  const [paperSize] = useState<PaperSize[]>([
-    {
-      name: 'A4',
-      size: {
-        width: '210px',
-        height: '297px',
+  const paperSize = useMemo<PaperSize[]>(
+    () => [
+      {
+        name: 'A4',
+        size: {
+          width: '210px',
+          height: '297px',
+        },
+        price: 55000,
       },
-      price: 55000,
-    },
-    {
-      name: 'A5',
-      size: {
-        width: '148px',
-        height: '210px',
+      {
+        name: 'A5',
+        size: {
+          width: '148px',
+          height: '210px',
+        },
+        price: 40000,
       },
-      price: 40000,
-    },
-    {
-      name: 'A6',
-      size: {
-        width: '105px',
-        height: '148px',
+      {
+        name: 'A6',
+        size: {
+          width: '105px',
+          height: '148px',
+        },
+        price: 30000,
       },
-      price: 30000,
-    },
-  ]);
+    ],
+    [],
+  );
 
   const [selectedFrame, setSelectedFrame] = useState(false); // 골랐는지 상태 여부
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<PaperSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
@@ -85,7 +88,8 @@ const Tool = () => {
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
   const [resizeNewImgSrc, setResizeNewImgSrc] = useState('');
-  const [isResize, setIsResize] = useState(false);
+  const [imgResizeStart, setImgResizeStart] = useState(false);
+  const [imgResizeEnd, setImgResizeEnd] = useState(false);
   const [canvasFramePositionList, setCanvasFramePositionList] = useState<CanvasFramePositionList[]>([]);
 
   const youSelectedFrameRef = useRef<HTMLDivElement>(null);
@@ -106,7 +110,7 @@ const Tool = () => {
       canvas.height = imgHeight;
       const ctx = canvas.getContext('2d');
       ctx?.drawImage(img, 0, 0, imgWidth, imgHeight);
-      (() => setResizeNewImgSrc(canvas.toDataURL('image/png', 1.0)))();
+      (() => setResizeNewImgSrc(canvas.toDataURL('image/jpeg', 1.0)))();
     };
   }, [imgHeight, imgUploadUrl, imgWidth]);
 
@@ -126,10 +130,11 @@ const Tool = () => {
       canvas.classList.add('cropped-img');
       canvas.width = frameWidth;
       canvas.height = frameHeight;
-      const canvasLeftPosition = cursorX + scrollX - frameWidth / 2;
-      const canvasTopPosition = cursorY + scrollY - frameHeight / 2 - 50;
+      const canvasLeftPosition = cursorX + scrollX - frameWidth / 2 - 1;
+      const canvasTopPosition = cursorY + scrollY - frameHeight / 2 - 50 - 1;
       canvas.style.left = `${canvasLeftPosition}px`;
       canvas.style.top = `${canvasTopPosition}px`;
+
       canvas.setAttribute('data-originleft', `${canvasLeftPosition - left}`);
       canvas.setAttribute('data-origintop', `${canvasTopPosition - top}`);
       canvas.id = Date.now().toString();
@@ -140,6 +145,8 @@ const Tool = () => {
 
       const ctx = canvas.getContext('2d');
       (ctx as CanvasRenderingContext2D).imageSmoothingQuality = 'high';
+      (ctx as CanvasRenderingContext2D).imageSmoothingEnabled = false;
+
       const cropX = cursorX - left;
       const cropY = cursorY - top;
       const img = new Image();
@@ -193,7 +200,13 @@ const Tool = () => {
   );
 
   const handleImgResizing = useCallback(() => {
-    setIsResize((prev) => !prev);
+    setImgResizeStart(true);
+    setImgResizeEnd(false);
+  }, []);
+
+  const handleImgResizeEnd = useCallback(() => {
+    setImgResizeEnd(true);
+    setImgResizeStart(false);
   }, []);
 
   const handleImgPreview = useCallback(() => {
@@ -254,20 +267,19 @@ const Tool = () => {
   }, [imgNode, imgUploadUrl, imgWidth, imgHeight]);
 
   // 리사이즈를 하겠다는 표시가 뜨면 함수 실행 (canvas -> data:base64로 변경하기 위해서임)
-  useEffect(() => {
-    if (isResize) {
-      resizeImageSrc();
-    }
-  }, [isResize, resizeImageSrc]);
 
   useEffect(() => {
-    if (isResize && imgNode.current) {
-      imgNode.current.width = 100;
-      imgNode.current.height = 100;
-      setImgWidth(100);
-      setImgHeight(100);
+    if (imgResizeStart) {
+      console.log('이미지 자르기 시작');
     }
-  }, [imgWidth, imgHeight, imgNode, isResize]);
+  }, [imgResizeStart]);
+
+  useEffect(() => {
+    if (imgResizeEnd) {
+      console.log('이미지 자르기 끝');
+      resizeImageSrc();
+    }
+  }, [imgResizeEnd, resizeImageSrc]);
 
   // 이미지 업로드시 file로 변환 TODO: 이걸로 formData 만들어서 서버에 보내기
   useEffect(() => {
@@ -324,6 +336,7 @@ const Tool = () => {
         <VersatileWrapper>
           <ImageToolWrapper>
             <ImageToolBtn onClick={handleImgResizing}>이미지 리사이징</ImageToolBtn>
+            {imgResizeStart && <ImageToolBtn onClick={handleImgResizeEnd}>리사이징끝</ImageToolBtn>}
             <ImageToolBtn onClick={handleImgPreview}>미리보기</ImageToolBtn>
           </ImageToolWrapper>
           <Versatile>
