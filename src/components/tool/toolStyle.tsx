@@ -31,7 +31,9 @@ export const ImageWrapper = styled.div`
   align-items: center;
   position: relative;
   height: calc(100vh - 50px);
-
+  img {
+    max-height: calc(100vh - 50px);
+  }
   .cropped-img {
     position: absolute;
     border: 1px inset #333;
