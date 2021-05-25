@@ -337,11 +337,14 @@ const Tool = () => {
         )}
         <ImageWrapper id="img-box" ref={imgWrapperRef}>
           {imgUploadUrl ? (
-            isPreview || (
-              <>
-                <img ref={imgNode} src={imgUploadUrl} alt="샘플이미지" />
-              </>
-            )
+            <>
+              <img
+                ref={imgNode}
+                style={{ visibility: `${isPreview ? 'hidden' : 'visible'}` }}
+                src={imgUploadUrl}
+                alt="샘플이미지"
+              />
+            </>
           ) : (
             <input type="file" accept="image/*" onChange={handleImgUpload} />
           )}
