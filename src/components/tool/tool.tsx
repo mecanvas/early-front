@@ -88,7 +88,6 @@ const Tool = () => {
   const [imgUploadUrl, setImgUploadUrl] = useState('');
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
-  const [resizeNewImgSrc, setResizeNewImgSrc] = useState<HTMLCanvasElement>();
   const [imgResizeStart, setImgResizeStart] = useState(false);
   const [imgResizeEnd, setImgResizeEnd] = useState(false);
   const [canvasFramePositionList, setCanvasFramePositionList] = useState<CanvasFramePositionList[]>([]);
@@ -99,27 +98,9 @@ const Tool = () => {
 
   const [isPreview, setIsPreview] = useState(false);
 
-  // canvas로 이미지의 너비,높이를 바꿔야 이미지의 크기가 바뀐다. (액자로 자를 시 natural size를 사용하기 때문)
-  const resizeImageSrc = useCallback(() => {
-    if (imgWidth && imgHeight) {
-      const img = new Image(imgWidth, imgHeight);
-      img.src = imgUploadUrl;
-      const canvas = document.createElement('canvas');
-      img.onload = () => {
-        canvas.width = imgWidth;
-        canvas.height = imgHeight;
-        const ctx = canvas.getContext('2d');
-        (ctx as CanvasRenderingContext2D).imageSmoothingQuality = 'high';
-        ctx?.drawImage(img, 0, 0, imgWidth, imgHeight);
-        setResizeNewImgSrc(canvas);
-      };
-    }
-  }, [imgUploadUrl, imgWidth, imgHeight]);
-
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
   const insertFrameToCanvas = useCallback(async () => {
-    console.log(resizeNewImgSrc, imgNode, selectedFrameInfo);
-    if (youSelectedFrameRef.current && imgNode.current && selectedFrameInfo && resizeNewImgSrc) {
+    if (youSelectedFrameRef.current && imgNode.current && selectedFrameInfo) {
       //  액자의 가격을 price에 넣기
       const { name, price } = selectedFrameInfo;
       setFramePrice([{ name, price }, ...framePrice]);
@@ -129,15 +110,14 @@ const Tool = () => {
       const { left, top } = imgNode.current.getBoundingClientRect();
 
       // 크롭된 이미지를 담을 액자 생성
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement('div');
       canvas.classList.add('cropped-img');
-      canvas.width = frameWidth;
-      canvas.height = frameHeight;
-      const canvasLeftPosition = cursorX + scrollX - frameWidth / 2 - 1;
-      const canvasTopPosition = cursorY + scrollY - frameHeight / 2 - 50 - 1;
+      canvas.style.width = `${frameWidth}px`;
+      canvas.style.height = `${frameHeight}px`;
+      const canvasLeftPosition = cursorX + scrollX - frameWidth / 2;
+      const canvasTopPosition = cursorY + scrollY - frameHeight / 2 - 50;
       canvas.style.left = `${canvasLeftPosition}px`;
       canvas.style.top = `${canvasTopPosition}px`;
-
       canvas.setAttribute('data-originleft', `${canvasLeftPosition - left}`);
       canvas.setAttribute('data-origintop', `${canvasTopPosition - top}`);
       canvas.id = Date.now().toString();
@@ -146,42 +126,23 @@ const Tool = () => {
         { left: canvasLeftPosition, top: canvasTopPosition, id: Date.now() },
       ]);
 
-      const ctx = canvas.getContext('2d');
-      (ctx as CanvasRenderingContext2D).imageSmoothingQuality = 'high';
-      (ctx as CanvasRenderingContext2D).imageSmoothingEnabled = false;
-
-      const cropX = cursorX - left;
-      const cropY = cursorY - top;
-
       const sampleImg = document.createElement('img');
       sampleImg.setAttribute(
         'style',
         `
-        position: absolute; left: ${canvasLeftPosition}px; top: ${canvasTopPosition}px;
-        background-image : url(${imgUploadUrl}); background-size: ${imgWidth}px ${imgHeight}px; 
-  background-position-x: -${canvasLeftPosition - left}px; background-position-y: -${canvasTopPosition - top + 50}px;
-        width: ${frameWidth}px; height: ${frameHeight}px;
+        background-image : url(${imgUploadUrl});
+        background-repeat : no-repeat;
+        background-size: ${imgWidth}px ${imgHeight}px; 
+        background-position-x: ${-canvasLeftPosition + left - 1}px;
+        background-position-y: ${-canvasTopPosition + top - 50 - 1}px;
+        width: ${100}%;
+        height: ${100}%;
       `,
       );
-
-      imgWrapperRef.current?.prepend(sampleImg);
-
-      ctx?.drawImage(
-        resizeNewImgSrc,
-        cropX - frameWidth / 2,
-        cropY - frameHeight / 2,
-        frameWidth,
-        frameHeight,
-        0,
-        0,
-        frameWidth,
-        frameHeight,
-      );
-
-      imgWrapperRef?.current?.prepend(canvas);
+      canvas.append(sampleImg);
+      imgWrapperRef.current?.prepend(canvas);
     }
   }, [
-    resizeNewImgSrc,
     selectedFrameInfo,
     framePrice,
     cursorX,
@@ -189,7 +150,9 @@ const Tool = () => {
     cursorY,
     scrollY,
     canvasFramePositionList,
-    imgWrapperRef,
+    imgUploadUrl,
+    imgWidth,
+    imgHeight,
   ]);
 
   //   따라다니는 액자를 재클릭하면 insert하고 사라짐.
@@ -260,7 +223,7 @@ const Tool = () => {
           fd.append('image', file);
 
           await axios
-            .post('/post/img', fd, { baseURL: 'https://api.kormelon.com' })
+            .post('/post/img', fd, { baseURL: 'http://localhost:4000' })
             .then((res) => setImgUploadUrl(res.data || ''));
         }
       } catch (err) {
@@ -270,8 +233,6 @@ const Tool = () => {
     [imgWrapperRef],
   );
 
-  // 리사이즈를 하겠다는 표시가 뜨면 함수 실행 (canvas -> data:base64로 변경하기 위해서임)
-
   // 리사이즈시에도 동일하게 움직일 수 있도록 설정
   const handleFramePositionReletive = useCallback(() => {
     if (imgNode.current) {
@@ -279,11 +240,12 @@ const Tool = () => {
       const cropImg = document.querySelectorAll('.cropped-img');
       cropImg.forEach((node) => {
         if (!node) return;
-        const { originleft, origintop } = (node as HTMLCanvasElement).dataset;
+        const { originleft, origintop } = (node as HTMLDivElement).dataset;
         if (originleft && origintop) {
           const left = `${+originleft + imgLeft}px`;
           const top = `${+origintop + imgTop}px`;
-          node.setAttribute('style', `left: ${left}; top: ${top};`);
+          (node as HTMLDivElement).style.left = left;
+          (node as HTMLDivElement).style.top = top;
         }
       });
     }
@@ -311,13 +273,7 @@ const Tool = () => {
     if (imgResizeEnd) {
       console.log('이미지 자르기 끝');
     }
-  }, [imgResizeEnd, resizeImageSrc]);
-
-  useEffect(() => {
-    if (imgUploadUrl && imgWidth && imgHeight) {
-      resizeImageSrc();
-    }
-  }, [resizeImageSrc, imgWidth, imgHeight, imgUploadUrl]);
+  }, [imgResizeEnd]);
 
   useEffect(() => {
     if (!imgUploadUrl) return;
