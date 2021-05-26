@@ -141,10 +141,10 @@ const Tool = () => {
     div.classList.add('cropped-img');
     div.style.width = `${frameWidth}px`;
     div.style.height = `${frameHeight}px`;
-    const canvasLeftPosition = cursorX + scrollX - frameWidth / 2;
-    const canvasTopPosition = cursorY + scrollY - frameHeight / 2 - 50;
-    div.style.left = `${canvasLeftPosition}px`;
-    div.style.top = `${canvasTopPosition}px`;
+    const canvasLeftPosition = cursorX - frameWidth / 2;
+    const canvasTopPosition = cursorY - frameHeight / 2 - 50;
+    div.style.left = `${canvasLeftPosition + scrollX}px`;
+    div.style.top = `${canvasTopPosition + scrollY}px`;
     div.setAttribute('data-originleft', `${canvasLeftPosition - left}`);
     div.setAttribute('data-origintop', `${canvasTopPosition - top}`);
     div.id = Date.now().toString();
@@ -201,6 +201,10 @@ const Tool = () => {
       const el = imgNode.current;
       if (el) {
         const { width, height } = el.getBoundingClientRect();
+        el.style.width = `${width}px`;
+        el.style.height = `${height}px`;
+        el.style.maxHeight = `${height}px`;
+
         setImgWidth(width);
         setImgHeight(height);
       }
@@ -272,14 +276,14 @@ const Tool = () => {
         if (!node) return;
         const { originleft, origintop } = (node as HTMLDivElement).dataset;
         if (originleft && origintop) {
-          const left = `${+originleft + imgLeft}px`;
-          const top = `${+origintop + imgTop}px`;
+          const left = `${+originleft + imgLeft + scrollX}px`;
+          const top = `${+origintop + imgTop + scrollY}px`;
           (node as HTMLDivElement).style.left = left;
           (node as HTMLDivElement).style.top = top;
         }
       });
     }
-  }, [imgNode]);
+  }, [scrollX, scrollY]);
 
   // 액자 클릭시 움직이는 로직
   useEffect(() => {
@@ -292,8 +296,6 @@ const Tool = () => {
       setSelectedFramePosition({ left: `${x}px`, top: `${y}px` });
     }
   }, [selectedFrame, selectedFrameInfo, cursorX, cursorY, scrollX, scrollY]);
-
-  console.log(selectedFrameList);
 
   useEffect(() => {
     if (imgResizeStart) {
