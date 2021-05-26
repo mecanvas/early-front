@@ -25,13 +25,12 @@ export const YouSelectedFrame = styled.div<{ width: string; height: string; left
 `;
 
 export const ImageWrapper = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
   position: relative;
   height: calc(100vh - 50px);
-  img {
+  & > img {
     max-height: calc(100vh - 50px);
   }
   .cropped-img {
