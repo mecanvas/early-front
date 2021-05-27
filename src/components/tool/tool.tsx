@@ -150,7 +150,6 @@ const Tool = () => {
       setFramePrice(framePrice.slice(1));
       setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== imgBoxId));
       setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== imgBoxId));
-      console.log(selectedFrameList, imgBoxId);
     }
   }, [framePrice, canvasFramePositionList, selectedFrameList, isPreview]);
 
