@@ -428,6 +428,12 @@ const Tool = () => {
     }
   }, [imgResizeEnd]);
 
+  useEffect(() => {
+    if (imgNode.current) {
+      imgNode.current.style.visibility = isPreview ? 'hidden' : 'visible';
+    }
+  }, [isPreview]);
+
   // 자른 캔버스 저장을 위한 로직
   useEffect(() => {
     if (resizeImgCanvas) return;
@@ -470,12 +476,7 @@ const Tool = () => {
         <ImageWrapper id="img-box" ref={imgWrapperRef}>
           {imgUploadUrl ? (
             <>
-              <img
-                ref={imgNode}
-                style={{ visibility: `${isPreview ? 'hidden' : 'visible'}` }}
-                src={imgUploadUrl}
-                alt="캔버스로 만들 이미지"
-              />
+              <img ref={imgNode} src={imgUploadUrl} alt="캔버스로 만들 이미지" />
             </>
           ) : (
             <input type="file" accept="image/*" onChange={handleImgUpload} />
