@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useGetCursorPosition, useGetScollPosition } from 'src/hooks';
 import axios from 'axios';
 import ToolColorPalette from './ToolColorPalette';
-
 import {
   ImageGoBack,
   ToolContainer,
