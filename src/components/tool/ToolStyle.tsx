@@ -112,8 +112,8 @@ export const ColorPaletteWrapper = styled.div`
   display: flex;
   margin-bottom: 12px;
   .circle-picker {
-    & > div {
-      border: 1px solid #333;
+    & > span > div {
+      border: 1px solid #dbdbdb;
       border-radius: 50%;
     }
   }
