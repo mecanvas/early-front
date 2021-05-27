@@ -19,7 +19,7 @@ export const YouSelectedFrame = styled.div<{ width: string; height: string; left
   height: ${({ height }) => height};
   top: ${({ top }) => top};
   left: ${({ left }) => left};
-  border: 1px solid #333;
+  border: 1px solid red;
   position: absolute;
   cursor: pointer;
   z-index: 2;
@@ -36,7 +36,6 @@ export const ImageWrapper = styled.div`
   }
   .cropped-img {
     position: absolute;
-    border: 1px inset #333;
     &:hover .cropped-img-delete {
       display: block;
     }

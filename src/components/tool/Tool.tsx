@@ -217,10 +217,11 @@ const Tool = () => {
         background-image : url(${imgUploadUrl});
         background-repeat : no-repeat;
         background-size: ${imgWidth}px ${imgHeight}px; 
-        background-position-x: ${-canvasLeftPosition + left - 1}px;
-        background-position-y: ${-canvasTopPosition + top - 50 - 1}px;
+        background-position-x: ${-canvasLeftPosition + left}px;
+        background-position-y: ${-canvasTopPosition + top - 50}px;
         width: ${100}%;
         height: ${100}%;
+        box-shadow : 0 0 7px #333 inset, 0 0 6px #ededed;
         `,
       );
 
