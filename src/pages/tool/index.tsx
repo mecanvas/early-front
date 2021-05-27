@@ -1,3 +1,3 @@
-import Tool from '../../components/tool/tool';
+import Tool from '../../components/tool/Tool';
 
 export default Tool;
