@@ -90,6 +90,12 @@ const Tool = () => {
   const [imgUploadUrl, setImgUploadUrl] = useState('');
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
+
+  const [originWidth, setOriginWidth] = useState(0);
+  const [originHeight, setOriginHeight] = useState(0);
+  const [resizeWidth, setResizeWidth] = useState(0);
+  const [resizeHeight, setResizeHeight] = useState(0);
+  const [ratioPersist, setRatioPersist] = useState(false);
   const [imgResizeStart, setImgResizeStart] = useState(false);
   const [imgResizeEnd, setImgResizeEnd] = useState(false);
   const [canvasFramePositionList, setCanvasFramePositionList] = useState<CanvasFramePositionList[]>([]);
@@ -112,7 +118,6 @@ const Tool = () => {
     oCanvas.height = frameHeight;
     const oCtx = oCanvas.getContext('2d');
     (oCtx as CanvasRenderingContext2D).imageSmoothingQuality = 'high';
-    console.log(resizeImgCanvas);
     const cropX = cursorX - left;
     const cropY = cursorY - top;
     if (resizeImgCanvas) {
@@ -215,6 +220,48 @@ const Tool = () => {
     [paperSize],
   );
 
+  // 사이즈 변경입력을 확인
+  const handleConfirmChange = useCallback(() => {
+    if (imgNode.current) {
+      const el = imgNode.current;
+      el.style.width = `${resizeWidth}px`;
+      el.style.height = `${resizeHeight}px`;
+      el.style.maxHeight = `${resizeHeight}px`;
+    }
+  }, [resizeHeight, resizeWidth]);
+
+  const handleResizeReset = useCallback(() => {
+    setResizeWidth(originWidth);
+    setResizeHeight(originHeight);
+  }, [originWidth, originHeight]);
+
+  const handleRatioPersist = useCallback(() => {
+    setRatioPersist((prev) => !prev);
+  }, []);
+
+  // 이미지 사이즈를 변경 입력
+  const handleChangeImgSize = useCallback(
+    (e) => {
+      const { name, value } = e.target;
+
+      if (name === 'width') {
+        setResizeWidth(+value);
+
+        if (ratioPersist) {
+          const ratioHeight = (+value * originHeight) / originWidth;
+          setResizeHeight(+ratioHeight.toFixed(1));
+        }
+      }
+      if (name === 'height') {
+        setResizeHeight(+value);
+        if (ratioPersist) {
+          setResizeWidth((+value * originWidth) / originHeight);
+        }
+      }
+    },
+    [originHeight, originWidth, ratioPersist],
+  );
+
   const handleImgResizing = useCallback(() => {
     setImgResizeStart(true);
     setImgResizeEnd(false);
@@ -297,18 +344,27 @@ const Tool = () => {
     }
   }, [selectedFrame, selectedFrameInfo, cursorX, cursorY, scrollX, scrollY]);
 
+  // 자르기 시작할때 원래 이미지 사이즈 저장
   useEffect(() => {
     if (imgResizeStart) {
-      console.log('이미지 자르기 시작');
+      if (imgNode.current) {
+        const { width, height } = imgNode.current?.getBoundingClientRect();
+        setOriginWidth(width);
+        setOriginHeight(height);
+        setResizeWidth(width);
+        setResizeHeight(height);
+      }
     }
   }, [imgResizeStart]);
 
+  // 자르기 끝
   useEffect(() => {
     if (imgResizeEnd) {
       console.log('이미지 자르기 끝');
     }
   }, [imgResizeEnd]);
 
+  // 자른 캔버스 저장을 위한 로직
   useEffect(() => {
     if (resizeImgCanvas) return;
     if (imgHeight && imgWidth && imgUploadUrl) {
@@ -365,6 +421,27 @@ const Tool = () => {
           <ImageToolWrapper>
             <ImageToolBtn onClick={handleImgResizing}>이미지 리사이징</ImageToolBtn>
             {imgResizeStart && <ImageToolBtn onClick={handleImgResizeEnd}>리사이징끝</ImageToolBtn>}
+            {imgResizeStart && (
+              <div>
+                <div>입력하세요</div>
+                <form onChange={handleChangeImgSize}>
+                  <input type="text" name="width" value={resizeWidth} placeholder="너비" />
+                  <input type="text" name="height" value={resizeHeight} placeholder="높이" />
+                </form>
+                <div>
+                  <input type="checkbox" onChange={handleRatioPersist} />
+                  <span>너비에 비율을 맞춥니다.</span>
+                </div>
+                <div>
+                  <button type="button" onClick={handleResizeReset}>
+                    원래대로
+                  </button>
+                </div>
+                <button type="button" onClick={handleConfirmChange}>
+                  확인
+                </button>
+              </div>
+            )}
             <ImageToolBtn onClick={handleImgPreview}>미리보기</ImageToolBtn>
           </ImageToolWrapper>
           <Versatile>
