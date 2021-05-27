@@ -14,12 +14,18 @@ export const ImageGoBack = styled.button`
   z-index: 4;
 `;
 
-export const YouSelectedFrame = styled.div<{ width: string; height: string; left: string; top: string }>`
+export const YouSelectedFrame = styled.div<{
+  width: string;
+  height: string;
+  left: string;
+  top: string;
+  border: string;
+}>`
   width: ${({ width }) => width};
   height: ${({ height }) => height};
   top: ${({ top }) => top};
   left: ${({ left }) => left};
-  border: 1px solid red;
+  border: 1px solid ${({ border }) => border};
   position: absolute;
   cursor: pointer;
   z-index: 2;

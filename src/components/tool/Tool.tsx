@@ -108,7 +108,9 @@ const Tool = () => {
 
   const [isPreview, setIsPreview] = useState(false);
 
+  // 바뀌는 색상
   const [bgColor, setBgColor] = useState('#ffffff');
+  const [frameBorderColor, setFrameBorderColor] = useState('#333');
 
   const handleDeleteCanvas = useCallback(
     (e) => {
@@ -389,6 +391,11 @@ const Tool = () => {
     setBgColor(hex);
   }, []);
 
+  const handleFrameColorChange = useCallback((color: ColorResult) => {
+    const { hex } = color;
+    setFrameBorderColor(hex);
+  }, []);
+
   // 액자 클릭시 움직이는 로직
   useEffect(() => {
     if (selectedFrame && selectedFrameInfo) {
@@ -453,6 +460,7 @@ const Tool = () => {
       <ToolContainer bgColor={bgColor}>
         {selectedFrame && selectedFrameInfo && selectedFramePosition && (
           <YouSelectedFrame
+            border={frameBorderColor}
             ref={youSelectedFrameRef}
             onClick={handleFrameRelease}
             {...selectedFrameInfo.size}
@@ -504,9 +512,11 @@ const Tool = () => {
           <Versatile>
             <Factory>
               <FactoryTitle>색상</FactoryTitle>
-              <ToolColorPalette handleColorChange={handleColorChange} />
+              <ToolColorPalette type="bg" onChange={handleColorChange} />
 
               <FactoryTitle>액자크기</FactoryTitle>
+              <small>액자의 테두리 색상을 변경하세요.</small>
+              <ToolColorPalette type="frame" onChange={handleFrameColorChange} />
               <FrameWrapper>
                 {paperSize.map((paper, index) => (
                   <FrameSize key={index} data-value={paper.name} {...paper.size} onClick={handleFrameSelect}>
