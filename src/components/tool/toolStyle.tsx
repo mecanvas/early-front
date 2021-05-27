@@ -1,9 +1,10 @@
 import styled from '@emotion/styled';
 
-export const ToolContainer = styled.div`
+export const ToolContainer = styled.div<{ bgColor: string }>`
   width: 100%;
   margin: 0 auto;
   display: flex;
+  background-color: ${({ bgColor }) => bgColor};
 `;
 
 export const ImageGoBack = styled.button`

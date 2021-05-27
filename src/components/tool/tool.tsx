@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useGetCursorPosition, useGetScollPosition } from 'src/hooks';
 import axios from 'axios';
+import ToolColorPalette from './ToolColorPalette';
 
 import {
   ImageGoBack,
@@ -13,13 +14,11 @@ import {
   Versatile,
   Factory,
   FactoryTitle,
-  ColorPaletteWrapper,
-  ColorPalette,
   FrameWrapper,
   FrameSize,
   FrameSizeName,
   BillInfomation,
-} from './toolStyle';
+} from './ToolStyle';
 import { canvasToImage } from 'src/util/canvasToImage';
 import { resizeImgForCanvas } from 'src/util/resizeImgForCanvas';
 
@@ -442,7 +441,7 @@ const Tool = () => {
   return (
     <>
       <ImageGoBack onClick={handleImgGoBack}>뒤로 가기</ImageGoBack>
-      <ToolContainer>
+      <ToolContainer bgColor={'gray'}>
         {selectedFrame && selectedFrameInfo && selectedFramePosition && (
           <YouSelectedFrame
             ref={youSelectedFrameRef}
@@ -496,12 +495,7 @@ const Tool = () => {
           <Versatile>
             <Factory>
               <FactoryTitle>색상</FactoryTitle>
-              <ColorPaletteWrapper>
-                <ColorPalette />
-                <ColorPalette color="blue" />
-                <ColorPalette color="green" />
-                <ColorPalette color="yellow" />
-              </ColorPaletteWrapper>
+              <ToolColorPalette />
 
               <FactoryTitle>액자크기</FactoryTitle>
               <FrameWrapper>
