@@ -246,10 +246,9 @@ const Tool = () => {
 
       if (name === 'width') {
         setResizeWidth(+value);
-
         if (ratioPersist) {
           const ratioHeight = (+value * originHeight) / originWidth;
-          setResizeHeight(+ratioHeight.toFixed(1));
+          setResizeHeight(ratioHeight);
         }
       }
       if (name === 'height') {
@@ -409,7 +408,7 @@ const Tool = () => {
                 ref={imgNode}
                 style={{ visibility: `${isPreview ? 'hidden' : 'visible'}` }}
                 src={imgUploadUrl}
-                alt="샘플이미지"
+                alt="캔버스로 만들 이미지"
               />
             </>
           ) : (
@@ -425,8 +424,8 @@ const Tool = () => {
               <div>
                 <div>입력하세요</div>
                 <form onChange={handleChangeImgSize}>
-                  <input type="text" name="width" value={resizeWidth} placeholder="너비" />
-                  <input type="text" name="height" value={resizeHeight} placeholder="높이" />
+                  <input type="text" name="width" value={resizeWidth.toFixed(1)} placeholder="너비" />
+                  <input type="text" name="height" value={resizeHeight.toFixed(1)} placeholder="높이" />
                 </form>
                 <div>
                   <input type="checkbox" onChange={handleRatioPersist} />
