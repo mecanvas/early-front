@@ -111,20 +111,12 @@ export const ImageToolBtn = styled.button`
 export const ColorPaletteWrapper = styled.div`
   display: flex;
   margin-bottom: 12px;
-
-  div + div {
-    margin-left: 8px;
-    cursor: pointer;
+  .circle-picker {
+    & > div {
+      border: 1px solid #333;
+      border-radius: 50%;
+    }
   }
-`;
-
-export const ColorPalette = styled.div<{ color?: string }>`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: ${({ color }) => {
-    return color || 'antiquewhite';
-  }};
 `;
 
 export const FrameWrapper = styled.div`

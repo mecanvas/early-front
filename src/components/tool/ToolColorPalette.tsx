@@ -1,13 +1,19 @@
 import React from 'react';
-import { ColorPalette, ColorPaletteWrapper } from './ToolStyle';
+import { ColorPaletteWrapper } from './ToolStyle';
+import { CirclePicker, ColorResult } from 'react-color';
 
-const ToolColorPalette = () => {
+interface Props {
+  handleColorChange: (color: ColorResult) => void;
+}
+
+const ToolColorPalette = ({ handleColorChange }: Props) => {
   return (
     <ColorPaletteWrapper>
-      <ColorPalette />
-      <ColorPalette color="blue" />
-      <ColorPalette color="green" />
-      <ColorPalette color="yellow" />
+      <CirclePicker
+        onChange={handleColorChange}
+        colors={['#ffffff', '#333', '#D9E3F0', '#F47373', '#697689']}
+        circleSpacing={7}
+      />
     </ColorPaletteWrapper>
   );
 };

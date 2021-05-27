@@ -21,6 +21,7 @@ import {
 } from './ToolStyle';
 import { canvasToImage } from 'src/util/canvasToImage';
 import { resizeImgForCanvas } from 'src/util/resizeImgForCanvas';
+import { ColorResult } from 'react-color';
 
 interface PaperSize {
   name: string;
@@ -107,6 +108,8 @@ const Tool = () => {
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
 
   const [isPreview, setIsPreview] = useState(false);
+
+  const [bgColor, setBgColor] = useState('#ffffff');
 
   const handleDeleteCanvas = useCallback(
     (e) => {
@@ -380,6 +383,12 @@ const Tool = () => {
     }
   }, [scrollX, scrollY]);
 
+  // 컬러 체이닞
+  const handleColorChange = useCallback((color: ColorResult) => {
+    const { hex } = color;
+    setBgColor(hex);
+  }, []);
+
   // 액자 클릭시 움직이는 로직
   useEffect(() => {
     if (selectedFrame && selectedFrameInfo) {
@@ -441,7 +450,7 @@ const Tool = () => {
   return (
     <>
       <ImageGoBack onClick={handleImgGoBack}>뒤로 가기</ImageGoBack>
-      <ToolContainer bgColor={'gray'}>
+      <ToolContainer bgColor={bgColor}>
         {selectedFrame && selectedFrameInfo && selectedFramePosition && (
           <YouSelectedFrame
             ref={youSelectedFrameRef}
@@ -495,7 +504,7 @@ const Tool = () => {
           <Versatile>
             <Factory>
               <FactoryTitle>색상</FactoryTitle>
-              <ToolColorPalette />
+              <ToolColorPalette handleColorChange={handleColorChange} />
 
               <FactoryTitle>액자크기</FactoryTitle>
               <FrameWrapper>
