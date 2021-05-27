@@ -36,6 +36,29 @@ export const ImageWrapper = styled.div`
   .cropped-img {
     position: absolute;
     border: 1px inset #333;
+    &:hover .cropped-img-delete {
+      display: block;
+    }
+  }
+  .cropped-img-delete {
+    display: none;
+    cursor: pointer;
+    &::before {
+      content: 'X';
+      font-size: 5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+    }
 
     &.position {
       left: 0 !important;

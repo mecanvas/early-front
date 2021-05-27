@@ -35,6 +35,7 @@ interface PaperSize {
 interface FramePrice {
   name: string;
   price: number;
+  id: number;
 }
 
 interface FramePosition {
@@ -108,6 +109,51 @@ const Tool = () => {
 
   const [isPreview, setIsPreview] = useState(false);
 
+  const handleDeleteCanvas = useCallback(
+    (e) => {
+      if (imgWrapperRef.current) {
+        const { current: imgBox } = imgWrapperRef;
+        if (imgBox.childNodes.length <= 1) {
+          if (!isPreview) {
+            return console.log('존재하는 액자가 없습니다.');
+          }
+          if (imgBox.childNodes.length === 0) {
+            return console.log('존재하는 액자가 없습니다.');
+          }
+        }
+        imgBox.childNodes.forEach((node) => {
+          if ((node as HTMLElement).id === e.target.id) {
+            imgBox.removeChild(node);
+          }
+        });
+        setFramePrice(framePrice.filter((lst) => lst.id !== +e.target.id));
+        setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== +e.target.id));
+        setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== +e.target.id));
+      }
+    },
+    [canvasFramePositionList, framePrice, isPreview, selectedFrameList],
+  );
+
+  const handleImgGoBack = useCallback(() => {
+    if (imgWrapperRef.current) {
+      const { current: imgBox } = imgWrapperRef;
+      if (imgBox.childNodes.length <= 1) {
+        if (!isPreview) {
+          return console.log('존재하는 액자가 없습니다.');
+        }
+        if (imgBox.childNodes.length === 0) {
+          return console.log('존재하는 액자가 없습니다.');
+        }
+      }
+      const imgBoxId = +(imgBox.childNodes[0] as any).id;
+      imgBox?.removeChild(imgBox.childNodes[0]);
+      setFramePrice(framePrice.slice(1));
+      setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== imgBoxId));
+      setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== imgBoxId));
+      console.log(selectedFrameList, imgBoxId);
+    }
+  }, [framePrice, canvasFramePositionList, selectedFrameList, isPreview]);
+
   // 이미지 저장을 위한 캔버스 생성 (스프라이트 기법으로 이미지 저장은 안되기 때문에 품질이 깨지더라도 이 방법 사용합니다.)
   const createCanvasForSave = useCallback(
     (id: number) => {
@@ -148,6 +194,10 @@ const Tool = () => {
 
       // 크롭된 이미지를 담을 캔버스 생성
       const div = document.createElement('div');
+      const deleteBtn = document.createElement('div');
+      deleteBtn.classList.add('cropped-img-delete');
+      deleteBtn.addEventListener('click', handleDeleteCanvas);
+      deleteBtn.id = id.toString();
       div.classList.add('cropped-img');
       div.style.width = `${frameWidth}px`;
       div.style.height = `${frameHeight}px`;
@@ -181,9 +231,20 @@ const Tool = () => {
       ]);
 
       div.append(cropImage);
+      div.append(deleteBtn);
       imgWrapperRef.current?.prepend(div);
     },
-    [canvasFramePositionList, cursorX, cursorY, imgHeight, imgUploadUrl, imgWidth, scrollX, scrollY],
+    [
+      canvasFramePositionList,
+      cursorX,
+      cursorY,
+      handleDeleteCanvas,
+      imgHeight,
+      imgUploadUrl,
+      imgWidth,
+      scrollX,
+      scrollY,
+    ],
   );
 
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
@@ -191,8 +252,8 @@ const Tool = () => {
     if (youSelectedFrameRef.current && imgNode.current && selectedFrameInfo) {
       //  액자의 가격을 price에 넣기
       const { name, price } = selectedFrameInfo;
-      setFramePrice([{ name, price }, ...framePrice]);
       const id = Date.now();
+      setFramePrice([{ name, price, id }, ...framePrice]);
       createImageCanvas(id);
       createCanvasForSave(id);
     }
@@ -283,26 +344,6 @@ const Tool = () => {
     if (!imgUploadUrl) return;
     setIsPreview((prev) => !prev);
   }, [imgUploadUrl]);
-
-  const handleImgGoBack = useCallback(() => {
-    if (imgWrapperRef.current) {
-      const { current: imgBox } = imgWrapperRef;
-      if (imgBox.childNodes.length <= 1) {
-        if (!isPreview) {
-          return console.log('존재하는 액자가 없습니다.');
-        }
-        if (imgBox.childNodes.length === 0) {
-          return console.log('존재하는 액자가 없습니다.');
-        }
-      }
-      const imgBoxId = +(imgBox.childNodes[0] as any).id;
-      imgBox?.removeChild(imgBox.childNodes[0]);
-      setFramePrice(framePrice.slice(1));
-      setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== imgBoxId));
-      setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== imgBoxId));
-      console.log(selectedFrameList, imgBoxId);
-    }
-  }, [framePrice, canvasFramePositionList, selectedFrameList, isPreview]);
 
   const handleImgUpload = useCallback(
     async (e: React.ChangeEventHandler<HTMLInputElement> | any) => {
