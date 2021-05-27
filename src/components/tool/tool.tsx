@@ -35,6 +35,7 @@ interface PaperSize {
 interface FramePrice {
   name: string;
   price: number;
+  id: number;
 }
 
 interface FramePosition {
@@ -108,57 +109,110 @@ const Tool = () => {
 
   const [isPreview, setIsPreview] = useState(false);
 
-  // 이미지 저장을 위한 캔버스 생성 (스프라이트 기법으로 이미지 저장은 안되기 때문에 품질이 깨지더라도 이 방법 사용합니다.)
-  const createCanvasForSave = useCallback(() => {
-    if (!youSelectedFrameRef.current || !imgNode.current) return;
-    const { width: frameWidth, height: frameHeight } = youSelectedFrameRef.current.getBoundingClientRect();
-    const { left, top } = imgNode.current.getBoundingClientRect();
-    const oCanvas = document.createElement('canvas');
-    oCanvas.width = frameWidth;
-    oCanvas.height = frameHeight;
-    const oCtx = oCanvas.getContext('2d');
-    (oCtx as CanvasRenderingContext2D).imageSmoothingQuality = 'high';
-    const cropX = cursorX - left;
-    const cropY = cursorY - top;
-    if (resizeImgCanvas) {
-      oCtx?.drawImage(
-        resizeImgCanvas,
-        cropX - frameWidth / 2,
-        cropY - frameHeight / 2,
-        frameWidth,
-        frameHeight,
-        0,
-        0,
-        frameWidth,
-        frameHeight,
-      );
-      setSelectedFrameList([...selectedFrameList, oCanvas]);
+  const handleDeleteCanvas = useCallback(
+    (e) => {
+      if (imgWrapperRef.current) {
+        const { current: imgBox } = imgWrapperRef;
+        if (imgBox.childNodes.length <= 1) {
+          if (!isPreview) {
+            return console.log('존재하는 액자가 없습니다.');
+          }
+          if (imgBox.childNodes.length === 0) {
+            return console.log('존재하는 액자가 없습니다.');
+          }
+        }
+        imgBox.childNodes.forEach((node) => {
+          if ((node as HTMLElement).id === e.target.id) {
+            imgBox.removeChild(node);
+          }
+        });
+        setFramePrice(framePrice.filter((lst) => lst.id !== +e.target.id));
+        setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== +e.target.id));
+        setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== +e.target.id));
+      }
+    },
+    [canvasFramePositionList, framePrice, isPreview, selectedFrameList],
+  );
+
+  const handleImgGoBack = useCallback(() => {
+    if (imgWrapperRef.current) {
+      const { current: imgBox } = imgWrapperRef;
+      if (imgBox.childNodes.length <= 1) {
+        if (!isPreview) {
+          return console.log('존재하는 액자가 없습니다.');
+        }
+        if (imgBox.childNodes.length === 0) {
+          return console.log('존재하는 액자가 없습니다.');
+        }
+      }
+      const imgBoxId = +(imgBox.childNodes[0] as any).id;
+      imgBox?.removeChild(imgBox.childNodes[0]);
+      setFramePrice(framePrice.slice(1));
+      setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== imgBoxId));
+      setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== imgBoxId));
     }
-  }, [cursorX, cursorY, resizeImgCanvas, selectedFrameList]);
+  }, [framePrice, canvasFramePositionList, selectedFrameList, isPreview]);
 
-  const createImageCanvas = useCallback(() => {
-    if (!youSelectedFrameRef.current || !imgNode.current) return;
-    const { width: frameWidth, height: frameHeight } = youSelectedFrameRef.current.getBoundingClientRect();
-    const { left, top } = imgNode.current.getBoundingClientRect();
+  // 이미지 저장을 위한 캔버스 생성 (스프라이트 기법으로 이미지 저장은 안되기 때문에 품질이 깨지더라도 이 방법 사용합니다.)
+  const createCanvasForSave = useCallback(
+    (id: number) => {
+      if (!youSelectedFrameRef.current || !imgNode.current) return;
+      const { width: frameWidth, height: frameHeight } = youSelectedFrameRef.current.getBoundingClientRect();
+      const { left, top } = imgNode.current.getBoundingClientRect();
+      const oCanvas = document.createElement('canvas');
+      oCanvas.width = frameWidth;
+      oCanvas.height = frameHeight;
+      oCanvas.id = id.toString();
+      const oCtx = oCanvas.getContext('2d');
+      (oCtx as CanvasRenderingContext2D).imageSmoothingQuality = 'high';
+      const cropX = cursorX - left;
+      const cropY = cursorY - top;
+      if (resizeImgCanvas) {
+        oCtx?.drawImage(
+          resizeImgCanvas,
+          cropX - frameWidth / 2,
+          cropY - frameHeight / 2,
+          frameWidth,
+          frameHeight,
+          0,
+          0,
+          frameWidth,
+          frameHeight,
+        );
+        setSelectedFrameList([...selectedFrameList, oCanvas]);
+      }
+    },
+    [cursorX, cursorY, resizeImgCanvas, selectedFrameList],
+  );
 
-    // 크롭된 이미지를 담을 캔버스 생성
-    const div = document.createElement('div');
-    div.classList.add('cropped-img');
-    div.style.width = `${frameWidth}px`;
-    div.style.height = `${frameHeight}px`;
-    const canvasLeftPosition = cursorX - frameWidth / 2;
-    const canvasTopPosition = cursorY - frameHeight / 2 - 50;
-    div.style.left = `${canvasLeftPosition + scrollX}px`;
-    div.style.top = `${canvasTopPosition + scrollY}px`;
-    div.setAttribute('data-originleft', `${canvasLeftPosition - left}`);
-    div.setAttribute('data-origintop', `${canvasTopPosition - top}`);
-    div.id = Date.now().toString();
+  const createImageCanvas = useCallback(
+    (id: number) => {
+      if (!youSelectedFrameRef.current || !imgNode.current) return;
+      const { width: frameWidth, height: frameHeight } = youSelectedFrameRef.current.getBoundingClientRect();
+      const { left, top } = imgNode.current.getBoundingClientRect();
 
-    // 크롭된 이미지 생성 (화질 구지 방지를 위해 스프라이트 기법 사용)
-    const cropImage = document.createElement('img');
-    cropImage.setAttribute(
-      'style',
-      `
+      // 크롭된 이미지를 담을 캔버스 생성
+      const div = document.createElement('div');
+      const deleteBtn = document.createElement('div');
+      deleteBtn.classList.add('cropped-img-delete');
+      deleteBtn.addEventListener('click', handleDeleteCanvas);
+      deleteBtn.id = id.toString();
+      div.classList.add('cropped-img');
+      div.style.width = `${frameWidth}px`;
+      div.style.height = `${frameHeight}px`;
+      const canvasLeftPosition = cursorX - frameWidth / 2;
+      const canvasTopPosition = cursorY - frameHeight / 2 - 50;
+      div.style.left = `${canvasLeftPosition + scrollX}px`;
+      div.style.top = `${canvasTopPosition + scrollY}px`;
+      div.setAttribute('data-originleft', `${canvasLeftPosition - left}`);
+      div.setAttribute('data-origintop', `${canvasTopPosition - top}`);
+      div.id = id.toString();
+
+      // 크롭된 이미지 생성 (화질 구지 방지를 위해 스프라이트 기법 사용)
+      const cropImage = document.createElement('img');
+      cropImage.setAttribute(
+        'style',
+        `
         background-image : url(${imgUploadUrl});
         background-repeat : no-repeat;
         background-size: ${imgWidth}px ${imgHeight}px; 
@@ -167,26 +221,40 @@ const Tool = () => {
         width: ${100}%;
         height: ${100}%;
         `,
-    );
+      );
 
-    // 만든 캔버스 액자의 포지션이 어떤지 설정해주기, 왜 와이? 리사이즈 시 위치 바꾸기 위함
-    setCanvasFramePositionList([
-      ...canvasFramePositionList,
-      { left: canvasLeftPosition, top: canvasTopPosition, id: Date.now() },
-    ]);
+      // 만든 캔버스 액자의 포지션이 어떤지 설정해주기, 왜 와이? 리사이즈 시 위치 바꾸기 위함
+      setCanvasFramePositionList([
+        ...canvasFramePositionList,
+        { left: canvasLeftPosition, top: canvasTopPosition, id },
+      ]);
 
-    div.append(cropImage);
-    imgWrapperRef.current?.prepend(div);
-  }, [canvasFramePositionList, cursorX, cursorY, imgHeight, imgUploadUrl, imgWidth, scrollX, scrollY]);
+      div.append(cropImage);
+      div.append(deleteBtn);
+      imgWrapperRef.current?.prepend(div);
+    },
+    [
+      canvasFramePositionList,
+      cursorX,
+      cursorY,
+      handleDeleteCanvas,
+      imgHeight,
+      imgUploadUrl,
+      imgWidth,
+      scrollX,
+      scrollY,
+    ],
+  );
 
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
   const insertFrameToCanvas = useCallback(async () => {
     if (youSelectedFrameRef.current && imgNode.current && selectedFrameInfo) {
       //  액자의 가격을 price에 넣기
       const { name, price } = selectedFrameInfo;
-      setFramePrice([{ name, price }, ...framePrice]);
-      createImageCanvas();
-      createCanvasForSave();
+      const id = Date.now();
+      setFramePrice([{ name, price, id }, ...framePrice]);
+      createImageCanvas(id);
+      createCanvasForSave(id);
     }
   }, [selectedFrameInfo, framePrice, createImageCanvas, createCanvasForSave]);
 
@@ -275,24 +343,6 @@ const Tool = () => {
     if (!imgUploadUrl) return;
     setIsPreview((prev) => !prev);
   }, [imgUploadUrl]);
-
-  const handleImgGoBack = useCallback(() => {
-    if (imgWrapperRef.current) {
-      const { current: imgBox } = imgWrapperRef;
-      if (imgBox.childNodes.length <= 1) {
-        if (!isPreview) {
-          return console.log('존재하는 액자가 없습니다.');
-        }
-        if (imgBox.childNodes.length === 0) {
-          return console.log('존재하는 액자가 없습니다.');
-        }
-      }
-      const imgBoxId = +(imgBox.childNodes[0] as any).id;
-      imgBox?.removeChild(imgBox.childNodes[0]);
-      setFramePrice(framePrice.slice(1));
-      setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== imgBoxId));
-    }
-  }, [framePrice, isPreview, canvasFramePositionList]);
 
   const handleImgUpload = useCallback(
     async (e: React.ChangeEventHandler<HTMLInputElement> | any) => {
