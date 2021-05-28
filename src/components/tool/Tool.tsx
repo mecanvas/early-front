@@ -19,7 +19,6 @@ import {
   BillInfomation,
 } from './ToolStyle';
 import { canvasToImage } from 'src/util/canvasToImage';
-import { resizeImgForCanvas } from 'src/util/resizeImgForCanvas';
 import { ColorResult } from 'react-color';
 
 interface PaperSize {
@@ -29,6 +28,11 @@ interface PaperSize {
     height: string;
   };
   price: number;
+}
+
+interface SelectedFrameInfo {
+  width: string;
+  height: string;
 }
 
 interface FramePrice {
@@ -52,26 +56,29 @@ const Tool = () => {
   const paperSize = useMemo<PaperSize[]>(
     () => [
       {
-        name: 'A4',
+        name: 'S-4호',
+        // 24cm X 24cm
         size: {
-          width: '210px',
-          height: '297px',
+          width: '907.09px',
+          height: '907.09px',
         },
         price: 55000,
       },
       {
-        name: 'A5',
+        name: 'S-6호',
+        // 31.8cm X 31.8cm
         size: {
-          width: '148px',
-          height: '210px',
+          width: '1201.9px',
+          height: '1201.9px',
         },
         price: 40000,
       },
       {
-        name: 'A6',
+        name: 'M-4호',
+        // 19cm X 33.3cm
         size: {
-          width: '105px',
-          height: '148px',
+          width: '718.1px',
+          height: '1258.58px',
         },
         price: 30000,
       },
@@ -100,7 +107,7 @@ const Tool = () => {
   const [imgResizeEnd, setImgResizeEnd] = useState(false);
   const [canvasFramePositionList, setCanvasFramePositionList] = useState<CanvasFramePositionList[]>([]);
   const [selectedFrameList, setSelectedFrameList] = useState<HTMLCanvasElement[]>([]);
-  const [resizeImgCanvas, setResizeImgCanvas] = useState<HTMLCanvasElement | null>(null);
+  const [yourSelectedFrame, setYourSelectedFrame] = useState<SelectedFrameInfo | null>(null);
 
   const youSelectedFrameRef = useRef<HTMLDivElement>(null);
 
@@ -130,7 +137,7 @@ const Tool = () => {
           }
         });
         setFramePrice(framePrice.filter((lst) => lst.id !== +e.target.id));
-        setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== +e.target.id));
+        setCanvasFramePositionList(canvasFramePositionList.filter((lst) => +lst.id !== +e.target.id));
         setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== +e.target.id));
       }
     },
@@ -162,30 +169,39 @@ const Tool = () => {
       if (!youSelectedFrameRef.current || !imgNode.current) return;
       const { width: frameWidth, height: frameHeight } = youSelectedFrameRef.current.getBoundingClientRect();
       const { left, top } = imgNode.current.getBoundingClientRect();
+
+      const image = imgNode.current;
       const oCanvas = document.createElement('canvas');
-      oCanvas.width = frameWidth;
-      oCanvas.height = frameHeight;
       oCanvas.id = id.toString();
+      const cropX = cursorX - left - frameWidth / 2;
+      const cropY = cursorY - top - frameHeight / 2;
+
+      const scaleX = image.naturalWidth / image.width;
+      const scaleY = image.naturalHeight / image.height;
       const oCtx = oCanvas.getContext('2d');
+      const pixelRatio = window.devicePixelRatio;
+
+      oCanvas.width = frameWidth * pixelRatio;
+      oCanvas.height = frameHeight * pixelRatio;
+
+      oCtx?.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
       (oCtx as CanvasRenderingContext2D).imageSmoothingQuality = 'high';
-      const cropX = cursorX - left;
-      const cropY = cursorY - top;
-      if (resizeImgCanvas) {
-        oCtx?.drawImage(
-          resizeImgCanvas,
-          cropX - frameWidth / 2,
-          cropY - frameHeight / 2,
-          frameWidth,
-          frameHeight,
-          0,
-          0,
-          frameWidth,
-          frameHeight,
-        );
-        setSelectedFrameList([...selectedFrameList, oCanvas]);
-      }
+
+      oCtx?.drawImage(
+        image,
+        cropX * scaleX,
+        cropY * scaleY,
+        frameWidth * scaleX,
+        frameHeight * scaleY,
+        0,
+        0,
+        frameWidth,
+        frameHeight,
+      );
+
+      setSelectedFrameList([...selectedFrameList, oCanvas]);
     },
-    [cursorX, cursorY, resizeImgCanvas, selectedFrameList],
+    [cursorX, cursorY, selectedFrameList],
   );
 
   const createImageCanvas = useCallback(
@@ -269,6 +285,7 @@ const Tool = () => {
     setSelectedFrame(() => false);
     setSelectedFrameInfo(() => null);
     setSelectedFramePosition(() => null);
+    setYourSelectedFrame(() => null);
   }, [selectedFrame, insertFrameToCanvas]);
 
   //   액자를 클릭하묜?
@@ -284,10 +301,19 @@ const Tool = () => {
 
         setImgWidth(width);
         setImgHeight(height);
+        const naturalWidth = el.naturalWidth / width;
+        const naturalHeight = el.naturalHeight / height;
+        const seletctedName = paperSize.filter((lst) => {
+          if (lst.name === value) {
+            const newWidth = +lst.size.width.replace('px', '') / naturalWidth;
+            const newHeight = +lst.size.height.replace('px', '') / naturalHeight;
+            setYourSelectedFrame({ width: `${newWidth}px`, height: `${newHeight}px` });
+            setSelectedFrame(() => true);
+            return lst;
+          }
+        });
+        setSelectedFrameInfo(seletctedName[0]);
       }
-      const selectedFrameName = paperSize.filter((lst) => lst.name === value);
-      setSelectedFrame(() => true);
-      setSelectedFrameInfo(selectedFrameName[0]);
     },
     [paperSize],
   );
@@ -398,15 +424,13 @@ const Tool = () => {
 
   // 액자 클릭시 움직이는 로직
   useEffect(() => {
-    if (selectedFrame && selectedFrameInfo) {
-      const {
-        size: { width, height },
-      } = selectedFrameInfo;
+    if (selectedFrame && yourSelectedFrame) {
+      const { width, height } = yourSelectedFrame;
       const x = cursorX + scrollX - +width.replace('px', '') / 2;
       const y = cursorY + scrollY - +height.replace('px', '') / 2;
       setSelectedFramePosition({ left: `${x}px`, top: `${y}px` });
     }
-  }, [selectedFrame, selectedFrameInfo, cursorX, cursorY, scrollX, scrollY]);
+  }, [selectedFrame, yourSelectedFrame, cursorX, cursorY, scrollX, scrollY]);
 
   // 자르기 시작할때 원래 이미지 사이즈 저장
   useEffect(() => {
@@ -434,15 +458,6 @@ const Tool = () => {
     }
   }, [isPreview]);
 
-  // 자른 캔버스 저장을 위한 로직
-  useEffect(() => {
-    if (resizeImgCanvas) return;
-    if (imgHeight && imgWidth && imgUploadUrl) {
-      const realCanvas = resizeImgForCanvas(imgUploadUrl, imgWidth, imgHeight);
-      setResizeImgCanvas(realCanvas);
-    }
-  }, [imgWidth, imgHeight, imgUploadUrl, resizeImgCanvas]);
-
   useEffect(() => {
     if (!imgUploadUrl) return;
     const el = imgNode.current;
@@ -464,19 +479,19 @@ const Tool = () => {
     <>
       <ImageGoBack onClick={handleImgGoBack}>뒤로 가기</ImageGoBack>
       <ToolContainer bgColor={bgColor}>
-        {selectedFrame && selectedFrameInfo && selectedFramePosition && (
+        {selectedFrame && selectedFramePosition && yourSelectedFrame && (
           <YouSelectedFrame
             border={frameBorderColor}
             ref={youSelectedFrameRef}
             onClick={handleFrameRelease}
-            {...selectedFrameInfo.size}
+            {...yourSelectedFrame}
             {...selectedFramePosition}
           ></YouSelectedFrame>
         )}
         <ImageWrapper id="img-box" ref={imgWrapperRef}>
           {imgUploadUrl ? (
             <>
-              <img ref={imgNode} src={imgUploadUrl} alt="캔버스로 만들 이미지" />
+              <img ref={imgNode} src={imgUploadUrl} crossOrigin="anonymous" alt="캔버스로 만들 이미지" />
             </>
           ) : (
             <input type="file" accept="image/*" onChange={handleImgUpload} />
