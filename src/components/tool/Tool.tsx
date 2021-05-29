@@ -104,7 +104,7 @@ const Tool = () => {
   const [originHeight, setOriginHeight] = useState(0);
   const [resizeWidth, setResizeWidth] = useState(0);
   const [resizeHeight, setResizeHeight] = useState(0);
-  const [ratioPersist, setRatioPersist] = useState(false);
+  const [ratioPersist, setRatioPersist] = useState(true);
   const [imgResizeStart, setImgResizeStart] = useState(false);
   const [imgResizeEnd, setImgResizeEnd] = useState(false);
   const [canvasFramePositionList, setCanvasFramePositionList] = useState<CanvasFramePositionList[]>([]);
@@ -169,7 +169,6 @@ const Tool = () => {
     [isPreview],
   );
 
-  console.log(selectedFrameList.filter((lst) => console.log(lst)));
   const handleImgGoBack = useCallback(() => {
     if (imgWrapperRef.current) {
       const { current: imgBox } = imgWrapperRef;
@@ -327,8 +326,8 @@ const Tool = () => {
 
         setImgWidth(width);
         setImgHeight(height);
-        const naturalWidth = el.naturalWidth / width;
-        const naturalHeight = el.naturalHeight / height;
+        const naturalWidth = width > el.naturalWidth ? width / el.naturalWidth : el.naturalWidth / width;
+        const naturalHeight = height > el.naturalHeight ? height / el.naturalHeight : el.naturalHeight / height;
         const seletctedName = paperSize.filter((lst) => {
           if (lst.name === value) {
             const newWidth = +lst.size.width.replace('px', '') / naturalWidth;
@@ -444,8 +443,9 @@ const Tool = () => {
     if (imgResizeStart) {
       if (imgNode.current) {
         const { width, height } = imgNode.current?.getBoundingClientRect();
-        setOriginWidth(width);
-        setOriginHeight(height);
+        const { naturalHeight, naturalWidth } = imgNode.current;
+        setOriginWidth(naturalWidth);
+        setOriginHeight(naturalHeight);
         setResizeWidth(width);
         setResizeHeight(height);
       }
@@ -518,11 +518,11 @@ const Tool = () => {
               <div>
                 <div>입력하세요</div>
                 <form onChange={handleChangeImgSize}>
-                  <input type="text" name="width" value={resizeWidth.toFixed(1)} placeholder="너비" />
-                  <input type="text" name="height" value={resizeHeight.toFixed(1)} placeholder="높이" />
+                  <input type="text" name="width" value={resizeWidth} placeholder="너비" />
+                  <input type="text" name="height" value={resizeHeight} placeholder="높이" />
                 </form>
                 <div>
-                  <input type="checkbox" onChange={handleRatioPersist} />
+                  <input type="checkbox" defaultChecked={ratioPersist} onChange={handleRatioPersist} />
                   <span>너비에 비율을 맞춥니다.</span>
                 </div>
                 <div>
