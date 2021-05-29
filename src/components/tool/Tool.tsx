@@ -17,9 +17,11 @@ import {
   FrameSize,
   FrameSizeName,
   BillInfomation,
+  DropZone,
 } from './ToolStyle';
 import { canvasToImage } from 'src/util/canvasToImage';
 import { ColorResult } from 'react-color';
+import { useDropzone } from 'react-dropzone';
 
 interface PaperSize {
   name: string;
@@ -118,6 +120,29 @@ const Tool = () => {
   // 바뀌는 색상
   const [bgColor, setBgColor] = useState('#ffffff');
   const [frameBorderColor, setFrameBorderColor] = useState('#333');
+
+  // 이미지 업로드
+  const handleImgUpload = useCallback(async (acceptedFiles) => {
+    if (!acceptedFiles[0].type.includes('image')) {
+      return alert('이미지 파일이 아닌건 지원하지 않습니다.');
+    }
+    if (acceptedFiles[0].type.includes('svg')) {
+      return alert('svg 파일은 지원하지 않습니다.');
+    }
+
+    try {
+      if (imgWrapperRef.current) {
+        const file = acceptedFiles[0];
+        const fd = new FormData();
+        fd.append('image', file);
+
+        await axios.post('/canvas/img', fd).then((res) => setImgUploadUrl(res.data || ''));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: handleImgUpload });
 
   const handleDeleteCanvas = useCallback(
     (e) => {
@@ -374,23 +399,6 @@ const Tool = () => {
     setIsPreview((prev) => !prev);
   }, [imgUploadUrl]);
 
-  const handleImgUpload = useCallback(
-    async (e: React.ChangeEventHandler<HTMLInputElement> | any) => {
-      try {
-        if (imgWrapperRef.current) {
-          const file = e.target.files[0];
-          const fd = new FormData();
-          fd.append('image', file);
-
-          await axios.post('/canvas/img', fd).then((res) => setImgUploadUrl(res.data || ''));
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    },
-    [imgWrapperRef],
-  );
-
   // 리사이즈시에도 동일하게 움직일 수 있도록 설정
   const handleFramePositionReletive = useCallback(() => {
     if (imgNode.current) {
@@ -492,7 +500,12 @@ const Tool = () => {
               <img ref={imgNode} src={imgUploadUrl} crossOrigin="anonymous" alt="캔버스로 만들 이미지" />
             </>
           ) : (
-            <input type="file" accept="image/*" onChange={handleImgUpload} />
+            <>
+              <DropZone {...getRootProps()}>
+                <input {...getInputProps()} accept="image/*" />
+                {isDragActive ? <p>드롭하시오!</p> : <p>이곳을 눌러 이미지를 첨부하거나 이곳으로 드롭하세용</p>}
+              </DropZone>
+            </>
           )}
         </ImageWrapper>
 
