@@ -31,6 +31,14 @@ export const YouSelectedFrame = styled.div<{
   z-index: 2;
 `;
 
+export const DropZone = styled.div`
+  border: 1px solid #dbdbdb;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
+  cursor: pointer;
+`;
+
 export const ImageWrapper = styled.div`
   width: 100%;
   margin: 0 auto;
