@@ -161,14 +161,15 @@ const Tool = () => {
             imgBox.removeChild(node);
           }
         });
-        setFramePrice(framePrice.filter((lst) => lst.id !== +e.target.id));
-        setCanvasFramePositionList(canvasFramePositionList.filter((lst) => +lst.id !== +e.target.id));
-        setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== +e.target.id));
+        setFramePrice((prev) => prev.filter((lst) => lst.id !== +e.target.id));
+        setCanvasFramePositionList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
+        setSelectedFrameList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
       }
     },
-    [canvasFramePositionList, framePrice, isPreview, selectedFrameList],
+    [isPreview],
   );
 
+  console.log(selectedFrameList.filter((lst) => console.log(lst)));
   const handleImgGoBack = useCallback(() => {
     if (imgWrapperRef.current) {
       const { current: imgBox } = imgWrapperRef;
