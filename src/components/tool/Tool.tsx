@@ -382,9 +382,7 @@ const Tool = () => {
           const fd = new FormData();
           fd.append('image', file);
 
-          await axios
-            .post('/post/img', fd, { baseURL: 'http://localhost:4000' })
-            .then((res) => setImgUploadUrl(res.data || ''));
+          await axios.post('/canvas/img', fd).then((res) => setImgUploadUrl(res.data || ''));
         }
       } catch (err) {
         console.error(err);

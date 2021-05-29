@@ -27,8 +27,7 @@ export const canvasToImage = (canvas: HTMLCanvasElement[]) => {
     if (file) {
       const fd = new FormData();
       fd.append('image', file);
-      (async () =>
-        await axios.post('/post/sample', fd, { baseURL: 'http://localhost:4000' }).then(() => alert('저장되썽')))();
+      (async () => await axios.post('/post/sample', fd).then(() => alert('저장되썽')))();
     }
   });
 };
