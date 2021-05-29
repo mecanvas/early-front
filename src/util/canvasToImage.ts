@@ -23,11 +23,11 @@ export const canvasToImage = (canvas: HTMLCanvasElement[]) => {
   if (!window) return;
   canvas.forEach((node, index) => {
     const dataUrl = (node as HTMLCanvasElement).toDataURL('image/png', 1.0);
-    const file = dataURLtoFile(dataUrl, `김창회_${new Date().toLocaleDateString()}_${index}.png`);
+    const file = dataURLtoFile(dataUrl, `${new Date().toLocaleDateString()}_${'김창회'}_${index + 1}.png`);
     if (file) {
       const fd = new FormData();
       fd.append('image', file);
-      (async () => await axios.post('/post/sample', fd).then(() => alert('저장되썽')))();
+      (async () => await axios.post('/canvas', fd).then(() => alert('저장되썽')))();
     }
   });
 };
