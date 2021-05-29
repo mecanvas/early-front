@@ -122,7 +122,24 @@ const Tool = () => {
   const [frameBorderColor, setFrameBorderColor] = useState('#333');
 
   // 이미지 업로드
-  const handleImgUpload = useCallback(async (acceptedFiles) => {
+  const handleImgUpload = useCallback(
+    async (e: React.ChangeEventHandler<HTMLInputElement> | any) => {
+      try {
+        if (imgWrapperRef.current) {
+          const file = e.target.files[0];
+          const fd = new FormData();
+          fd.append('image', file);
+
+          await axios.post('/canvas/img', fd).then((res) => setImgUploadUrl(res.data || ''));
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [imgWrapperRef],
+  );
+
+  const handleImgDropUpload = useCallback(async (acceptedFiles) => {
     if (!acceptedFiles[0].type.includes('image')) {
       return alert('이미지 파일이 아닌건 지원하지 않습니다.');
     }
@@ -142,7 +159,7 @@ const Tool = () => {
       console.error(err);
     }
   }, []);
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: handleImgUpload });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: handleImgDropUpload });
 
   const handleDeleteCanvas = useCallback(
     (e) => {
@@ -536,6 +553,9 @@ const Tool = () => {
               </div>
             )}
             <ImageToolBtn onClick={handleImgPreview}>미리보기</ImageToolBtn>
+            <ImageToolBtn>
+              <input type="file" accept="image/*" onChange={handleImgUpload} />
+            </ImageToolBtn>
           </ImageToolWrapper>
           <Versatile>
             <Factory>
