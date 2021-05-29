@@ -61,8 +61,8 @@ const Tool = () => {
         name: 'S-4호',
         // 24cm X 24cm
         size: {
-          width: '907.09px',
-          height: '907.09px',
+          width: `${907.09 / 3}px`,
+          height: `${907.09 / 3}px`,
         },
         price: 55000,
       },
@@ -70,8 +70,8 @@ const Tool = () => {
         name: 'S-6호',
         // 31.8cm X 31.8cm
         size: {
-          width: '1201.9px',
-          height: '1201.9px',
+          width: `${1201.9 / 3}px`,
+          height: `${1201.9 / 3}px`,
         },
         price: 40000,
       },
@@ -79,8 +79,8 @@ const Tool = () => {
         name: 'M-4호',
         // 19cm X 33.3cm
         size: {
-          width: '718.1px',
-          height: '1258.58px',
+          width: `${718.1 / 3}px`,
+          height: `${1258.58 / 3}px`,
         },
         price: 30000,
       },
@@ -326,12 +326,12 @@ const Tool = () => {
 
         setImgWidth(width);
         setImgHeight(height);
-        const naturalWidth = width > el.naturalWidth ? width / el.naturalWidth : el.naturalWidth / width;
-        const naturalHeight = height > el.naturalHeight ? height / el.naturalHeight : el.naturalHeight / height;
+        const naturalWidth = el.naturalWidth / width > 1 ? el.naturalWidth / width : 1;
+        const naturalHeight = el.naturalHeight / height > 1 ? el.naturalHeight / height : 1;
         const seletctedName = paperSize.filter((lst) => {
           if (lst.name === value) {
-            const newWidth = +lst.size.width.replace('px', '') / naturalWidth;
-            const newHeight = +lst.size.height.replace('px', '') / naturalHeight;
+            const newWidth = (+lst.size.width.replace('px', '') * 3) / naturalWidth;
+            const newHeight = (+lst.size.height.replace('px', '') * 3) / naturalHeight;
             setYourSelectedFrame({ width: `${newWidth}px`, height: `${newHeight}px` });
             setSelectedFrame(() => true);
             return lst;
