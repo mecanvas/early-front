@@ -1,5 +1,5 @@
 import { AppProps } from 'next/dist/next-server/lib/router/router';
-import '../styles/globals.css';
+import '../style/style.less';
 import styled from '@emotion/styled';
 import AppLayout from 'src/components/layouts/AppLayout';
 import axios from 'axios';

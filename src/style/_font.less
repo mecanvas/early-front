@@ -1,0 +1,111 @@
+// Desktop: headings, p, small
+//––––––––––––––––––––––––––––––––––––––––––––––––––
+
+/* noto-sans-kr-regular - latin_korean */
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 400;
+  src: local(''), url('') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */ url('') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* noto-sans-kr-500 - latin_korean */
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 500;
+  src: local(''), url('') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */ url('') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* noto-sans-kr-700 - latin_korean */
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 700;
+  src: local(''), url('') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */ url('') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+*,
+body {
+  font-family: 'Noto Sans KR', -apple-system, Sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: @gray-900;
+  line-height: 1.65em;
+  letter-spacing: -0.02em;
+  word-break: keep-all;
+  -webkit-font-smoothing: antialiased; // Chrome, Safari
+  -moz-osx-font-smoothing: grayscale; // Firefox
+}
+
+h1 {
+  font-size: 35px;
+  line-height: 1em;
+  letter-spacing: -0.04em;
+}
+
+h2 {
+  font-weight: 600;
+  font-size: 29px;
+  line-height: 1.2em;
+  letter-spacing: -0.03em;
+}
+
+h3 {
+  font-size: 23px;
+  line-height: 1em;
+  letter-spacing: -0.02em;
+}
+
+h4 {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1em;
+}
+
+p {
+  font-size: 15px;
+  line-height: 1.65em;
+}
+
+span,
+b {
+  font-size: inherit;
+  color: inherit;
+}
+
+small {
+  font-size: 13px;
+  line-height: 1em;
+}
+
+// Desktop: headings, p, small
+//––––––––––––––––––––––––––––––––––––––––––––––––––
+@media (max-width: 650px) {
+  *,
+  body {
+    font-size: 15px;
+    font-weight: 400;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 500;
+  }
+
+  h2 {
+    font-size: 21px;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  h4 {
+    font-size: 16px;
+  }
+
+  p {
+    font-size: 15px;
+  }
+}
