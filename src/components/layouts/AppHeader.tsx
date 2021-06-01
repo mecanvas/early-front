@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { Button } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const HeaderContainer = styled.header`
   width: 100%;
@@ -9,10 +10,21 @@ const HeaderContainer = styled.header`
 `;
 
 const Header = styled.div`
+  height: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 100%;
+  justify-content: space-between;
+  margin: 0 auto;
+  padding: 0 40px;
+`;
+
+const HeaderBackIcon = styled(Button)`
+  width: 100px;
+  svg {
+    path {
+      color: ${({ theme }) => theme.color.white};
+    }
+  }
 `;
 
 const AppHeader = () => {
@@ -22,12 +34,27 @@ const AppHeader = () => {
     router.push('/tool');
   }, [router]);
 
+  const handlePushMainPage = useCallback(() => {
+    router.push('/');
+  }, [router]);
+
   return (
     <HeaderContainer>
       <Header>
-        <Button type="primary" onClick={handlePushCustomPage}>
-          뭔가 캔버스를 만들수 있을거 같은 버튼
-        </Button>
+        {router.asPath === '/tool' ? (
+          <>
+            <HeaderBackIcon type="primary" onClick={handlePushMainPage}>
+              <ArrowLeftOutlined />
+            </HeaderBackIcon>
+          </>
+        ) : (
+          <>
+            <h4>MeCanvas</h4>
+            <Button type="primary" onClick={handlePushCustomPage}>
+              Canvas
+            </Button>
+          </>
+        )}
       </Header>
     </HeaderContainer>
   );

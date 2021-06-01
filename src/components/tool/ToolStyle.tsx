@@ -85,6 +85,9 @@ export const VersatileWrapper = styled.div`
   flex-direction: column;
   z-index: 3;
   background: #fff;
+  position: absolute;
+  top: 0;
+  right: 0;
 `;
 
 export const Versatile = styled.div`
