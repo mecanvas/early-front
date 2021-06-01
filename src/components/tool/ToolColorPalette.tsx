@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { ColorPaletteWrapper } from './ToolStyle';
+import { ColorPaletteFreeColor, ColorPaletteWrapper } from './ToolStyle';
 import { CirclePicker, ColorResult, ChromePicker } from 'react-color';
+import { CaretDownOutlined } from '@ant-design/icons';
 
 interface Props {
   onChange: (color: ColorResult) => void;
@@ -35,9 +36,11 @@ const ToolColorPalette = ({ onChange, type }: Props) => {
             disableAlpha={true}
           />
         ) : null}
-        <CirclePicker onChange={onChange} colors={colors[type]} circleSpacing={7} />
+        <CirclePicker onChange={onChange} colors={colors[type]} circleSpacing={4} circleSize={18} />
       </ColorPaletteWrapper>
-      <div onClick={handleFreeColor}>난 다른거..</div>
+      <ColorPaletteFreeColor onClick={handleFreeColor}>
+        <CaretDownOutlined />
+      </ColorPaletteFreeColor>
     </>
   );
 };

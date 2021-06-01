@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { Card } from 'antd';
 
 export const ToolContainer = styled.div<{ bgColor: string }>`
   width: 100%;
@@ -7,19 +8,12 @@ export const ToolContainer = styled.div<{ bgColor: string }>`
   background-color: ${({ bgColor }) => bgColor};
 `;
 
-export const ImageGoBack = styled.button`
-  position: absolute;
-  top: 55px;
-  left: 12px;
-  z-index: 4;
-`;
-
 export const YouSelectedFrame = styled.div<{
   width: string;
   height: string;
   left: string;
   top: string;
-  border: string;
+  border?: string;
 }>`
   width: ${({ width }) => width};
   height: ${({ height }) => height};
@@ -84,49 +78,35 @@ export const VersatileWrapper = styled.div`
   display: flex;
   flex-direction: column;
   z-index: 3;
-  background: #fff;
+  padding: 4px;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 50px;
+  right: 4px;
 `;
 
 export const Versatile = styled.div`
-  width: 275px;
-  border: 1px solid #dbdbdb;
-  margin-right: 8px;
+  border-radius: 4px;
+  display: flex;
 `;
 
 export const Factory = styled.div`
-  padding: 6px 8px;
   display: flex;
-  flex-direction: column;
 `;
 
 export const FactoryTitle = styled.div`
   width: 100%;
   display: flex;
-  padding: 0 4px;
   margin-bottom: 3px;
-  font-size: 18px;
+  font-size: 14px;
   div {
     margin-left: auto;
   }
 `;
 
-export const ImageToolWrapper = styled.div`
-  display: flex;
-  margin-bottom: 8px;
-`;
-
-export const ImageToolBtn = styled.button`
-  padding: 8px 12px;
-  border-radius: 6px;
-  background-color: aliceblue;
-`;
-
 export const ColorPaletteWrapper = styled.div`
   display: flex;
   margin-bottom: 12px;
+  width: 40px;
   .circle-picker {
     & > span > div {
       border: 1px solid #dbdbdb;
@@ -135,11 +115,17 @@ export const ColorPaletteWrapper = styled.div`
   }
 `;
 
-export const FrameWrapper = styled.div`
-  display: flex;
-  margin-bottom: 12px;
+export const ColorPaletteFreeColor = styled.div`
+  text-align: center;
+  cursor: pointer;
+  border-top: 1px solid #dbdbdb;
+`;
 
+export const FrameWrapper = styled(Card)`
+  border: 1px solid #dbdbdb;
+  margin-top: 6px;
   div {
+    display: flex;
     cursor: pointer;
   }
 
@@ -162,9 +148,25 @@ export const FrameSizeName = styled.div`
   transform: translate(-50%, -50%);
 `;
 
+export const CanvasInfomationWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  border-radius: 4px;
+  button {
+    width: 100%;
+  }
+
+  div {
+    display: flex;
+  }
+`;
+
 export const BillInfomation = styled.div`
   display: flex;
+  background-color: ${({ theme }) => theme.color.white};
   padding: 6px 8px;
   border-bottom: 1px solid #dbdbdb;
   margin-top: 8px;
+  border-radius: 4px;
 `;
