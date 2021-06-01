@@ -3,6 +3,8 @@ import styled from '@emotion/styled';
 
 const FooterContainer = styled.footer`
   width: 100%;
+  padding: 40px;
+  background-color: ${({ theme }) => theme.color.secondarybg};
 `;
 
 const Footer = styled.div`

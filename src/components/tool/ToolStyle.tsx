@@ -1,11 +1,11 @@
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Card } from 'antd';
 
-export const ToolContainer = styled.div<{ bgColor: string }>`
+export const ToolContainer = styled.div`
   width: 100%;
   margin: 0 auto;
   display: flex;
-  background-color: ${({ bgColor }) => bgColor};
 `;
 
 export const YouSelectedFrame = styled.div<{
@@ -33,12 +33,45 @@ export const DropZone = styled.div`
   cursor: pointer;
 `;
 
-export const ImageWrapper = styled.div`
+export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+
+  &:hover {
+    opacity: 0.4;
+  }
+
+  ${({ isDragActive }) =>
+    isDragActive
+      ? css`
+          opacity: 0.4;
+        `
+      : css`
+          opacity: 1;
+        `}
+
+  *  > svg {
+    font-size: 50px;
+    path {
+      color: ${({ theme }) => theme.color.primary};
+    }
+  }
+`;
+
+export const ImageWrapper = styled.div<{ bgColor: string }>`
+  background-color: ${({ bgColor }) => bgColor};
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 0;
   margin: 0 auto;
   text-align: center;
   position: relative;
-  height: calc(100vh - 50px);
+  min-height: calc(100vh - 50px);
   & > img {
     max-height: calc(100vh - 50px);
   }

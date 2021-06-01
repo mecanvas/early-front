@@ -16,13 +16,15 @@ import {
   BillInfomation,
   DropZone,
   CanvasInfomationWrapper,
+  DropZoneDiv,
 } from './ToolStyle';
 import { canvasToImage } from 'src/util/canvasToImage';
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
-import { BgColorsOutlined, ColumnWidthOutlined, DiffOutlined, UndoOutlined } from '@ant-design/icons';
+import { BgColorsOutlined, ColumnWidthOutlined, DiffOutlined, PlusOutlined, UndoOutlined } from '@ant-design/icons';
 import { Button, Modal, notification, Popover, Upload } from 'antd';
 import { RcFile } from 'antd/lib/upload';
+import { theme } from 'src/style/theme';
 
 interface PaperSize {
   name: string;
@@ -120,7 +122,7 @@ const Tool = () => {
   const [isPreview, setIsPreview] = useState(false);
 
   // 바뀌는 색상
-  const [bgColor, setBgColor] = useState('#ffffff');
+  const [bgColor, setBgColor] = useState(theme.color.white);
   // const [frameBorderColor, setFrameBorderColor] = useState('#333');
 
   // 이미지 업로드
@@ -338,6 +340,7 @@ const Tool = () => {
     (e: React.MouseEvent<HTMLDivElement>) => {
       const { value } = e.currentTarget.dataset;
       const el = imgNode.current;
+
       if (el) {
         const { width, height } = el.getBoundingClientRect();
         el.style.width = `${width}px`;
@@ -541,7 +544,7 @@ const Tool = () => {
         ></Modal>
       )}
 
-      <ToolContainer bgColor={bgColor}>
+      <ToolContainer>
         {selectedFrame && selectedFramePosition && yourSelectedFrame && (
           <YouSelectedFrame
             // border={frameBorderColor}
@@ -551,7 +554,7 @@ const Tool = () => {
             {...selectedFramePosition}
           ></YouSelectedFrame>
         )}
-        <ImageWrapper id="img-box" ref={imgWrapperRef}>
+        <ImageWrapper id="img-box" ref={imgWrapperRef} bgColor={bgColor}>
           {imgUploadUrl ? (
             <>
               <img ref={imgNode} src={imgUploadUrl} crossOrigin="anonymous" alt="캔버스로 만들 이미지" />
@@ -560,7 +563,9 @@ const Tool = () => {
             <>
               <DropZone {...getRootProps()}>
                 <input {...getInputProps()} accept="image/*" />
-                {isDragActive ? <p>드롭하시오!</p> : <p>이곳을 눌러 이미지를 첨부하거나 이곳으로 드롭하세용</p>}
+                <DropZoneDiv isDragActive={isDragActive}>
+                  <PlusOutlined />
+                </DropZoneDiv>
               </DropZone>
             </>
           )}

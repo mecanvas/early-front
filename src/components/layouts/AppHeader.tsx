@@ -7,6 +7,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 const HeaderContainer = styled.header`
   width: 100%;
   height: 50px;
+  background-color: ${({ theme }) => theme.color.white};
 `;
 
 const Header = styled.div`
