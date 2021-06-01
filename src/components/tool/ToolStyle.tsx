@@ -1,11 +1,24 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Card } from 'antd';
+import { Button, Card } from 'antd';
 
 export const ToolContainer = styled.div`
   width: 100%;
   margin: 0 auto;
   display: flex;
+`;
+
+export const BackIcon = styled(Button)`
+  width: 75px;
+  position: absolute;
+  z-index: 3;
+  top: 10px;
+  left: 10px;
+  svg {
+    path {
+      color: ${({ theme }) => theme.color.white};
+    }
+  }
 `;
 
 export const YouSelectedFrame = styled.div<{
@@ -40,6 +53,10 @@ export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
   justify-content: center;
   height: 100%;
 
+  p {
+    margin-top: 6px;
+  }
+
   &:hover {
     opacity: 0.4;
   }
@@ -71,9 +88,9 @@ export const ImageWrapper = styled.div<{ bgColor: string }>`
   margin: 0 auto;
   text-align: center;
   position: relative;
-  min-height: calc(100vh - 50px);
+  min-height: 100vh;
   & > img {
-    max-height: calc(100vh - 50px);
+    max-height: 100vh;
   }
   .cropped-img {
     position: absolute;
@@ -140,6 +157,12 @@ export const ColorPaletteWrapper = styled.div`
   display: flex;
   margin-bottom: 12px;
   width: 40px;
+  position: relative;
+  .chrome-picker {
+    position: absolute;
+    z-index: 2;
+    right: 0;
+  }
   .circle-picker {
     & > span > div {
       border: 1px solid #dbdbdb;

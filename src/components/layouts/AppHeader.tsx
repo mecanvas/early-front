@@ -2,7 +2,6 @@ import React, { useCallback } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { Button } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const HeaderContainer = styled.header`
   width: 100%;
@@ -19,15 +18,6 @@ const Header = styled.div`
   padding: 0 40px;
 `;
 
-const HeaderBackIcon = styled(Button)`
-  width: 100px;
-  svg {
-    path {
-      color: ${({ theme }) => theme.color.white};
-    }
-  }
-`;
-
 const AppHeader = () => {
   const router = useRouter();
 
@@ -35,27 +25,19 @@ const AppHeader = () => {
     router.push('/tool');
   }, [router]);
 
-  const handlePushMainPage = useCallback(() => {
-    router.push('/');
-  }, [router]);
+  if (router.asPath === '/tool') {
+    return null;
+  }
 
   return (
     <HeaderContainer>
       <Header>
-        {router.asPath === '/tool' ? (
-          <>
-            <HeaderBackIcon type="primary" onClick={handlePushMainPage}>
-              <ArrowLeftOutlined />
-            </HeaderBackIcon>
-          </>
-        ) : (
-          <>
-            <h4>MeCanvas</h4>
-            <Button type="primary" onClick={handlePushCustomPage}>
-              Canvas
-            </Button>
-          </>
-        )}
+        <>
+          <h4>MeCanvas</h4>
+          <Button type="primary" onClick={handlePushCustomPage}>
+            Canvas
+          </Button>
+        </>
       </Header>
     </HeaderContainer>
   );

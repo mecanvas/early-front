@@ -17,14 +17,23 @@ import {
   DropZone,
   CanvasInfomationWrapper,
   DropZoneDiv,
+  BackIcon,
 } from './ToolStyle';
 import { canvasToImage } from 'src/util/canvasToImage';
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
-import { BgColorsOutlined, ColumnWidthOutlined, DiffOutlined, PlusOutlined, UndoOutlined } from '@ant-design/icons';
+import {
+  ArrowLeftOutlined,
+  BgColorsOutlined,
+  ColumnWidthOutlined,
+  DiffOutlined,
+  PlusOutlined,
+  UndoOutlined,
+} from '@ant-design/icons';
 import { Button, Modal, notification, Popover, Upload } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import { theme } from 'src/style/theme';
+import { useRouter } from 'next/router';
 
 interface PaperSize {
   name: string;
@@ -58,6 +67,7 @@ interface CanvasFramePositionList {
 }
 
 const Tool = () => {
+  const router = useRouter();
   const paperSize = useMemo<PaperSize[]>(
     () => [
       {
@@ -118,7 +128,19 @@ const Tool = () => {
   const youSelectedFrameRef = useRef<HTMLDivElement>(null);
 
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
-
+  const yourPriceList = useMemo(() => {
+    return Object.entries(
+      framePrice.reduce((acc: { [key: string]: number }, cur) => {
+        const name = cur.name;
+        if (!acc[name]) {
+          acc[name] = 1;
+          return acc;
+        }
+        acc[name]++;
+        return acc;
+      }, {}),
+    );
+  }, [framePrice]);
   const [isPreview, setIsPreview] = useState(false);
 
   // 바뀌는 색상
@@ -267,7 +289,7 @@ const Tool = () => {
       div.style.width = `${frameWidth}px`;
       div.style.height = `${frameHeight}px`;
       const canvasLeftPosition = cursorX - frameWidth / 2;
-      const canvasTopPosition = cursorY - frameHeight / 2 - 50;
+      const canvasTopPosition = cursorY - frameHeight / 2;
       div.style.left = `${canvasLeftPosition + scrollX}px`;
       div.style.top = `${canvasTopPosition + scrollY}px`;
       div.setAttribute('data-originleft', `${canvasLeftPosition - left}`);
@@ -283,7 +305,7 @@ const Tool = () => {
         background-repeat : no-repeat;
         background-size: ${imgWidth}px ${imgHeight}px; 
         background-position-x: ${-canvasLeftPosition + left}px;
-        background-position-y: ${-canvasTopPosition + top - 50}px;
+        background-position-y: ${-canvasTopPosition + top}px;
         width: ${100}%;
         height: ${100}%;
         box-shadow : 0 0 7px #333 inset, 0 0 6px #ededed;
@@ -512,8 +534,15 @@ const Tool = () => {
     };
   }, [handleFramePositionReletive]);
 
+  const handlePushMainPage = useCallback(() => {
+    router.push('/');
+  }, [router]);
+
   return (
     <>
+      <BackIcon type="primary" onClick={handlePushMainPage}>
+        <ArrowLeftOutlined />
+      </BackIcon>
       {imgResizeStart && (
         <Modal
           visible={imgResizeModal}
@@ -558,6 +587,72 @@ const Tool = () => {
           {imgUploadUrl ? (
             <>
               <img ref={imgNode} src={imgUploadUrl} crossOrigin="anonymous" alt="캔버스로 만들 이미지" />
+
+              <VersatileWrapper>
+                <Versatile>
+                  <Button onClick={handleImgGoBack}>
+                    <UndoOutlined />
+                  </Button>
+                  <Upload accept="image/*" beforeUpload={handleImgUpload} showUploadList={false}>
+                    <Button>
+                      <DiffOutlined />
+                    </Button>
+                  </Upload>
+                  {imgResizeStart ? (
+                    <Button onClick={handleImgResizeEnd}>
+                      <ColumnWidthOutlined />
+                    </Button>
+                  ) : (
+                    <Button onClick={handleImgResizing}>
+                      <ColumnWidthOutlined />
+                    </Button>
+                  )}
+                  <Factory>
+                    <Popover
+                      style={{ padding: 0 }}
+                      trigger="click"
+                      placement="bottom"
+                      content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
+                    >
+                      <Button>
+                        <BgColorsOutlined />
+                      </Button>
+                    </Popover>
+
+                    {/* <ToolColorPalette type="frame" onChange={handleFrameColorChange} /> */}
+                  </Factory>
+                </Versatile>
+                <FrameWrapper
+                  children={paperSize.map((paper, index) => (
+                    <FrameSize key={index} data-value={paper.name} {...paper.size} onClick={handleFrameSelect}>
+                      <FrameSizeName>{paper.name}</FrameSizeName>
+                    </FrameSize>
+                  ))}
+                />
+                <CanvasInfomationWrapper>
+                  <div>
+                    <Button onClick={handleImgPreview}>미리보기 </Button>
+                    <Button type="primary" onClick={() => canvasToImage(selectedFrameList)}>
+                      저장
+                    </Button>
+                  </div>
+                  <BillInfomation>
+                    <FactoryTitle>
+                      예상 가격 <div>{framePrice.reduce((acc, cur) => (acc += cur.price), 0).toLocaleString()}원</div>
+                    </FactoryTitle>
+                  </BillInfomation>
+
+                  {/* 사용한 액자 x 수량 */}
+                  <div>
+                    {yourPriceList.map(([key, value], index) => (
+                      <div key={index}>
+                        <div>{key}</div>
+                        <div>{value}</div>
+                      </div>
+                    ))}
+                  </div>
+                </CanvasInfomationWrapper>
+              </VersatileWrapper>
             </>
           ) : (
             <>
@@ -565,68 +660,12 @@ const Tool = () => {
                 <input {...getInputProps()} accept="image/*" />
                 <DropZoneDiv isDragActive={isDragActive}>
                   <PlusOutlined />
+                  <p>이미지를 드롭하거나 첨부하세요!</p>
                 </DropZoneDiv>
               </DropZone>
             </>
           )}
         </ImageWrapper>
-
-        <VersatileWrapper>
-          <Versatile>
-            <Button onClick={handleImgGoBack}>
-              <UndoOutlined />
-            </Button>
-            <Upload accept="image/*" beforeUpload={handleImgUpload} showUploadList={false}>
-              <Button>
-                <DiffOutlined />
-              </Button>
-            </Upload>
-            {imgResizeStart ? (
-              <Button onClick={handleImgResizeEnd}>
-                <ColumnWidthOutlined />
-              </Button>
-            ) : (
-              <Button onClick={handleImgResizing}>
-                <ColumnWidthOutlined />
-              </Button>
-            )}
-            <Factory>
-              <Popover
-                style={{ padding: 0 }}
-                trigger="click"
-                placement="bottom"
-                content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
-              >
-                <Button>
-                  <BgColorsOutlined />
-                </Button>
-              </Popover>
-
-              {/* <ToolColorPalette type="frame" onChange={handleFrameColorChange} /> */}
-            </Factory>
-          </Versatile>
-          <FrameWrapper
-            title="정사각"
-            children={paperSize.map((paper, index) => (
-              <FrameSize key={index} data-value={paper.name} {...paper.size} onClick={handleFrameSelect}>
-                <FrameSizeName>{paper.name}</FrameSizeName>
-              </FrameSize>
-            ))}
-          />
-          <CanvasInfomationWrapper>
-            <div>
-              <Button onClick={handleImgPreview}>미리보기 </Button>
-              <Button type="primary" onClick={() => canvasToImage(selectedFrameList)}>
-                저장
-              </Button>
-            </div>
-            <BillInfomation>
-              <FactoryTitle>
-                예상 가격 <div>{framePrice.reduce((acc, cur) => (acc += cur.price), 0).toLocaleString()}원</div>
-              </FactoryTitle>
-            </BillInfomation>
-          </CanvasInfomationWrapper>
-        </VersatileWrapper>
       </ToolContainer>
     </>
   );

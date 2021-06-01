@@ -8,7 +8,6 @@ import { theme } from 'src/style/theme';
 
 const AppContainer = styled.main`
   width: 100%;
-  height: calc(100vh - 50px);
 `;
 
 axios.defaults.baseURL = 'http://localhost:4000';
