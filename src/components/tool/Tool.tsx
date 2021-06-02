@@ -130,13 +130,13 @@ const Tool = () => {
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
   const yourPriceList = useMemo(() => {
     return Object.entries(
-      framePrice.reduce((acc: { [key: string]: number }, cur) => {
+      framePrice.reduce((acc: { [key: string]: any }, cur) => {
         const name = cur.name;
         if (!acc[name]) {
-          acc[name] = 1;
+          acc[name] = { quantity: 1, price: cur.price };
           return acc;
         }
-        acc[name]++;
+        acc[name].quantity++;
         return acc;
       }, {}),
     );
@@ -643,11 +643,16 @@ const Tool = () => {
                   </BillInfomation>
 
                   {/* 사용한 액자 x 수량 */}
-                  <div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {yourPriceList.map(([key, value], index) => (
-                      <div key={index}>
+                      <div
+                        style={{ display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 3px' }}
+                        key={index}
+                      >
                         <div>{key}</div>
-                        <div>{value}</div>
+                        <div>
+                          {value.quantity}개 x {value.price.toString()}
+                        </div>
                       </div>
                     ))}
                   </div>
