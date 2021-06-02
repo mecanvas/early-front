@@ -634,6 +634,7 @@ const Tool = () => {
             {...selectedFramePosition}
           ></YouSelectedFrame>
         )}
+
         <ImageWrapper
           id="img-box"
           onClick={isResizeMode ? handleResizeMode : undefined}
@@ -645,6 +646,7 @@ const Tool = () => {
         >
           {imgUploadUrl ? (
             <>
+              {isResizeStart && <small>{`${resizeWidth.toFixed()}px X ${resizeHeight.toFixed()}px`}</small>}
               <ImgControlelr data-layout="inner" isResizeStart={isResizeMode} cmd={resizeCmd}>
                 <img
                   onMouseUp={handleImgResizeEnd}
@@ -731,7 +733,7 @@ const Tool = () => {
               </VersatileWrapper>
             </>
           ) : (
-            <>
+            <ImageWrapper>
               <DropZone {...getRootProps()}>
                 <input {...getInputProps()} accept="image/*" />
                 <DropZoneDiv isDragActive={isDragActive}>
@@ -739,7 +741,7 @@ const Tool = () => {
                   <p>이미지를 드롭하거나 첨부하세요!</p>
                 </DropZoneDiv>
               </DropZone>
-            </>
+            </ImageWrapper>
           )}
         </ImageWrapper>
       </ToolContainer>

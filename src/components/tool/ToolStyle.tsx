@@ -79,8 +79,8 @@ export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
 `;
 
 export const ImageWrapper = styled.div<{
-  bgColor: string;
-  cmd: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
+  bgColor?: string;
+  cmd?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
 }>`
   background-color: ${({ bgColor }) => bgColor};
   width: 100%;
@@ -92,6 +92,18 @@ export const ImageWrapper = styled.div<{
   text-align: center;
   position: relative;
   min-height: 100vh;
+
+  small {
+    position: absolute;
+    top: 25px;
+    z-index: 3;
+    padding: 8px;
+    font-weight: bold;
+    border: 1px solid ${({ theme }) => theme.color.primary};
+    border-radius: 20px;
+    background-color: ${({ theme }) => theme.color.secondarybg};
+    color: ${({ theme }) => theme.color.primary};
+  }
 
   ${({ cmd }) => {
     if (!cmd) return;
