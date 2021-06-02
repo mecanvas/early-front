@@ -31,7 +31,7 @@ import {
   PlusOutlined,
   UndoOutlined,
 } from '@ant-design/icons';
-import { Button, Modal, notification, Popover, Upload } from 'antd';
+import { Button, Modal, notification, Popover, Upload, Checkbox, Input } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import { theme } from 'src/style/theme';
 import { useRouter } from 'next/router';
@@ -117,9 +117,7 @@ const Tool = () => {
   const [resizeWidth, setResizeWidth] = useState(0);
   const [resizeHeight, setResizeHeight] = useState(0);
   const [ratioPersist, setRatioPersist] = useState(true);
-  const [imgResizeStart, setImgResizeStart] = useState(false);
-  const [imgResizeEnd, setImgResizeEnd] = useState(false);
-  const [imgResizeModal, setIsImgResizeModal] = useState(false);
+  const [imgModalResizeOpen, setImgModalResizeOpen] = useState(false);
   const [canvasFramePositionList, setCanvasFramePositionList] = useState<CanvasFramePositionList[]>([]);
   const [selectedFrameList, setSelectedFrameList] = useState<HTMLCanvasElement[]>([]);
   const [yourSelectedFrame, setYourSelectedFrame] = useState<SelectedFrameInfo | null>(null);
@@ -271,10 +269,10 @@ const Tool = () => {
         const { current: imgBox } = imgWrapperRef;
         if (imgBox.childNodes.length <= 1) {
           if (!isPreview) {
-            return console.log('존재하는 액자가 없습니다.');
+            return;
           }
           if (imgBox.childNodes.length === 0) {
-            return console.log('존재하는 액자가 없습니다.');
+            return;
           }
         }
         imgBox.childNodes.forEach((node) => {
@@ -452,15 +450,6 @@ const Tool = () => {
     [paperSize],
   );
 
-  // 사이즈 변경입력을 확인
-  const handleConfirmChange = useCallback(() => {
-    if (imgNode.current) {
-      const el = imgNode.current;
-      el.style.width = `${resizeWidth}px`;
-      el.style.height = `${resizeHeight}px`;
-    }
-  }, [resizeHeight, resizeWidth]);
-
   const handleResizeReset = useCallback(() => {
     setResizeWidth(originWidth);
     setResizeHeight(originHeight);
@@ -474,7 +463,6 @@ const Tool = () => {
   const handleChangeImgSize = useCallback(
     (e) => {
       const { name, value } = e.target;
-
       if (name === 'width') {
         setResizeWidth(+value);
         if (ratioPersist) {
@@ -492,22 +480,17 @@ const Tool = () => {
     [originHeight, originWidth, ratioPersist],
   );
 
-  const handleImgResizeOpen = useCallback(() => {
-    setImgResizeStart(true);
-    setIsImgResizeModal(true);
-    setImgResizeEnd(false);
+  const handleModalResize = useCallback(() => {
+    setImgModalResizeOpen((prev) => !prev);
   }, []);
 
-  const handleImgResizeClose = useCallback(() => {
-    setImgResizeEnd(true);
-    setImgResizeStart(false);
-    setIsImgResizeModal(false);
-  }, []);
-
-  const handleImgResizeCancel = useCallback(() => {
-    setIsImgResizeModal(false);
-    setImgResizeStart(false);
-  }, []);
+  const handleModalResizeOk = useCallback(() => {
+    if (imgNode.current) {
+      imgNode.current.style.width = `${resizeWidth}px`;
+      imgNode.current.style.height = `${resizeHeight}px`;
+      setImgModalResizeOpen((prev) => !prev);
+    }
+  }, [resizeWidth, resizeHeight]);
 
   const handleImgPreview = useCallback(() => {
     if (!imgUploadUrl) return;
@@ -553,13 +536,6 @@ const Tool = () => {
     }
   }, [selectedFrame, yourSelectedFrame, cursorX, cursorY, scrollX, scrollY]);
 
-  // 자르기 끝
-  useEffect(() => {
-    if (imgResizeEnd) {
-      console.log('이미지 자르기 끝');
-    }
-  }, [imgResizeEnd]);
-
   useEffect(() => {
     if (imgNode.current) {
       imgNode.current.style.visibility = isPreview ? 'hidden' : 'visible';
@@ -594,35 +570,28 @@ const Tool = () => {
       <BackIcon type="primary" onClick={handlePushMainPage}>
         <ArrowLeftOutlined />
       </BackIcon>
-      {imgResizeStart && (
-        <Modal
-          visible={imgResizeModal}
-          onOk={handleImgResizeEnd}
-          onCancel={handleImgResizeCancel}
-          title="이미지의 너비와 높이를 입력하세요."
-          children={
-            <div>
-              <div>입력하세요</div>
-              <form onChange={handleChangeImgSize}>
-                <input type="text" name="width" value={resizeWidth} placeholder="너비" />
-                <input type="text" name="height" value={resizeHeight} placeholder="높이" />
-              </form>
-              <div>
-                <input type="checkbox" defaultChecked={ratioPersist} onChange={handleRatioPersist} />
-                <span>너비에 비율을 맞춥니다.</span>
-              </div>
-              <div>
-                <button type="button" onClick={handleResizeReset}>
-                  원래대로
-                </button>
-              </div>
-              <button type="button" onClick={handleConfirmChange}>
-                확인
-              </button>
-            </div>
-          }
-        ></Modal>
-      )}
+      <Modal
+        visible={imgModalResizeOpen}
+        onOk={handleModalResizeOk}
+        onCancel={handleModalResize}
+        title="이미지의 너비와 높이를 입력하세요."
+      >
+        <div>
+          <form onChange={handleChangeImgSize}>
+            <Input type="text" name="width" value={resizeWidth || ''} placeholder="너비" addonAfter="px" />
+            <Input type="text" name="height" value={resizeHeight || ''} placeholder="높이" addonAfter="px" />
+          </form>
+
+          <div style={{ textAlign: 'right' }}>
+            <Checkbox defaultChecked={ratioPersist} onChange={handleRatioPersist}>
+              너비에 비율을 맞춥니다.
+            </Checkbox>
+          </div>
+          <div style={{ textAlign: 'right', marginTop: '6px' }}>
+            <Button onClick={handleResizeReset}>원래의 이미지 크기로 되돌립니다.</Button>
+          </div>
+        </div>
+      </Modal>
 
       <ToolContainer>
         {selectedFrame && selectedFramePosition && yourSelectedFrame && (
@@ -676,15 +645,10 @@ const Tool = () => {
                       <DiffOutlined />
                     </Button>
                   </Upload>
-                  {imgResizeStart ? (
-                    <Button onClick={handleImgResizeClose}>
-                      <ColumnWidthOutlined />
-                    </Button>
-                  ) : (
-                    <Button onClick={handleImgResizeOpen}>
-                      <ColumnWidthOutlined />
-                    </Button>
-                  )}
+                  <Button onClick={handleModalResize}>
+                    <ColumnWidthOutlined />
+                  </Button>
+
                   <Factory>
                     <Popover
                       style={{ padding: 0 }}
