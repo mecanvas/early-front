@@ -111,8 +111,6 @@ const Tool = () => {
   const imgWrapperRef = useRef<HTMLDivElement>(null);
   const imgNode = useRef<HTMLImageElement>(null);
   const [imgUploadUrl, setImgUploadUrl] = useState('');
-  const [imgWidth, setImgWidth] = useState(0);
-  const [imgHeight, setImgHeight] = useState(0);
 
   const [originWidth, setOriginWidth] = useState(0);
   const [originHeight, setOriginHeight] = useState(0);
@@ -156,6 +154,7 @@ const Tool = () => {
 
   const [isResizeStart, setIsResizeStart] = useState(false);
   const [resizeCmd, setResizeCmd] = useState<'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null>(null);
+  const [isResizeMode, setIsResizeMode] = useState(false);
 
   const positioningImageResize = useCallback(
     (resizeCmd: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null, x: number, y: number) => {
@@ -191,20 +190,27 @@ const Tool = () => {
 
       imgNode.current.style.width = `${newWidth}px`;
       imgNode.current.style.height = `${newHeight}px`;
+      setResizeWidth(newWidth);
+      setResizeHeight(newHeight);
     },
     [],
   );
 
+  const handleResizeMode = useCallback((e) => {
+    e.stopPropagation();
+    setIsResizeMode((prev) => !prev);
+  }, []);
+
   const handleImgResize = useCallback(
     (e) => {
-      if (!isResizeStart) return;
+      if (!isResizeStart && !isResizeMode) return;
       if (imgNode.current) {
         const { clientY, clientX } = e.nativeEvent;
 
         positioningImageResize(resizeCmd, clientX, clientY);
       }
     },
-    [isResizeStart, positioningImageResize, resizeCmd],
+    [isResizeMode, isResizeStart, positioningImageResize, resizeCmd],
   );
 
   const handleImgResizeStart = useCallback((e) => {
@@ -348,7 +354,7 @@ const Tool = () => {
     (id: number) => {
       if (!youSelectedFrameRef.current || !imgNode.current) return;
       const { width: frameWidth, height: frameHeight } = youSelectedFrameRef.current.getBoundingClientRect();
-      const { left, top } = imgNode.current.getBoundingClientRect();
+      const { left, top, width, height } = imgNode.current.getBoundingClientRect();
 
       // 크롭된 이미지를 담을 캔버스 생성
       const div = document.createElement('div');
@@ -374,7 +380,7 @@ const Tool = () => {
         `
         background-image : url(${imgUploadUrl});
         background-repeat : no-repeat;
-        background-size: ${imgWidth}px ${imgHeight}px; 
+        background-size: ${width}px ${height}px; 
         background-position-x: ${-canvasLeftPosition + left}px;
         background-position-y: ${-canvasTopPosition + top}px;
         width: ${100}%;
@@ -393,17 +399,7 @@ const Tool = () => {
       div.append(deleteBtn);
       imgWrapperRef.current?.prepend(div);
     },
-    [
-      canvasFramePositionList,
-      cursorX,
-      cursorY,
-      handleDeleteCanvas,
-      imgHeight,
-      imgUploadUrl,
-      imgWidth,
-      scrollX,
-      scrollY,
-    ],
+    [canvasFramePositionList, cursorX, cursorY, handleDeleteCanvas, imgUploadUrl, scrollX, scrollY],
   );
 
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
@@ -438,10 +434,7 @@ const Tool = () => {
         const { width, height } = el.getBoundingClientRect();
         el.style.width = `${width}px`;
         el.style.height = `${height}px`;
-        el.style.maxHeight = `${height}px`;
 
-        setImgWidth(width);
-        setImgHeight(height);
         const naturalWidth = el.naturalWidth / width > 1 ? el.naturalWidth / width : 1;
         const naturalHeight = el.naturalHeight / height > 1 ? el.naturalHeight / height : 1;
         const seletctedName = paperSize.filter((lst) => {
@@ -465,7 +458,6 @@ const Tool = () => {
       const el = imgNode.current;
       el.style.width = `${resizeWidth}px`;
       el.style.height = `${resizeHeight}px`;
-      el.style.maxHeight = `${resizeHeight}px`;
     }
   }, [resizeHeight, resizeWidth]);
 
@@ -561,20 +553,6 @@ const Tool = () => {
     }
   }, [selectedFrame, yourSelectedFrame, cursorX, cursorY, scrollX, scrollY]);
 
-  // 자르기 시작할때 원래 이미지 사이즈 저장
-  useEffect(() => {
-    if (imgResizeStart) {
-      if (imgNode.current) {
-        const { width, height } = imgNode.current?.getBoundingClientRect();
-        const { naturalHeight, naturalWidth } = imgNode.current;
-        setOriginWidth(naturalWidth);
-        setOriginHeight(naturalHeight);
-        setResizeWidth(width);
-        setResizeHeight(height);
-      }
-    }
-  }, [imgResizeStart]);
-
   // 자르기 끝
   useEffect(() => {
     if (imgResizeEnd) {
@@ -593,6 +571,12 @@ const Tool = () => {
     const el = imgNode.current;
     if (el) {
       el.src = imgUploadUrl;
+      el.onload = () => {
+        setOriginWidth(el.width);
+        setOriginHeight(el.height);
+        setResizeWidth(el.width);
+        setResizeHeight(el.height);
+      };
     }
   }, [imgUploadUrl]);
 
@@ -652,7 +636,7 @@ const Tool = () => {
         )}
         <ImageWrapper
           id="img-box"
-          // data-layout="wrapper"
+          onClick={isResizeMode ? handleResizeMode : undefined}
           onMouseMove={isResizeStart ? handleImgResize : undefined}
           ref={imgWrapperRef}
           bgColor={bgColor}
@@ -661,27 +645,24 @@ const Tool = () => {
         >
           {imgUploadUrl ? (
             <>
-              <ImgControlelr data-layout="inner" isResizeStart={isResizeStart} cmd={resizeCmd}>
+              <ImgControlelr data-layout="inner" isResizeStart={isResizeMode} cmd={resizeCmd}>
                 <img
-                  // onMouseMove={isResizeStart ? handleImgResize : undefined}
                   onMouseUp={handleImgResizeEnd}
                   ref={imgNode}
                   src={imgUploadUrl}
                   crossOrigin="anonymous"
                   alt="캔버스로 만들 이미지"
                 />
-                <div data-cmd="top-left" onMouseDown={handleImgResizeStart}>
-                  ㄱ
-                </div>
-                <div data-cmd="top-right" onMouseDown={handleImgResizeStart}>
-                  ㄱ
-                </div>
-                <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}>
-                  ㄴ
-                </div>
-                <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}>
-                  ㄴ
-                </div>
+                {isResizeMode ? (
+                  <>
+                    <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
+                  </>
+                ) : (
+                  <button type="button" onClick={handleResizeMode}></button>
+                )}
               </ImgControlelr>
               <VersatileWrapper>
                 <Versatile>
