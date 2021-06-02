@@ -105,11 +105,12 @@ export const ImageWrapper = styled.div<{
     `;
   }}
 
-  & > img {
+  img {
     max-height: 100vh;
   }
   .cropped-img {
     position: absolute;
+    z-index: 3;
     &:hover .cropped-img-delete {
       display: block;
     }
@@ -145,6 +146,7 @@ export const ImgControlelr = styled.div<{
   cmd: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
 }>`
   position: relative;
+  border: ${({ theme, isResizeStart }) => isResizeStart && `2px solid ${theme.color.cyan}`};
 
   ${({ isResizeStart }) =>
     isResizeStart &&
@@ -164,47 +166,65 @@ export const ImgControlelr = styled.div<{
     `;
   }}
 
-/* top-left */
-  div:nth-of-type(1) {
+/* 클릭 시 resize mode on */
+button {
+    all: unset;
     position: absolute;
+    width: 100%;
+    height: 100%;
     top: 0;
     left: 0;
-    width: 4px;
-    height: 4px;
-    background: ${({ theme }) => theme.color.black};
+  }
+
+  /* top-left */
+  div:nth-of-type(1) {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: nwse-resize;
   }
 
   /* top-right */
   div:nth-of-type(2) {
     position: absolute;
-    top: 0;
-    right: 0;
-    width: 4px;
-    height: 4px;
-    background: ${({ theme }) => theme.color.black};
+    top: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: nesw-resize;
   }
 
   /* bottom-left */
   div:nth-of-type(3) {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 4px;
-    height: 4px;
-    background: ${({ theme }) => theme.color.black};
+    bottom: -4px;
+    left: -4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: nesw-resize;
   }
 
   /* bottom-right */
   div:nth-of-type(4) {
     position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 4px;
-    height: 4px;
-    background: ${({ theme }) => theme.color.black};
+    bottom: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: nwse-resize;
   }
 `;
