@@ -223,10 +223,8 @@ const Tool = () => {
   }, []);
 
   // 이미지 업로드
-  const handleImgUpload = useCallback(
+  const handleImgReUpload = useCallback(
     async (file: RcFile) => {
-      console.log(file);
-
       try {
         if (imgWrapperRef.current) {
           const fd = new FormData();
@@ -546,6 +544,8 @@ const Tool = () => {
     if (!imgUploadUrl) return;
     const el = imgNode.current;
     if (el) {
+      el.style.width = '';
+      el.style.height = '';
       el.src = imgUploadUrl;
       el.onload = () => {
         setOriginWidth(el.width);
@@ -640,7 +640,7 @@ const Tool = () => {
                   <Button onClick={handleImgGoBack}>
                     <UndoOutlined />
                   </Button>
-                  <Upload accept="image/*" beforeUpload={handleImgUpload} showUploadList={false}>
+                  <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
                     <Button>
                       <DiffOutlined />
                     </Button>
