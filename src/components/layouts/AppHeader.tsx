@@ -1,23 +1,21 @@
 import React, { useCallback } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
+import { Button } from 'antd';
 
 const HeaderContainer = styled.header`
   width: 100%;
   height: 50px;
+  background-color: ${({ theme }) => theme.color.white};
 `;
 
 const Header = styled.div`
+  height: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 100%;
-
-  button {
-    padding: 12px;
-    background-color: blue;
-    color: white;
-  }
+  justify-content: space-between;
+  margin: 0 auto;
+  padding: 0 40px;
 `;
 
 const AppHeader = () => {
@@ -27,12 +25,19 @@ const AppHeader = () => {
     router.push('/tool');
   }, [router]);
 
+  if (router.asPath === '/tool') {
+    return null;
+  }
+
   return (
     <HeaderContainer>
       <Header>
-        <button type="button" onClick={handlePushCustomPage}>
-          뭔가 캔버스를 만들수 있을거 같은 버튼
-        </button>
+        <>
+          <h4>MeCanvas</h4>
+          <Button type="primary" onClick={handlePushCustomPage}>
+            Canvas
+          </Button>
+        </>
       </Header>
     </HeaderContainer>
   );

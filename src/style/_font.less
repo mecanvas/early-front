@@ -1,0 +1,122 @@
+// Desktop: headings, p, small
+//––––––––––––––––––––––––––––––––––––––––––––––––––
+
+// regular - 400
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 400;
+  src: local(''),
+    url('https://mecanvas-assets.s3.ap-northeast-2.amazonaws.com/font/NotoSansKR-Regular.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('https://mecanvas-assets.s3.ap-northeast-2.amazonaws.com/font/NotoSansKR-Regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+// medium - 500
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 500;
+  src: local(''),
+    url('https://mecanvas-assets.s3.ap-northeast-2.amazonaws.com/font/NotoSansKR-Medium.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('https://mecanvas-assets.s3.ap-northeast-2.amazonaws.com/font/NotoSansKR-Medium.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+// bold - 700
+@font-face {
+  font-family: 'Noto Sans KR';
+  font-style: normal;
+  font-weight: 700;
+  src: local(''),
+    url('https://mecanvas-assets.s3.ap-northeast-2.amazonaws.com/upload/NotoSansKR-Bold.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('https://mecanvas-assets.s3.ap-northeast-2.amazonaws.com/upload/NotoSansKR-Bold.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+*,
+body {
+  font-family: 'Noto Sans KR', -apple-system, Sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: @gray-900;
+  line-height: 1.65em;
+  letter-spacing: -0.02em;
+  word-break: keep-all;
+  -webkit-font-smoothing: antialiased; // Chrome, Safari
+  -moz-osx-font-smoothing: grayscale; // Firefox
+}
+
+h1 {
+  font-size: 35px;
+  line-height: 1em;
+  letter-spacing: -0.04em;
+}
+
+h2 {
+  font-weight: 600;
+  font-size: 29px;
+  line-height: 1.2em;
+  letter-spacing: -0.03em;
+}
+
+h3 {
+  font-size: 23px;
+  line-height: 1em;
+  letter-spacing: -0.02em;
+}
+
+h4 {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1em;
+}
+
+p {
+  font-size: 15px;
+  line-height: 1.65em;
+}
+
+span,
+b {
+  font-size: inherit;
+  color: inherit;
+}
+
+small {
+  font-size: 13px;
+  line-height: 1em;
+}
+
+// Desktop: headings, p, small
+//––––––––––––––––––––––––––––––––––––––––––––––––––
+@media (max-width: 650px) {
+  *,
+  body {
+    font-size: 15px;
+    font-weight: 400;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 500;
+  }
+
+  h2 {
+    font-size: 21px;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  h4 {
+    font-size: 16px;
+  }
+
+  p {
+    font-size: 15px;
+  }
+}
