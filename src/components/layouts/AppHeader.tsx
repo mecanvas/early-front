@@ -6,13 +6,16 @@ import { Button } from 'antd';
 const HeaderContainer = styled.header`
   width: 100%;
   height: 50px;
+  background-color: ${({ theme }) => theme.color.white};
 `;
 
 const Header = styled.div`
+  height: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 100%;
+  justify-content: space-between;
+  margin: 0 auto;
+  padding: 0 40px;
 `;
 
 const AppHeader = () => {
@@ -22,12 +25,19 @@ const AppHeader = () => {
     router.push('/tool');
   }, [router]);
 
+  if (router.asPath === '/tool') {
+    return null;
+  }
+
   return (
     <HeaderContainer>
       <Header>
-        <Button type="primary" onClick={handlePushCustomPage}>
-          뭔가 캔버스를 만들수 있을거 같은 버튼
-        </Button>
+        <>
+          <h4>MeCanvas</h4>
+          <Button type="primary" onClick={handlePushCustomPage}>
+            Canvas
+          </Button>
+        </>
       </Header>
     </HeaderContainer>
   );

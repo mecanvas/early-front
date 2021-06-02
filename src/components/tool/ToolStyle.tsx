@@ -1,17 +1,24 @@
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import { Button, Card } from 'antd';
 
-export const ToolContainer = styled.div<{ bgColor: string }>`
+export const ToolContainer = styled.div`
   width: 100%;
   margin: 0 auto;
   display: flex;
-  background-color: ${({ bgColor }) => bgColor};
 `;
 
-export const ImageGoBack = styled.button`
+export const BackIcon = styled(Button)`
+  width: 75px;
   position: absolute;
-  top: 55px;
-  left: 12px;
-  z-index: 4;
+  z-index: 3;
+  top: 10px;
+  left: 10px;
+  svg {
+    path {
+      color: ${({ theme }) => theme.color.white};
+    }
+  }
 `;
 
 export const YouSelectedFrame = styled.div<{
@@ -19,7 +26,7 @@ export const YouSelectedFrame = styled.div<{
   height: string;
   left: string;
   top: string;
-  border: string;
+  border?: string;
 }>`
   width: ${({ width }) => width};
   height: ${({ height }) => height};
@@ -39,14 +46,51 @@ export const DropZone = styled.div`
   cursor: pointer;
 `;
 
-export const ImageWrapper = styled.div`
+export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+
+  p {
+    margin-top: 6px;
+  }
+
+  &:hover {
+    opacity: 0.4;
+  }
+
+  ${({ isDragActive }) =>
+    isDragActive
+      ? css`
+          opacity: 0.4;
+        `
+      : css`
+          opacity: 1;
+        `}
+
+  *  > svg {
+    font-size: 50px;
+    path {
+      color: ${({ theme }) => theme.color.primary};
+    }
+  }
+`;
+
+export const ImageWrapper = styled.div<{ bgColor: string }>`
+  background-color: ${({ bgColor }) => bgColor};
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 0;
   margin: 0 auto;
   text-align: center;
   position: relative;
-  height: calc(100vh - 50px);
+  min-height: 100vh;
   & > img {
-    max-height: calc(100vh - 50px);
+    max-height: 100vh;
   }
   .cropped-img {
     position: absolute;
@@ -84,46 +128,41 @@ export const VersatileWrapper = styled.div`
   display: flex;
   flex-direction: column;
   z-index: 3;
-  background: #fff;
+  padding: 4px;
+  position: absolute;
+  top: 50px;
+  right: 4px;
 `;
 
 export const Versatile = styled.div`
-  width: 275px;
-  border: 1px solid #dbdbdb;
-  margin-right: 8px;
+  border-radius: 4px;
+  display: flex;
 `;
 
 export const Factory = styled.div`
-  padding: 6px 8px;
   display: flex;
-  flex-direction: column;
 `;
 
 export const FactoryTitle = styled.div`
   width: 100%;
   display: flex;
-  padding: 0 4px;
   margin-bottom: 3px;
-  font-size: 18px;
+  font-size: 14px;
   div {
     margin-left: auto;
   }
 `;
 
-export const ImageToolWrapper = styled.div`
-  display: flex;
-  margin-bottom: 8px;
-`;
-
-export const ImageToolBtn = styled.button`
-  padding: 8px 12px;
-  border-radius: 6px;
-  background-color: aliceblue;
-`;
-
 export const ColorPaletteWrapper = styled.div`
   display: flex;
   margin-bottom: 12px;
+  width: 40px;
+  position: relative;
+  .chrome-picker {
+    position: absolute;
+    z-index: 2;
+    right: 0;
+  }
   .circle-picker {
     & > span > div {
       border: 1px solid #dbdbdb;
@@ -132,11 +171,17 @@ export const ColorPaletteWrapper = styled.div`
   }
 `;
 
-export const FrameWrapper = styled.div`
-  display: flex;
-  margin-bottom: 12px;
+export const ColorPaletteFreeColor = styled.div`
+  text-align: center;
+  cursor: pointer;
+  border-top: 1px solid #dbdbdb;
+`;
 
+export const FrameWrapper = styled(Card)`
+  border: 1px solid #dbdbdb;
+  margin-top: 6px;
   div {
+    display: flex;
     cursor: pointer;
   }
 
@@ -159,9 +204,25 @@ export const FrameSizeName = styled.div`
   transform: translate(-50%, -50%);
 `;
 
+export const CanvasInfomationWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  border-radius: 4px;
+  button {
+    width: 100%;
+  }
+
+  div {
+    display: flex;
+  }
+`;
+
 export const BillInfomation = styled.div`
   display: flex;
+  background-color: ${({ theme }) => theme.color.white};
   padding: 6px 8px;
   border-bottom: 1px solid #dbdbdb;
   margin-top: 8px;
+  border-radius: 4px;
 `;
