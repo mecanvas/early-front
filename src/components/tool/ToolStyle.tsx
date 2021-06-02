@@ -78,7 +78,10 @@ export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
   }
 `;
 
-export const ImageWrapper = styled.div<{ bgColor: string }>`
+export const ImageWrapper = styled.div<{
+  bgColor: string;
+  cmd: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
+}>`
   background-color: ${({ bgColor }) => bgColor};
   width: 100%;
   display: flex;
@@ -89,6 +92,19 @@ export const ImageWrapper = styled.div<{ bgColor: string }>`
   text-align: center;
   position: relative;
   min-height: 100vh;
+
+  ${({ cmd }) => {
+    if (!cmd) return;
+    if (cmd === 'top-left' || cmd === 'bottom-left') {
+      return css`
+        cursor: nwse-resize;
+      `;
+    }
+    return css`
+      cursor: nesw-resize;
+    `;
+  }}
+
   & > img {
     max-height: 100vh;
   }
@@ -121,6 +137,70 @@ export const ImageWrapper = styled.div<{ bgColor: string }>`
     &.position {
       left: 0 !important;
     }
+  }
+`;
+
+export const ImgControlelr = styled.div<{
+  isResizeStart: boolean;
+  cmd: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
+}>`
+  position: relative;
+
+  ${({ isResizeStart }) =>
+    isResizeStart &&
+    css`
+      opacity: 0.4;
+    `}
+
+  ${({ cmd }) => {
+    if (!cmd) return;
+    if (cmd === 'top-left' || cmd === 'bottom-left') {
+      return css`
+        cursor: nwse-resize;
+      `;
+    }
+    return css`
+      cursor: nesw-resize;
+    `;
+  }}
+
+  div:nth-of-type(1) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 4px;
+    background: ${({ theme }) => theme.color.black};
+    cursor: nwse-resize;
+  }
+
+  div:nth-of-type(2) {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 4px;
+    background: ${({ theme }) => theme.color.black};
+    cursor: nesw-resize;
+  }
+  div:nth-of-type(3) {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 4px;
+    height: 4px;
+    background: ${({ theme }) => theme.color.black};
+    cursor: nesw-resize;
+  }
+
+  div:nth-of-type(4) {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 4px;
+    height: 4px;
+    background: ${({ theme }) => theme.color.black};
+    cursor: nwse-resize;
   }
 `;
 

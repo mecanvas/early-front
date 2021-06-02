@@ -18,6 +18,7 @@ import {
   CanvasInfomationWrapper,
   DropZoneDiv,
   BackIcon,
+  ImgControlelr,
 } from './ToolStyle';
 import { canvasToImage } from 'src/util/canvasToImage';
 import { ColorResult } from 'react-color';
@@ -128,6 +129,8 @@ const Tool = () => {
   const youSelectedFrameRef = useRef<HTMLDivElement>(null);
 
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
+
+  // 고른 액자의 이름과 수량
   const yourPriceList = useMemo(() => {
     return Object.entries(
       framePrice.reduce((acc: { [key: string]: number }, cur) => {
@@ -143,9 +146,40 @@ const Tool = () => {
   }, [framePrice]);
   const [isPreview, setIsPreview] = useState(false);
 
+  const handlePushMainPage = useCallback(() => {
+    router.push('/');
+  }, [router]);
+
   // 바뀌는 색상
   const [bgColor, setBgColor] = useState(theme.color.white);
   // const [frameBorderColor, setFrameBorderColor] = useState('#333');
+
+  const [isResizeStart, setIsResizeStart] = useState(false);
+  const [resizeCmd, setResizeCmd] = useState<'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null>(null);
+
+  const handleImgResize = useCallback(
+    (e) => {
+      if (!isResizeStart) return;
+
+      const { offsetX: x, offsetY: y } = e.nativeEvent;
+
+      console.log(x, y, resizeCmd);
+    },
+    [isResizeStart, resizeCmd],
+  );
+
+  const handleImgResizeStart = useCallback((e) => {
+    const { cmd } = e.currentTarget.dataset;
+
+    setIsResizeStart(true);
+    setResizeCmd(cmd);
+    console.log(cmd);
+  }, []);
+
+  const handleImgResizeEnd = useCallback(() => {
+    setIsResizeStart(false);
+    setResizeCmd(null);
+  }, []);
 
   // 이미지 업로드
   const handleImgUpload = useCallback(
@@ -429,13 +463,13 @@ const Tool = () => {
     [originHeight, originWidth, ratioPersist],
   );
 
-  const handleImgResizing = useCallback(() => {
+  const handleImgResizeOpen = useCallback(() => {
     setImgResizeStart(true);
     setIsImgResizeModal(true);
     setImgResizeEnd(false);
   }, []);
 
-  const handleImgResizeEnd = useCallback(() => {
+  const handleImgResizeClose = useCallback(() => {
     setImgResizeEnd(true);
     setImgResizeStart(false);
     setIsImgResizeModal(false);
@@ -534,10 +568,6 @@ const Tool = () => {
     };
   }, [handleFramePositionReletive]);
 
-  const handlePushMainPage = useCallback(() => {
-    router.push('/');
-  }, [router]);
-
   return (
     <>
       <BackIcon type="primary" onClick={handlePushMainPage}>
@@ -583,11 +613,31 @@ const Tool = () => {
             {...selectedFramePosition}
           ></YouSelectedFrame>
         )}
-        <ImageWrapper id="img-box" ref={imgWrapperRef} bgColor={bgColor}>
+        <ImageWrapper id="img-box" ref={imgWrapperRef} bgColor={bgColor} onMouseUp={handleImgResizeEnd} cmd={resizeCmd}>
           {imgUploadUrl ? (
             <>
-              <img ref={imgNode} src={imgUploadUrl} crossOrigin="anonymous" alt="캔버스로 만들 이미지" />
-
+              <ImgControlelr isResizeStart={isResizeStart} cmd={resizeCmd}>
+                <img
+                  onMouseMove={isResizeStart ? handleImgResize : undefined}
+                  onMouseUp={handleImgResizeEnd}
+                  ref={imgNode}
+                  src={imgUploadUrl}
+                  crossOrigin="anonymous"
+                  alt="캔버스로 만들 이미지"
+                />
+                <div data-cmd="top-left" onMouseDown={handleImgResizeStart}>
+                  ㄱ
+                </div>
+                <div data-cmd="top-right" onMouseDown={handleImgResizeStart}>
+                  ㄱ
+                </div>
+                <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}>
+                  ㄴ
+                </div>
+                <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}>
+                  ㄴ
+                </div>
+              </ImgControlelr>
               <VersatileWrapper>
                 <Versatile>
                   <Button onClick={handleImgGoBack}>
@@ -599,11 +649,11 @@ const Tool = () => {
                     </Button>
                   </Upload>
                   {imgResizeStart ? (
-                    <Button onClick={handleImgResizeEnd}>
+                    <Button onClick={handleImgResizeClose}>
                       <ColumnWidthOutlined />
                     </Button>
                   ) : (
-                    <Button onClick={handleImgResizing}>
+                    <Button onClick={handleImgResizeOpen}>
                       <ColumnWidthOutlined />
                     </Button>
                   )}
