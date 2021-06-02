@@ -78,7 +78,10 @@ export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
   }
 `;
 
-export const ImageWrapper = styled.div<{ bgColor: string }>`
+export const ImageWrapper = styled.div<{
+  bgColor?: string;
+  cmd?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
+}>`
   background-color: ${({ bgColor }) => bgColor};
   width: 100%;
   display: flex;
@@ -89,11 +92,37 @@ export const ImageWrapper = styled.div<{ bgColor: string }>`
   text-align: center;
   position: relative;
   min-height: 100vh;
-  & > img {
+
+  small {
+    position: absolute;
+    top: 25px;
+    z-index: 3;
+    padding: 8px;
+    font-weight: bold;
+    border: 1px solid ${({ theme }) => theme.color.primary};
+    border-radius: 20px;
+    background-color: ${({ theme }) => theme.color.secondarybg};
+    color: ${({ theme }) => theme.color.primary};
+  }
+
+  ${({ cmd }) => {
+    if (!cmd) return;
+    if (cmd === 'top-left' || cmd === 'bottom-right') {
+      return css`
+        cursor: nwse-resize;
+      `;
+    }
+    return css`
+      cursor: nesw-resize;
+    `;
+  }}
+
+  img {
     max-height: 100vh;
   }
   .cropped-img {
     position: absolute;
+    z-index: 3;
     &:hover .cropped-img-delete {
       display: block;
     }
@@ -121,6 +150,94 @@ export const ImageWrapper = styled.div<{ bgColor: string }>`
     &.position {
       left: 0 !important;
     }
+  }
+`;
+
+export const ImgControlelr = styled.div<{
+  isResizeStart: boolean;
+  cmd: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
+}>`
+  position: relative;
+  border: ${({ theme, isResizeStart }) => isResizeStart && `2px solid ${theme.color.cyan}`};
+
+  ${({ isResizeStart }) =>
+    isResizeStart &&
+    css`
+      opacity: 0.4;
+    `}
+
+  ${({ cmd }) => {
+    if (!cmd) return;
+    if (cmd === 'top-left' || cmd === 'bottom-right') {
+      return css`
+        cursor: nwse-resize;
+      `;
+    }
+    return css`
+      cursor: nesw-resize;
+    `;
+  }}
+
+/* 클릭 시 resize mode on */
+button {
+    all: unset;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+  }
+
+  /* top-left */
+  div:nth-of-type(1) {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
+    cursor: nwse-resize;
+  }
+
+  /* top-right */
+  div:nth-of-type(2) {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
+    cursor: nesw-resize;
+  }
+
+  /* bottom-left */
+  div:nth-of-type(3) {
+    position: absolute;
+    bottom: -4px;
+    left: -4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
+    cursor: nesw-resize;
+  }
+
+  /* bottom-right */
+  div:nth-of-type(4) {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
+    cursor: nwse-resize;
   }
 `;
 
