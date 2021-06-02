@@ -157,23 +157,60 @@ const Tool = () => {
   const [isResizeStart, setIsResizeStart] = useState(false);
   const [resizeCmd, setResizeCmd] = useState<'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null>(null);
 
+  const positioningImageResize = useCallback(
+    (resizeCmd: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null, x: number, y: number) => {
+      if (!imgNode.current) return;
+      const { width, height, left, top, right } = imgNode.current.getBoundingClientRect();
+      const absX = Math.abs(x - Math.ceil(left));
+      const absY = Math.abs(height + Math.ceil(top - y));
+      const absLeftX = Math.abs(x - Math.ceil(right));
+      const absBottomY = Math.abs(y + height - (top + height)); // bottom - top <- 이거 풀어씀.
+      let newWidth = width;
+      let newHeight = height;
+
+      switch (resizeCmd) {
+        case 'bottom-right':
+          newWidth = absX;
+          newHeight = absBottomY;
+          break;
+        case 'top-right':
+          newHeight = absY;
+          newWidth = absX;
+          break;
+        case 'bottom-left':
+          newWidth = absLeftX;
+          newHeight = absBottomY;
+          break;
+        case 'top-left':
+          newHeight = absY;
+          newWidth = absLeftX;
+          break;
+        default:
+          break;
+      }
+
+      imgNode.current.style.width = `${newWidth}px`;
+      imgNode.current.style.height = `${newHeight}px`;
+    },
+    [],
+  );
+
   const handleImgResize = useCallback(
     (e) => {
       if (!isResizeStart) return;
+      if (imgNode.current) {
+        const { clientY, clientX } = e.nativeEvent;
 
-      const { offsetX: x, offsetY: y } = e.nativeEvent;
-
-      console.log(x, y, resizeCmd);
+        positioningImageResize(resizeCmd, clientX, clientY);
+      }
     },
-    [isResizeStart, resizeCmd],
+    [isResizeStart, positioningImageResize, resizeCmd],
   );
 
   const handleImgResizeStart = useCallback((e) => {
     const { cmd } = e.currentTarget.dataset;
-
     setIsResizeStart(true);
     setResizeCmd(cmd);
-    console.log(cmd);
   }, []);
 
   const handleImgResizeEnd = useCallback(() => {
@@ -613,12 +650,20 @@ const Tool = () => {
             {...selectedFramePosition}
           ></YouSelectedFrame>
         )}
-        <ImageWrapper id="img-box" ref={imgWrapperRef} bgColor={bgColor} onMouseUp={handleImgResizeEnd} cmd={resizeCmd}>
+        <ImageWrapper
+          id="img-box"
+          // data-layout="wrapper"
+          onMouseMove={isResizeStart ? handleImgResize : undefined}
+          ref={imgWrapperRef}
+          bgColor={bgColor}
+          onMouseUp={handleImgResizeEnd}
+          cmd={resizeCmd}
+        >
           {imgUploadUrl ? (
             <>
-              <ImgControlelr isResizeStart={isResizeStart} cmd={resizeCmd}>
+              <ImgControlelr data-layout="inner" isResizeStart={isResizeStart} cmd={resizeCmd}>
                 <img
-                  onMouseMove={isResizeStart ? handleImgResize : undefined}
+                  // onMouseMove={isResizeStart ? handleImgResize : undefined}
                   onMouseUp={handleImgResizeEnd}
                   ref={imgNode}
                   src={imgUploadUrl}
@@ -631,10 +676,10 @@ const Tool = () => {
                 <div data-cmd="top-right" onMouseDown={handleImgResizeStart}>
                   ㄱ
                 </div>
-                <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}>
+                <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}>
                   ㄴ
                 </div>
-                <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}>
+                <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}>
                   ㄴ
                 </div>
               </ImgControlelr>

@@ -95,7 +95,7 @@ export const ImageWrapper = styled.div<{
 
   ${({ cmd }) => {
     if (!cmd) return;
-    if (cmd === 'top-left' || cmd === 'bottom-left') {
+    if (cmd === 'top-left' || cmd === 'bottom-right') {
       return css`
         cursor: nwse-resize;
       `;
@@ -154,7 +154,7 @@ export const ImgControlelr = styled.div<{
 
   ${({ cmd }) => {
     if (!cmd) return;
-    if (cmd === 'top-left' || cmd === 'bottom-left') {
+    if (cmd === 'top-left' || cmd === 'bottom-right') {
       return css`
         cursor: nwse-resize;
       `;
@@ -164,6 +164,7 @@ export const ImgControlelr = styled.div<{
     `;
   }}
 
+/* top-left */
   div:nth-of-type(1) {
     position: absolute;
     top: 0;
@@ -174,6 +175,7 @@ export const ImgControlelr = styled.div<{
     cursor: nwse-resize;
   }
 
+  /* top-right */
   div:nth-of-type(2) {
     position: absolute;
     top: 0;
@@ -183,6 +185,8 @@ export const ImgControlelr = styled.div<{
     background: ${({ theme }) => theme.color.black};
     cursor: nesw-resize;
   }
+
+  /* bottom-left */
   div:nth-of-type(3) {
     position: absolute;
     bottom: 0;
@@ -193,6 +197,7 @@ export const ImgControlelr = styled.div<{
     cursor: nesw-resize;
   }
 
+  /* bottom-right */
   div:nth-of-type(4) {
     position: absolute;
     bottom: 0;
