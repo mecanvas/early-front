@@ -196,6 +196,11 @@ const Tool = () => {
 
   const handleResizeMode = useCallback((e) => {
     e.stopPropagation();
+    const { component } = e.currentTarget.dataset;
+    if (component === 'wrapper') {
+      return setIsResizeMode(false);
+    }
+
     setIsResizeMode((prev) => !prev);
   }, []);
 
@@ -606,8 +611,9 @@ const Tool = () => {
 
         <ImageWrapper
           id="img-box"
-          onClick={isResizeMode ? handleResizeMode : undefined}
-          onMouseMove={isResizeStart ? handleImgResize : undefined}
+          data-component="wrapper"
+          onClick={handleResizeMode}
+          onMouseMove={handleImgResize}
           ref={imgWrapperRef}
           bgColor={bgColor}
           onMouseUp={handleImgResizeEnd}
