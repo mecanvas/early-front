@@ -20,7 +20,7 @@ module.exports = withPlugins(
         },
         webpack(config, { isServer }) {
           if (isServer) {
-            const antStyles = /antd\/.*?\/style.*?/;
+            const antStyles = /(antd\/.*?\/style).*(?<![.]js)$/;
             const origExternals = [...config.externals];
             config.externals = [
               (context, request, callback) => {
