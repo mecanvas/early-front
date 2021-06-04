@@ -80,6 +80,7 @@ export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
 
 export const ImageWrapper = styled.div<{
   bgColor?: string;
+  imgUploadLoading?: boolean;
   cmd?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
 }>`
   background-color: ${({ bgColor }) => bgColor};
@@ -92,6 +93,12 @@ export const ImageWrapper = styled.div<{
   text-align: center;
   position: relative;
   min-height: 100vh;
+
+  ${({ imgUploadLoading }) =>
+    imgUploadLoading &&
+    css`
+      opacity: 0.3;
+    `}
 
   small {
     position: absolute;

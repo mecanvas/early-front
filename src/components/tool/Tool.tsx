@@ -35,6 +35,7 @@ import { Button, Modal, notification, Popover, Upload, Checkbox, Input } from 'a
 import { RcFile } from 'antd/lib/upload';
 import { theme } from 'src/style/theme';
 import { useRouter } from 'next/router';
+import Loading from '../common/Loading';
 
 interface PaperSize {
   name: string;
@@ -111,6 +112,7 @@ const Tool = () => {
   const imgWrapperRef = useRef<HTMLDivElement>(null);
   const imgNode = useRef<HTMLImageElement>(null);
   const [imgUploadUrl, setImgUploadUrl] = useState('');
+  const [imgUploadLoading, setImgUploadLoading] = useState(false);
 
   const [originWidth, setOriginWidth] = useState(0);
   const [originHeight, setOriginHeight] = useState(0);
@@ -230,6 +232,7 @@ const Tool = () => {
   // 이미지 업로드
   const handleImgReUpload = useCallback(
     async (file: RcFile) => {
+      setImgUploadLoading(true);
       try {
         if (imgWrapperRef.current) {
           const fd = new FormData();
@@ -238,6 +241,8 @@ const Tool = () => {
         }
       } catch (err) {
         console.error(err);
+      } finally {
+        setImgUploadLoading(false);
       }
       return false;
     },
@@ -251,7 +256,7 @@ const Tool = () => {
     if (acceptedFiles[0].type.includes('svg')) {
       return alert('svg 파일은 지원하지 않습니다.');
     }
-
+    setImgUploadLoading(true);
     try {
       if (imgWrapperRef.current) {
         const file = acceptedFiles[0];
@@ -262,6 +267,8 @@ const Tool = () => {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setImgUploadLoading(false);
     }
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: handleImgDropUpload });
@@ -575,6 +582,7 @@ const Tool = () => {
       <BackIcon type="primary" onClick={handlePushMainPage}>
         <ArrowLeftOutlined />
       </BackIcon>
+      {imgUploadLoading && <Loading />}
       <Modal
         visible={imgModalResizeOpen}
         onOk={handleModalResizeOk}
@@ -610,6 +618,7 @@ const Tool = () => {
         )}
 
         <ImageWrapper
+          imgUploadLoading={imgUploadLoading}
           id="img-box"
           data-component="wrapper"
           onClick={handleResizeMode}
@@ -708,7 +717,7 @@ const Tool = () => {
               </VersatileWrapper>
             </>
           ) : (
-            <ImageWrapper>
+            <ImageWrapper imgUploadLoading={imgUploadLoading}>
               <DropZone {...getRootProps()}>
                 <input {...getInputProps()} accept="image/*" />
                 <DropZoneDiv isDragActive={isDragActive}>
