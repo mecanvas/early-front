@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
+import { useSpring, animated } from 'react-spring';
 import { keyframes } from '@emotion/react';
 
 const LoaderAnimation = keyframes`
@@ -45,16 +46,24 @@ const LoaderInnerAnimation = keyframes`
   }
 `;
 
-const Loader = styled.span`
-  z-index: 30;
-  width: 40px;
-  height: 40px;
+const LoaderContainer = styled.div`
   position: absolute;
-  border: 4px solid ${({ theme }) => theme.color.primary};
+  z-index: 30;
   top: 50%;
   left: 50%;
-  animation: ${LoaderAnimation} 2s infinite ease;
+  transform: translate(-50%, -50%);
+`;
 
+const Loader = styled.div`
+  width: 40px;
+  height: 40px;
+  border: 4px solid ${({ theme }) => theme.color.primary};
+  display: inline-block;
+  position: relative;
+  left: 50px;
+  top: 50%;
+  animation: ${LoaderAnimation} 2s infinite ease;
+  margin-bottom: 12px;
   span {
     vertical-align: top;
     display: inline-block;
@@ -65,10 +74,19 @@ const Loader = styled.span`
 `;
 
 const Loading = () => {
+  const textAni = useSpring({
+    to: { opacity: 1, translateY: 0 },
+    from: { opacity: 0, translateY: 20 },
+    delay: 500,
+    config: { duration: 1000 },
+  });
   return (
-    <Loader>
-      <span></span>
-    </Loader>
+    <LoaderContainer>
+      <Loader>
+        <span></span>
+      </Loader>
+      <animated.p style={textAni}>잠시만 기다려 주세요.</animated.p>
+    </LoaderContainer>
   );
 };
 
