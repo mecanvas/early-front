@@ -31,7 +31,7 @@ import { useRouter } from 'next/router';
 import Loading from '../common/Loading';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faImages, faSquare } from '@fortawesome/free-regular-svg-icons';
-import { faFill, faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faFill, faHome, faUndo } from '@fortawesome/free-solid-svg-icons';
 
 interface PaperSize {
   name: string;
@@ -571,7 +571,7 @@ const Tool = () => {
   return (
     <>
       <BackIcon type="primary" onClick={handlePushMainPage}>
-        <ArrowLeftOutlined />
+        <FontAwesomeIcon style={{ fontSize: '18px' }} icon={faHome} fill={theme.color.white} />
       </BackIcon>
       {imgUploadLoading && <Loading />}
       <Modal
@@ -688,7 +688,7 @@ const Tool = () => {
                         >
                           <div>{key}</div>
                           <div>
-                            {value.quantity}개 x {value.price.toString()}
+                            {value.price.toString()} x {value.quantity}개
                           </div>
                         </div>
                       ))}

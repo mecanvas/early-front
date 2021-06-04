@@ -9,7 +9,9 @@ export const ToolContainer = styled.div`
 `;
 
 export const BackIcon = styled(Button)`
-  width: 75px;
+  padding: 0;
+  width: 30px;
+  height: 30px;
   position: absolute;
   z-index: 3;
   top: 10px;
