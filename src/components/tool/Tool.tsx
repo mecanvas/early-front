@@ -687,31 +687,30 @@ const Tool = () => {
                   ))}
                 />
                 <CanvasInfomationWrapper>
+                  {/* 사용한 액자 x 수량 */}
+                  <BillInfomation>
+                    <div>
+                      {yourPriceList.map(([key, value], index) => (
+                        <div
+                          style={{ display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 3px' }}
+                          key={index}
+                        >
+                          <div>{key}</div>
+                          <div>
+                            {value.quantity}개 x {value.price.toString()}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <FactoryTitle>
+                      예상 가격 <div>{framePrice.reduce((acc, cur) => (acc += cur.price), 0).toLocaleString()}원</div>
+                    </FactoryTitle>
+                  </BillInfomation>
                   <div>
                     <Button onClick={handleImgPreview}>미리보기 </Button>
                     <Button type="primary" onClick={() => canvasToImage(selectedFrameList)}>
                       저장
                     </Button>
-                  </div>
-                  <BillInfomation>
-                    <FactoryTitle>
-                      예상 가격 <div>{framePrice.reduce((acc, cur) => (acc += cur.price), 0).toLocaleString()}원</div>
-                    </FactoryTitle>
-                  </BillInfomation>
-
-                  {/* 사용한 액자 x 수량 */}
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    {yourPriceList.map(([key, value], index) => (
-                      <div
-                        style={{ display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 3px' }}
-                        key={index}
-                      >
-                        <div>{key}</div>
-                        <div>
-                          {value.quantity}개 x {value.price.toString()}
-                        </div>
-                      </div>
-                    ))}
                   </div>
                 </CanvasInfomationWrapper>
               </VersatileWrapper>

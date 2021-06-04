@@ -344,9 +344,19 @@ export const CanvasInfomationWrapper = styled.div`
 
 export const BillInfomation = styled.div`
   display: flex;
+  flex-direction: column;
   background-color: ${({ theme }) => theme.color.white};
   padding: 6px 8px;
   border-bottom: 1px solid #dbdbdb;
-  margin-top: 8px;
+  margin-bottom: 8px;
   border-radius: 4px;
+
+  & > div:nth-of-type(1) {
+    display: flex;
+    flex-direction: column;
+    & > div:last-child {
+      margin-bottom: 4px;
+      border-bottom: 1px solid ${({ theme }) => theme.color.gray400};
+    }
+  }
 `;
