@@ -688,7 +688,7 @@ const Tool = () => {
                         >
                           <div>{key}</div>
                           <div>
-                            {value.price.toString()} x {value.quantity}개
+                            {value.price.toLocaleString()} x {value.quantity}개
                           </div>
                         </div>
                       ))}
