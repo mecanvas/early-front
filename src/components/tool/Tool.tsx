@@ -23,7 +23,7 @@ import {
 import { canvasToImage } from 'src/util/canvasToImage';
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
-import { ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { Button, Modal, notification, Popover, Upload, Checkbox, Input } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import { theme } from 'src/style/theme';
@@ -162,7 +162,6 @@ const Tool = () => {
       const absBottomY = Math.abs(y + height - (top + height)); // bottom - top <- 이거 풀어씀.
       let newWidth = width;
       let newHeight = height;
-
       switch (resizeCmd) {
         case 'bottom-right':
           newWidth = absX;
@@ -206,8 +205,12 @@ const Tool = () => {
     (e) => {
       if (!isResizeStart && !isResizeMode) return;
       if (imgNode.current) {
-        const { clientY, clientX } = e.nativeEvent;
+        if (e.type === 'touchmove') {
+          const { clientX, clientY } = e.changedTouches[0];
+          positioningImageResize(resizeCmd, clientX, clientY);
+        }
 
+        const { clientY, clientX } = e.nativeEvent;
         positioningImageResize(resizeCmd, clientX, clientY);
       }
     },
@@ -614,6 +617,7 @@ const Tool = () => {
           data-component="wrapper"
           onClick={handleResizeMode}
           onMouseMove={handleImgResize}
+          onTouchMove={handleImgResize}
           ref={imgWrapperRef}
           bgColor={bgColor}
           onMouseUp={handleImgResizeEnd}
@@ -625,6 +629,7 @@ const Tool = () => {
               <ImgControlelr data-layout="inner" isResizeStart={isResizeMode} cmd={resizeCmd}>
                 <img
                   onMouseUp={handleImgResizeEnd}
+                  onTouchStart={handleImgResizeEnd}
                   ref={imgNode}
                   src={imgUploadUrl}
                   crossOrigin="anonymous"
@@ -632,10 +637,22 @@ const Tool = () => {
                 />
                 {isResizeMode ? (
                   <>
-                    <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="top-left" onMouseDown={handleImgResizeStart} onTouchEnd={handleImgResizeStart}></div>
+                    <div
+                      data-cmd="top-right"
+                      onMouseDown={handleImgResizeStart}
+                      onTouchEnd={handleImgResizeStart}
+                    ></div>
+                    <div
+                      data-cmd="bottom-left"
+                      onMouseDown={handleImgResizeStart}
+                      onTouchEnd={handleImgResizeStart}
+                    ></div>
+                    <div
+                      data-cmd="bottom-right"
+                      onMouseDown={handleImgResizeStart}
+                      onTouchEnd={handleImgResizeStart}
+                    ></div>
                   </>
                 ) : (
                   <button type="button" onClick={handleResizeMode}></button>
