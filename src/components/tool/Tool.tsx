@@ -23,19 +23,15 @@ import {
 import { canvasToImage } from 'src/util/canvasToImage';
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
-import {
-  ArrowLeftOutlined,
-  BgColorsOutlined,
-  ColumnWidthOutlined,
-  DiffOutlined,
-  PlusOutlined,
-  UndoOutlined,
-} from '@ant-design/icons';
+import { ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Modal, notification, Popover, Upload, Checkbox, Input } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import { theme } from 'src/style/theme';
 import { useRouter } from 'next/router';
 import Loading from '../common/Loading';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faImages, faSquare } from '@fortawesome/free-regular-svg-icons';
+import { faFill, faUndo } from '@fortawesome/free-solid-svg-icons';
 
 interface PaperSize {
   name: string;
@@ -653,15 +649,15 @@ const Tool = () => {
               <VersatileWrapper>
                 <Versatile>
                   <Button onClick={handleImgGoBack}>
-                    <UndoOutlined />
+                    <FontAwesomeIcon style={{ fontSize: '18px' }} icon={faUndo} fill={theme.color.gray900} />
                   </Button>
                   <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
                     <Button>
-                      <DiffOutlined />
+                      <FontAwesomeIcon style={{ fontSize: '18px' }} icon={faImages} fill={theme.color.gray900} />
                     </Button>
                   </Upload>
                   <Button onClick={handleModalResize}>
-                    <ColumnWidthOutlined />
+                    <FontAwesomeIcon style={{ fontSize: '18px' }} icon={faSquare} fill={theme.color.gray900} />
                   </Button>
 
                   <Factory>
@@ -672,7 +668,7 @@ const Tool = () => {
                       content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
                     >
                       <Button>
-                        <BgColorsOutlined />
+                        <FontAwesomeIcon style={{ fontSize: '18px' }} icon={faFill} fill={theme.color.gray900} />
                       </Button>
                     </Popover>
 
