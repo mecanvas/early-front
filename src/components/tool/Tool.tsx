@@ -297,13 +297,8 @@ const Tool = () => {
   const handleImgGoBack = useCallback(() => {
     if (imgWrapperRef.current) {
       const { current: imgBox } = imgWrapperRef;
-      if (imgBox.childNodes.length <= 1) {
-        if (!isPreview) {
-          return notification.info({ message: '존재하는 액자가 없습니다.', placement: 'bottomLeft' });
-        }
-        if (imgBox.childNodes.length === 0) {
-          return notification.info({ message: '존재하는 액자가 없습니다.', placement: 'bottomLeft' });
-        }
+      if (imgBox.childNodes.length <= 2) {
+        return notification.info({ message: '존재하는 액자가 없습니다.', placement: 'bottomLeft' });
       }
       const imgBoxId = +(imgBox.childNodes[0] as any).id;
       imgBox?.removeChild(imgBox.childNodes[0]);
@@ -311,7 +306,7 @@ const Tool = () => {
       setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== imgBoxId));
       setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== imgBoxId));
     }
-  }, [framePrice, canvasFramePositionList, selectedFrameList, isPreview]);
+  }, [framePrice, canvasFramePositionList, selectedFrameList]);
 
   // 이미지 저장을 위한 캔버스 생성 (스프라이트 기법으로 이미지 저장은 안되기 때문에 품질이 깨지더라도 이 방법 사용합니다.)
   const createCanvasForSave = useCallback(
@@ -587,8 +582,8 @@ const Tool = () => {
       >
         <div>
           <form onChange={handleChangeImgSize}>
-            <Input type="text" name="width" value={resizeWidth || ''} placeholder="너비" addonAfter="px" />
-            <Input type="text" name="height" value={resizeHeight || ''} placeholder="높이" addonAfter="px" />
+            <Input type="text" name="width" value={resizeWidth || ''} addonBefore="너비" addonAfter="px" />
+            <Input type="text" name="height" value={resizeHeight || ''} addonBefore="높이" addonAfter="px" />
           </form>
 
           <div style={{ textAlign: 'right' }}>
