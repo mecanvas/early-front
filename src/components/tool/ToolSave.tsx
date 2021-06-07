@@ -47,7 +47,7 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
 
   useEffect(() => {
     if (isDone) {
-      router.push('/');
+      router.push('/success');
     }
   }, [isDone, router]);
 
