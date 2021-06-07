@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import useSWR from 'swr';
 
 export const useGetCursorPosition = (isSelected: boolean) => {
   const [windowX, setWindowX] = useState(0);
@@ -40,4 +41,18 @@ export const useGetScollPosition = () => {
   }, [handleGetScrollPosition]);
 
   return [scrollX, scrollY];
+};
+
+// 전역변수를 swr을 이용해 사용합니다.
+export const useGlobalState = <T,>(key: string, defaultValue?: T | null) => {
+  const { data: state = defaultValue, mutate } = useSWR(key, null, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    refreshWhenHidden: false,
+    refreshWhenOffline: false,
+  });
+
+  const setState = useCallback((value: any) => mutate(value, false), [mutate]);
+
+  return [state, setState];
 };
