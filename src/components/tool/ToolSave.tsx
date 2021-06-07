@@ -123,15 +123,21 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
             ></AntdInput>
           </Form.Item>
         </form>
-        <div>주문 하신 액자 맞으신가요?</div>
-        {yourPriceList?.map(([key, value], index) => (
-          <div key={index}>
-            <div>{key}</div>
-            <div>
-              {value.price.toLocaleString()} x {value.quantity}개
-            </div>
-          </div>
-        ))}
+        {selectedFrameList.length ? (
+          <>
+            <div>생성하신 액자가 맞으신가요?</div>
+            {yourPriceList?.map(([key, value], index) => (
+              <div key={index}>
+                <div>{key}</div>
+                <div>
+                  {value.price.toLocaleString()} x {value.quantity}개
+                </div>
+              </div>
+            ))}
+          </>
+        ) : (
+          <div style={{ textAlign: 'center' }}>생성하신 액자가 없으시네요! 액자를 만들어 주셔야 진행됩니다.</div>
+        )}
       </Modal>
     </>
   );
