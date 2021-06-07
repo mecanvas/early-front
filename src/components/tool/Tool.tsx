@@ -404,7 +404,7 @@ const Tool = () => {
       div.append(deleteBtn);
       imgWrapperRef.current?.prepend(div);
     },
-    [handleDeleteCanvas, cursorX, cursorY, scrollX, scrollY, imgUploadUrl, canvasFramePositionList],
+    [handleDeleteCanvas, cursorX, cursorY, scrollX, scrollY, imgUploadUrl, bgColor, canvasFramePositionList],
   );
 
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
