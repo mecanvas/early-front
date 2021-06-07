@@ -383,6 +383,7 @@ const Tool = () => {
         'style',
         `
         background-image : url(${imgUploadUrl});
+        background-color : ${bgColor};
         background-repeat : no-repeat;
         background-size: ${width}px ${height}px; 
         background-position-x: ${-canvasLeftPosition + left}px;
