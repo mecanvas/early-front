@@ -577,6 +577,13 @@ const Tool = () => {
     };
   }, [handleFramePositionReletive]);
 
+  useEffect(() => {
+    if (isSaveCanvas) {
+      setIsSaveCanvas(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <BackIcon type="primary" onClick={handlePushMainPage}>

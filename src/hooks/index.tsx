@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import useSWR from 'swr';
+import { notification } from 'antd';
 
 export const useGetCursorPosition = (isSelected: boolean) => {
   const [windowX, setWindowX] = useState(0);
@@ -80,6 +81,7 @@ export const useCanvasToServer = () => {
 
   const canvasToImage = (canvas: HTMLCanvasElement[], name: string) => {
     if (!window) return;
+    if (!canvas.length) return notification.error({ message: '액자를 만들어주세요.', placement: 'bottomLeft' });
 
     const sendToCanvas = async () => {
       setLoading(true);
