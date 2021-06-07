@@ -96,7 +96,6 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
 
   return (
     <>
-      <Loading loading={loading} />
       <Modal
         visible={isSaveCanvas}
         onOk={handleSendToConfrim}
@@ -106,6 +105,7 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
         okText="확인"
         cancelText="취소"
       >
+        <Loading loading={loading} />
         <form onChange={handleFormChange}>
           <Form.Item labelCol={{ span: 3 }} label="이름" extra={userNameEmpty.extra}>
             <AntdInput
