@@ -75,7 +75,7 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
     [info, resetEmpty],
   );
 
-  const handleSendToConfrim = useCallback(() => {
+  const handleSendToConfirm = useCallback(() => {
     if (!info) {
       setUserNameEmpty({ ...userNameEmpty, isRequired: true, extra: '이름을 입력해 주세요!' });
       setPhoneNumberEmpty({ ...phoneNumberEmpty, isRequired: true, extra: '연락처를 입력해 주세요!' });
@@ -98,7 +98,7 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
     <>
       <Modal
         visible={isSaveCanvas}
-        onOk={handleSendToConfrim}
+        onOk={handleSendToConfirm}
         onCancel={handleVisible}
         confirmLoading={loading}
         title="저장하시나요?"
