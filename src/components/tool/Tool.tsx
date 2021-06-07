@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useGetCursorPosition, useGetScollPosition } from 'src/hooks';
+import { useGetCursorPosition, useGetScollPosition, useGlobalState } from 'src/hooks';
 import axios from 'axios';
 import ToolColorPalette from './ToolColorPalette';
 import {
@@ -20,10 +20,9 @@ import {
   BackIcon,
   ImgControlelr,
 } from './ToolStyle';
-import { canvasToImage } from 'src/util/canvasToImage';
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
-import { ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { Button, Modal, notification, Popover, Upload, Checkbox, Input } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import { theme } from 'src/style/theme';
@@ -32,6 +31,7 @@ import Loading from '../common/Loading';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faImages, faSquare } from '@fortawesome/free-regular-svg-icons';
 import { faFill, faHome, faUndo } from '@fortawesome/free-solid-svg-icons';
+import ToolSave from './ToolSave';
 
 interface PaperSize {
   name: string;
@@ -123,6 +123,8 @@ const Tool = () => {
   const youSelectedFrameRef = useRef<HTMLDivElement>(null);
 
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
+
+  const [isSaveCanvas, setIsSaveCanvas] = useGlobalState('saveModal', false);
 
   // 고른 액자의 이름과 수량
   const yourPriceList = useMemo(() => {
@@ -311,13 +313,16 @@ const Tool = () => {
   // 이미지 저장을 위한 캔버스 생성 (스프라이트 기법으로 이미지 저장은 안되기 때문에 품질이 깨지더라도 이 방법 사용합니다.)
   const createCanvasForSave = useCallback(
     (id: number) => {
-      if (!youSelectedFrameRef.current || !imgNode.current) return;
+      if (!youSelectedFrameRef.current || !imgNode.current || !selectedFrameInfo) return;
+
+      const { name } = selectedFrameInfo;
       const { width: frameWidth, height: frameHeight } = youSelectedFrameRef.current.getBoundingClientRect();
       const { left, top } = imgNode.current.getBoundingClientRect();
 
       const image = imgNode.current;
       const oCanvas = document.createElement('canvas');
       oCanvas.id = id.toString();
+      oCanvas.dataset.paper = name;
       const cropX = cursorX - left - frameWidth / 2;
       const cropY = cursorY - top - frameHeight / 2;
 
@@ -346,7 +351,7 @@ const Tool = () => {
 
       setSelectedFrameList([...selectedFrameList, oCanvas]);
     },
-    [cursorX, cursorY, selectedFrameList],
+    [cursorX, cursorY, selectedFrameInfo, selectedFrameList],
   );
 
   const createImageCanvas = useCallback(
@@ -398,7 +403,7 @@ const Tool = () => {
       div.append(deleteBtn);
       imgWrapperRef.current?.prepend(div);
     },
-    [canvasFramePositionList, cursorX, cursorY, handleDeleteCanvas, imgUploadUrl, scrollX, scrollY],
+    [handleDeleteCanvas, cursorX, cursorY, scrollX, scrollY, imgUploadUrl, canvasFramePositionList],
   );
 
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
@@ -527,6 +532,10 @@ const Tool = () => {
   //   setFrameBorderColor(hex);
   // }, []);
 
+  const handleSaveCanvas = useCallback(() => {
+    setIsSaveCanvas(true);
+  }, [setIsSaveCanvas]);
+
   // 액자 클릭시 움직이는 로직
   useEffect(() => {
     if (selectedFrame && yourSelectedFrame) {
@@ -568,12 +577,19 @@ const Tool = () => {
     };
   }, [handleFramePositionReletive]);
 
+  useEffect(() => {
+    if (isSaveCanvas) {
+      setIsSaveCanvas(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <BackIcon type="primary" onClick={handlePushMainPage}>
         <FontAwesomeIcon style={{ fontSize: '18px' }} icon={faHome} fill={theme.color.white} />
       </BackIcon>
-      {imgUploadLoading && <Loading />}
+      {<Loading loading={imgUploadLoading} />}
       <Modal
         visible={imgModalResizeOpen}
         onOk={handleModalResizeOk}
@@ -699,9 +715,10 @@ const Tool = () => {
                   </BillInfomation>
                   <div>
                     <Button onClick={handleImgPreview}>미리보기 </Button>
-                    <Button type="primary" onClick={() => canvasToImage(selectedFrameList)}>
+                    <Button type="primary" onClick={handleSaveCanvas}>
                       저장
                     </Button>
+                    {isSaveCanvas && <ToolSave yourPriceList={yourPriceList} selectedFrameList={selectedFrameList} />}
                   </div>
                 </CanvasInfomationWrapper>
               </VersatileWrapper>
