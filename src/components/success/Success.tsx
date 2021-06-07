@@ -1,9 +1,11 @@
 import { Result, Button } from 'antd';
 import { useRouter } from 'next/router';
-import React, { useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
+import { useGlobalState } from 'src/hooks';
 
 const Success = () => {
   const router = useRouter();
+  const [isDone] = useGlobalState('isDone');
 
   const handleRouterByKey = useCallback(
     (e) => {
@@ -12,6 +14,18 @@ const Success = () => {
     },
     [router],
   );
+
+  useEffect(() => {
+    if (!window) return;
+    if (!isDone) {
+      window.alert('접근 권한이 없습니다.');
+      router.push('/');
+    }
+  }, [router, isDone]);
+
+  if (!isDone) {
+    return null;
+  }
 
   return (
     <Result

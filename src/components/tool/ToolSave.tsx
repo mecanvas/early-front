@@ -82,8 +82,9 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
       return;
     }
     if (!info.username) return setUserNameEmpty({ ...userNameEmpty, isRequired: true, extra: '이름을 입력해 주세요!' });
-    if (!info.phoneNumberEmpty)
+    if (!info.phoneNumber)
       return setPhoneNumberEmpty({ ...phoneNumberEmpty, isRequired: true, extra: '연락처를 입력해 주세요!' });
+
     canvasToImage(selectedFrameList, info.username);
   }, [canvasToImage, info, phoneNumberEmpty, selectedFrameList, userNameEmpty]);
 

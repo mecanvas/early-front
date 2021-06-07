@@ -77,7 +77,7 @@ export const useCanvasToServer = () => {
     }
   };
   const [loading, setLoading] = useState(false);
-  const [isDone, setIsDone] = useState(false);
+  const [isDone, setIsDone] = useGlobalState('isDone', false);
 
   const canvasToImage = (canvas: HTMLCanvasElement[], name: string) => {
     if (!window) return;
