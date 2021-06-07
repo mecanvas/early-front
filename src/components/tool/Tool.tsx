@@ -29,8 +29,8 @@ import { theme } from 'src/style/theme';
 import { useRouter } from 'next/router';
 import Loading from '../common/Loading';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faImages, faSquare } from '@fortawesome/free-regular-svg-icons';
-import { faFill, faHome, faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faEdit } from '@fortawesome/free-regular-svg-icons';
+import { faHome, faPaintRoller, faPlus, faUndo } from '@fortawesome/free-solid-svg-icons';
 import ToolSave from './ToolSave';
 
 interface PaperSize {
@@ -652,6 +652,9 @@ const Tool = () => {
                     <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
                     <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
                     <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
+                    <span onClick={handleModalResize}>
+                      <FontAwesomeIcon icon={faEdit} />
+                    </span>
                   </>
                 ) : (
                   <button type="button" onClick={handleResizeMode}></button>
@@ -660,16 +663,13 @@ const Tool = () => {
               <VersatileWrapper>
                 <Versatile>
                   <Button onClick={handleImgGoBack}>
-                    <FontAwesomeIcon style={{ fontSize: '18px' }} icon={faUndo} fill={theme.color.gray900} />
+                    <FontAwesomeIcon icon={faUndo} />
                   </Button>
                   <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
                     <Button>
-                      <FontAwesomeIcon style={{ fontSize: '18px' }} icon={faImages} fill={theme.color.gray900} />
+                      <FontAwesomeIcon icon={faPlus} />
                     </Button>
                   </Upload>
-                  <Button onClick={handleModalResize}>
-                    <FontAwesomeIcon style={{ fontSize: '18px' }} icon={faSquare} fill={theme.color.gray900} />
-                  </Button>
 
                   <Factory>
                     <Popover
@@ -679,7 +679,7 @@ const Tool = () => {
                       content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
                     >
                       <Button>
-                        <FontAwesomeIcon style={{ fontSize: '18px' }} icon={faFill} fill={theme.color.gray900} />
+                        <FontAwesomeIcon icon={faPaintRoller} />
                       </Button>
                     </Popover>
 
