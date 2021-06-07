@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 import useSWR from 'swr';
 
 export const useGetCursorPosition = (isSelected: boolean) => {
@@ -55,4 +56,52 @@ export const useGlobalState = <T,>(key: string, defaultValue?: T | null) => {
   const setState = useCallback((value: any) => mutate(value, false), [mutate]);
 
   return [state, setState];
+};
+
+export const useCanvasToServer = () => {
+  const dataURLtoFile = (dataurl: any, filename: any) => {
+    if (dataurl) {
+      const arr = dataurl.split(',');
+      const mime = arr[0].match(/:(.*?);/)[1];
+      const bstr = window.atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new File([u8arr], filename, {
+        type: mime,
+      });
+    }
+  };
+  const [loading, setLoading] = useState(false);
+  const [isDone, setIsDone] = useState(false);
+
+  const canvasToImage = (canvas: HTMLCanvasElement[], name: string) => {
+    if (!window) return;
+
+    const sendToCanvas = async () => {
+      setLoading(true);
+      await canvas.forEach(async (node, index) => {
+        const dataUrl = (node as HTMLCanvasElement).toDataURL('image/png', 1.0);
+        const { dataset } = node;
+        const file = dataURLtoFile(
+          dataUrl,
+          `${new Date().toLocaleDateString()}_${name}_${dataset.paper}_${index + 1}.png`,
+        );
+        if (file) {
+          const fd = new FormData();
+          fd.append('image', file);
+          await axios.post('/canvas', fd);
+        }
+      });
+      setLoading(false);
+      setIsDone(true);
+    };
+
+    sendToCanvas();
+  };
+
+  return { canvasToImage, loading, isDone };
 };
