@@ -172,7 +172,9 @@ export const ImgControlelr = styled.div<{
   ${({ isResizeStart }) =>
     isResizeStart &&
     css`
-      opacity: 0.4;
+      img {
+        opacity: 0.4;
+      }
     `}
 
   ${({ cmd }) => {
@@ -248,6 +250,21 @@ button {
     border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: nwse-resize;
   }
+
+  /* edit btn */
+  span {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    cursor: pointer;
+    svg {
+      font-size: 18px;
+
+      path {
+        fill: ${({ theme }) => theme.color.yellow};
+      }
+    }
+  }
 `;
 
 export const VersatileWrapper = styled.div`
@@ -263,6 +280,15 @@ export const VersatileWrapper = styled.div`
 export const Versatile = styled.div`
   border-radius: 4px;
   display: flex;
+
+  button {
+    svg {
+      font-size: 16px;
+      path {
+        fill: ${({ theme }) => theme.color.primary};
+      }
+    }
+  }
 `;
 
 export const Factory = styled.div`
