@@ -73,19 +73,27 @@ const Loader = styled.div`
   }
 `;
 
-const Loading = () => {
+interface Props {
+  loading: boolean;
+  text?: string;
+}
+
+const Loading = ({ loading, text }: Props) => {
   const textAni = useSpring({
     to: { opacity: 1, translateY: 0 },
     from: { opacity: 0, translateY: 20 },
     delay: 500,
     config: { duration: 1000 },
   });
+  if (!loading) {
+    return null;
+  }
   return (
     <LoaderContainer>
       <Loader>
         <span></span>
       </Loader>
-      <animated.p style={textAni}>잠시만 기다려 주세요.</animated.p>
+      <animated.p style={textAni}>{text ? text : '잠시만 기다려 주세요.'}</animated.p>
     </LoaderContainer>
   );
 };
