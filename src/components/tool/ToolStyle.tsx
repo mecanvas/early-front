@@ -277,10 +277,12 @@ export const VersatileWrapper = styled.div`
   right: 4px;
 `;
 
-export const Versatile = styled.div`
-  border-radius: 4px;
+export const Factory = styled.div`
   display: flex;
-
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 33;
   button {
     svg {
       font-size: 16px;
@@ -289,10 +291,6 @@ export const Versatile = styled.div`
       }
     }
   }
-`;
-
-export const Factory = styled.div`
-  display: flex;
 `;
 
 export const FactoryTitle = styled.div`

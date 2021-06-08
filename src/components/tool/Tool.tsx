@@ -7,7 +7,6 @@ import {
   YouSelectedFrame,
   ImageWrapper,
   VersatileWrapper,
-  Versatile,
   Factory,
   FactoryTitle,
   FrameWrapper,
@@ -593,6 +592,29 @@ const Tool = () => {
       <BackIcon type="primary" onClick={handlePushMainPage}>
         <FontAwesomeIcon style={{ fontSize: '18px' }} icon={faHome} fill={theme.color.white} />
       </BackIcon>
+
+      {/* 사진 조절하는 툴바들 */}
+      <Factory>
+        <Button onClick={handleImgGoBack}>
+          <FontAwesomeIcon icon={faUndo} />
+        </Button>
+        <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
+          <Button>
+            <FontAwesomeIcon icon={faPlus} />
+          </Button>
+        </Upload>
+        <Popover
+          style={{ padding: 0 }}
+          trigger="click"
+          placement="bottom"
+          content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
+        >
+          <Button>
+            <FontAwesomeIcon icon={faPaintRoller} />
+          </Button>
+        </Popover>
+      </Factory>
+
       {<Loading loading={imgUploadLoading} />}
       <Modal
         visible={imgModalResizeOpen}
@@ -679,31 +701,6 @@ const Tool = () => {
                 )}
               </ImgControlelr>
               <VersatileWrapper>
-                <Versatile>
-                  <Button onClick={handleImgGoBack}>
-                    <FontAwesomeIcon icon={faUndo} />
-                  </Button>
-                  <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
-                    <Button>
-                      <FontAwesomeIcon icon={faPlus} />
-                    </Button>
-                  </Upload>
-
-                  <Factory>
-                    <Popover
-                      style={{ padding: 0 }}
-                      trigger="click"
-                      placement="bottom"
-                      content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
-                    >
-                      <Button>
-                        <FontAwesomeIcon icon={faPaintRoller} />
-                      </Button>
-                    </Popover>
-
-                    {/* <ToolColorPalette type="frame" onChange={handleFrameColorChange} /> */}
-                  </Factory>
-                </Versatile>
                 <FrameWrapper
                   children={paperSize.map((paper, index) => (
                     <FrameSize key={index} data-value={paper.name} {...paper.size} onClick={handleFrameSelect}>
