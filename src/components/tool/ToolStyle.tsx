@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Button, Card } from 'antd';
+import { Card } from 'antd';
 
 export const ToolContainer = styled.div`
   width: 100%;
@@ -8,32 +8,42 @@ export const ToolContainer = styled.div`
   display: flex;
 `;
 
-export const BackIcon = styled(Button)`
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  position: absolute;
-  z-index: 3;
-  top: 10px;
-  left: 10px;
-  svg {
-    path {
-      color: ${({ theme }) => theme.color.white};
-    }
+export const FactoryHeader = styled.div`
+  display: flex;
+  width: 100%;
+  background-color: ${({ theme }) => theme.color.white};
+  position: fixed;
+  z-index: 33;
+  top: 0px;
+  flex-direction: column;
+
+  h1 {
+    margin: 0;
+    padding: 0.4em;
+    text-align: center;
+    border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
   }
 `;
 
-export const Factory = styled.div`
+export const FactoryTool = styled.div`
   display: flex;
-  position: absolute;
-  right: 10px;
-  z-index: 33;
-  top: 10px;
+  align-items: center;
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
+  justify-content: center;
+
   button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    small {
+      margin-left: 3px;
+      font-size: 12px;
+      color: ${({ theme }) => theme.color.gray800};
+    }
     svg {
       font-size: 16px;
       path {
-        fill: ${({ theme }) => theme.color.primary};
+        fill: ${({ theme }) => theme.color.secondarydark};
       }
     }
   }
@@ -106,7 +116,7 @@ export const ImageWrapper = styled.div<{
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 15px 0;
+  padding: 115px 10px 50px 10px;
   margin: 0 auto;
   text-align: center;
   position: relative;
@@ -143,8 +153,9 @@ export const ImageWrapper = styled.div<{
   }}
 
   img {
-    max-height: 100vh;
+    max-height: calc(100vh - 170px);
   }
+
   .cropped-img {
     position: absolute;
     z-index: 3;

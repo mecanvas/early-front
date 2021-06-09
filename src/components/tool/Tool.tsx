@@ -7,7 +7,6 @@ import {
   YouSelectedFrame,
   ImageWrapper,
   VersatileWrapper,
-  Factory,
   FactoryTitle,
   FrameWrapper,
   FrameSizeList,
@@ -16,8 +15,9 @@ import {
   DropZone,
   CanvasInfomationWrapper,
   DropZoneDiv,
-  BackIcon,
   ImgControlelr,
+  FactoryHeader,
+  FactoryTool,
 } from './ToolStyle';
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
@@ -29,8 +29,10 @@ import { useRouter } from 'next/router';
 import Loading from '../common/Loading';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit } from '@fortawesome/free-regular-svg-icons';
-import { faHome, faPaintRoller, faPlus, faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faPaintRoller, faUndo, faImage } from '@fortawesome/free-solid-svg-icons';
 import ToolSave from './ToolSave';
+import { cmToPx } from 'src/utils/cmToPx';
+import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
 
 interface FrameSize {
   name: string;
@@ -63,11 +65,6 @@ interface CanvasFramePositionList {
   left: number;
   top: number;
 }
-
-const cmToPx = (cm: number) => {
-  const px = 37.7952755906;
-  return (cm * px) / 2;
-};
 
 const Tool = () => {
   const router = useRouter();
@@ -245,7 +242,7 @@ const Tool = () => {
       }
 
       imgNode.current.style.width = `${newWidth}px`;
-      imgNode.current.style.height = `${newHeight}px`;
+      imgNode.current.style.height = `${filterOverMaxHeight(newHeight)}px`;
       setResizeWidth(newWidth);
       setResizeHeight(newHeight);
     },
@@ -502,8 +499,8 @@ const Tool = () => {
         const naturalHeight = el.naturalHeight / height > 1 ? el.naturalHeight / height : 1;
         const seletctedName = frameSize.filter((lst) => {
           if (lst.name === value) {
-            const newWidth = (+lst.size.width.replace('px', '') * 3) / naturalWidth;
-            const newHeight = (+lst.size.height.replace('px', '') * 3) / naturalHeight;
+            const newWidth = (+lst.size.width.replace('px', '') * 2) / naturalWidth;
+            const newHeight = (+lst.size.height.replace('px', '') * 2) / naturalHeight;
             setYourSelectedFrame({ width: `${newWidth}px`, height: `${newHeight}px` });
             setSelectedFrame(() => true);
             return lst;
@@ -645,32 +642,34 @@ const Tool = () => {
 
   return (
     <>
-      <BackIcon type="primary" onClick={handlePushMainPage}>
-        <FontAwesomeIcon style={{ fontSize: '18px' }} icon={faHome} fill={theme.color.white} />
-      </BackIcon>
-
       {/* 사진 조절하는 툴바들 */}
 
-      <Factory>
-        <Button onClick={handleImgGoBack}>
-          <FontAwesomeIcon icon={faUndo} />
-        </Button>
-        <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
-          <Button>
-            <FontAwesomeIcon icon={faPlus} />
+      <FactoryHeader>
+        <h1 onClick={handlePushMainPage}>Early</h1>
+        <FactoryTool>
+          <Button type="text" onClick={handleImgGoBack}>
+            <FontAwesomeIcon icon={faUndo} />
+            <small>실행취소</small>
           </Button>
-        </Upload>
-        <Popover
-          style={{ padding: 0 }}
-          trigger="click"
-          placement="bottom"
-          content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
-        >
-          <Button>
-            <FontAwesomeIcon icon={faPaintRoller} />
-          </Button>
-        </Popover>
-      </Factory>
+          <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
+            <Button type="text">
+              <FontAwesomeIcon icon={faImage} />
+              <small>변경</small>
+            </Button>
+          </Upload>
+          <Popover
+            style={{ padding: 0 }}
+            trigger="click"
+            placement="bottom"
+            content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
+          >
+            <Button type="text">
+              <FontAwesomeIcon icon={faPaintRoller} />
+              <small>배경</small>
+            </Button>
+          </Popover>
+        </FactoryTool>
+      </FactoryHeader>
 
       {<Loading loading={imgUploadLoading} />}
       <Modal
@@ -788,7 +787,7 @@ const Tool = () => {
               </VersatileWrapper>
             </>
           ) : (
-            <ImageWrapper imgUploadLoading={imgUploadLoading}>
+            <>
               <DropZone {...getRootProps()}>
                 <input {...getInputProps()} accept="image/*" />
                 <DropZoneDiv isDragActive={isDragActive}>
@@ -796,7 +795,7 @@ const Tool = () => {
                   <p>이미지를 드롭하거나 첨부하세요!</p>
                 </DropZoneDiv>
               </DropZone>
-            </ImageWrapper>
+            </>
           )}
         </ImageWrapper>
       </ToolContainer>
