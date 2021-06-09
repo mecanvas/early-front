@@ -65,8 +65,9 @@ interface CanvasFramePositionList {
   top: number;
 }
 
-const cmToPx = (number: number) => {
-  return (number * 37.7952755906) / 2;
+const cmToPx = (cm: number) => {
+  const px = 37.7952755906;
+  return (cm * px) / 2;
 };
 
 const Tool = () => {
@@ -94,14 +95,14 @@ const Tool = () => {
         price: 40000,
       },
       {
-        name: 'F 2호',
-        attribute: '인물',
-        // 18cm X 25.8cm
+        name: 'S 4호',
+        attribute: '정방',
+        // 24cm X 24cm
         size: {
-          width: `${cmToPx(18)}px`,
-          height: `${cmToPx(25.8)}px`,
+          width: `${cmToPx(24)}px`,
+          height: `${cmToPx(24)}px`,
         },
-        price: 40000,
+        price: 30000,
       },
       {
         name: 'P 2호',
@@ -114,14 +115,34 @@ const Tool = () => {
         price: 30000,
       },
       {
-        name: 'S 4호',
-        attribute: '정방',
-        // 24cm X 24cm
+        name: 'P 4호',
+        attribute: '풍경',
+        // 21.2cm X 33.3cm
         size: {
-          width: `${cmToPx(24)}px`,
-          height: `${cmToPx(24)}px`,
+          width: `${cmToPx(21.2)}px`,
+          height: `${cmToPx(33.3)}px`,
         },
         price: 30000,
+      },
+      {
+        name: 'F 2호',
+        attribute: '인물',
+        // 18cm X 25.8cm
+        size: {
+          width: `${cmToPx(18)}px`,
+          height: `${cmToPx(25.8)}px`,
+        },
+        price: 40000,
+      },
+      {
+        name: 'F 4호',
+        attribute: '인물',
+        // 24cm X 33.3cm
+        size: {
+          width: `${cmToPx(24)}px`,
+          height: `${cmToPx(33.3)}px`,
+        },
+        price: 40000,
       },
       {
         name: 'M 4호',
@@ -129,16 +150,6 @@ const Tool = () => {
         // 19cm X 33.3cm
         size: {
           width: `${cmToPx(19)}px`,
-          height: `${cmToPx(33.3)}px`,
-        },
-        price: 30000,
-      },
-      {
-        name: 'P 4호',
-        attribute: '풍경',
-        // 21.2cm X 33.3cm
-        size: {
-          width: `${cmToPx(21.2)}px`,
           height: `${cmToPx(33.3)}px`,
         },
         price: 30000,
