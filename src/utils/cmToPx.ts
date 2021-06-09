@@ -1,4 +1,4 @@
 export const cmToPx = (cm: number) => {
   const px = 37.7952755906;
-  return (cm * px) / 2;
+  return (cm * px) / 1.5;
 };

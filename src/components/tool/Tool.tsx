@@ -22,7 +22,7 @@ import {
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Modal, notification, Popover, Upload, Checkbox, Input } from 'antd';
+import { Button, Modal, Popover, Upload, Checkbox, Input } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import { theme } from 'src/style/theme';
 import { useRouter } from 'next/router';
@@ -342,8 +342,8 @@ const Tool = () => {
   const handleImgGoBack = useCallback(() => {
     if (imgWrapperRef.current) {
       const { current: imgBox } = imgWrapperRef;
-      if (imgBox.childNodes.length <= 2) {
-        return notification.info({ message: '존재하는 액자가 없습니다.', placement: 'bottomLeft' });
+      if (imgBox.childNodes.length < 2) {
+        return;
       }
       const imgBoxId = +(imgBox.childNodes[0] as any).id;
       imgBox?.removeChild(imgBox.childNodes[0]);
@@ -483,13 +483,14 @@ const Tool = () => {
         el.style.width = `${width}px`;
         el.style.height = `${height}px`;
 
-        const naturalWidth = el.naturalWidth / width > 1 ? el.naturalWidth / width : 1;
-        const naturalHeight = el.naturalHeight / height > 1 ? el.naturalHeight / height : 1;
         const seletctedName = frameSize.filter((lst) => {
           if (lst.name === value) {
-            const newWidth = (+lst.size.width.replace('px', '') * 2) / naturalWidth;
-            const newHeight = (+lst.size.height.replace('px', '') * 2) / naturalHeight;
-            setYourSelectedFrame({ width: `${newWidth}px`, height: `${newHeight}px` });
+            // const naturalWidth = el.naturalWidth / width > 1 ? el.naturalWidth / width : 1;
+            // const naturalHeight = el.naturalHeight / height > 1 ? el.naturalHeight / height : 1;
+            // const newWidth = (+lst.size.width.replace('px', '') * 2) / naturalWidth;
+            // const newHeight = (+lst.size.height.replace('px', '') * 2) / naturalHeight;
+            // setYourSelectedFrame({ width: `${newWidth}px`, height: `${newHeight}px` });
+            setYourSelectedFrame({ width: `${lst.size.width}`, height: `${lst.size.height}` });
             setSelectedFrame(() => true);
             return lst;
           }
@@ -678,7 +679,7 @@ const Tool = () => {
           </FactoryUtills>
           <FactoryTool>
             <div>
-              <Button type="text" onClick={handleImgGoBack}>
+              <Button type="text" style={{ opacity: selectedFrameList.length ? 1 : 0.4 }} onClick={handleImgGoBack}>
                 <FontAwesomeIcon icon={faUndo} />
                 <small>실행취소</small>
               </Button>
