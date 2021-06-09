@@ -1,6 +1,7 @@
 export interface FrameSize {
   name: string;
   attribute: '정방' | '해경' | '인물' | '풍경';
+  cm: string;
   size: {
     width: string;
     height: string;

@@ -58,7 +58,6 @@ export const FrameTool = styled.div`
 
   button {
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
 
@@ -69,7 +68,9 @@ export const FrameTool = styled.div`
     }
 
     small {
-      margin-top: 3px;
+      margin-left: 3px;
+      font-size: 12px;
+      color: ${({ theme }) => theme.color.gray800};
     }
   }
 `;
@@ -365,28 +366,36 @@ export const ColorPaletteFreeColor = styled.div`
   border-top: 1px solid #dbdbdb;
 `;
 
-export const FrameWrapper = styled(Card)`
-  border: 1px solid #dbdbdb;
-  margin-top: 6px;
+export const FrameWrapper = styled.div`
+  position: absolute;
+  top: 115px;
+  right: 0;
+  z-index: 30;
+  text-align: center;
+  border: 1px solid ${({ theme }) => theme.color.gray300};
+  border-radius: 20px;
+  padding: 1em;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
 
-  div {
-    &::before {
-      display: none;
-    }
-    display: grid;
-    justify-content: center;
-    align-items: center;
-    grid-template-columns: repeat(3, 1fr);
-    cursor: pointer;
-    margin: 0 auto;
+  & > div {
+    flex-direction: column;
+    display: flex;
+  }
+  small {
+    font-size: 10px;
   }
 `;
 
 export const FrameSizeList = styled.div<{ width: string; height: string }>`
   width: ${({ width }) => `${+width.replace('px', '') / 5}px`};
   height: ${({ height }) => `${+height.replace('px', '') / 5}px`};
-  background-color: ${({ theme }) => theme.color.gray100};
-  border: 1px solid ${({ theme }) => theme.color.white};
+  z-index: 30;
+  background-color: ${({ theme }) => theme.color.secondarybg};
+  cursor: pointer;
+  margin: 10px;
   position: relative;
 `;
 

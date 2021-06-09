@@ -50,7 +50,7 @@ const Tool = () => {
       {
         name: 'S 1호',
         attribute: '정방',
-        // 16cm X 16cm
+        cm: '16cm X 16cm',
         size: {
           width: `${cmToPx(16)}px`,
           height: `${cmToPx(16)}px`,
@@ -60,7 +60,7 @@ const Tool = () => {
       {
         name: 'S 2호',
         attribute: '정방',
-        // 19cm X 19cm
+        cm: '19cm X 19cm',
         size: {
           width: `${cmToPx(19)}px`,
           height: `${cmToPx(19)}px`,
@@ -70,7 +70,7 @@ const Tool = () => {
       {
         name: 'S 4호',
         attribute: '정방',
-        // 24cm X 24cm
+        cm: '24cm X 24cm',
         size: {
           width: `${cmToPx(24)}px`,
           height: `${cmToPx(24)}px`,
@@ -80,7 +80,7 @@ const Tool = () => {
       {
         name: 'P 2호',
         attribute: '풍경',
-        // 16cm X 25.8cm
+        cm: '16cm X 25.8cm',
         size: {
           width: `${cmToPx(16)}px`,
           height: `${cmToPx(25.8)}px`,
@@ -90,7 +90,7 @@ const Tool = () => {
       {
         name: 'P 4호',
         attribute: '풍경',
-        // 21.2cm X 33.3cm
+        cm: '21.2cm X 33.3cm',
         size: {
           width: `${cmToPx(21.2)}px`,
           height: `${cmToPx(33.3)}px`,
@@ -100,7 +100,7 @@ const Tool = () => {
       {
         name: 'F 2호',
         attribute: '인물',
-        // 18cm X 25.8cm
+        cm: '18cm X 25.8cm',
         size: {
           width: `${cmToPx(18)}px`,
           height: `${cmToPx(25.8)}px`,
@@ -110,7 +110,7 @@ const Tool = () => {
       {
         name: 'F 4호',
         attribute: '인물',
-        // 24cm X 33.3cm
+        cm: '24cm X 33.3cm',
         size: {
           width: `${cmToPx(24)}px`,
           height: `${cmToPx(33.3)}px`,
@@ -120,7 +120,7 @@ const Tool = () => {
       {
         name: 'M 4호',
         attribute: '해경',
-        // 19cm X 33.3cm
+        cm: '19cm X 33.3cm',
         size: {
           width: `${cmToPx(19)}px`,
           height: `${cmToPx(33.3)}px`,
@@ -619,7 +619,7 @@ const Tool = () => {
 
   return (
     <>
-      <ToolFrame frameSize={frameSize}></ToolFrame>
+      <ToolFrame frameSize={frameSize} attribute="정방" onClick={handleFrameSelect}></ToolFrame>
 
       {/* 사진 조절하는 툴바들 */}
       <FactoryHeader>
@@ -741,19 +741,6 @@ const Tool = () => {
                 )}
               </ImgControlelr>
               <VersatileWrapper>
-                <FrameWrapper
-                  children={frameSize.map((frame, index) => (
-                    <FrameSizeList
-                      key={index}
-                      data-value={frame.name}
-                      data-attribute={frame.attribute}
-                      {...frame.size}
-                      onClick={handleFrameSelect}
-                    >
-                      <FrameSizeName>{frame.name}</FrameSizeName>
-                    </FrameSizeList>
-                  ))}
-                />
                 <CanvasInfomationWrapper>
                   {/* 사용한 액자 x 수량 */}
                   <BillInfomation>
