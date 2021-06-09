@@ -17,12 +17,38 @@ export const FactoryHeader = styled.div`
   z-index: 33;
   top: 0px;
   flex-direction: column;
+`;
 
+export const FactoryUtills = styled.div`
+  height: 64px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 3em;
+  align-items: center;
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
   h1 {
     margin: 0;
     padding: 0.4em;
     text-align: center;
-    border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
+  }
+
+  & > div {
+    display: flex;
+    button {
+      span {
+        font-weight: 500;
+        font-size: 15px;
+      }
+    }
+    button + button {
+      margin-left: 6px;
+    }
+
+    /* 저장 버튼 */
+    button:nth-of-type(3) {
+      background-color: ${({ theme }) => theme.color.secondary};
+      color: ${({ theme }) => theme.color.white};
+    }
   }
 `;
 
@@ -329,26 +355,6 @@ button {
   }
 `;
 
-export const VersatileWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  z-index: 3;
-  padding: 4px;
-  position: absolute;
-  top: 50px;
-  right: 4px;
-`;
-
-export const FactoryTitle = styled.div`
-  width: 100%;
-  display: flex;
-  margin-bottom: 3px;
-  font-size: 14px;
-  div {
-    margin-left: auto;
-  }
-`;
-
 export const ColorPaletteWrapper = styled.div`
   display: flex;
   margin-bottom: 12px;
@@ -437,32 +443,36 @@ export const FrameSizeName = styled.div`
 export const CanvasInfomationWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 8px;
-  border-radius: 4px;
-  button {
-    width: 100%;
-  }
-
-  div {
-    display: flex;
-  }
+  width: 200px;
 `;
 
 export const BillInfomation = styled.div`
   display: flex;
   flex-direction: column;
   background-color: ${({ theme }) => theme.color.white};
-  padding: 6px 8px;
-  border-bottom: 1px solid #dbdbdb;
-  margin-bottom: 8px;
-  border-radius: 4px;
+`;
 
-  & > div:nth-of-type(1) {
+export const Bill = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.3em;
+
+  div {
     display: flex;
-    flex-direction: column;
-    & > div:last-child {
-      margin-bottom: 4px;
-      border-bottom: 1px solid ${({ theme }) => theme.color.gray400};
-    }
+    justify-content: space-between;
+    color: ${({ theme }) => theme.color.gray700};
   }
+
+  /* 액자 이름 */
+  & > div > div:nth-of-type(1) {
+    font-weight: bold;
+  }
+`;
+
+export const BillTotal = styled.div`
+  width: 100%;
+  padding-top: 0.3em;
+  border-top: 1px solid ${({ theme }) => theme.color.gray300};
+  text-align: right;
+  font-weight: bold;
 `;

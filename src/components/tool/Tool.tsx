@@ -6,8 +6,7 @@ import {
   ToolContainer,
   YouSelectedFrame,
   ImageWrapper,
-  VersatileWrapper,
-  FactoryTitle,
+  BillTotal,
   BillInfomation,
   DropZone,
   CanvasInfomationWrapper,
@@ -17,6 +16,8 @@ import {
   FactoryTool,
   FrameTool,
   ImageShowingWidthHeight,
+  FactoryUtills,
+  Bill,
 } from './ToolStyle';
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
@@ -46,7 +47,7 @@ const Tool = () => {
   const frameSize = useMemo<FrameSize[]>(
     () => [
       {
-        name: 'S 1호',
+        name: 'S-1호',
         attribute: '정방',
         cm: '16cm X 16cm',
         size: {
@@ -56,7 +57,7 @@ const Tool = () => {
         price: 55000,
       },
       {
-        name: 'S 2호',
+        name: 'S-2호',
         attribute: '정방',
         cm: '19cm X 19cm',
         size: {
@@ -66,7 +67,7 @@ const Tool = () => {
         price: 40000,
       },
       {
-        name: 'S 4호',
+        name: 'S-4호',
         attribute: '정방',
         cm: '24cm X 24cm',
         size: {
@@ -76,7 +77,7 @@ const Tool = () => {
         price: 30000,
       },
       {
-        name: 'P 2호',
+        name: 'P-2호',
         attribute: '풍경',
         cm: '16cm X 25.8cm',
         size: {
@@ -86,7 +87,7 @@ const Tool = () => {
         price: 30000,
       },
       {
-        name: 'P 4호',
+        name: 'P-4호',
         attribute: '풍경',
         cm: '21.2cm X 33.3cm',
         size: {
@@ -96,7 +97,7 @@ const Tool = () => {
         price: 30000,
       },
       {
-        name: 'F 2호',
+        name: 'F-2호',
         attribute: '인물',
         cm: '18cm X 25.8cm',
         size: {
@@ -106,7 +107,7 @@ const Tool = () => {
         price: 40000,
       },
       {
-        name: 'F 4호',
+        name: 'F-4호',
         attribute: '인물',
         cm: '24cm X 33.3cm',
         size: {
@@ -116,7 +117,7 @@ const Tool = () => {
         price: 40000,
       },
       {
-        name: 'M 4호',
+        name: 'M-4호',
         attribute: '해경',
         cm: '19cm X 33.3cm',
         size: {
@@ -630,7 +631,47 @@ const Tool = () => {
 
         {/* 사진 조절하는 툴바들 */}
         <FactoryHeader>
-          <h1 onClick={handlePushMainPage}>Early</h1>
+          <FactoryUtills>
+            <h1 onClick={handlePushMainPage}>Early</h1>
+            <div>
+              <Popover
+                style={{ padding: 0 }}
+                content={
+                  yourPriceList.length ? (
+                    <CanvasInfomationWrapper>
+                      {/* 사용한 액자 x 수량 */}
+                      <BillInfomation>
+                        <Bill>
+                          {yourPriceList.map(([key, value], index) => (
+                            <div key={index}>
+                              <div>{key}</div>
+                              <div>
+                                {value.price.toLocaleString()} x {value.quantity}개
+                              </div>
+                            </div>
+                          ))}
+                        </Bill>
+                        <BillTotal>
+                          {framePrice.reduce((acc, cur) => (acc += cur.price), 0).toLocaleString()}원
+                        </BillTotal>
+                      </BillInfomation>
+                    </CanvasInfomationWrapper>
+                  ) : (
+                    '제작하신 액자가 없습니다.'
+                  )
+                }
+              >
+                <Button type="text">예상가격</Button>
+              </Popover>
+              <Button onClick={handleImgPreview} type={!isPreview ? 'default' : 'primary'}>
+                {!isPreview ? '미리보기' : '이미지로'}
+              </Button>
+              <Button type="text" onClick={handleSaveCanvas}>
+                저장
+              </Button>
+              {isSaveCanvas && <ToolSave yourPriceList={yourPriceList} selectedFrameList={selectedFrameList} />}
+            </div>
+          </FactoryUtills>
           <FactoryTool>
             <div>
               <Button type="text" onClick={handleImgGoBack}>
@@ -752,36 +793,6 @@ const Tool = () => {
                   <button type="button" onClick={handleResizeMode}></button>
                 )}
               </ImgControlelr>
-              <VersatileWrapper>
-                <CanvasInfomationWrapper>
-                  {/* 사용한 액자 x 수량 */}
-                  <BillInfomation>
-                    <div>
-                      {yourPriceList.map(([key, value], index) => (
-                        <div
-                          style={{ display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 3px' }}
-                          key={index}
-                        >
-                          <div>{key}</div>
-                          <div>
-                            {value.price.toLocaleString()} x {value.quantity}개
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <FactoryTitle>
-                      예상 가격 <div>{framePrice.reduce((acc, cur) => (acc += cur.price), 0).toLocaleString()}원</div>
-                    </FactoryTitle>
-                  </BillInfomation>
-                  <div>
-                    <Button onClick={handleImgPreview}>미리보기 </Button>
-                    <Button type="primary" onClick={handleSaveCanvas}>
-                      저장
-                    </Button>
-                    {isSaveCanvas && <ToolSave yourPriceList={yourPriceList} selectedFrameList={selectedFrameList} />}
-                  </div>
-                </CanvasInfomationWrapper>
-              </VersatileWrapper>
             </>
           ) : (
             <>
