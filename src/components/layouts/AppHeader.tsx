@@ -5,7 +5,7 @@ import { Button } from 'antd';
 
 const HeaderContainer = styled.header`
   width: 100%;
-  height: 50px;
+  padding: 0.4em;
   background-color: ${({ theme }) => theme.color.white};
 `;
 
@@ -15,7 +15,6 @@ const Header = styled.div`
   align-items: center;
   justify-content: space-between;
   margin: 0 auto;
-  padding: 0 40px;
 `;
 
 const AppHeader = () => {

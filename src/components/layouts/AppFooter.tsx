@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
+import { useRouter } from 'next/router';
 
 const FooterContainer = styled.footer`
   width: 100%;
@@ -13,6 +14,12 @@ const Footer = styled.div`
 `;
 
 const AppFooter = () => {
+  const router = useRouter();
+
+  if (router.asPath === '/tool') {
+    return null;
+  }
+
   return (
     <FooterContainer>
       <Footer>&copy; mecanvas 2021</Footer>
