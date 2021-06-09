@@ -11,7 +11,7 @@ import {
   Factory,
   FactoryTitle,
   FrameWrapper,
-  FrameSize,
+  FrameSizeList,
   FrameSizeName,
   BillInfomation,
   DropZone,
@@ -33,8 +33,9 @@ import { faEdit } from '@fortawesome/free-regular-svg-icons';
 import { faHome, faPaintRoller, faPlus, faUndo } from '@fortawesome/free-solid-svg-icons';
 import ToolSave from './ToolSave';
 
-interface PaperSize {
+interface FrameSize {
   name: string;
+  attribute: '정방' | '해경' | '인물' | '풍경';
   size: {
     width: string;
     height: string;
@@ -64,34 +65,81 @@ interface CanvasFramePositionList {
   top: number;
 }
 
+const cmToPx = (number: number) => {
+  return (number * 37.7952755906) / 2;
+};
+
 const Tool = () => {
   const router = useRouter();
-  const paperSize = useMemo<PaperSize[]>(
+  const frameSize = useMemo<FrameSize[]>(
     () => [
       {
-        name: '10x10',
-        // 10cm X 10cm
+        name: 'S 1호',
+        attribute: '정방',
+        // 16cm X 16cm
         size: {
-          width: `${377.95275590551 / 3}px`,
-          height: `${377.95275590551 / 3}px`,
+          width: `${cmToPx(16)}px`,
+          height: `${cmToPx(16)}px`,
         },
         price: 55000,
       },
       {
-        name: '20x20',
-        // 20cm X 20cm
+        name: 'S 2호',
+        attribute: '정방',
+        // 19cm X 19cm
         size: {
-          width: `${755.90551181102 / 3}px`,
-          height: `${755.90551181102 / 3}px`,
+          width: `${cmToPx(19)}px`,
+          height: `${cmToPx(19)}px`,
         },
         price: 40000,
       },
       {
-        name: '30x30',
-        // 30cm X 30cm
+        name: 'F 2호',
+        attribute: '인물',
+        // 18cm X 25.8cm
         size: {
-          width: `${1133.8582677165 / 3}px`,
-          height: `${1133.8582677165 / 3}px`,
+          width: `${cmToPx(18)}px`,
+          height: `${cmToPx(25.8)}px`,
+        },
+        price: 40000,
+      },
+      {
+        name: 'P 2호',
+        attribute: '풍경',
+        // 16cm X 25.8cm
+        size: {
+          width: `${cmToPx(16)}px`,
+          height: `${cmToPx(25.8)}px`,
+        },
+        price: 30000,
+      },
+      {
+        name: 'S 4호',
+        attribute: '정방',
+        // 24cm X 24cm
+        size: {
+          width: `${cmToPx(24)}px`,
+          height: `${cmToPx(24)}px`,
+        },
+        price: 30000,
+      },
+      {
+        name: 'M 4호',
+        attribute: '해경',
+        // 19cm X 33.3cm
+        size: {
+          width: `${cmToPx(19)}px`,
+          height: `${cmToPx(33.3)}px`,
+        },
+        price: 30000,
+      },
+      {
+        name: 'P 4호',
+        attribute: '풍경',
+        // 21.2cm X 33.3cm
+        size: {
+          width: `${cmToPx(21.2)}px`,
+          height: `${cmToPx(33.3)}px`,
         },
         price: 30000,
       },
@@ -100,7 +148,7 @@ const Tool = () => {
   );
 
   const [selectedFrame, setSelectedFrame] = useState(false); // 골랐는지 상태 여부
-  const [selectedFrameInfo, setSelectedFrameInfo] = useState<PaperSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
+  const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
   const [selectedFramePosition, setSelectedFramePosition] = useState<FramePosition | null>(null); // top, letf 위치 조절
   const [cursorX, cursorY] = useGetCursorPosition(selectedFrame);
   const [scrollX, scrollY] = useGetScollPosition();
@@ -442,7 +490,7 @@ const Tool = () => {
 
         const naturalWidth = el.naturalWidth / width > 1 ? el.naturalWidth / width : 1;
         const naturalHeight = el.naturalHeight / height > 1 ? el.naturalHeight / height : 1;
-        const seletctedName = paperSize.filter((lst) => {
+        const seletctedName = frameSize.filter((lst) => {
           if (lst.name === value) {
             const newWidth = (+lst.size.width.replace('px', '') * 3) / naturalWidth;
             const newHeight = (+lst.size.height.replace('px', '') * 3) / naturalHeight;
@@ -454,7 +502,7 @@ const Tool = () => {
         setSelectedFrameInfo(seletctedName[0]);
       }
     },
-    [paperSize],
+    [frameSize],
   );
 
   const handleResizeReset = useCallback(() => {
@@ -688,10 +736,16 @@ const Tool = () => {
                   </Factory>
                 </Versatile>
                 <FrameWrapper
-                  children={paperSize.map((paper, index) => (
-                    <FrameSize key={index} data-value={paper.name} {...paper.size} onClick={handleFrameSelect}>
-                      <FrameSizeName>{paper.name}</FrameSizeName>
-                    </FrameSize>
+                  children={frameSize.map((frame, index) => (
+                    <FrameSizeList
+                      key={index}
+                      data-value={frame.name}
+                      data-attribute={frame.attribute}
+                      {...frame.size}
+                      onClick={handleFrameSelect}
+                    >
+                      <FrameSizeName>{frame.name}</FrameSizeName>
+                    </FrameSizeList>
                   ))}
                 />
                 <CanvasInfomationWrapper>

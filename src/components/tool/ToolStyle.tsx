@@ -332,20 +332,25 @@ export const ColorPaletteFreeColor = styled.div`
 export const FrameWrapper = styled(Card)`
   border: 1px solid #dbdbdb;
   margin-top: 6px;
-  div {
-    display: flex;
-    cursor: pointer;
-  }
 
-  div + div {
-    margin-left: 8px;
+  div {
+    &::before {
+      display: none;
+    }
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: repeat(3, 1fr);
+    cursor: pointer;
+    margin: 0 auto;
   }
 `;
 
-export const FrameSize = styled.div<{ width: string; height: string }>`
+export const FrameSizeList = styled.div<{ width: string; height: string }>`
   width: ${({ width }) => `${+width.replace('px', '') / 5}px`};
   height: ${({ height }) => `${+height.replace('px', '') / 5}px`};
-  border: 1px solid #333;
+  background-color: ${({ theme }) => theme.color.gray100};
+  border: 1px solid ${({ theme }) => theme.color.white};
   position: relative;
 `;
 
@@ -354,6 +359,8 @@ export const FrameSizeName = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  display: flex !important;
+  font-size: 12px;
 `;
 
 export const CanvasInfomationWrapper = styled.div`
