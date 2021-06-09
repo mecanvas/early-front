@@ -241,7 +241,7 @@ export const ImageShowingWidthHeight = styled.small`
   background-color: ${({ theme }) => theme.color.secondarybg};
   color: ${({ theme }) => theme.color.primary};
 
-  /* edit btn */
+  /* 사진 edit btn */
   span {
     position: absolute;
     cursor: pointer;
@@ -300,6 +300,7 @@ button {
     height: 100%;
     top: 0;
     left: 0;
+    cursor: pointer;
   }
 
   /* top-left */
