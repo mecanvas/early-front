@@ -624,81 +624,81 @@ const Tool = () => {
 
   return (
     <>
-      <ToolFrame frameSize={frameSize} attribute={frameAttribute} onClick={handleFrameSelect}></ToolFrame>
-
-      {/* 사진 조절하는 툴바들 */}
-      <FactoryHeader>
-        <h1 onClick={handlePushMainPage}>Early</h1>
-        <FactoryTool>
-          <div>
-            <Button type="text" onClick={handleImgGoBack}>
-              <FontAwesomeIcon icon={faUndo} />
-              <small>실행취소</small>
-            </Button>
-            <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
-              <Button type="text">
-                <FontAwesomeIcon icon={faImage} />
-                <small>변경</small>
-              </Button>
-            </Upload>
-            <Popover
-              style={{ padding: 0 }}
-              trigger="click"
-              placement="bottom"
-              content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
-            >
-              <Button type="text">
-                <FontAwesomeIcon icon={faPaintRoller} />
-                <small>배경</small>
-              </Button>
-            </Popover>
-          </div>
-          <FrameTool>
-            <Button type="text" onClick={handleGetFrameAttribute} value="정방">
-              <FontAwesomeIcon icon={faSquare} />
-              <small>정방</small>
-            </Button>
-            <Button type="text" onClick={handleGetFrameAttribute} value="인물">
-              <FontAwesomeIcon icon={faSquare} />
-              <small>인물</small>
-            </Button>
-            <Button type="text" onClick={handleGetFrameAttribute} value="해경">
-              <FontAwesomeIcon icon={faSquare} />
-              <small>해경</small>
-            </Button>
-            <Button type="text" onClick={handleGetFrameAttribute} value="풍경">
-              <FontAwesomeIcon icon={faSquare} />
-              <small>풍경</small>
-            </Button>
-          </FrameTool>
-        </FactoryTool>
-      </FactoryHeader>
-
-      {<Loading loading={imgUploadLoading} />}
-      <Modal
-        visible={imgModalResizeOpen}
-        onOk={handleModalResizeOk}
-        onCancel={handleModalResize}
-        title="이미지의 너비와 높이를 입력하세요."
-      >
-        <div>
-          <form onChange={handleChangeImgSize}>
-            <Input type="text" name="width" value={resizeWidth || ''} addonBefore="너비" addonAfter="px" />
-            <Input type="text" name="height" value={resizeHeight || ''} addonBefore="높이" addonAfter="px" />
-          </form>
-
-          <div style={{ textAlign: 'right' }}>
-            <Checkbox defaultChecked={ratioPersist} onChange={handleRatioPersist}>
-              너비에 비율을 맞춥니다.
-            </Checkbox>
-          </div>
-          <div style={{ textAlign: 'right', marginTop: '6px' }}>
-            <Button onClick={handleResizeReset}>원래의 이미지 크기로 되돌립니다.</Button>
-          </div>
-        </div>
-      </Modal>
-
       <ToolContainer>
+        <ToolFrame frameSize={frameSize} attribute={frameAttribute} onClick={handleFrameSelect}></ToolFrame>
+
+        {/* 사진 조절하는 툴바들 */}
+        <FactoryHeader>
+          <h1 onClick={handlePushMainPage}>Early</h1>
+          <FactoryTool>
+            <div>
+              <Button type="text" onClick={handleImgGoBack}>
+                <FontAwesomeIcon icon={faUndo} />
+                <small>실행취소</small>
+              </Button>
+              <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
+                <Button type="text">
+                  <FontAwesomeIcon icon={faImage} />
+                  <small>변경</small>
+                </Button>
+              </Upload>
+              <Popover
+                style={{ padding: 0 }}
+                trigger="click"
+                placement="bottom"
+                content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
+              >
+                <Button type="text">
+                  <FontAwesomeIcon icon={faPaintRoller} />
+                  <small>배경</small>
+                </Button>
+              </Popover>
+            </div>
+            <FrameTool>
+              <Button type="text" onClick={handleGetFrameAttribute} value="정방">
+                <FontAwesomeIcon icon={faSquare} />
+                <small>정방</small>
+              </Button>
+              <Button type="text" onClick={handleGetFrameAttribute} value="인물">
+                <FontAwesomeIcon icon={faSquare} />
+                <small>인물</small>
+              </Button>
+              <Button type="text" onClick={handleGetFrameAttribute} value="해경">
+                <FontAwesomeIcon icon={faSquare} />
+                <small>해경</small>
+              </Button>
+              <Button type="text" onClick={handleGetFrameAttribute} value="풍경">
+                <FontAwesomeIcon icon={faSquare} />
+                <small>풍경</small>
+              </Button>
+            </FrameTool>
+          </FactoryTool>
+        </FactoryHeader>
+
+        {<Loading loading={imgUploadLoading} />}
+        <Modal
+          visible={imgModalResizeOpen}
+          onOk={handleModalResizeOk}
+          onCancel={handleModalResize}
+          title="이미지의 너비와 높이를 입력하세요."
+        >
+          <div>
+            <form onChange={handleChangeImgSize}>
+              <Input type="text" name="width" value={resizeWidth || ''} addonBefore="너비" addonAfter="px" />
+              <Input type="text" name="height" value={resizeHeight || ''} addonBefore="높이" addonAfter="px" />
+            </form>
+
+            <div style={{ textAlign: 'right' }}>
+              <Checkbox defaultChecked={ratioPersist} onChange={handleRatioPersist}>
+                너비에 비율을 맞춥니다.
+              </Checkbox>
+            </div>
+            <div style={{ textAlign: 'right', marginTop: '6px' }}>
+              <Button onClick={handleResizeReset}>원래의 이미지 크기로 되돌립니다.</Button>
+            </div>
+          </div>
+        </Modal>
+
         {selectedFrame && selectedFramePosition && yourSelectedFrame && (
           <YouSelectedFrame
             // border={frameBorderColor}

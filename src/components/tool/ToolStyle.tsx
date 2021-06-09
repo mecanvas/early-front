@@ -5,6 +5,8 @@ export const ToolContainer = styled.div`
   width: 100%;
   margin: 0 auto;
   display: flex;
+  overflow-x: hidden;
+  position: relative;
 `;
 
 export const FactoryHeader = styled.div`
@@ -364,23 +366,25 @@ export const ColorPaletteFreeColor = styled.div`
 `;
 
 export const FrameWrapper = styled.div`
-  position: absolute;
-  top: 115px;
-  right: 5px;
-  z-index: 30;
-  text-align: center;
-  border: 1px solid ${({ theme }) => theme.color.gray300};
-  background-color: ${({ theme }) => theme.color.white};
-  border-radius: 20px;
-  padding: 1em;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
-
   & > div {
-    flex-direction: column;
+    position: absolute;
+    top: 115px;
+    right: 5px;
+    z-index: 30;
+    text-align: center;
+    border: 1px solid ${({ theme }) => theme.color.gray300};
+    background-color: ${({ theme }) => theme.color.white};
+    border-radius: 20px;
+    padding: 1em;
     display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+
+    & > div {
+      flex-direction: column;
+      display: flex;
+    }
   }
   small {
     font-size: 10px;
