@@ -1,0 +1,14 @@
+// https://github.com/emotion-js/emotion/tree/main/packages/babel-plugin
+{
+  "plugins": [
+    [
+      "@emotion",
+      {
+        "sourceMap": true,
+        "autoLabel": "dev-only",
+        "labelFormat": "[filename]-[local]",
+        "cssPropOptimization": true
+      }
+    ]
+  ]
+}
