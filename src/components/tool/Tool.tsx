@@ -6,92 +6,124 @@ import {
   ToolContainer,
   YouSelectedFrame,
   ImageWrapper,
-  VersatileWrapper,
-  Versatile,
-  Factory,
-  FactoryTitle,
-  FrameWrapper,
-  FrameSize,
-  FrameSizeName,
+  BillTotal,
   BillInfomation,
   DropZone,
   CanvasInfomationWrapper,
   DropZoneDiv,
-  BackIcon,
   ImgControlelr,
+  FactoryHeader,
+  FactoryTool,
+  FrameTool,
+  ImageShowingWidthHeight,
+  FactoryUtills,
+  Bill,
 } from './ToolStyle';
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Modal, notification, Popover, Upload, Checkbox, Input } from 'antd';
+import { Button, Modal, Popover, Upload, Checkbox, Input } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import { theme } from 'src/style/theme';
 import { useRouter } from 'next/router';
 import Loading from '../common/Loading';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit } from '@fortawesome/free-regular-svg-icons';
-import { faHome, faPaintRoller, faPlus, faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faSquare } from '@fortawesome/free-regular-svg-icons';
+import { faPaintRoller, faUndo, faImage } from '@fortawesome/free-solid-svg-icons';
 import ToolSave from './ToolSave';
-
-interface PaperSize {
-  name: string;
-  size: {
-    width: string;
-    height: string;
-  };
-  price: number;
-}
-
-interface SelectedFrameInfo {
-  width: string;
-  height: string;
-}
-
-interface FramePrice {
-  name: string;
-  price: number;
-  id: number;
-}
-
-interface FramePosition {
-  left: string;
-  top: string;
-}
-
-interface CanvasFramePositionList {
-  id: number;
-  left: number;
-  top: number;
-}
+import { cmToPx } from 'src/utils/cmToPx';
+import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
+import ToolFrame from './ToolFrame';
+import {
+  FrameSize,
+  FramePosition,
+  CanvasFramePositionList,
+  SelectedFrameInfo,
+  FramePrice,
+} from 'src/interfaces/ToolInterface';
+import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 
 const Tool = () => {
   const router = useRouter();
-  const paperSize = useMemo<PaperSize[]>(
+  const frameSize = useMemo<FrameSize[]>(
     () => [
       {
-        name: '10x10',
-        // 10cm X 10cm
+        name: 'S-1호',
+        attribute: '정방',
+        cm: '16cm X 16cm',
         size: {
-          width: `${377.95275590551 / 3}px`,
-          height: `${377.95275590551 / 3}px`,
+          width: `${cmToPx(16)}px`,
+          height: `${cmToPx(16)}px`,
         },
         price: 55000,
       },
       {
-        name: '20x20',
-        // 20cm X 20cm
+        name: 'S-2호',
+        attribute: '정방',
+        cm: '19cm X 19cm',
         size: {
-          width: `${755.90551181102 / 3}px`,
-          height: `${755.90551181102 / 3}px`,
+          width: `${cmToPx(19)}px`,
+          height: `${cmToPx(19)}px`,
         },
         price: 40000,
       },
       {
-        name: '30x30',
-        // 30cm X 30cm
+        name: 'S-4호',
+        attribute: '정방',
+        cm: '24cm X 24cm',
         size: {
-          width: `${1133.8582677165 / 3}px`,
-          height: `${1133.8582677165 / 3}px`,
+          width: `${cmToPx(24)}px`,
+          height: `${cmToPx(24)}px`,
+        },
+        price: 30000,
+      },
+      {
+        name: 'P-2호',
+        attribute: '풍경',
+        cm: '16cm X 25.8cm',
+        size: {
+          width: `${cmToPx(16)}px`,
+          height: `${cmToPx(25.8)}px`,
+        },
+        price: 30000,
+      },
+      {
+        name: 'P-4호',
+        attribute: '풍경',
+        cm: '21.2cm X 33.3cm',
+        size: {
+          width: `${cmToPx(21.2)}px`,
+          height: `${cmToPx(33.3)}px`,
+        },
+        price: 30000,
+      },
+      {
+        name: 'F-2호',
+        attribute: '인물',
+        cm: '18cm X 25.8cm',
+        size: {
+          width: `${cmToPx(18)}px`,
+          height: `${cmToPx(25.8)}px`,
+        },
+        price: 40000,
+      },
+      {
+        name: 'F-4호',
+        attribute: '인물',
+        cm: '24cm X 33.3cm',
+        size: {
+          width: `${cmToPx(24)}px`,
+          height: `${cmToPx(33.3)}px`,
+        },
+        price: 40000,
+      },
+      {
+        name: 'M-4호',
+        attribute: '해경',
+        cm: '19cm X 33.3cm',
+        size: {
+          width: `${cmToPx(19)}px`,
+          height: `${cmToPx(33.3)}px`,
         },
         price: 30000,
       },
@@ -100,7 +132,7 @@ const Tool = () => {
   );
 
   const [selectedFrame, setSelectedFrame] = useState(false); // 골랐는지 상태 여부
-  const [selectedFrameInfo, setSelectedFrameInfo] = useState<PaperSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
+  const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
   const [selectedFramePosition, setSelectedFramePosition] = useState<FramePosition | null>(null); // top, letf 위치 조절
   const [cursorX, cursorY] = useGetCursorPosition(selectedFrame);
   const [scrollX, scrollY] = useGetScollPosition();
@@ -125,6 +157,14 @@ const Tool = () => {
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
 
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState('saveModal', false);
+
+  // 액자 사이즈들 변경
+  const [frameAttribute, setFrameAttribute] = useState<'정방' | '해경' | '인물' | '풍경'>('정방');
+
+  const handleGetFrameAttribute = useCallback((e) => {
+    const { value } = e.currentTarget;
+    setFrameAttribute(value);
+  }, []);
 
   // 고른 액자의 이름과 수량
   const yourPriceList = useMemo(() => {
@@ -187,7 +227,7 @@ const Tool = () => {
       }
 
       imgNode.current.style.width = `${newWidth}px`;
-      imgNode.current.style.height = `${newHeight}px`;
+      imgNode.current.style.height = `${filterOverMaxHeight(newHeight)}px`;
       setResizeWidth(newWidth);
       setResizeHeight(newHeight);
     },
@@ -230,6 +270,7 @@ const Tool = () => {
   // 이미지 업로드
   const handleImgReUpload = useCallback(
     async (file: RcFile) => {
+      if (!imgSizeChecker(file)) return;
       setImgUploadLoading(true);
       try {
         if (imgWrapperRef.current) {
@@ -254,6 +295,8 @@ const Tool = () => {
     if (acceptedFiles[0].type.includes('svg')) {
       return alert('svg 파일은 지원하지 않습니다.');
     }
+    if (!imgSizeChecker(acceptedFiles[0])) return;
+
     setImgUploadLoading(true);
     try {
       if (imgWrapperRef.current) {
@@ -299,8 +342,8 @@ const Tool = () => {
   const handleImgGoBack = useCallback(() => {
     if (imgWrapperRef.current) {
       const { current: imgBox } = imgWrapperRef;
-      if (imgBox.childNodes.length <= 2) {
-        return notification.info({ message: '존재하는 액자가 없습니다.', placement: 'bottomLeft' });
+      if (imgBox.childNodes.length < 2) {
+        return;
       }
       const imgBoxId = +(imgBox.childNodes[0] as any).id;
       imgBox?.removeChild(imgBox.childNodes[0]);
@@ -378,7 +421,7 @@ const Tool = () => {
       div.id = id.toString();
 
       // 크롭된 이미지 생성 (화질 구지 방지를 위해 스프라이트 기법 사용)
-      const cropImage = document.createElement('img');
+      const cropImage = new Image();
       cropImage.setAttribute(
         'style',
         `
@@ -440,13 +483,14 @@ const Tool = () => {
         el.style.width = `${width}px`;
         el.style.height = `${height}px`;
 
-        const naturalWidth = el.naturalWidth / width > 1 ? el.naturalWidth / width : 1;
-        const naturalHeight = el.naturalHeight / height > 1 ? el.naturalHeight / height : 1;
-        const seletctedName = paperSize.filter((lst) => {
+        const seletctedName = frameSize.filter((lst) => {
           if (lst.name === value) {
-            const newWidth = (+lst.size.width.replace('px', '') * 3) / naturalWidth;
-            const newHeight = (+lst.size.height.replace('px', '') * 3) / naturalHeight;
-            setYourSelectedFrame({ width: `${newWidth}px`, height: `${newHeight}px` });
+            // const naturalWidth = el.naturalWidth / width > 1 ? el.naturalWidth / width : 1;
+            // const naturalHeight = el.naturalHeight / height > 1 ? el.naturalHeight / height : 1;
+            // const newWidth = (+lst.size.width.replace('px', '') * 2) / naturalWidth;
+            // const newHeight = (+lst.size.height.replace('px', '') * 2) / naturalHeight;
+            // setYourSelectedFrame({ width: `${newWidth}px`, height: `${newHeight}px` });
+            setYourSelectedFrame({ width: `${lst.size.width}`, height: `${lst.size.height}` });
             setSelectedFrame(() => true);
             return lst;
           }
@@ -454,7 +498,7 @@ const Tool = () => {
         setSelectedFrameInfo(seletctedName[0]);
       }
     },
-    [paperSize],
+    [frameSize],
   );
 
   const handleResizeReset = useCallback(() => {
@@ -587,34 +631,121 @@ const Tool = () => {
 
   return (
     <>
-      <BackIcon type="primary" onClick={handlePushMainPage}>
-        <FontAwesomeIcon style={{ fontSize: '18px' }} icon={faHome} fill={theme.color.white} />
-      </BackIcon>
-      {<Loading loading={imgUploadLoading} />}
-      <Modal
-        visible={imgModalResizeOpen}
-        onOk={handleModalResizeOk}
-        onCancel={handleModalResize}
-        title="이미지의 너비와 높이를 입력하세요."
-      >
-        <div>
-          <form onChange={handleChangeImgSize}>
-            <Input type="text" name="width" value={resizeWidth || ''} addonBefore="너비" addonAfter="px" />
-            <Input type="text" name="height" value={resizeHeight || ''} addonBefore="높이" addonAfter="px" />
-          </form>
-
-          <div style={{ textAlign: 'right' }}>
-            <Checkbox defaultChecked={ratioPersist} onChange={handleRatioPersist}>
-              너비에 비율을 맞춥니다.
-            </Checkbox>
-          </div>
-          <div style={{ textAlign: 'right', marginTop: '6px' }}>
-            <Button onClick={handleResizeReset}>원래의 이미지 크기로 되돌립니다.</Button>
-          </div>
-        </div>
-      </Modal>
-
       <ToolContainer>
+        <ToolFrame frameSize={frameSize} attribute={frameAttribute} onClick={handleFrameSelect}></ToolFrame>
+
+        {/* 사진 조절하는 툴바들 */}
+        <FactoryHeader>
+          <FactoryUtills>
+            <h1 onClick={handlePushMainPage}>Early</h1>
+            <div>
+              <Popover
+                style={{ padding: 0 }}
+                content={
+                  yourPriceList.length ? (
+                    <CanvasInfomationWrapper>
+                      {/* 사용한 액자 x 수량 */}
+                      <BillInfomation>
+                        <Bill>
+                          {yourPriceList.map(([key, value], index) => (
+                            <div key={index}>
+                              <div>{key}</div>
+                              <div>
+                                {value.price.toLocaleString()} x {value.quantity}개
+                              </div>
+                            </div>
+                          ))}
+                        </Bill>
+                        <BillTotal>
+                          {framePrice.reduce((acc, cur) => (acc += cur.price), 0).toLocaleString()}원
+                        </BillTotal>
+                      </BillInfomation>
+                    </CanvasInfomationWrapper>
+                  ) : (
+                    '제작하신 액자가 없습니다.'
+                  )
+                }
+              >
+                <Button type="text">예상가격</Button>
+              </Popover>
+              <Button onClick={handleImgPreview} type={!isPreview ? 'default' : 'primary'}>
+                {!isPreview ? '미리보기' : '이미지로'}
+              </Button>
+              <Button type="text" onClick={handleSaveCanvas}>
+                저장
+              </Button>
+              {isSaveCanvas && <ToolSave yourPriceList={yourPriceList} selectedFrameList={selectedFrameList} />}
+            </div>
+          </FactoryUtills>
+          <FactoryTool>
+            <div>
+              <Button type="text" style={{ opacity: selectedFrameList.length ? 1 : 0.4 }} onClick={handleImgGoBack}>
+                <FontAwesomeIcon icon={faUndo} />
+                <small>실행취소</small>
+              </Button>
+              <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
+                <Button type="text">
+                  <FontAwesomeIcon icon={faImage} />
+                  <small>변경</small>
+                </Button>
+              </Upload>
+              <Popover
+                style={{ padding: 0 }}
+                trigger="click"
+                placement="bottom"
+                content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
+              >
+                <Button type="text">
+                  <FontAwesomeIcon icon={faPaintRoller} />
+                  <small>배경</small>
+                </Button>
+              </Popover>
+            </div>
+            <FrameTool>
+              <Button type="text" onClick={handleGetFrameAttribute} value="정방">
+                <FontAwesomeIcon icon={faSquare} />
+                <small>정방</small>
+              </Button>
+              <Button type="text" onClick={handleGetFrameAttribute} value="인물">
+                <FontAwesomeIcon icon={faSquare} />
+                <small>인물</small>
+              </Button>
+              <Button type="text" onClick={handleGetFrameAttribute} value="해경">
+                <FontAwesomeIcon icon={faSquare} />
+                <small>해경</small>
+              </Button>
+              <Button type="text" onClick={handleGetFrameAttribute} value="풍경">
+                <FontAwesomeIcon icon={faSquare} />
+                <small>풍경</small>
+              </Button>
+            </FrameTool>
+          </FactoryTool>
+        </FactoryHeader>
+
+        {<Loading loading={imgUploadLoading} />}
+        <Modal
+          visible={imgModalResizeOpen}
+          onOk={handleModalResizeOk}
+          onCancel={handleModalResize}
+          title="이미지의 너비와 높이를 입력하세요."
+        >
+          <div>
+            <form onChange={handleChangeImgSize}>
+              <Input type="text" name="width" value={resizeWidth || ''} addonBefore="너비" addonAfter="px" />
+              <Input type="text" name="height" value={resizeHeight || ''} addonBefore="높이" addonAfter="px" />
+            </form>
+
+            <div style={{ textAlign: 'right' }}>
+              <Checkbox defaultChecked={ratioPersist} onChange={handleRatioPersist}>
+                너비에 비율을 맞춥니다.
+              </Checkbox>
+            </div>
+            <div style={{ textAlign: 'right', marginTop: '6px' }}>
+              <Button onClick={handleResizeReset}>원래의 이미지 크기로 되돌립니다.</Button>
+            </div>
+          </div>
+        </Modal>
+
         {selectedFrame && selectedFramePosition && yourSelectedFrame && (
           <YouSelectedFrame
             // border={frameBorderColor}
@@ -638,7 +769,16 @@ const Tool = () => {
         >
           {imgUploadUrl ? (
             <>
-              {isResizeStart && <small>{`${resizeWidth.toFixed()}px X ${resizeHeight.toFixed()}px`}</small>}
+              {isResizeMode && (
+                <>
+                  <ImageShowingWidthHeight>
+                    {`${resizeWidth.toFixed()}px X ${resizeHeight.toFixed()}px`}
+                    <span onClick={handleModalResize}>
+                      <FontAwesomeIcon icon={faEdit} />
+                    </span>
+                  </ImageShowingWidthHeight>
+                </>
+              )}
               <ImgControlelr data-layout="inner" isResizeStart={isResizeMode} cmd={resizeCmd}>
                 <img
                   onMouseUp={handleImgResizeEnd}
@@ -653,79 +793,14 @@ const Tool = () => {
                     <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
                     <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
                     <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
-                    <span onClick={handleModalResize}>
-                      <FontAwesomeIcon icon={faEdit} />
-                    </span>
                   </>
                 ) : (
                   <button type="button" onClick={handleResizeMode}></button>
                 )}
               </ImgControlelr>
-              <VersatileWrapper>
-                <Versatile>
-                  <Button onClick={handleImgGoBack}>
-                    <FontAwesomeIcon icon={faUndo} />
-                  </Button>
-                  <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
-                    <Button>
-                      <FontAwesomeIcon icon={faPlus} />
-                    </Button>
-                  </Upload>
-
-                  <Factory>
-                    <Popover
-                      style={{ padding: 0 }}
-                      trigger="click"
-                      placement="bottom"
-                      content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
-                    >
-                      <Button>
-                        <FontAwesomeIcon icon={faPaintRoller} />
-                      </Button>
-                    </Popover>
-
-                    {/* <ToolColorPalette type="frame" onChange={handleFrameColorChange} /> */}
-                  </Factory>
-                </Versatile>
-                <FrameWrapper
-                  children={paperSize.map((paper, index) => (
-                    <FrameSize key={index} data-value={paper.name} {...paper.size} onClick={handleFrameSelect}>
-                      <FrameSizeName>{paper.name}</FrameSizeName>
-                    </FrameSize>
-                  ))}
-                />
-                <CanvasInfomationWrapper>
-                  {/* 사용한 액자 x 수량 */}
-                  <BillInfomation>
-                    <div>
-                      {yourPriceList.map(([key, value], index) => (
-                        <div
-                          style={{ display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 3px' }}
-                          key={index}
-                        >
-                          <div>{key}</div>
-                          <div>
-                            {value.price.toLocaleString()} x {value.quantity}개
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <FactoryTitle>
-                      예상 가격 <div>{framePrice.reduce((acc, cur) => (acc += cur.price), 0).toLocaleString()}원</div>
-                    </FactoryTitle>
-                  </BillInfomation>
-                  <div>
-                    <Button onClick={handleImgPreview}>미리보기 </Button>
-                    <Button type="primary" onClick={handleSaveCanvas}>
-                      저장
-                    </Button>
-                    {isSaveCanvas && <ToolSave yourPriceList={yourPriceList} selectedFrameList={selectedFrameList} />}
-                  </div>
-                </CanvasInfomationWrapper>
-              </VersatileWrapper>
             </>
           ) : (
-            <ImageWrapper imgUploadLoading={imgUploadLoading}>
+            <>
               <DropZone {...getRootProps()}>
                 <input {...getInputProps()} accept="image/*" />
                 <DropZoneDiv isDragActive={isDragActive}>
@@ -733,7 +808,7 @@ const Tool = () => {
                   <p>이미지를 드롭하거나 첨부하세요!</p>
                 </DropZoneDiv>
               </DropZone>
-            </ImageWrapper>
+            </>
           )}
         </ImageWrapper>
       </ToolContainer>

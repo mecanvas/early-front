@@ -1,24 +1,103 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Button, Card } from 'antd';
 
 export const ToolContainer = styled.div`
   width: 100%;
   margin: 0 auto;
   display: flex;
+  overflow-x: hidden;
+  position: relative;
 `;
 
-export const BackIcon = styled(Button)`
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  position: absolute;
-  z-index: 3;
-  top: 10px;
-  left: 10px;
-  svg {
-    path {
+export const FactoryHeader = styled.div`
+  display: flex;
+  width: 100%;
+  background-color: ${({ theme }) => theme.color.white};
+  position: fixed;
+  z-index: 33;
+  top: 0px;
+  flex-direction: column;
+`;
+
+export const FactoryUtills = styled.div`
+  height: 64px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 3em;
+  align-items: center;
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
+  h1 {
+    margin: 0;
+    padding: 0.4em;
+    text-align: center;
+  }
+
+  & > div {
+    display: flex;
+    button {
+      span {
+        font-weight: 500;
+        font-size: 15px;
+      }
+    }
+    button + button {
+      margin-left: 6px;
+    }
+
+    /* 저장 버튼 */
+    button:nth-of-type(3) {
+      background-color: ${({ theme }) => theme.color.secondary};
       color: ${({ theme }) => theme.color.white};
+    }
+  }
+`;
+
+export const FactoryTool = styled.div`
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
+  justify-content: center;
+
+  & > div:nth-of-type(1) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    button {
+      small {
+        margin-left: 3px;
+        font-size: 12px;
+        color: ${({ theme }) => theme.color.gray800};
+      }
+      svg {
+        font-size: 16px;
+        path {
+          fill: ${({ theme }) => theme.color.secondarydark};
+        }
+      }
+    }
+  }
+`;
+
+export const FrameTool = styled.div`
+  position: absolute;
+  right: 0;
+  display: flex;
+
+  button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+      font-size: 18px;
+      path {
+      }
+    }
+
+    small {
+      margin-left: 3px;
+      font-size: 12px;
+      color: ${({ theme }) => theme.color.gray800};
     }
   }
 `;
@@ -90,7 +169,7 @@ export const ImageWrapper = styled.div<{
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 15px 0;
+  padding: 115px 10px 50px 10px;
   margin: 0 auto;
   text-align: center;
   position: relative;
@@ -101,18 +180,6 @@ export const ImageWrapper = styled.div<{
     css`
       opacity: 0.3;
     `}
-
-  small {
-    position: absolute;
-    top: 25px;
-    z-index: 3;
-    padding: 8px;
-    font-weight: bold;
-    border: 1px solid ${({ theme }) => theme.color.primary};
-    border-radius: 20px;
-    background-color: ${({ theme }) => theme.color.secondarybg};
-    color: ${({ theme }) => theme.color.primary};
-  }
 
   ${({ cmd }) => {
     if (!cmd) return;
@@ -127,8 +194,9 @@ export const ImageWrapper = styled.div<{
   }}
 
   img {
-    max-height: 100vh;
+    max-height: ${() => 'calc(100vh - 170px)'};
   }
+
   .cropped-img {
     position: absolute;
     z-index: 3;
@@ -158,6 +226,41 @@ export const ImageWrapper = styled.div<{
 
     &.position {
       left: 0 !important;
+    }
+  }
+`;
+
+export const ImageShowingWidthHeight = styled.small`
+  position: absolute;
+  top: 110px;
+  z-index: 33;
+  padding: 8px;
+  font-weight: bold;
+  border: 1px solid ${({ theme }) => theme.color.primary};
+  border-radius: 20px;
+  background-color: ${({ theme }) => theme.color.secondarybg};
+  color: ${({ theme }) => theme.color.primary};
+
+  /* 사진 edit btn */
+  span {
+    position: absolute;
+    cursor: pointer;
+    right: -35px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    border: 1px solid ${({ theme }) => theme.color.primary};
+    background-color: ${({ theme }) => theme.color.secondarybg};
+    svg {
+      font-size: 16px;
+
+      path {
+        fill: ${({ theme }) => theme.color.primary};
+      }
     }
   }
 `;
@@ -197,6 +300,7 @@ button {
     height: 100%;
     top: 0;
     left: 0;
+    cursor: pointer;
   }
 
   /* top-left */
@@ -250,59 +354,6 @@ button {
     border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: nwse-resize;
   }
-
-  /* edit btn */
-  span {
-    position: absolute;
-    bottom: -30px;
-    left: 50%;
-    cursor: pointer;
-    svg {
-      font-size: 18px;
-
-      path {
-        fill: ${({ theme }) => theme.color.yellow};
-      }
-    }
-  }
-`;
-
-export const VersatileWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  z-index: 3;
-  padding: 4px;
-  position: absolute;
-  top: 50px;
-  right: 4px;
-`;
-
-export const Versatile = styled.div`
-  border-radius: 4px;
-  display: flex;
-
-  button {
-    svg {
-      font-size: 16px;
-      path {
-        fill: ${({ theme }) => theme.color.primary};
-      }
-    }
-  }
-`;
-
-export const Factory = styled.div`
-  display: flex;
-`;
-
-export const FactoryTitle = styled.div`
-  width: 100%;
-  display: flex;
-  margin-bottom: 3px;
-  font-size: 14px;
-  div {
-    margin-left: auto;
-  }
 `;
 
 export const ColorPaletteWrapper = styled.div`
@@ -329,23 +380,55 @@ export const ColorPaletteFreeColor = styled.div`
   border-top: 1px solid #dbdbdb;
 `;
 
-export const FrameWrapper = styled(Card)`
-  border: 1px solid #dbdbdb;
-  margin-top: 6px;
-  div {
+export const FrameWrapper = styled.div`
+  & > div {
+    position: absolute;
+    top: 115px;
+    right: 5px;
+    z-index: 30;
+    text-align: center;
+    border: 1px solid ${({ theme }) => theme.color.gray300};
+    background-color: ${({ theme }) => theme.color.white};
+    border-radius: 20px;
+    padding: 1em;
     display: flex;
-    cursor: pointer;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+
+    & > div {
+      flex-direction: column;
+      display: flex;
+    }
   }
 
-  div + div {
-    margin-left: 8px;
+  /* 접는 아이콘 */
+  span {
+    z-index: 33;
+    cursor: pointer;
+    position: fixed;
+    top: 118px;
+    right: 20px;
+    fill: ${({ theme }) => theme.color.secondarydark};
+    padding: 3px 6px;
+    border-radius: 20px;
+    &:hover {
+      background-color: ${({ theme }) => theme.color.gray300};
+    }
+  }
+
+  small {
+    font-size: 10px;
   }
 `;
 
-export const FrameSize = styled.div<{ width: string; height: string }>`
+export const FrameSizeList = styled.div<{ width: string; height: string }>`
   width: ${({ width }) => `${+width.replace('px', '') / 5}px`};
   height: ${({ height }) => `${+height.replace('px', '') / 5}px`};
-  border: 1px solid #333;
+  z-index: 30;
+  background-color: ${({ theme }) => theme.color.secondarybg};
+  cursor: pointer;
+  margin: 10px;
   position: relative;
 `;
 
@@ -354,37 +437,43 @@ export const FrameSizeName = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  display: flex !important;
+  font-size: 12px;
 `;
 
 export const CanvasInfomationWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 8px;
-  border-radius: 4px;
-  button {
-    width: 100%;
-  }
-
-  div {
-    display: flex;
-  }
+  width: 200px;
 `;
 
 export const BillInfomation = styled.div`
   display: flex;
   flex-direction: column;
   background-color: ${({ theme }) => theme.color.white};
-  padding: 6px 8px;
-  border-bottom: 1px solid #dbdbdb;
-  margin-bottom: 8px;
-  border-radius: 4px;
+`;
 
-  & > div:nth-of-type(1) {
+export const Bill = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.3em;
+
+  div {
     display: flex;
-    flex-direction: column;
-    & > div:last-child {
-      margin-bottom: 4px;
-      border-bottom: 1px solid ${({ theme }) => theme.color.gray400};
-    }
+    justify-content: space-between;
+    color: ${({ theme }) => theme.color.gray700};
   }
+
+  /* 액자 이름 */
+  & > div > div:nth-of-type(1) {
+    font-weight: bold;
+  }
+`;
+
+export const BillTotal = styled.div`
+  width: 100%;
+  padding-top: 0.3em;
+  border-top: 1px solid ${({ theme }) => theme.color.gray300};
+  text-align: right;
+  font-weight: bold;
 `;
