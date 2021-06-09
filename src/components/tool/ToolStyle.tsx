@@ -394,6 +394,22 @@ export const FrameWrapper = styled.div`
       display: flex;
     }
   }
+
+  /* 접는 아이콘 */
+  span {
+    z-index: 33;
+    cursor: pointer;
+    position: fixed;
+    top: 118px;
+    right: 20px;
+    fill: ${({ theme }) => theme.color.secondarydark};
+    padding: 3px 6px;
+    border-radius: 20px;
+    &:hover {
+      background-color: ${({ theme }) => theme.color.gray300};
+    }
+  }
+
   small {
     font-size: 10px;
   }

@@ -1,4 +1,6 @@
-import React, { useEffect, useMemo } from 'react';
+import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { FrameAttributes, FrameSize } from 'src/interfaces/ToolInterface';
 import { FrameWrapper, FrameSizeList, FrameSizeName } from './ToolStyle';
@@ -13,6 +15,12 @@ const ToolFrame = ({ frameSize, attribute, onClick }: Props) => {
     return frameSize.filter((lst) => lst.attribute === attribute);
   }, [attribute, frameSize]);
 
+  const [isFold, setIsFold] = useState(false);
+
+  const handleFoldFrameList = useCallback(() => {
+    setIsFold((prev) => !prev);
+  }, []);
+
   const [frameRendering, api] = useSpring(() => ({
     to: { translateX: 0 },
     from: { translateX: 100 },
@@ -24,8 +32,21 @@ const ToolFrame = ({ frameSize, attribute, onClick }: Props) => {
     api.start();
   }, [attribute, api]);
 
+  useEffect(() => {
+    if (isFold) {
+      api.update({ from: { translateX: 0 }, to: { translateX: 200 } });
+      api.start();
+    } else {
+      api.update({ from: { translateX: 200 }, to: { translateX: 0 } });
+      api.start();
+    }
+  }, [api, isFold]);
+
   return (
     <FrameWrapper>
+      <span onClick={handleFoldFrameList}>
+        <FontAwesomeIcon icon={!isFold ? faArrowRight : faArrowLeft} />
+      </span>
       <animated.div style={frameRendering}>
         {frameList.map((frame, index) => (
           <div key={index}>
