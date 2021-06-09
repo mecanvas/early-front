@@ -1,6 +1,10 @@
-export interface FrameSize {
-  name: string;
+export interface FrameAttributes {
+  // 미대오빠 캔버스 참고
   attribute: '정방' | '해경' | '인물' | '풍경';
+}
+
+export interface FrameSize extends FrameAttributes {
+  name: string;
   cm: string;
   size: {
     width: string;

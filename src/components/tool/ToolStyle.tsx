@@ -1,6 +1,5 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Card } from 'antd';
 
 export const ToolContainer = styled.div`
   width: 100%;
@@ -74,8 +73,6 @@ export const FrameTool = styled.div`
     }
   }
 `;
-
-export const FrameList = styled.div``;
 
 export const YouSelectedFrame = styled.div<{
   width: string;
@@ -369,10 +366,11 @@ export const ColorPaletteFreeColor = styled.div`
 export const FrameWrapper = styled.div`
   position: absolute;
   top: 115px;
-  right: 0;
+  right: 5px;
   z-index: 30;
   text-align: center;
   border: 1px solid ${({ theme }) => theme.color.gray300};
+  background-color: ${({ theme }) => theme.color.white};
   border-radius: 20px;
   padding: 1em;
   display: flex;

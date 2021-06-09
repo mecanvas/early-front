@@ -8,9 +8,6 @@ import {
   ImageWrapper,
   VersatileWrapper,
   FactoryTitle,
-  FrameWrapper,
-  FrameSizeList,
-  FrameSizeName,
   BillInfomation,
   DropZone,
   CanvasInfomationWrapper,
@@ -157,6 +154,14 @@ const Tool = () => {
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
 
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState('saveModal', false);
+
+  // 액자 사이즈들 변경
+  const [frameAttribute, setFrameAttribute] = useState<'정방' | '해경' | '인물' | '풍경'>('정방');
+
+  const handleGetFrameAttribute = useCallback((e) => {
+    const { value } = e.currentTarget;
+    setFrameAttribute(value);
+  }, []);
 
   // 고른 액자의 이름과 수량
   const yourPriceList = useMemo(() => {
@@ -619,7 +624,7 @@ const Tool = () => {
 
   return (
     <>
-      <ToolFrame frameSize={frameSize} attribute="정방" onClick={handleFrameSelect}></ToolFrame>
+      <ToolFrame frameSize={frameSize} attribute={frameAttribute} onClick={handleFrameSelect}></ToolFrame>
 
       {/* 사진 조절하는 툴바들 */}
       <FactoryHeader>
@@ -649,19 +654,19 @@ const Tool = () => {
             </Popover>
           </div>
           <FrameTool>
-            <Button type="text">
+            <Button type="text" onClick={handleGetFrameAttribute} value="정방">
               <FontAwesomeIcon icon={faSquare} />
               <small>정방</small>
             </Button>
-            <Button type="text">
+            <Button type="text" onClick={handleGetFrameAttribute} value="인물">
               <FontAwesomeIcon icon={faSquare} />
               <small>인물</small>
             </Button>
-            <Button type="text">
+            <Button type="text" onClick={handleGetFrameAttribute} value="해경">
               <FontAwesomeIcon icon={faSquare} />
-              <small>인물</small>
+              <small>해경</small>
             </Button>
-            <Button type="text">
+            <Button type="text" onClick={handleGetFrameAttribute} value="풍경">
               <FontAwesomeIcon icon={faSquare} />
               <small>풍경</small>
             </Button>

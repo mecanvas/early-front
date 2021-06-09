@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react';
-import { FrameSize } from 'src/interfaces/ToolInterface';
+import { FrameAttributes, FrameSize } from 'src/interfaces/ToolInterface';
 import { FrameWrapper, FrameSizeList, FrameSizeName } from './ToolStyle';
 
-interface Props {
+interface Props extends FrameAttributes {
   frameSize: FrameSize[];
-  attribute: '정방' | '해경' | '인물' | '풍경';
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
