@@ -23,12 +23,12 @@ const ToolFrame = ({ frameSize, attribute, onClick }: Props) => {
 
   const [frameRendering, api] = useSpring(() => ({
     to: { translateX: 0 },
-    from: { translateX: 100 },
+    from: { translateX: 200 },
     config: { duration: 400 },
   }));
 
   useEffect(() => {
-    api.update({ from: { translateX: 100 }, to: { translateX: 0 } });
+    api.update({ from: { translateX: 200 }, to: { translateX: 0 } });
     api.start();
   }, [attribute, api]);
 
