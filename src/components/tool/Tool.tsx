@@ -18,6 +18,7 @@ import {
   ImgControlelr,
   FactoryHeader,
   FactoryTool,
+  FrameTool,
 } from './ToolStyle';
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
@@ -28,43 +29,19 @@ import { theme } from 'src/style/theme';
 import { useRouter } from 'next/router';
 import Loading from '../common/Loading';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit } from '@fortawesome/free-regular-svg-icons';
+import { faEdit, faSquare } from '@fortawesome/free-regular-svg-icons';
 import { faPaintRoller, faUndo, faImage } from '@fortawesome/free-solid-svg-icons';
 import ToolSave from './ToolSave';
 import { cmToPx } from 'src/utils/cmToPx';
 import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
-
-interface FrameSize {
-  name: string;
-  attribute: '정방' | '해경' | '인물' | '풍경';
-  size: {
-    width: string;
-    height: string;
-  };
-  price: number;
-}
-
-interface SelectedFrameInfo {
-  width: string;
-  height: string;
-}
-
-interface FramePrice {
-  name: string;
-  price: number;
-  id: number;
-}
-
-interface FramePosition {
-  left: string;
-  top: string;
-}
-
-interface CanvasFramePositionList {
-  id: number;
-  left: number;
-  top: number;
-}
+import ToolFrame from './ToolFrame';
+import {
+  FrameSize,
+  FramePosition,
+  CanvasFramePositionList,
+  SelectedFrameInfo,
+  FramePrice,
+} from 'src/interfaces/ToolInterface';
 
 const Tool = () => {
   const router = useRouter();
@@ -642,32 +619,53 @@ const Tool = () => {
 
   return (
     <>
-      {/* 사진 조절하는 툴바들 */}
+      <ToolFrame frameSize={frameSize}></ToolFrame>
 
+      {/* 사진 조절하는 툴바들 */}
       <FactoryHeader>
         <h1 onClick={handlePushMainPage}>Early</h1>
         <FactoryTool>
-          <Button type="text" onClick={handleImgGoBack}>
-            <FontAwesomeIcon icon={faUndo} />
-            <small>실행취소</small>
-          </Button>
-          <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
-            <Button type="text">
-              <FontAwesomeIcon icon={faImage} />
-              <small>변경</small>
+          <div>
+            <Button type="text" onClick={handleImgGoBack}>
+              <FontAwesomeIcon icon={faUndo} />
+              <small>실행취소</small>
             </Button>
-          </Upload>
-          <Popover
-            style={{ padding: 0 }}
-            trigger="click"
-            placement="bottom"
-            content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
-          >
+            <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
+              <Button type="text">
+                <FontAwesomeIcon icon={faImage} />
+                <small>변경</small>
+              </Button>
+            </Upload>
+            <Popover
+              style={{ padding: 0 }}
+              trigger="click"
+              placement="bottom"
+              content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
+            >
+              <Button type="text">
+                <FontAwesomeIcon icon={faPaintRoller} />
+                <small>배경</small>
+              </Button>
+            </Popover>
+          </div>
+          <FrameTool>
             <Button type="text">
-              <FontAwesomeIcon icon={faPaintRoller} />
-              <small>배경</small>
+              <FontAwesomeIcon icon={faSquare} />
+              <small>정방</small>
             </Button>
-          </Popover>
+            <Button type="text">
+              <FontAwesomeIcon icon={faSquare} />
+              <small>인물</small>
+            </Button>
+            <Button type="text">
+              <FontAwesomeIcon icon={faSquare} />
+              <small>인물</small>
+            </Button>
+            <Button type="text">
+              <FontAwesomeIcon icon={faSquare} />
+              <small>풍경</small>
+            </Button>
+          </FrameTool>
         </FactoryTool>
       </FactoryHeader>
 

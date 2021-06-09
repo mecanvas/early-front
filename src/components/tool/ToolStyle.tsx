@@ -31,23 +31,50 @@ export const FactoryTool = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
   justify-content: center;
 
-  button {
+  & > div:nth-of-type(1) {
     display: flex;
     justify-content: center;
     align-items: center;
-    small {
-      margin-left: 3px;
-      font-size: 12px;
-      color: ${({ theme }) => theme.color.gray800};
-    }
-    svg {
-      font-size: 16px;
-      path {
-        fill: ${({ theme }) => theme.color.secondarydark};
+    button {
+      small {
+        margin-left: 3px;
+        font-size: 12px;
+        color: ${({ theme }) => theme.color.gray800};
+      }
+      svg {
+        font-size: 16px;
+        path {
+          fill: ${({ theme }) => theme.color.secondarydark};
+        }
       }
     }
   }
 `;
+
+export const FrameTool = styled.div`
+  position: absolute;
+  right: 0;
+  display: flex;
+
+  button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+      font-size: 18px;
+      path {
+      }
+    }
+
+    small {
+      margin-top: 3px;
+    }
+  }
+`;
+
+export const FrameList = styled.div``;
 
 export const YouSelectedFrame = styled.div<{
   width: string;
