@@ -41,6 +41,7 @@ import {
   SelectedFrameInfo,
   FramePrice,
 } from 'src/interfaces/ToolInterface';
+import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 
 const Tool = () => {
   const router = useRouter();
@@ -269,6 +270,7 @@ const Tool = () => {
   // 이미지 업로드
   const handleImgReUpload = useCallback(
     async (file: RcFile) => {
+      if (!imgSizeChecker(file)) return;
       setImgUploadLoading(true);
       try {
         if (imgWrapperRef.current) {
@@ -293,6 +295,8 @@ const Tool = () => {
     if (acceptedFiles[0].type.includes('svg')) {
       return alert('svg 파일은 지원하지 않습니다.');
     }
+    if (!imgSizeChecker(acceptedFiles[0])) return;
+
     setImgUploadLoading(true);
     try {
       if (imgWrapperRef.current) {
