@@ -155,18 +155,6 @@ export const ImageWrapper = styled.div<{
       opacity: 0.3;
     `}
 
-  small {
-    position: absolute;
-    top: 25px;
-    z-index: 3;
-    padding: 8px;
-    font-weight: bold;
-    border: 1px solid ${({ theme }) => theme.color.primary};
-    border-radius: 20px;
-    background-color: ${({ theme }) => theme.color.secondarybg};
-    color: ${({ theme }) => theme.color.primary};
-  }
-
   ${({ cmd }) => {
     if (!cmd) return;
     if (cmd === 'top-left' || cmd === 'bottom-right') {
@@ -212,6 +200,41 @@ export const ImageWrapper = styled.div<{
 
     &.position {
       left: 0 !important;
+    }
+  }
+`;
+
+export const ImageShowingWidthHeight = styled.small`
+  position: absolute;
+  top: 110px;
+  z-index: 33;
+  padding: 8px;
+  font-weight: bold;
+  border: 1px solid ${({ theme }) => theme.color.primary};
+  border-radius: 20px;
+  background-color: ${({ theme }) => theme.color.secondarybg};
+  color: ${({ theme }) => theme.color.primary};
+
+  /* edit btn */
+  span {
+    position: absolute;
+    cursor: pointer;
+    right: -35px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    border: 1px solid ${({ theme }) => theme.color.primary};
+    background-color: ${({ theme }) => theme.color.secondarybg};
+    svg {
+      font-size: 16px;
+
+      path {
+        fill: ${({ theme }) => theme.color.primary};
+      }
     }
   }
 `;
@@ -303,21 +326,6 @@ button {
     background: ${({ theme }) => theme.color.white};
     border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: nwse-resize;
-  }
-
-  /* edit btn */
-  span {
-    position: absolute;
-    bottom: -30px;
-    left: 50%;
-    cursor: pointer;
-    svg {
-      font-size: 18px;
-
-      path {
-        fill: ${({ theme }) => theme.color.yellow};
-      }
-    }
   }
 `;
 

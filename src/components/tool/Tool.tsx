@@ -16,6 +16,7 @@ import {
   FactoryHeader,
   FactoryTool,
   FrameTool,
+  ImageShowingWidthHeight,
 } from './ToolStyle';
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
@@ -722,7 +723,16 @@ const Tool = () => {
         >
           {imgUploadUrl ? (
             <>
-              {isResizeStart && <small>{`${resizeWidth.toFixed()}px X ${resizeHeight.toFixed()}px`}</small>}
+              {isResizeMode && (
+                <>
+                  <ImageShowingWidthHeight>
+                    {`${resizeWidth.toFixed()}px X ${resizeHeight.toFixed()}px`}
+                    <span onClick={handleModalResize}>
+                      <FontAwesomeIcon icon={faEdit} />
+                    </span>
+                  </ImageShowingWidthHeight>
+                </>
+              )}
               <ImgControlelr data-layout="inner" isResizeStart={isResizeMode} cmd={resizeCmd}>
                 <img
                   onMouseUp={handleImgResizeEnd}
@@ -737,9 +747,6 @@ const Tool = () => {
                     <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
                     <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
                     <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
-                    <span onClick={handleModalResize}>
-                      <FontAwesomeIcon icon={faEdit} />
-                    </span>
                   </>
                 ) : (
                   <button type="button" onClick={handleResizeMode}></button>
