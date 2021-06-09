@@ -279,6 +279,7 @@ const Tool = () => {
           await axios.post('/canvas/img', fd).then((res) => setImgUploadUrl(res.data || ''));
         }
       } catch (err) {
+        alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
         console.error(err);
       } finally {
         setImgUploadLoading(false);
@@ -307,6 +308,7 @@ const Tool = () => {
         await axios.post('/canvas/img', fd).then((res) => setImgUploadUrl(res.data || ''));
       }
     } catch (err) {
+      alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
       console.error(err);
     } finally {
       setImgUploadLoading(false);
