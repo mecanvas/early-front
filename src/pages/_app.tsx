@@ -5,12 +5,13 @@ import AppLayout from 'src/components/layouts/AppLayout';
 import axios from 'axios';
 import { ThemeProvider } from '@emotion/react';
 import { theme } from 'src/style/theme';
+import { API_URL } from 'src/constants';
 
 const AppContainer = styled.main`
   width: 100%;
 `;
 
-axios.defaults.baseURL = 'http://localhost:4000';
+axios.defaults.baseURL = API_URL;
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
