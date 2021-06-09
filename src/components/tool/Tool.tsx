@@ -436,7 +436,7 @@ const Tool = () => {
       div.id = id.toString();
 
       // 크롭된 이미지 생성 (화질 구지 방지를 위해 스프라이트 기법 사용)
-      const cropImage = document.createElement('img');
+      const cropImage = new Image();
       cropImage.setAttribute(
         'style',
         `
@@ -650,6 +650,7 @@ const Tool = () => {
       </BackIcon>
 
       {/* 사진 조절하는 툴바들 */}
+
       <Factory>
         <Button onClick={handleImgGoBack}>
           <FontAwesomeIcon icon={faUndo} />

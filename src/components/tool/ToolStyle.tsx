@@ -23,6 +23,22 @@ export const BackIcon = styled(Button)`
   }
 `;
 
+export const Factory = styled.div`
+  display: flex;
+  position: absolute;
+  right: 10px;
+  z-index: 33;
+  top: 10px;
+  button {
+    svg {
+      font-size: 16px;
+      path {
+        fill: ${({ theme }) => theme.color.primary};
+      }
+    }
+  }
+`;
+
 export const YouSelectedFrame = styled.div<{
   width: string;
   height: string;
@@ -275,22 +291,6 @@ export const VersatileWrapper = styled.div`
   position: absolute;
   top: 50px;
   right: 4px;
-`;
-
-export const Factory = styled.div`
-  display: flex;
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  z-index: 33;
-  button {
-    svg {
-      font-size: 16px;
-      path {
-        fill: ${({ theme }) => theme.color.primary};
-      }
-    }
-  }
 `;
 
 export const FactoryTitle = styled.div`
