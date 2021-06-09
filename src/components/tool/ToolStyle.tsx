@@ -180,7 +180,7 @@ export const ImageWrapper = styled.div<{
   }}
 
   img {
-    max-height: calc(100vh - 170px);
+    max-height: ${() => 'calc(100vh - 170px)'};
   }
 
   .cropped-img {

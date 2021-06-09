@@ -1,7 +1,9 @@
+import { MAX_HEIGHT } from 'src/constants';
+
 export const filterOverMaxHeight = (px: number) => {
   let newPx = 0;
-  if (px > 1000) {
-    newPx = 1000;
+  if (px > MAX_HEIGHT) {
+    newPx = MAX_HEIGHT;
   } else {
     newPx = px;
   }
