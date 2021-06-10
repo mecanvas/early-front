@@ -33,7 +33,7 @@ import { faPaintRoller, faUndo, faImage } from '@fortawesome/free-solid-svg-icon
 import ToolSave from './ToolSave';
 import { cmToPx } from 'src/utils/cmToPx';
 import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
-import ToolFrame from './ToolFrame';
+import ToolFrameList from './ToolFrameList';
 import {
   FrameSize,
   FramePosition,
@@ -641,7 +641,7 @@ const Tool = () => {
   return (
     <>
       <ToolContainer>
-        <ToolFrame frameSize={frameSize} attribute={frameAttribute} onClick={handleFrameSelect}></ToolFrame>
+        <ToolFrameList frameSize={frameSize} attribute={frameAttribute} onClick={handleFrameSelect}></ToolFrameList>
 
         {/* 사진 조절하는 툴바들 */}
         <FactoryHeader>
