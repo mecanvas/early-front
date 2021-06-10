@@ -131,10 +131,10 @@ const Tool = () => {
     [],
   );
 
-  const [selectedFrame, setSelectedFrame] = useState(false); // 골랐는지 상태 여부
+  const [isSelectFrame, setIsSelectFrame] = useState(false); // 골랐는지 상태 여부
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
   const [selectedFramePosition, setSelectedFramePosition] = useState<FramePosition | null>(null); // top, letf 위치 조절
-  const [cursorX, cursorY] = useGetCursorPosition(selectedFrame);
+  const [cursorX, cursorY] = useGetCursorPosition(isSelectFrame);
   const [scrollX, scrollY] = useGetScollPosition();
 
   const imgWrapperRef = useRef<HTMLDivElement>(null);
@@ -466,13 +466,13 @@ const Tool = () => {
 
   //   따라다니는 액자를 재클릭하면 insert하고 사라짐.
   const handleFrameRelease = useCallback(() => {
-    if (!selectedFrame) return;
+    if (!isSelectFrame) return;
     insertFrameToCanvas();
-    setSelectedFrame(() => false);
+    setIsSelectFrame(() => false);
     setSelectedFrameInfo(() => null);
     setSelectedFramePosition(() => null);
     setYourSelectedFrame(() => null);
-  }, [selectedFrame, insertFrameToCanvas]);
+  }, [isSelectFrame, insertFrameToCanvas]);
 
   //   액자를 클릭하묜?
   const handleFrameSelect = useCallback(
@@ -493,7 +493,7 @@ const Tool = () => {
             // const newHeight = (+lst.size.height.replace('px', '') * 2) / naturalHeight;
             // setYourSelectedFrame({ width: `${newWidth}px`, height: `${newHeight}px` });
             setYourSelectedFrame({ width: `${lst.size.width}`, height: `${lst.size.height}` });
-            setSelectedFrame(() => true);
+            setIsSelectFrame(() => true);
             return lst;
           }
         });
@@ -585,13 +585,13 @@ const Tool = () => {
 
   // 액자 클릭시 움직이는 로직
   useEffect(() => {
-    if (selectedFrame && yourSelectedFrame) {
+    if (isSelectFrame && yourSelectedFrame) {
       const { width, height } = yourSelectedFrame;
       const x = cursorX + scrollX - +width.replace('px', '') / 2;
       const y = cursorY + scrollY - +height.replace('px', '') / 2;
       setSelectedFramePosition({ left: `${x}px`, top: `${y}px` });
     }
-  }, [selectedFrame, yourSelectedFrame, cursorX, cursorY, scrollX, scrollY]);
+  }, [isSelectFrame, yourSelectedFrame, cursorX, cursorY, scrollX, scrollY]);
 
   useEffect(() => {
     if (imgNode.current) {
@@ -755,7 +755,7 @@ const Tool = () => {
           </div>
         </Modal>
 
-        {selectedFrame && selectedFramePosition && yourSelectedFrame && (
+        {isSelectFrame && selectedFramePosition && yourSelectedFrame && (
           <YouSelectedFrame
             // border={frameBorderColor}
             ref={youSelectedFrameRef}
