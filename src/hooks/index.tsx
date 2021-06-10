@@ -38,7 +38,7 @@ export const useGetScollPosition = () => {
       document.addEventListener('scroll', handleGetScrollPosition);
     }
     return () => {
-      document.addEventListener('scroll', handleGetScrollPosition);
+      document.removeEventListener('scroll', handleGetScrollPosition);
     };
   }, [handleGetScrollPosition]);
 

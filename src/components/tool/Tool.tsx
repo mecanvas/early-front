@@ -42,6 +42,7 @@ import {
   FramePrice,
 } from 'src/interfaces/ToolInterface';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
+import ToolSelectedFrame from './ToolSelectedFrame';
 
 const Tool = () => {
   const router = useRouter();
@@ -584,14 +585,14 @@ const Tool = () => {
   }, [setIsSaveCanvas]);
 
   // 액자 클릭시 움직이는 로직
-  useEffect(() => {
-    if (isSelectFrame && yourSelectedFrame) {
-      const { width, height } = yourSelectedFrame;
-      const x = cursorX + scrollX - +width.replace('px', '') / 2;
-      const y = cursorY + scrollY - +height.replace('px', '') / 2;
-      setSelectedFramePosition({ left: `${x}px`, top: `${y}px` });
-    }
-  }, [isSelectFrame, yourSelectedFrame, cursorX, cursorY, scrollX, scrollY]);
+  // useEffect(() => {
+  //   if (isSelectFrame && yourSelectedFrame) {
+  //     const { width, height } = yourSelectedFrame;
+  //     const x = cursorX + scrollX - +width.replace('px', '') / 2;
+  //     const y = cursorY + scrollY - +height.replace('px', '') / 2;
+  //     setSelectedFramePosition({ left: `${x}px`, top: `${y}px` });
+  //   }
+  // }, [isSelectFrame, yourSelectedFrame, cursorX, cursorY, scrollX, scrollY]);
 
   useEffect(() => {
     if (imgNode.current) {
@@ -755,7 +756,7 @@ const Tool = () => {
           </div>
         </Modal>
 
-        {isSelectFrame && selectedFramePosition && yourSelectedFrame && (
+        {/* {isSelectFrame && selectedFramePosition && yourSelectedFrame && (
           <YouSelectedFrame
             // border={frameBorderColor}
             ref={youSelectedFrameRef}
@@ -763,7 +764,7 @@ const Tool = () => {
             {...yourSelectedFrame}
             {...selectedFramePosition}
           ></YouSelectedFrame>
-        )}
+        )} */}
 
         <ImageWrapper
           imgUploadLoading={imgUploadLoading}
@@ -778,6 +779,8 @@ const Tool = () => {
         >
           {imgUploadUrl ? (
             <>
+              {isSelectFrame && <ToolSelectedFrame {...yourSelectedFrame} onClick={handleFrameRelease} />}
+
               {isResizeMode && (
                 <>
                   <ImageShowingWidthHeight>

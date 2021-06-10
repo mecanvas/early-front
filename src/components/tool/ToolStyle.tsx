@@ -102,6 +102,22 @@ export const FrameTool = styled.div`
   }
 `;
 
+export const SelectedFrameWrapper = styled.div`
+  width: 100%;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 115px 10px 50px 10px;
+
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+`;
+
 export const YouSelectedFrame = styled.div<{
   width: string;
   height: string;
