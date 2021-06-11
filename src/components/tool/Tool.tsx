@@ -39,6 +39,7 @@ import {
   CanvasFramePositionList,
   FramePrice,
   CanvasFrameSizeInfo,
+  ResizeCmd,
 } from 'src/interfaces/ToolInterface';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 import ToolSelectedFrame from './ToolSelectedFrame';
@@ -196,49 +197,61 @@ const Tool = () => {
   // const [frameBorderColor, setFrameBorderColor] = useState('#333');
 
   const [isResizeStart, setIsResizeStart] = useState(false);
-  const [resizeCmd, setResizeCmd] = useState<'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null>(null);
+  const [resizeCmd, setResizeCmd] = useState<ResizeCmd | null>(null);
   const [isResizeMode, setIsResizeMode] = useState(false);
 
-  const positioningImageResize = useCallback(
-    (resizeCmd: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null, x: number, y: number) => {
-      if (!imgNode.current) return;
-      const { width, height, left, top, right } = imgNode.current.getBoundingClientRect();
-      const absX = Math.abs(x - Math.ceil(left));
-      const absY = Math.abs(height + Math.ceil(top - y));
-      const absLeftX = Math.abs(x - Math.ceil(right));
-      const absBottomY = Math.abs(y + height - (top + height)); // bottom - top <- 이거 풀어씀.
-      let newWidth = width;
-      let newHeight = height;
+  const positioningImageResize = useCallback((resizeCmd: ResizeCmd | null, x: number, y: number) => {
+    if (!imgNode.current) return;
+    const { width, height, left, top, right } = imgNode.current.getBoundingClientRect();
+    const absX = Math.abs(x - Math.ceil(left));
+    const absY = Math.abs(height + Math.ceil(top - y));
+    const absLeftX = Math.abs(x - Math.ceil(right));
+    const absBottomY = Math.abs(y + height - (top + height)); // bottom - top <- 이거 풀어씀.
 
-      switch (resizeCmd) {
-        case 'bottom-right':
-          newWidth = absX;
-          newHeight = absBottomY;
-          break;
-        case 'top-right':
-          newHeight = absY;
-          newWidth = absX;
-          break;
-        case 'bottom-left':
-          newWidth = absLeftX;
-          newHeight = absBottomY;
-          break;
-        case 'top-left':
-          newHeight = absY;
-          newWidth = absLeftX;
-          break;
-        default:
-          break;
-      }
+    let newWidth = width;
+    let newHeight = height;
 
-      imgNode.current.style.width = `${newWidth}px`;
-      imgNode.current.style.height = `${filterOverMaxHeight(newHeight)}px`;
-      setResizeWidth(newWidth);
-      setResizeHeight(newHeight);
-      requestAnimationFrame(() => positioningImageResize);
-    },
-    [],
-  );
+    const getNewHeight = (x: number) => {
+      return (x * height) / width;
+    };
+
+    switch (resizeCmd) {
+      case 'bottom-right':
+        newHeight = getNewHeight(absX);
+        newWidth = absX;
+        break;
+      case 'top-right':
+        newHeight = getNewHeight(absX);
+        newWidth = absX;
+        break;
+      case 'bottom-left':
+        newHeight = getNewHeight(absLeftX);
+        newWidth = absLeftX;
+        break;
+      case 'top-left':
+        newHeight = getNewHeight(absLeftX);
+        newWidth = absLeftX;
+        break;
+      case 'bottom-center':
+        newHeight = absBottomY;
+        break;
+      case 'top-center':
+        newHeight = absY;
+        break;
+      case 'right':
+        newWidth = absX;
+        break;
+      case 'left':
+        newWidth = absLeftX;
+        break;
+      default:
+        break;
+    }
+
+    setResizeWidth(newWidth);
+    setResizeHeight(newHeight);
+    requestAnimationFrame(() => positioningImageResize);
+  }, []);
 
   const handleResizeMode = useCallback((e) => {
     e.stopPropagation();
@@ -264,6 +277,7 @@ const Tool = () => {
 
   const handleImgResizeStart = useCallback((e) => {
     const { cmd } = e.currentTarget.dataset;
+    console.log(cmd);
     setIsResizeStart(true);
     setResizeCmd(cmd);
   }, []);
@@ -551,12 +565,8 @@ const Tool = () => {
   }, []);
 
   const handleModalResizeOk = useCallback(() => {
-    if (imgNode.current) {
-      imgNode.current.style.width = `${resizeWidth}px`;
-      imgNode.current.style.height = `${resizeHeight}px`;
-      setImgModalResizeOpen((prev) => !prev);
-    }
-  }, [resizeWidth, resizeHeight]);
+    setImgModalResizeOpen((prev) => !prev);
+  }, []);
 
   const handleImgPreview = useCallback(() => {
     if (!imgUploadUrl) return;
@@ -596,6 +606,16 @@ const Tool = () => {
   const handleSaveCanvas = useCallback(() => {
     setIsSaveCanvas(true);
   }, [setIsSaveCanvas]);
+
+  useEffect(() => {
+    if (!imgNode.current) return;
+    if (resizeWidth) {
+      imgNode.current.style.width = `${resizeWidth}px`;
+    }
+    if (resizeHeight) {
+      imgNode.current.style.height = `${filterOverMaxHeight(resizeHeight)}px`;
+    }
+  }, [resizeWidth, resizeHeight]);
 
   useEffect(() => {
     if (imgNode.current) {
@@ -800,9 +820,16 @@ const Tool = () => {
                 {isResizeMode ? (
                   <>
                     <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="top-center" onMouseDown={handleImgResizeStart}></div>
                     <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
+
+                    <div data-cmd="right" onMouseDown={handleImgResizeStart}></div>
+
                     <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="bottom-center" onMouseDown={handleImgResizeStart}></div>
                     <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
+
+                    <div data-cmd="left" onMouseDown={handleImgResizeStart}></div>
                   </>
                 ) : (
                   <button type="button" onClick={handleResizeMode}></button>

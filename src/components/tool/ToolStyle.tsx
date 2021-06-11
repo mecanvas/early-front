@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import { ResizeCmd } from 'src/interfaces/ToolInterface';
 
 export const ToolContainer = styled.div`
   width: 100%;
@@ -178,7 +179,7 @@ export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
 export const ImageWrapper = styled.div<{
   bgColor?: string;
   imgUploadLoading?: boolean;
-  cmd?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
+  cmd?: ResizeCmd | null;
 }>`
   background-color: ${({ bgColor }) => bgColor};
   width: 100%;
@@ -283,7 +284,7 @@ export const ImageShowingWidthHeight = styled.small`
 
 export const ImgControlelr = styled.div<{
   isResizeStart: boolean;
-  cmd: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
+  cmd: ResizeCmd | null;
 }>`
   position: relative;
   border: ${({ theme, isResizeStart }) => isResizeStart && `2px solid ${theme.color.cyan}`};
@@ -303,6 +304,18 @@ export const ImgControlelr = styled.div<{
         cursor: nwse-resize;
       `;
     }
+    if (cmd === 'right' || cmd === 'left') {
+      return css`
+        cursor: ew-resize;
+      `;
+    }
+
+    if (cmd === 'bottom-center' || cmd === 'top-center') {
+      return css`
+        cursor: ns-resize;
+      `;
+    }
+
     return css`
       cursor: nesw-resize;
     `;
@@ -332,8 +345,21 @@ button {
     cursor: nwse-resize;
   }
 
-  /* top-right */
+  /* top-center */
   div:nth-of-type(2) {
+    position: absolute;
+    top: -3px;
+    transform: translateX(-50%);
+    left: 50%;
+    width: 20px;
+    height: 5px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
+    cursor: ns-resize;
+  }
+
+  /* top-right */
+  div:nth-of-type(3) {
     position: absolute;
     top: -4px;
     right: -4px;
@@ -345,8 +371,21 @@ button {
     cursor: nesw-resize;
   }
 
+  /* right */
+  div:nth-of-type(4) {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: -3px;
+    width: 5px;
+    height: 20px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
+    cursor: ew-resize;
+  }
+
   /* bottom-left */
-  div:nth-of-type(3) {
+  div:nth-of-type(5) {
     position: absolute;
     bottom: -4px;
     left: -4px;
@@ -358,8 +397,21 @@ button {
     cursor: nesw-resize;
   }
 
+  /* bottom-center */
+  div:nth-of-type(6) {
+    position: absolute;
+    bottom: -3px;
+    transform: translateX(-50%);
+    left: 50%;
+    width: 20px;
+    height: 5px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
+    cursor: ns-resize;
+  }
+
   /* bottom-right */
-  div:nth-of-type(4) {
+  div:nth-of-type(7) {
     position: absolute;
     bottom: -4px;
     right: -4px;
@@ -369,6 +421,19 @@ button {
     background: ${({ theme }) => theme.color.white};
     border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: nwse-resize;
+  }
+
+  /* left */
+  div:nth-of-type(8) {
+    position: absolute;
+    bottom: 50%;
+    transform: translateY(50%);
+    width: 5px;
+    height: 20px;
+    left: -3px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
+    cursor: ew-resize;
   }
 `;
 
