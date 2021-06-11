@@ -230,6 +230,7 @@ const Tool = () => {
       imgNode.current.style.height = `${filterOverMaxHeight(newHeight)}px`;
       setResizeWidth(newWidth);
       setResizeHeight(newHeight);
+      requestAnimationFrame(() => positioningImageResize);
     },
     [],
   );
@@ -572,6 +573,7 @@ const Tool = () => {
           (node as HTMLDivElement).style.top = top;
         }
       });
+      requestAnimationFrame(() => handleFramePositionReletive);
     }
   }, [scrollX, scrollY]);
 
