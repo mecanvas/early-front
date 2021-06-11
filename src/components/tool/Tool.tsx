@@ -28,7 +28,7 @@ import { useRouter } from 'next/router';
 import Loading from '../common/Loading';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSquare } from '@fortawesome/free-regular-svg-icons';
-import { faPaintRoller, faUndo, faImage } from '@fortawesome/free-solid-svg-icons';
+import { faPaintRoller, faUndo, faImage, faCompress } from '@fortawesome/free-solid-svg-icons';
 import ToolSave from './ToolSave';
 import { cmToPx } from 'src/utils/cmToPx';
 import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
@@ -43,6 +43,7 @@ import {
 } from 'src/interfaces/ToolInterface';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 import ToolSelectedFrame from './ToolSelectedFrame';
+import { getOriginRatio } from 'src/utils/getOriginRatio';
 
 const Tool = () => {
   const router = useRouter();
@@ -253,6 +254,14 @@ const Tool = () => {
     requestAnimationFrame(() => positioningImageResize);
   }, []);
 
+  const handleImgRatioSetting = useCallback(() => {
+    const [w, h] = getOriginRatio(originWidth, originHeight);
+    const newWidth = w * resizeHeight;
+    const newHeight = h * newWidth;
+    setResizeWidth(+newWidth.toFixed());
+    setResizeHeight(+newHeight.toFixed());
+  }, [originHeight, originWidth, resizeHeight]);
+
   const handleResizeMode = useCallback((e) => {
     e.stopPropagation();
     const { component } = e.currentTarget.dataset;
@@ -277,7 +286,6 @@ const Tool = () => {
 
   const handleImgResizeStart = useCallback((e) => {
     const { cmd } = e.currentTarget.dataset;
-    console.log(cmd);
     setIsResizeStart(true);
     setResizeCmd(cmd);
   }, []);
@@ -631,8 +639,8 @@ const Tool = () => {
       el.style.height = '';
       el.src = imgUploadUrl;
       el.onload = () => {
-        setOriginWidth(el.width);
-        setOriginHeight(el.height);
+        setOriginWidth(el.naturalWidth || el.width);
+        setOriginHeight(el.naturalHeight || el.height);
         setResizeWidth(el.width);
         setResizeHeight(el.height);
       };
@@ -738,6 +746,11 @@ const Tool = () => {
                   <small>배경</small>
                 </Button>
               </Popover>
+
+              <Button type="text" onClick={handleImgRatioSetting}>
+                <FontAwesomeIcon icon={faCompress} />
+                <small>비율 맞추기</small>
+              </Button>
             </div>
             <FrameTool>
               <Button type="text" onClick={handleGetFrameAttribute} value="정방">
