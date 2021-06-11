@@ -409,8 +409,8 @@ export const FrameWrapper = styled.div`
     padding: 1em;
     display: flex;
     align-items: center;
-    flex-direction: column;
     justify-content: center;
+    flex-direction: column;
 
     & > div {
       flex-direction: column;
@@ -419,7 +419,7 @@ export const FrameWrapper = styled.div`
   }
 
   /* 접는 아이콘 */
-  span {
+  & > span {
     z-index: 33;
     cursor: pointer;
     position: fixed;
@@ -434,7 +434,22 @@ export const FrameWrapper = styled.div`
   }
 
   small {
-    font-size: 10px;
+    font-size: 8px;
+  }
+
+  button {
+    width: 80px;
+    height: 30px;
+    font-size: 14px;
+    padding: 0;
+    margin-top: 10px;
+
+    svg {
+      font-size: 12px;
+      path {
+        fill: ${({ theme }) => theme.color.secondary};
+      }
+    }
   }
 `;
 
@@ -444,7 +459,7 @@ export const FrameSizeList = styled.div<{ width: string; height: string }>`
   z-index: 30;
   background-color: ${({ theme }) => theme.color.secondarybg};
   cursor: pointer;
-  margin: 10px;
+  margin: 10px 10px 5px 10px;
   position: relative;
 `;
 
