@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import useSWR from 'swr';
+import useSWR, { SWRResponse } from 'swr';
 import { notification } from 'antd';
 
 export const useGetCursorPosition = (isSelected: boolean) => {
@@ -38,7 +38,7 @@ export const useGetScollPosition = () => {
       document.addEventListener('scroll', handleGetScrollPosition);
     }
     return () => {
-      document.addEventListener('scroll', handleGetScrollPosition);
+      document.removeEventListener('scroll', handleGetScrollPosition);
     };
   }, [handleGetScrollPosition]);
 
@@ -47,16 +47,16 @@ export const useGetScollPosition = () => {
 
 // 전역변수를 swr을 이용해 사용합니다.
 export const useGlobalState = <T,>(key: string, defaultValue?: T | null) => {
-  const { data: state = defaultValue, mutate } = useSWR(key, null, {
+  const { data: state = defaultValue, mutate }: SWRResponse<T | null, any> = useSWR(key, null, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
     refreshWhenHidden: false,
     refreshWhenOffline: false,
   });
 
-  const setState = useCallback((value: any) => mutate(value, false), [mutate]);
+  const setState = useCallback((value: T) => mutate(value, false), [mutate]);
 
-  return [state, setState];
+  return [state, setState] as const;
 };
 
 export const useCanvasToServer = () => {
