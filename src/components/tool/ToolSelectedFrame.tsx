@@ -55,6 +55,7 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
           ctx.stroke();
         }
       }
+      requestAnimationFrame(() => handleDrawingFrame);
     },
     [
       canvasFrameSizeInfo,
