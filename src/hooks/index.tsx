@@ -87,7 +87,8 @@ export const useCanvasToServer = () => {
       setLoading(true);
       await canvas.forEach(async (node, index) => {
         const { dataset } = node;
-
+        const w = node.width;
+        const h = node.height;
         // canvas 배경변경 https://github.com/mikechambers/ExamplesByMesh/blob/master/HTML5/canvas/exportWithBackgroundColor/scripts/main.js 참고
         if (dataset.bgColor) {
           const ctx = node.getContext('2d');
@@ -104,8 +105,6 @@ export const useCanvasToServer = () => {
           const ctx = node.getContext('2d');
 
           if (ctx) {
-            const w = node.width;
-            const h = node.height;
             const data = ctx.getImageData(0, 0, w, h);
             const compositeOperation = ctx.globalCompositeOperation;
             ctx.clearRect(0, 0, w, h);
