@@ -86,8 +86,33 @@ export const useCanvasToServer = () => {
     const sendToCanvas = async () => {
       setLoading(true);
       await canvas.forEach(async (node, index) => {
-        const dataUrl = (node as HTMLCanvasElement).toDataURL('image/png', 1.0);
         const { dataset } = node;
+        const w = node.width;
+        const h = node.height;
+        // canvas 배경변경 https://github.com/mikechambers/ExamplesByMesh/blob/master/HTML5/canvas/exportWithBackgroundColor/scripts/main.js 참고
+        if (dataset.bgColor) {
+          const ctx = node.getContext('2d');
+          if (ctx) {
+            ctx.globalCompositeOperation = 'destination-over';
+            ctx.fillStyle = dataset.bgColor;
+            ctx.fillRect(0, 0, w, h);
+          }
+        }
+
+        const dataUrl = (node as HTMLCanvasElement).toDataURL('image/png', 1.0);
+
+        if (dataset.bgColor) {
+          const ctx = node.getContext('2d');
+
+          if (ctx) {
+            const data = ctx.getImageData(0, 0, w, h);
+            const compositeOperation = ctx.globalCompositeOperation;
+            ctx.clearRect(0, 0, w, h);
+            ctx.putImageData(data, 0, 0);
+            ctx.globalCompositeOperation = compositeOperation;
+          }
+        }
+
         const file = dataURLtoFile(
           dataUrl,
           `${new Date().toLocaleDateString()}_${name}_${dataset.paper}_${index + 1}.png`,
