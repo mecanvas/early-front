@@ -793,6 +793,7 @@ const Tool = () => {
           ref={imgWrapperRef}
           bgColor={bgColor}
           onMouseUp={handleImgResizeEnd}
+          onMouseLeave={handleImgResizeEnd}
           cmd={resizeCmd}
         >
           {imgUploadUrl ? (
