@@ -45,6 +45,7 @@ import ToolSelectedFrame from './ToolSelectedFrame';
 
 const Tool = () => {
   const router = useRouter();
+  const [ratio, setRatio] = useState(1.5);
   const frameSize = useMemo<FrameSize[]>(
     () => [
       {
@@ -52,8 +53,8 @@ const Tool = () => {
         attribute: '정방',
         cm: '16cm X 16cm',
         size: {
-          width: `${cmToPx(16)}px`,
-          height: `${cmToPx(16)}px`,
+          width: `${cmToPx(16, ratio)}px`,
+          height: `${cmToPx(16, ratio)}px`,
         },
         price: 55000,
       },
@@ -62,8 +63,8 @@ const Tool = () => {
         attribute: '정방',
         cm: '19cm X 19cm',
         size: {
-          width: `${cmToPx(19)}px`,
-          height: `${cmToPx(19)}px`,
+          width: `${cmToPx(19, ratio)}px`,
+          height: `${cmToPx(19, ratio)}px`,
         },
         price: 40000,
       },
@@ -72,8 +73,8 @@ const Tool = () => {
         attribute: '정방',
         cm: '24cm X 24cm',
         size: {
-          width: `${cmToPx(24)}px`,
-          height: `${cmToPx(24)}px`,
+          width: `${cmToPx(24, ratio)}px`,
+          height: `${cmToPx(24, ratio)}px`,
         },
         price: 30000,
       },
@@ -82,8 +83,8 @@ const Tool = () => {
         attribute: '풍경',
         cm: '16cm X 25.8cm',
         size: {
-          width: `${cmToPx(16)}px`,
-          height: `${cmToPx(25.8)}px`,
+          width: `${cmToPx(16, ratio)}px`,
+          height: `${cmToPx(25.8, ratio)}px`,
         },
         price: 30000,
       },
@@ -92,8 +93,8 @@ const Tool = () => {
         attribute: '풍경',
         cm: '21.2cm X 33.3cm',
         size: {
-          width: `${cmToPx(21.2)}px`,
-          height: `${cmToPx(33.3)}px`,
+          width: `${cmToPx(21.2, ratio)}px`,
+          height: `${cmToPx(33.3, ratio)}px`,
         },
         price: 30000,
       },
@@ -102,8 +103,8 @@ const Tool = () => {
         attribute: '인물',
         cm: '18cm X 25.8cm',
         size: {
-          width: `${cmToPx(18)}px`,
-          height: `${cmToPx(25.8)}px`,
+          width: `${cmToPx(18, ratio)}px`,
+          height: `${cmToPx(25.8, ratio)}px`,
         },
         price: 40000,
       },
@@ -112,8 +113,8 @@ const Tool = () => {
         attribute: '인물',
         cm: '24cm X 33.3cm',
         size: {
-          width: `${cmToPx(24)}px`,
-          height: `${cmToPx(33.3)}px`,
+          width: `${cmToPx(24, ratio)}px`,
+          height: `${cmToPx(33.3, ratio)}px`,
         },
         price: 40000,
       },
@@ -122,13 +123,13 @@ const Tool = () => {
         attribute: '해경',
         cm: '19cm X 33.3cm',
         size: {
-          width: `${cmToPx(19)}px`,
-          height: `${cmToPx(33.3)}px`,
+          width: `${cmToPx(19, ratio)}px`,
+          height: `${cmToPx(33.3, ratio)}px`,
         },
         price: 30000,
       },
     ],
-    [],
+    [ratio],
   );
 
   const [isSelectFrame, setIsSelectFrame] = useState(false); // 골랐는지 상태 여부
@@ -686,7 +687,50 @@ const Tool = () => {
             </div>
           </FactoryUtills>
           <FactoryTool>
+            <Input
+              style={{ width: '140px' }}
+              placeholder="원하는 단축 비율"
+              onChange={(e) => (typeof +e.target.value === 'number' ? setRatio(+e.target.value) : alert('숫자만'))}
+              value={ratio || ''}
+            />
             <div>
+              <div>
+                <Button
+                  type="text"
+                  onClick={(e) => setRatio(e.currentTarget.dataset.ratio ? +e.currentTarget.dataset.ratio : 1.5)}
+                  data-ratio={1}
+                >
+                  1배
+                </Button>
+                <Button
+                  type="text"
+                  onClick={(e) => setRatio(e.currentTarget.dataset.ratio ? +e.currentTarget.dataset.ratio : 1.5)}
+                  data-ratio={1.5}
+                >
+                  1.5배
+                </Button>
+                <Button
+                  type="text"
+                  onClick={(e) => setRatio(e.currentTarget.dataset.ratio ? +e.currentTarget.dataset.ratio : 1.5)}
+                  data-ratio={2}
+                >
+                  2배
+                </Button>
+                <Button
+                  type="text"
+                  onClick={(e) => setRatio(e.currentTarget.dataset.ratio ? +e.currentTarget.dataset.ratio : 1.5)}
+                  data-ratio={2.5}
+                >
+                  2.5배
+                </Button>
+                <Button
+                  type="text"
+                  onClick={(e) => setRatio(e.currentTarget.dataset.ratio ? +e.currentTarget.dataset.ratio : 1.5)}
+                  data-ratio={3}
+                >
+                  3배
+                </Button>
+              </div>
               <Button type="text" style={{ opacity: selectedFrameList.length ? 1 : 0.4 }} onClick={handleImgGoBack}>
                 <FontAwesomeIcon icon={faUndo} />
                 <small>실행취소</small>
