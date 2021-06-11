@@ -45,7 +45,6 @@ import ToolSelectedFrame from './ToolSelectedFrame';
 
 const Tool = () => {
   const router = useRouter();
-  const [ratio, setRatio] = useState(1.5);
   const frameSize = useMemo<FrameSize[]>(
     () => [
       {
@@ -53,8 +52,8 @@ const Tool = () => {
         attribute: '정방',
         cm: '16cm X 16cm',
         size: {
-          width: `${cmToPx(16, ratio)}px`,
-          height: `${cmToPx(16, ratio)}px`,
+          width: `${cmToPx(16)}px`,
+          height: `${cmToPx(16)}px`,
         },
         price: 55000,
       },
@@ -63,8 +62,8 @@ const Tool = () => {
         attribute: '정방',
         cm: '19cm X 19cm',
         size: {
-          width: `${cmToPx(19, ratio)}px`,
-          height: `${cmToPx(19, ratio)}px`,
+          width: `${cmToPx(19)}px`,
+          height: `${cmToPx(19)}px`,
         },
         price: 40000,
       },
@@ -73,8 +72,8 @@ const Tool = () => {
         attribute: '정방',
         cm: '24cm X 24cm',
         size: {
-          width: `${cmToPx(24, ratio)}px`,
-          height: `${cmToPx(24, ratio)}px`,
+          width: `${cmToPx(24)}px`,
+          height: `${cmToPx(24)}px`,
         },
         price: 30000,
       },
@@ -83,8 +82,8 @@ const Tool = () => {
         attribute: '풍경',
         cm: '16cm X 25.8cm',
         size: {
-          width: `${cmToPx(16, ratio)}px`,
-          height: `${cmToPx(25.8, ratio)}px`,
+          width: `${cmToPx(16)}px`,
+          height: `${cmToPx(25.8)}px`,
         },
         price: 30000,
       },
@@ -93,8 +92,8 @@ const Tool = () => {
         attribute: '풍경',
         cm: '21.2cm X 33.3cm',
         size: {
-          width: `${cmToPx(21.2, ratio)}px`,
-          height: `${cmToPx(33.3, ratio)}px`,
+          width: `${cmToPx(21.2)}px`,
+          height: `${cmToPx(33.3)}px`,
         },
         price: 30000,
       },
@@ -103,8 +102,8 @@ const Tool = () => {
         attribute: '인물',
         cm: '18cm X 25.8cm',
         size: {
-          width: `${cmToPx(18, ratio)}px`,
-          height: `${cmToPx(25.8, ratio)}px`,
+          width: `${cmToPx(18)}px`,
+          height: `${cmToPx(25.8)}px`,
         },
         price: 40000,
       },
@@ -113,8 +112,8 @@ const Tool = () => {
         attribute: '인물',
         cm: '24cm X 33.3cm',
         size: {
-          width: `${cmToPx(24, ratio)}px`,
-          height: `${cmToPx(33.3, ratio)}px`,
+          width: `${cmToPx(24)}px`,
+          height: `${cmToPx(33.3)}px`,
         },
         price: 40000,
       },
@@ -123,13 +122,13 @@ const Tool = () => {
         attribute: '해경',
         cm: '19cm X 33.3cm',
         size: {
-          width: `${cmToPx(19, ratio)}px`,
-          height: `${cmToPx(33.3, ratio)}px`,
+          width: `${cmToPx(19)}px`,
+          height: `${cmToPx(33.3)}px`,
         },
         price: 30000,
       },
     ],
-    [ratio],
+    [],
   );
 
   const [isSelectFrame, setIsSelectFrame] = useState(false); // 골랐는지 상태 여부
