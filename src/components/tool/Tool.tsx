@@ -687,50 +687,7 @@ const Tool = () => {
             </div>
           </FactoryUtills>
           <FactoryTool>
-            <Input
-              style={{ width: '140px' }}
-              placeholder="원하는 단축 비율"
-              onChange={(e) => (typeof +e.target.value === 'number' ? setRatio(+e.target.value) : alert('숫자만'))}
-              value={ratio || ''}
-            />
             <div>
-              <div>
-                <Button
-                  type="text"
-                  onClick={(e) => setRatio(e.currentTarget.dataset.ratio ? +e.currentTarget.dataset.ratio : 1.5)}
-                  data-ratio={1}
-                >
-                  1배
-                </Button>
-                <Button
-                  type="text"
-                  onClick={(e) => setRatio(e.currentTarget.dataset.ratio ? +e.currentTarget.dataset.ratio : 1.5)}
-                  data-ratio={1.5}
-                >
-                  1.5배
-                </Button>
-                <Button
-                  type="text"
-                  onClick={(e) => setRatio(e.currentTarget.dataset.ratio ? +e.currentTarget.dataset.ratio : 1.5)}
-                  data-ratio={2}
-                >
-                  2배
-                </Button>
-                <Button
-                  type="text"
-                  onClick={(e) => setRatio(e.currentTarget.dataset.ratio ? +e.currentTarget.dataset.ratio : 1.5)}
-                  data-ratio={2.5}
-                >
-                  2.5배
-                </Button>
-                <Button
-                  type="text"
-                  onClick={(e) => setRatio(e.currentTarget.dataset.ratio ? +e.currentTarget.dataset.ratio : 1.5)}
-                  data-ratio={3}
-                >
-                  3배
-                </Button>
-              </div>
               <Button type="text" style={{ opacity: selectedFrameList.length ? 1 : 0.4 }} onClick={handleImgGoBack}>
                 <FontAwesomeIcon icon={faUndo} />
                 <small>실행취소</small>
