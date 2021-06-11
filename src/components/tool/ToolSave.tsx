@@ -32,7 +32,7 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
   const [info, setInfo] = useState<Info | null>(null);
   const [userNameEmpty, setUserNameEmpty] = useState({ isRequired: false, extra: '' });
   const [phoneNumberEmpty, setPhoneNumberEmpty] = useState({ isRequired: false, extra: '' });
-  const [isSaveCanvas, setIsSaveCanvas] = useGlobalState('saveModal');
+  const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const { canvasToImage, loading, isDone } = useCanvasToServer();
   const router = useRouter();
 
@@ -97,7 +97,7 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
   return (
     <>
       <Modal
-        visible={isSaveCanvas}
+        visible={isSaveCanvas || false}
         onOk={handleSendToConfirm}
         onCancel={handleVisible}
         confirmLoading={loading}
