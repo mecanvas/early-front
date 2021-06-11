@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useGetCursorPosition, useGetScollPosition, useGlobalState } from 'src/hooks';
+import { useGetScollPosition, useGlobalState } from 'src/hooks';
 import axios from 'axios';
 import ToolColorPalette from './ToolColorPalette';
 import {
   ToolContainer,
-  YouSelectedFrame,
   ImageWrapper,
   BillTotal,
   BillInfomation,
@@ -36,10 +35,10 @@ import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
 import ToolFrameList from './ToolFrameList';
 import {
   FrameSize,
-  FramePosition,
+  CanvasPosition,
   CanvasFramePositionList,
-  SelectedFrameInfo,
   FramePrice,
+  CanvasFrameSizeInfo,
 } from 'src/interfaces/ToolInterface';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 import ToolSelectedFrame from './ToolSelectedFrame';
@@ -134,8 +133,10 @@ const Tool = () => {
 
   const [isSelectFrame, setIsSelectFrame] = useState(false); // 골랐는지 상태 여부
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
-  const [selectedFramePosition, setSelectedFramePosition] = useState<FramePosition | null>(null); // top, letf 위치 조절
-  const [cursorX, cursorY] = useGetCursorPosition(isSelectFrame);
+
+  const [canvasPosition] = useGlobalState<CanvasPosition>('canvasPosition');
+  const [canvasFrameSizeInfo] = useGlobalState<CanvasFrameSizeInfo>('canvasFrameSizeInfo');
+
   const [scrollX, scrollY] = useGetScollPosition();
 
   const imgWrapperRef = useRef<HTMLDivElement>(null);
@@ -151,9 +152,7 @@ const Tool = () => {
   const [imgModalResizeOpen, setImgModalResizeOpen] = useState(false);
   const [canvasFramePositionList, setCanvasFramePositionList] = useState<CanvasFramePositionList[]>([]);
   const [selectedFrameList, setSelectedFrameList] = useState<HTMLCanvasElement[]>([]);
-  const [yourSelectedFrame, setYourSelectedFrame] = useState<SelectedFrameInfo | null>(null);
-
-  const youSelectedFrameRef = useRef<HTMLDivElement>(null);
+  const [yourSelectedFrame, setYourSelectedFrame] = useState<CanvasFrameSizeInfo | null>(null);
 
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
 
@@ -359,18 +358,18 @@ const Tool = () => {
   // 이미지 저장을 위한 캔버스 생성 (스프라이트 기법으로 이미지 저장은 안되기 때문에 품질이 깨지더라도 이 방법 사용합니다.)
   const createCanvasForSave = useCallback(
     (id: number) => {
-      if (!youSelectedFrameRef.current || !imgNode.current || !selectedFrameInfo) return;
+      if (!canvasFrameSizeInfo || !imgNode.current || !selectedFrameInfo || !canvasPosition) return;
 
       const { name } = selectedFrameInfo;
-      const { width: frameWidth, height: frameHeight } = youSelectedFrameRef.current.getBoundingClientRect();
+      const { width: frameWidth, height: frameHeight } = canvasFrameSizeInfo;
       const { left, top } = imgNode.current.getBoundingClientRect();
-
+      const { left: canvasLeft, top: canvasTop } = canvasPosition;
       const image = imgNode.current;
       const oCanvas = document.createElement('canvas');
       oCanvas.id = id.toString();
       oCanvas.dataset.paper = name;
-      const cropX = cursorX - left - frameWidth / 2;
-      const cropY = cursorY - top - frameHeight / 2;
+      const cropX = canvasLeft - left;
+      const cropY = canvasTop - top;
 
       const scaleX = image.naturalWidth / image.width;
       const scaleY = image.naturalHeight / image.height;
@@ -397,15 +396,15 @@ const Tool = () => {
 
       setSelectedFrameList([...selectedFrameList, oCanvas]);
     },
-    [cursorX, cursorY, selectedFrameInfo, selectedFrameList],
+    [canvasFrameSizeInfo, canvasPosition, selectedFrameInfo, selectedFrameList],
   );
 
   const createImageCanvas = useCallback(
     (id: number) => {
-      if (!youSelectedFrameRef.current || !imgNode.current) return;
-      const { width: frameWidth, height: frameHeight } = youSelectedFrameRef.current.getBoundingClientRect();
+      if (!isSelectFrame || !imgNode.current || !canvasPosition || !canvasFrameSizeInfo) return;
+      const { width: frameWidth, height: frameHeight } = canvasFrameSizeInfo;
       const { left, top, width, height } = imgNode.current.getBoundingClientRect();
-
+      const { left: canvasLeft, top: canvasTop } = canvasPosition;
       // 크롭된 이미지를 담을 캔버스 생성
       const div = document.createElement('div');
       const deleteBtn = document.createElement('div');
@@ -415,12 +414,10 @@ const Tool = () => {
       div.classList.add('cropped-img');
       div.style.width = `${frameWidth}px`;
       div.style.height = `${frameHeight}px`;
-      const canvasLeftPosition = cursorX - frameWidth / 2;
-      const canvasTopPosition = cursorY - frameHeight / 2;
-      div.style.left = `${canvasLeftPosition + scrollX}px`;
-      div.style.top = `${canvasTopPosition + scrollY}px`;
-      div.setAttribute('data-originleft', `${canvasLeftPosition - left}`);
-      div.setAttribute('data-origintop', `${canvasTopPosition - top}`);
+      div.style.left = `${canvasLeft + scrollX}px`;
+      div.style.top = `${canvasTop + scrollY}px`;
+      div.setAttribute('data-originleft', `${canvasLeft - left}`);
+      div.setAttribute('data-origintop', `${canvasTop - top}`);
       div.id = id.toString();
 
       // 크롭된 이미지 생성 (화질 구지 방지를 위해 스프라이트 기법 사용)
@@ -432,8 +429,8 @@ const Tool = () => {
         background-color : ${bgColor};
         background-repeat : no-repeat;
         background-size: ${width}px ${height}px; 
-        background-position-x: ${-canvasLeftPosition + left}px;
-        background-position-y: ${-canvasTopPosition + top}px;
+        background-position-x: ${-canvasLeft + left}px;
+        background-position-y: ${-canvasTop + top}px;
         width: ${100}%;
         height: ${100}%;
         box-shadow : 0 0 7px #333 inset, 0 0 6px #ededed;
@@ -441,21 +438,28 @@ const Tool = () => {
       );
 
       // 만든 캔버스 액자의 포지션이 어떤지 설정해주기, 왜 와이? 리사이즈 시 위치 바꾸기 위함
-      setCanvasFramePositionList([
-        ...canvasFramePositionList,
-        { left: canvasLeftPosition, top: canvasTopPosition, id },
-      ]);
+      setCanvasFramePositionList([...canvasFramePositionList, { left: canvasLeft, top: canvasTop, id }]);
 
       div.append(cropImage);
       div.append(deleteBtn);
       imgWrapperRef.current?.prepend(div);
     },
-    [handleDeleteCanvas, cursorX, cursorY, scrollX, scrollY, imgUploadUrl, bgColor, canvasFramePositionList],
+    [
+      isSelectFrame,
+      canvasPosition,
+      canvasFrameSizeInfo,
+      handleDeleteCanvas,
+      scrollX,
+      scrollY,
+      imgUploadUrl,
+      bgColor,
+      canvasFramePositionList,
+    ],
   );
 
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
   const insertFrameToCanvas = useCallback(async () => {
-    if (youSelectedFrameRef.current && imgNode.current && selectedFrameInfo) {
+    if (imgNode.current && selectedFrameInfo) {
       //  액자의 가격을 price에 넣기
       const { name, price } = selectedFrameInfo;
       const id = Date.now();
@@ -471,7 +475,6 @@ const Tool = () => {
     insertFrameToCanvas();
     setIsSelectFrame(() => false);
     setSelectedFrameInfo(() => null);
-    setSelectedFramePosition(() => null);
     setYourSelectedFrame(() => null);
   }, [isSelectFrame, insertFrameToCanvas]);
 
@@ -493,11 +496,14 @@ const Tool = () => {
             // const newWidth = (+lst.size.width.replace('px', '') * 2) / naturalWidth;
             // const newHeight = (+lst.size.height.replace('px', '') * 2) / naturalHeight;
             // setYourSelectedFrame({ width: `${newWidth}px`, height: `${newHeight}px` });
-            setYourSelectedFrame({ width: `${lst.size.width}`, height: `${lst.size.height}` });
-            setIsSelectFrame(() => true);
+            setYourSelectedFrame({
+              width: +lst.size.width.replace('px', ''),
+              height: +lst.size.height.replace('px', ''),
+            });
             return lst;
           }
         });
+        setIsSelectFrame(() => true);
         setSelectedFrameInfo(seletctedName[0]);
       }
     },
@@ -583,16 +589,6 @@ const Tool = () => {
   const handleSaveCanvas = useCallback(() => {
     setIsSaveCanvas(true);
   }, [setIsSaveCanvas]);
-
-  // 액자 클릭시 움직이는 로직
-  // useEffect(() => {
-  //   if (isSelectFrame && yourSelectedFrame) {
-  //     const { width, height } = yourSelectedFrame;
-  //     const x = cursorX + scrollX - +width.replace('px', '') / 2;
-  //     const y = cursorY + scrollY - +height.replace('px', '') / 2;
-  //     setSelectedFramePosition({ left: `${x}px`, top: `${y}px` });
-  //   }
-  // }, [isSelectFrame, yourSelectedFrame, cursorX, cursorY, scrollX, scrollY]);
 
   useEffect(() => {
     if (imgNode.current) {
@@ -755,16 +751,6 @@ const Tool = () => {
             </div>
           </div>
         </Modal>
-
-        {/* {isSelectFrame && selectedFramePosition && yourSelectedFrame && (
-          <YouSelectedFrame
-            // border={frameBorderColor}
-            ref={youSelectedFrameRef}
-            onClick={handleFrameRelease}
-            {...yourSelectedFrame}
-            {...selectedFramePosition}
-          ></YouSelectedFrame>
-        )} */}
 
         <ImageWrapper
           imgUploadLoading={imgUploadLoading}

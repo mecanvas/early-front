@@ -13,9 +13,9 @@ export interface FrameSize extends FrameAttributes {
   price: number;
 }
 
-export interface SelectedFrameInfo {
-  width: string;
-  height: string;
+export interface CanvasFrameSizeInfo {
+  width: number;
+  height: number;
 }
 
 export interface FramePrice {
@@ -24,9 +24,9 @@ export interface FramePrice {
   id: number;
 }
 
-export interface FramePosition {
-  left: string;
-  top: string;
+export interface CanvasPosition {
+  left: number;
+  top: number;
 }
 
 export interface CanvasFramePositionList {
