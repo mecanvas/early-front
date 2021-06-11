@@ -45,6 +45,8 @@ import ToolSelectedFrame from './ToolSelectedFrame';
 
 const Tool = () => {
   const router = useRouter();
+  const [changeVertical, setChangeVertical] = useState(false);
+
   const frameSize = useMemo<FrameSize[]>(
     () => [
       {
@@ -80,60 +82,59 @@ const Tool = () => {
       {
         name: 'P-2호',
         attribute: '풍경',
-        cm: '16cm X 25.8cm',
+        cm: !changeVertical ? '16cm X 25.8cm' : '25.8cm X 16cm',
         size: {
-          width: `${cmToPx(16)}px`,
-          height: `${cmToPx(25.8)}px`,
+          width: `${cmToPx(!changeVertical ? 16 : 25.8)}px`,
+          height: `${cmToPx(!changeVertical ? 25.8 : 16)}px`,
         },
         price: 30000,
       },
       {
         name: 'P-4호',
         attribute: '풍경',
-        cm: '21.2cm X 33.3cm',
+        cm: !changeVertical ? '21.2cm X 33.3cm' : '33.3cm X 21.2cm',
         size: {
-          width: `${cmToPx(21.2)}px`,
-          height: `${cmToPx(33.3)}px`,
+          width: `${cmToPx(!changeVertical ? 21.2 : 33.3)}px`,
+          height: `${cmToPx(!changeVertical ? 33.3 : 21.2)}px`,
         },
         price: 30000,
       },
       {
         name: 'F-2호',
         attribute: '인물',
-        cm: '18cm X 25.8cm',
+        cm: !changeVertical ? '18cm X 25.8cm' : '25.8cm X 18cm',
         size: {
-          width: `${cmToPx(18)}px`,
-          height: `${cmToPx(25.8)}px`,
+          width: `${cmToPx(!changeVertical ? 18 : 25.8)}px`,
+          height: `${cmToPx(!changeVertical ? 25.8 : 18)}px`,
         },
         price: 40000,
       },
       {
         name: 'F-4호',
         attribute: '인물',
-        cm: '24cm X 33.3cm',
+        cm: !changeVertical ? '24cm X 33.3cm' : '33.3cm X 24cm',
         size: {
-          width: `${cmToPx(24)}px`,
-          height: `${cmToPx(33.3)}px`,
+          width: `${cmToPx(!changeVertical ? 24 : 33.3)}px`,
+          height: `${cmToPx(!changeVertical ? 33.3 : 24)}px`,
         },
         price: 40000,
       },
       {
         name: 'M-4호',
         attribute: '해경',
-        cm: '19cm X 33.3cm',
+        cm: !changeVertical ? '19cm X 33.3cm' : '33.3cm X 19cm',
         size: {
-          width: `${cmToPx(19)}px`,
-          height: `${cmToPx(33.3)}px`,
+          width: `${cmToPx(!changeVertical ? 19 : 33.3)}px`,
+          height: `${cmToPx(!changeVertical ? 33.3 : 19)}px`,
         },
         price: 30000,
       },
     ],
-    [],
+    [changeVertical],
   );
 
   const [isSelectFrame, setIsSelectFrame] = useState(false); // 골랐는지 상태 여부
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
-
   const [canvasPosition] = useGlobalState<CanvasPosition>('canvasPosition');
   const [canvasFrameSizeInfo] = useGlobalState<CanvasFrameSizeInfo>('canvasFrameSizeInfo');
 
@@ -160,6 +161,10 @@ const Tool = () => {
   const [isDone, setIsDone] = useGlobalState('isDone');
   // 액자 사이즈들 변경
   const [frameAttribute, setFrameAttribute] = useState<'정방' | '해경' | '인물' | '풍경'>('정방');
+
+  const handleChangeVertical = useCallback(() => {
+    setChangeVertical((prev) => !prev);
+  }, []);
 
   const handleGetFrameAttribute = useCallback((e) => {
     const { value } = e.currentTarget;
@@ -640,7 +645,12 @@ const Tool = () => {
   return (
     <>
       <ToolContainer>
-        <ToolFrameList frameSize={frameSize} attribute={frameAttribute} onClick={handleFrameSelect}></ToolFrameList>
+        <ToolFrameList
+          frameSize={frameSize}
+          attribute={frameAttribute}
+          onClick={handleFrameSelect}
+          onChangeVertical={handleChangeVertical}
+        ></ToolFrameList>
 
         {/* 사진 조절하는 툴바들 */}
         <FactoryHeader>

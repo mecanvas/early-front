@@ -1,5 +1,6 @@
-import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faArrowRight, faSync } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Button } from 'antd';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { FrameAttributes, FrameSize } from 'src/interfaces/ToolInterface';
@@ -8,9 +9,10 @@ import { FrameWrapper, FrameSizeList, FrameSizeName } from './ToolStyle';
 interface Props extends FrameAttributes {
   frameSize: FrameSize[];
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onChangeVertical: () => void;
 }
 
-const ToolFrame = ({ frameSize, attribute, onClick }: Props) => {
+const ToolFrame = ({ frameSize, attribute, onClick, onChangeVertical }: Props) => {
   const frameList = useMemo(() => {
     return frameSize.filter((lst) => lst.attribute === attribute);
   }, [attribute, frameSize]);
@@ -56,6 +58,9 @@ const ToolFrame = ({ frameSize, attribute, onClick }: Props) => {
             <small>{frame.cm}</small>
           </div>
         ))}
+        <Button type="dashed" onClick={onChangeVertical}>
+          <FontAwesomeIcon icon={faSync} />
+        </Button>
       </animated.div>
     </FrameWrapper>
   );
