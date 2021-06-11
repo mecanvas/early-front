@@ -396,12 +396,14 @@ const Tool = () => {
       const oCanvas = document.createElement('canvas');
       oCanvas.id = id.toString();
       oCanvas.dataset.paper = name;
+      oCanvas.dataset.bgColor = bgColor;
       const cropX = canvasLeft - left;
       const cropY = canvasTop - top;
 
       const scaleX = image.naturalWidth / image.width;
       const scaleY = image.naturalHeight / image.height;
       const oCtx = oCanvas.getContext('2d');
+
       const pixelRatio = window.devicePixelRatio;
 
       oCanvas.width = frameWidth * pixelRatio;
@@ -424,7 +426,7 @@ const Tool = () => {
 
       setSelectedFrameList([...selectedFrameList, oCanvas]);
     },
-    [canvasFrameSizeInfo, canvasPosition, selectedFrameInfo, selectedFrameList],
+    [bgColor, canvasFrameSizeInfo, canvasPosition, selectedFrameInfo, selectedFrameList],
   );
 
   const createImageCanvas = useCallback(
