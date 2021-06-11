@@ -58,9 +58,11 @@ const ToolFrame = ({ frameSize, attribute, onClick, onChangeVertical }: Props) =
             <small>{frame.cm}</small>
           </div>
         ))}
-        <Button type="dashed" onClick={onChangeVertical}>
-          <FontAwesomeIcon icon={faSync} />
-        </Button>
+        {attribute === '정방' || (
+          <Button type="dashed" onClick={onChangeVertical}>
+            <FontAwesomeIcon icon={faSync} />
+          </Button>
+        )}
       </animated.div>
     </FrameWrapper>
   );

@@ -28,7 +28,7 @@ import { useRouter } from 'next/router';
 import Loading from '../common/Loading';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSquare } from '@fortawesome/free-regular-svg-icons';
-import { faPaintRoller, faUndo, faImage } from '@fortawesome/free-solid-svg-icons';
+import { faPaintRoller, faUndo, faImage, faCompress } from '@fortawesome/free-solid-svg-icons';
 import ToolSave from './ToolSave';
 import { cmToPx } from 'src/utils/cmToPx';
 import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
@@ -39,9 +39,11 @@ import {
   CanvasFramePositionList,
   FramePrice,
   CanvasFrameSizeInfo,
+  ResizeCmd,
 } from 'src/interfaces/ToolInterface';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 import ToolSelectedFrame from './ToolSelectedFrame';
+import { getOriginRatio } from 'src/utils/getOriginRatio';
 
 const Tool = () => {
   const router = useRouter();
@@ -196,49 +198,69 @@ const Tool = () => {
   // const [frameBorderColor, setFrameBorderColor] = useState('#333');
 
   const [isResizeStart, setIsResizeStart] = useState(false);
-  const [resizeCmd, setResizeCmd] = useState<'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null>(null);
+  const [resizeCmd, setResizeCmd] = useState<ResizeCmd | null>(null);
   const [isResizeMode, setIsResizeMode] = useState(false);
 
-  const positioningImageResize = useCallback(
-    (resizeCmd: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null, x: number, y: number) => {
-      if (!imgNode.current) return;
-      const { width, height, left, top, right } = imgNode.current.getBoundingClientRect();
-      const absX = Math.abs(x - Math.ceil(left));
-      const absY = Math.abs(height + Math.ceil(top - y));
-      const absLeftX = Math.abs(x - Math.ceil(right));
-      const absBottomY = Math.abs(y + height - (top + height)); // bottom - top <- 이거 풀어씀.
-      let newWidth = width;
-      let newHeight = height;
+  const positioningImageResize = useCallback((resizeCmd: ResizeCmd | null, x: number, y: number) => {
+    if (!imgNode.current) return;
+    const { width, height, left, top, right } = imgNode.current.getBoundingClientRect();
+    const absX = Math.abs(x - Math.ceil(left));
+    const absY = Math.abs(height + Math.ceil(top - y));
+    const absLeftX = Math.abs(x - Math.ceil(right));
+    const absBottomY = Math.abs(y + height - (top + height)); // bottom - top <- 이거 풀어씀.
 
-      switch (resizeCmd) {
-        case 'bottom-right':
-          newWidth = absX;
-          newHeight = absBottomY;
-          break;
-        case 'top-right':
-          newHeight = absY;
-          newWidth = absX;
-          break;
-        case 'bottom-left':
-          newWidth = absLeftX;
-          newHeight = absBottomY;
-          break;
-        case 'top-left':
-          newHeight = absY;
-          newWidth = absLeftX;
-          break;
-        default:
-          break;
-      }
+    let newWidth = width;
+    let newHeight = height;
 
-      imgNode.current.style.width = `${newWidth}px`;
-      imgNode.current.style.height = `${filterOverMaxHeight(newHeight)}px`;
-      setResizeWidth(newWidth);
-      setResizeHeight(newHeight);
-      requestAnimationFrame(() => positioningImageResize);
-    },
-    [],
-  );
+    const getNewHeight = (x: number) => {
+      return (x * height) / width;
+    };
+
+    switch (resizeCmd) {
+      case 'bottom-right':
+        newHeight = getNewHeight(absX);
+        newWidth = absX;
+        break;
+      case 'top-right':
+        newHeight = getNewHeight(absX);
+        newWidth = absX;
+        break;
+      case 'bottom-left':
+        newHeight = getNewHeight(absLeftX);
+        newWidth = absLeftX;
+        break;
+      case 'top-left':
+        newHeight = getNewHeight(absLeftX);
+        newWidth = absLeftX;
+        break;
+      case 'bottom-center':
+        newHeight = absBottomY;
+        break;
+      case 'top-center':
+        newHeight = absY;
+        break;
+      case 'right':
+        newWidth = absX;
+        break;
+      case 'left':
+        newWidth = absLeftX;
+        break;
+      default:
+        break;
+    }
+
+    setResizeWidth(newWidth);
+    setResizeHeight(newHeight);
+    requestAnimationFrame(() => positioningImageResize);
+  }, []);
+
+  const handleImgRatioSetting = useCallback(() => {
+    const [w, h] = getOriginRatio(originWidth, originHeight);
+    const newWidth = w * resizeHeight;
+    const newHeight = h * newWidth;
+    setResizeWidth(+newWidth.toFixed());
+    setResizeHeight(+newHeight.toFixed());
+  }, [originHeight, originWidth, resizeHeight]);
 
   const handleResizeMode = useCallback((e) => {
     e.stopPropagation();
@@ -551,12 +573,8 @@ const Tool = () => {
   }, []);
 
   const handleModalResizeOk = useCallback(() => {
-    if (imgNode.current) {
-      imgNode.current.style.width = `${resizeWidth}px`;
-      imgNode.current.style.height = `${resizeHeight}px`;
-      setImgModalResizeOpen((prev) => !prev);
-    }
-  }, [resizeWidth, resizeHeight]);
+    setImgModalResizeOpen((prev) => !prev);
+  }, []);
 
   const handleImgPreview = useCallback(() => {
     if (!imgUploadUrl) return;
@@ -598,6 +616,16 @@ const Tool = () => {
   }, [setIsSaveCanvas]);
 
   useEffect(() => {
+    if (!imgNode.current) return;
+    if (resizeWidth) {
+      imgNode.current.style.width = `${resizeWidth}px`;
+    }
+    if (resizeHeight) {
+      imgNode.current.style.height = `${filterOverMaxHeight(resizeHeight)}px`;
+    }
+  }, [resizeWidth, resizeHeight]);
+
+  useEffect(() => {
     if (imgNode.current) {
       imgNode.current.style.visibility = isPreview ? 'hidden' : 'visible';
     }
@@ -611,8 +639,8 @@ const Tool = () => {
       el.style.height = '';
       el.src = imgUploadUrl;
       el.onload = () => {
-        setOriginWidth(el.width);
-        setOriginHeight(el.height);
+        setOriginWidth(el.naturalWidth || el.width);
+        setOriginHeight(el.naturalHeight || el.height);
         setResizeWidth(el.width);
         setResizeHeight(el.height);
       };
@@ -718,6 +746,11 @@ const Tool = () => {
                   <small>배경</small>
                 </Button>
               </Popover>
+
+              <Button type="text" onClick={handleImgRatioSetting}>
+                <FontAwesomeIcon icon={faCompress} />
+                <small>비율 맞추기</small>
+              </Button>
             </div>
             <FrameTool>
               <Button type="text" onClick={handleGetFrameAttribute} value="정방">
@@ -773,6 +806,7 @@ const Tool = () => {
           ref={imgWrapperRef}
           bgColor={bgColor}
           onMouseUp={handleImgResizeEnd}
+          onMouseLeave={handleImgResizeEnd}
           cmd={resizeCmd}
         >
           {imgUploadUrl ? (
@@ -800,9 +834,16 @@ const Tool = () => {
                 {isResizeMode ? (
                   <>
                     <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="top-center" onMouseDown={handleImgResizeStart}></div>
                     <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
+
+                    <div data-cmd="right" onMouseDown={handleImgResizeStart}></div>
+
                     <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="bottom-center" onMouseDown={handleImgResizeStart}></div>
                     <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
+
+                    <div data-cmd="left" onMouseDown={handleImgResizeStart}></div>
                   </>
                 ) : (
                   <button type="button" onClick={handleResizeMode}></button>
