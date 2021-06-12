@@ -144,7 +144,7 @@ const Tool = () => {
 
   const imgWrapperRef = useRef<HTMLDivElement>(null);
   const imgNode = useRef<HTMLImageElement>(null);
-  const [imgUploadUrl, setImgUploadUrl] = useState('');
+  const [imgUploadUrl, setImgUploadUrl] = useGlobalState('imgUploadUrl', '');
   const [imgUploadLoading, setImgUploadLoading] = useState(false);
 
   const [originWidth, setOriginWidth] = useState(0);

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import useSWR, { SWRResponse } from 'swr';
 import { notification } from 'antd';
+import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 export const useGetCursorPosition = (isSelected: boolean) => {
   const [windowX, setWindowX] = useState(0);
@@ -78,16 +79,18 @@ export const useCanvasToServer = () => {
   };
   const [loading, setLoading] = useState(false);
   const [isDone, setIsDone] = useGlobalState('isDone', false);
+  const [imgUploadUrl] = useGlobalState<string>('imgUploadUrl');
   const [isSave, setIsSave] = useState(false);
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [fileList, setFileList] = useState<File[]>([]);
   const [paperSize, setPaperSize] = useState<string[]>([]);
 
-  const canvasToImage = (canvas: HTMLCanvasElement[], name: string) => {
+  const canvasToImage = (canvas: HTMLCanvasElement[], name: string, email: string) => {
     if (!window) return;
     if (!canvas.length) return notification.error({ message: '액자를 만들어주세요.', placement: 'bottomLeft' });
     setUsername(name);
-
+    setEmail(email);
     const sendToCanvas = async () => {
       setLoading(true);
 
@@ -149,13 +152,14 @@ export const useCanvasToServer = () => {
 
     sendToCanvas();
   };
-
+  console.log(imgUploadUrl);
   useEffect(() => {
-    if (!isSave) return;
+    if (!isSave || !imgUploadUrl) return;
     const saveCanvas = async () => {
       const fd = new FormData();
       fd.append('username', username);
-      fd.append('email', 'sample123@gmail.com');
+      fd.append('email', email);
+      fd.append('originImgUrl', imgUploadUrl);
       fileList.forEach((file) => fd.append('image', file));
       fd.append('paper', paperSize.join());
       await axios.post('/canvas', fd, {
@@ -165,7 +169,7 @@ export const useCanvasToServer = () => {
       });
     };
     saveCanvas();
-  }, [fileList, isSave, paperSize, username]);
+  }, [email, fileList, isSave, paperSize, username, imgUploadUrl]);
 
   return { canvasToImage, loading, isDone };
 };
