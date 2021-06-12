@@ -144,7 +144,7 @@ const Tool = () => {
 
   const imgWrapperRef = useRef<HTMLDivElement>(null);
   const imgNode = useRef<HTMLImageElement>(null);
-  const [imgUploadUrl, setImgUploadUrl] = useState('');
+  const [imgUploadUrl, setImgUploadUrl] = useGlobalState('imgUploadUrl', '');
   const [imgUploadLoading, setImgUploadLoading] = useState(false);
 
   const [originWidth, setOriginWidth] = useState(0);
@@ -314,34 +314,37 @@ const Tool = () => {
       }
       return false;
     },
-    [imgWrapperRef],
+    [setImgUploadUrl],
   );
 
-  const handleImgDropUpload = useCallback(async (acceptedFiles) => {
-    if (!acceptedFiles[0].type.includes('image')) {
-      return alert('이미지 파일이 아닌건 지원하지 않습니다.');
-    }
-    if (acceptedFiles[0].type.includes('svg')) {
-      return alert('svg 파일은 지원하지 않습니다.');
-    }
-    if (!imgSizeChecker(acceptedFiles[0])) return;
-
-    setImgUploadLoading(true);
-    try {
-      if (imgWrapperRef.current) {
-        const file = acceptedFiles[0];
-        const fd = new FormData();
-        fd.append('image', file);
-
-        await axios.post('/canvas/img', fd).then((res) => setImgUploadUrl(res.data || ''));
+  const handleImgDropUpload = useCallback(
+    async (acceptedFiles) => {
+      if (!acceptedFiles[0].type.includes('image')) {
+        return alert('이미지 파일이 아닌건 지원하지 않습니다.');
       }
-    } catch (err) {
-      alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
-      console.error(err);
-    } finally {
-      setImgUploadLoading(false);
-    }
-  }, []);
+      if (acceptedFiles[0].type.includes('svg')) {
+        return alert('svg 파일은 지원하지 않습니다.');
+      }
+      if (!imgSizeChecker(acceptedFiles[0])) return;
+
+      setImgUploadLoading(true);
+      try {
+        if (imgWrapperRef.current) {
+          const file = acceptedFiles[0];
+          const fd = new FormData();
+          fd.append('image', file);
+
+          await axios.post('/canvas/img', fd).then((res) => setImgUploadUrl(res.data || ''));
+        }
+      } catch (err) {
+        alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
+        console.error(err);
+      } finally {
+        setImgUploadLoading(false);
+      }
+    },
+    [setImgUploadUrl],
+  );
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: handleImgDropUpload });
 
   const handleDeleteCanvas = useCallback(

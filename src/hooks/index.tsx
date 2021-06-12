@@ -78,57 +78,97 @@ export const useCanvasToServer = () => {
   };
   const [loading, setLoading] = useState(false);
   const [isDone, setIsDone] = useGlobalState('isDone', false);
+  const [imgUploadUrl] = useGlobalState<string>('imgUploadUrl');
+  const [isSave, setIsSave] = useState(false);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [fileList, setFileList] = useState<File[]>([]);
+  const [paperSize, setPaperSize] = useState<string[]>([]);
 
-  const canvasToImage = (canvas: HTMLCanvasElement[], name: string) => {
+  const canvasToImage = (canvas: HTMLCanvasElement[], name: string, email: string) => {
     if (!window) return;
     if (!canvas.length) return notification.error({ message: '액자를 만들어주세요.', placement: 'bottomLeft' });
-
+    setUsername(name);
+    setEmail(email);
     const sendToCanvas = async () => {
       setLoading(true);
-      await canvas.forEach(async (node, index) => {
-        const { dataset } = node;
-        const w = node.width;
-        const h = node.height;
-        // canvas 배경변경 https://github.com/mikechambers/ExamplesByMesh/blob/master/HTML5/canvas/exportWithBackgroundColor/scripts/main.js 참고
-        if (dataset.bgColor) {
-          const ctx = node.getContext('2d');
-          if (ctx) {
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.fillStyle = dataset.bgColor;
-            ctx.fillRect(0, 0, w, h);
+
+      try {
+        await canvas.forEach(async (node, index) => {
+          const { dataset } = node;
+          const w = node.width;
+          const h = node.height;
+          // canvas 배경변경 https://github.com/mikechambers/ExamplesByMesh/blob/master/HTML5/canvas/exportWithBackgroundColor/scripts/main.js 참고
+          if (dataset.bgColor) {
+            const ctx = node.getContext('2d');
+            if (ctx) {
+              ctx.globalCompositeOperation = 'destination-over';
+              ctx.fillStyle = dataset.bgColor;
+              ctx.fillRect(0, 0, w, h);
+            }
           }
-        }
 
-        const dataUrl = (node as HTMLCanvasElement).toDataURL('image/png', 1.0);
+          const dataUrl = (node as HTMLCanvasElement).toDataURL('image/png', 1.0);
 
-        if (dataset.bgColor) {
-          const ctx = node.getContext('2d');
+          if (dataset.bgColor) {
+            const ctx = node.getContext('2d');
 
-          if (ctx) {
-            const data = ctx.getImageData(0, 0, w, h);
-            const compositeOperation = ctx.globalCompositeOperation;
-            ctx.clearRect(0, 0, w, h);
-            ctx.putImageData(data, 0, 0);
-            ctx.globalCompositeOperation = compositeOperation;
+            if (ctx) {
+              const data = ctx.getImageData(0, 0, w, h);
+              const compositeOperation = ctx.globalCompositeOperation;
+              ctx.clearRect(0, 0, w, h);
+              ctx.putImageData(data, 0, 0);
+              ctx.globalCompositeOperation = compositeOperation;
+            }
           }
-        }
 
-        const file = dataURLtoFile(
-          dataUrl,
-          `${new Date().toLocaleDateString()}_${name}_${dataset.paper}_${index + 1}.png`,
-        );
-        if (file) {
-          const fd = new FormData();
-          fd.append('image', file);
-          await axios.post('/canvas', fd);
-        }
-      });
-      setLoading(false);
-      setIsDone(true);
+          const file = dataURLtoFile(
+            dataUrl,
+            `${new Date().toLocaleDateString()}_${name}_${dataset.paper}_${index + 1}.png`,
+          );
+
+          if (file) {
+            setFileList((prev) => {
+              return [...prev, file];
+            });
+            if (dataset.paper) {
+              setPaperSize((prev: any) => {
+                return [...prev, dataset.paper];
+              });
+            }
+            setIsSave(true);
+          }
+          setIsDone(true);
+        });
+      } catch (err) {
+        alert('저장에 실패했습니다. 다시 시도해주세요.');
+        setIsSave(false);
+        setIsDone(false);
+      } finally {
+        setLoading(false);
+      }
     };
 
     sendToCanvas();
   };
+
+  useEffect(() => {
+    if (!isSave || !imgUploadUrl) return;
+    const saveCanvas = async () => {
+      const fd = new FormData();
+      fd.append('username', username);
+      fd.append('email', email);
+      fd.append('originImgUrl', imgUploadUrl);
+      fileList.forEach((file) => fd.append('image', file));
+      fd.append('paperNames', paperSize.join());
+      await axios.post('/canvas', fd, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    };
+    saveCanvas();
+  }, [email, fileList, isSave, paperSize, username, imgUploadUrl]);
 
   return { canvasToImage, loading, isDone };
 };

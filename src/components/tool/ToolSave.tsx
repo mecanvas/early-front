@@ -20,7 +20,7 @@ const AntdInput = styled(Input)<{ isRequired: boolean }>`
 interface Info {
   [key: string]: any;
   username: string;
-  phoneNumber: string;
+  email: string;
 }
 
 interface Props {
@@ -31,7 +31,7 @@ interface Props {
 const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
   const [info, setInfo] = useState<Info | null>(null);
   const [userNameEmpty, setUserNameEmpty] = useState({ isRequired: false, extra: '' });
-  const [phoneNumberEmpty, setPhoneNumberEmpty] = useState({ isRequired: false, extra: '' });
+  const [emailEmpty, setEmailEmpty] = useState({ isRequired: false, extra: '' });
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const { canvasToImage, loading, isDone } = useCanvasToServer();
   const router = useRouter();
@@ -61,8 +61,8 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
       if (name === 'username') {
         resetEmpty(setUserNameEmpty);
       }
-      if (name === 'phoneNumber') {
-        resetEmpty(setPhoneNumberEmpty);
+      if (name === 'email') {
+        resetEmpty(setEmailEmpty);
       }
 
       if (info) {
@@ -78,15 +78,14 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
   const handleSendToConfirm = useCallback(() => {
     if (!info) {
       setUserNameEmpty({ ...userNameEmpty, isRequired: true, extra: '이름을 입력해 주세요!' });
-      setPhoneNumberEmpty({ ...phoneNumberEmpty, isRequired: true, extra: '연락처를 입력해 주세요!' });
+      setEmailEmpty({ ...emailEmpty, isRequired: true, extra: '연락처를 입력해 주세요!' });
       return;
     }
     if (!info.username) return setUserNameEmpty({ ...userNameEmpty, isRequired: true, extra: '이름을 입력해 주세요!' });
-    if (!info.phoneNumber)
-      return setPhoneNumberEmpty({ ...phoneNumberEmpty, isRequired: true, extra: '연락처를 입력해 주세요!' });
+    if (!info.email) return setEmailEmpty({ ...emailEmpty, isRequired: true, extra: '연락처를 입력해 주세요!' });
 
-    canvasToImage(selectedFrameList, info.username);
-  }, [canvasToImage, info, phoneNumberEmpty, selectedFrameList, userNameEmpty]);
+    canvasToImage(selectedFrameList, info.username, info.email);
+  }, [canvasToImage, info, emailEmpty, selectedFrameList, userNameEmpty]);
 
   useEffect(() => {
     if (isDone) {
@@ -115,11 +114,11 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
             ></AntdInput>
           </Form.Item>
 
-          <Form.Item labelCol={{ span: 3 }} label="연락처" extra={phoneNumberEmpty.extra}>
+          <Form.Item labelCol={{ span: 3 }} label="연락처" extra={emailEmpty.extra}>
             <AntdInput
-              name="phoneNumber"
-              placeholder="전화번호를 입력해 주세요."
-              isRequired={phoneNumberEmpty.isRequired}
+              name="email"
+              placeholder="이메일을 입력해 주세요."
+              isRequired={emailEmpty.isRequired}
             ></AntdInput>
           </Form.Item>
         </form>
