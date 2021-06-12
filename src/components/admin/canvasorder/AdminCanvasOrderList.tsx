@@ -55,7 +55,7 @@ const AdminOrderList = () => {
   return (
     <Tabs defaultActiveKey={defaultTab} onTabClick={handleTabKey} activeKey={defaultTab}>
       <TabPane key="canvasorder" tab="주문 목록">
-        <AppTable loading={!data} total={data?.total} dataSource={data?.results} columns={columns} />
+        <AppTable loading={!data} total={data?.total} dataSource={data?.results} isRecord columns={columns} />
       </TabPane>
     </Tabs>
   );
