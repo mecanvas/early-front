@@ -1,64 +1,62 @@
 import { Table } from 'antd';
 import { TableProps } from 'antd/lib/table';
-import React, { useCallback, useEffect, useState } from 'react';
-import queryString from 'query-string';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useGetQueryString } from 'src/hooks/useGetQueryString';
 
 interface Props extends TableProps<any> {
   total?: number;
-  pageSize?: number;
   fixed?: boolean;
   isRecord?: boolean;
 }
 
-const AppTable = ({ isRecord, total, pageSize, fixed, ...rest }: Props) => {
+const AppTable = memo(({ isRecord, total, fixed, ...rest }: Props) => {
   const router = useRouter();
-  const search = router.query.toString();
-  const pathname = router.pathname;
 
-  const [forceSelectPage, setForceSelectPage] = useState<number>(1);
-  const [perPageSize, setPerPageSize] = useState(pageSize);
+  const pathname = router.pathname;
+  const [selectPage, setSelectPage] = useState<number>(1);
+  const [perPageSize, setPerPageSize] = useState<number>(10);
+  const { queryStringify, query } = useGetQueryString();
+  const [routerChange, setRouterChange] = useState(false);
 
   const handleMoveNo = useCallback(
     ({ id }) => {
       const path = pathname.slice(-1) === '/' ? pathname : `${pathname}/`;
-
       router.push(`${path}${id}`);
     },
     [router, pathname],
   );
-
   const handlePagination = (page: number) => {
-    setForceSelectPage(page);
-
-    const query = queryString.parse(search);
-    query['page'] = page.toString();
-
-    router.push(`${pathname}?${queryString.stringify(query)}`);
+    setSelectPage(page);
+    setRouterChange(true);
   };
 
-  const handlePerPageSize = useCallback((_: number, size: number) => {
-    setPerPageSize(size);
-  }, []);
+  const handlePerPageSize = useCallback(
+    (_: number, size: number) => {
+      setPerPageSize(size);
+      setRouterChange(true);
+    },
+    [setPerPageSize],
+  );
 
-  // ? per_page를 변경할때마다 쿼리를 변경합니다.
+  // 파지네이션 시작시, 값에 따라 반영
   useEffect(() => {
-    if (!perPageSize) return;
-    const query = queryString.parse(search);
-    query['per_page'] = perPageSize.toString();
-
-    const newQuery = queryString.stringify(query);
-
-    router.push(`${pathname}?${newQuery}`);
-  }, [router, pathname, perPageSize, search]);
-
-  useEffect(() => {
-    const { page } = queryString.parse(search);
-    if (!page) {
-      return setForceSelectPage(1);
+    if (!routerChange) return;
+    if (selectPage && perPageSize) {
+      router.push(`${pathname}/?page=${selectPage}&per_page=${perPageSize}`);
     }
-    setForceSelectPage(+(page as string));
-  }, [search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routerChange, perPageSize, selectPage]);
+
+  // 첫 렌더시에는 주소에 따라 파지네이션
+  useEffect(() => {
+    if (query) {
+      setSelectPage(+(query.page as string) || 1);
+      setPerPageSize(+(query.per_page as string) || 10);
+      router.push(`${pathname}/?${queryStringify()}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -70,10 +68,10 @@ const AppTable = ({ isRecord, total, pageSize, fixed, ...rest }: Props) => {
           })}
           tableLayout={fixed ? 'fixed' : 'auto'}
           pagination={{
-            pageSize: pageSize ? pageSize : 10,
+            pageSize: perPageSize,
             className: 'pagination',
             responsive: true,
-            current: forceSelectPage,
+            current: selectPage,
             total,
             onChange: handlePagination,
             onShowSizeChange: handlePerPageSize,
@@ -90,6 +88,6 @@ const AppTable = ({ isRecord, total, pageSize, fixed, ...rest }: Props) => {
       )}
     </>
   );
-};
+});
 
 export default AppTable;

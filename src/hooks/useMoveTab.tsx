@@ -7,7 +7,7 @@ export const useMoveTab = (initialTab: string): any => {
 
   const handleTabKey = (key: string) => {
     setDefaultTab(key);
-    router.push(`/${key}`);
+    router.push(`/admin/${key}`);
   };
 
   return [defaultTab, handleTabKey, setDefaultTab];
