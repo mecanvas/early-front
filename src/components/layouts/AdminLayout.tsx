@@ -93,9 +93,9 @@ const AdminLayout = ({ children }: Props) => {
                 : router.pathname.split('/').slice(0, 3).join('/'),
             ]}
           >
-            <SubMenu key="/admin/order" title="캔버스 주문" onTitleClick={handleTitleClick}>
-              <Menu.Item key="/admin/order">
-                <Link href="/admin/order">주문 목록</Link>
+            <SubMenu key="/admin/canvasorder" title="캔버스 주문" onTitleClick={handleTitleClick}>
+              <Menu.Item key="/admin/canvasorder">
+                <Link href="/admin/canvasorder">주문 목록</Link>
               </Menu.Item>
             </SubMenu>
           </Menu>
