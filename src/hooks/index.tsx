@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import useSWR, { SWRResponse } from 'swr';
 import { notification } from 'antd';
-import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 export const useGetCursorPosition = (isSelected: boolean) => {
   const [windowX, setWindowX] = useState(0);
@@ -152,7 +151,7 @@ export const useCanvasToServer = () => {
 
     sendToCanvas();
   };
-  console.log(imgUploadUrl);
+
   useEffect(() => {
     if (!isSave || !imgUploadUrl) return;
     const saveCanvas = async () => {
