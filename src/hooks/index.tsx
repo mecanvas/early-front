@@ -161,7 +161,7 @@ export const useCanvasToServer = () => {
       fd.append('email', email);
       fd.append('originImgUrl', imgUploadUrl);
       fileList.forEach((file) => fd.append('image', file));
-      fd.append('paper', paperSize.join());
+      fd.append('paperNames', paperSize.join());
       await axios.post('/canvas', fd, {
         headers: {
           'Content-Type': 'multipart/form-data',
