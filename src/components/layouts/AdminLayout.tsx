@@ -23,6 +23,10 @@ const AdminHeader = styled(Header)`
   }
 `;
 
+const AdminLogo = styled.div`
+  cursor: pointer;
+`;
+
 const AdminMenu = styled.div`
   display: flex;
   align-items: center;
@@ -73,11 +77,11 @@ const AdminLayout = ({ children }: Props) => {
   return (
     <Layout>
       <AdminHeader>
-        <div>
+        <AdminLogo>
           <Link href="/admin">
             <h2>Early</h2>
           </Link>
-        </div>
+        </AdminLogo>
         <AdminMenu>
           <Menu
             mode="horizontal"
