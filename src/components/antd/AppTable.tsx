@@ -38,7 +38,6 @@ const AppTable = memo(({ isRecord, total, fixed, ...rest }: Props) => {
     },
     [setPerPageSize],
   );
-
   // 파지네이션 시작시, 값에 따라 반영
   useEffect(() => {
     if (!routerChange) return;
@@ -50,7 +49,7 @@ const AppTable = memo(({ isRecord, total, fixed, ...rest }: Props) => {
 
   // 첫 렌더시에는 주소에 따라 파지네이션
   useEffect(() => {
-    if (query) {
+    if (query && queryStringify()) {
       setSelectPage(+(query.page as string) || 1);
       setPerPageSize(+(query.per_page as string) || 10);
       router.push(`${pathname}/?${queryStringify()}`);

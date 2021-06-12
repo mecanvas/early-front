@@ -42,8 +42,8 @@ const AdminOrderList = () => {
   const { pathname } = useRouter();
   const [defaultTab, handleTabKey, setDefaultTab] = useMoveTab('canvasorder');
   const [columns, setColumns] = useState<ColumnsType<any>>([]);
-  const { stringifyQuery } = useGetQueryString();
-  const { data } = useSWR(`/${defaultTab}/?${stringifyQuery}` || null, getFetcher);
+  const { queryStringify } = useGetQueryString();
+  const { data } = useSWR(`/${defaultTab}/?${queryStringify() || `page=1&per_page=10`}` || null, getFetcher);
 
   useEffect(() => {
     if (pathname === '/admin/canvasorder') {
@@ -55,7 +55,7 @@ const AdminOrderList = () => {
   return (
     <Tabs defaultActiveKey={defaultTab} onTabClick={handleTabKey} activeKey={defaultTab}>
       <TabPane key="canvasorder" tab="주문 목록">
-        <AppTable loading={!data} total={data?.total} dataSource={data?.results} isRecord columns={columns} />
+        <AppTable loading={!data} total={data?.total * 20} dataSource={data?.results} isRecord columns={columns} />
       </TabPane>
     </Tabs>
   );
