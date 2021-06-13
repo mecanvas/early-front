@@ -24,7 +24,7 @@ const canvasOrderColumns = [
     dataIndex: 'originImgUrl',
     key: 'originImgUrl',
     render: (originImgUrl: string) => {
-      return <Img src={originImgUrl} alt="원본 사진"></Img>;
+      return <Img src={originImgUrl} alt="원본 사진" maxHeight={150}></Img>;
     },
   },
   {
