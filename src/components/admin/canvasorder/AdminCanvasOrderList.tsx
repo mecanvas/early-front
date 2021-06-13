@@ -4,7 +4,7 @@ import { Tabs, Tag } from 'antd';
 import { useMoveTab } from 'src/hooks/useMoveTab';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
-import { getFetcher } from 'src/fetcher';
+import { adminGetFetcher } from 'src/fetcher';
 import { ColumnsType } from 'antd/lib/table';
 import { useGetQueryString } from 'src/hooks/useGetQueryString';
 import { dateFormat } from 'src/utils/dateFormat';
@@ -85,24 +85,7 @@ const AdminOrderList = () => {
   const [defaultTab, handleTabKey, setDefaultTab] = useMoveTab('canvasorder');
   const [columns, setColumns] = useState<ColumnsType<any>>([]);
   const { queryStringify } = useGetQueryString();
-  const { data } = useSWR(`/${defaultTab}/?${queryStringify() || `page=1&per_page=10`}` || null, getFetcher);
-
-  const orderPaper = useMemo(() => {
-    data?.results.map((res: CanvasOrderList) => {
-      const { paperNames } = res;
-      if (!paperNames) return;
-      let obj: { [key: string]: number } = {};
-      for (let name of paperNames) {
-        if (!obj[name]) {
-          obj[name] = 1;
-        }
-        obj[name] += 1;
-      }
-
-      return Object.entries(obj);
-    });
-  }, [data?.results]);
-  console.log(orderPaper);
+  const { data } = useSWR(`/${defaultTab}/?${queryStringify() || `page=1&per_page=10`}` || null, adminGetFetcher);
 
   useEffect(() => {
     if (pathname === '/admin/canvasorder') {
@@ -127,6 +110,7 @@ const AdminOrderList = () => {
               return acc;
             }, {}),
             createdAt: dateFormat(res.createdAt),
+            key: res.id,
           }))}
           isRecord
           columns={columns}
