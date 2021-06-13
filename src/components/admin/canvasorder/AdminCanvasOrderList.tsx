@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AppTable from 'src/components/antd/AppTable';
 import { Tabs, Tag } from 'antd';
 import { useMoveTab } from 'src/hooks/useMoveTab';
@@ -9,17 +9,9 @@ import { ColumnsType } from 'antd/lib/table';
 import { useGetQueryString } from 'src/hooks/useGetQueryString';
 import { dateFormat } from 'src/utils/dateFormat';
 import Img from 'src/components/common/Img';
+import { CanvasOrderList } from 'src/interfaces/admin/CanvasOrderInterface';
 
 const { TabPane } = Tabs;
-
-interface CanvasOrderList {
-  id: number;
-  username: string;
-  email: string;
-  originImgUrl: string;
-  paperNames: string[];
-  createdAt: string;
-}
 
 const canvasOrderColumns = [
   {
