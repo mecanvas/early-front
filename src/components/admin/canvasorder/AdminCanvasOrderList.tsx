@@ -16,8 +16,8 @@ const { TabPane } = Tabs;
 const canvasOrderColumns = [
   {
     title: '주문번호',
-    dataIndex: 'id',
-    key: 'id',
+    dataIndex: 'orderNo',
+    key: 'orderNo',
   },
   {
     title: '원본',
