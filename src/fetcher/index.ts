@@ -1,6 +1,4 @@
 import Axios, { AxiosRequestConfig } from 'axios';
 
-const initialConfig = { baseURL: 'http://localhost:4000/admin' };
-
 export const adminGetFetcher = async (url: string, config?: AxiosRequestConfig) =>
-  await Axios.get(url, config || initialConfig).then((res) => res.data);
+  await Axios.get(`/admin${url}`, config).then((res) => res.data);
