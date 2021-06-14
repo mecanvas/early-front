@@ -27,10 +27,10 @@ const AdminOrderDetail = () => {
       if (!cmd || !data) return;
       setLoading(true);
       const a = document.createElement('a');
-      const { originImgUrl, canvasFrameUrls, createdAt, username, id, paperNames } = data;
+      const { originImgUrl, canvasFrameUrls, createdAt, username, orderNo, paperNames } = data;
 
       const downloadOriginImg = async () => {
-        a.download = `${id}_${dateFormat(createdAt)}_${username}_원본이미지`;
+        a.download = `${orderNo}_${dateFormat(createdAt)}_${username}_원본이미지`;
         a.href = await ImgToDataURL(`${originImgUrl}?${new Date().getTime()}`);
         a.click();
       };
@@ -39,7 +39,7 @@ const AdminOrderDetail = () => {
         canvasFrameUrls.forEach(async (url: string, index: number) => {
           const a = document.createElement('a');
           const paperName = paperNames[index];
-          a.download = await `${id}_${dateFormat(createdAt)}_${username}_${paperName}`;
+          a.download = await `${orderNo}_${dateFormat(createdAt)}_${username}_${paperName}`;
           a.href = await ImgToDataURL(`${url}?${new Date().getTime()}`);
           a.click();
         });
