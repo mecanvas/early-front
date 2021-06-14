@@ -45,7 +45,7 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
       Math.abs(top - centerY - 32) < conditionValue || Math.abs(bottom - centerY - 32) < conditionValue;
     if (isNearingAxisXByBox(5.5) || isNearingAxisYByBox(5.5)) {
       if (isNearingAxisXByBox(5.5) && isNearingAxisYByBox(5.5)) {
-        if (isNearingAxisXByBox(1.5) || isNearingAxisYByBox(1.5)) {
+        if (isNearingAxisXByBox(1.1) || isNearingAxisYByBox(1.1)) {
           setIsFitX(true);
           setIsFitY(true);
         }
@@ -54,14 +54,14 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
         return;
       }
       if (isNearingAxisXByBox(5.5)) {
-        if (isNearingAxisXByBox(1.5)) {
+        if (isNearingAxisXByBox(1.1)) {
           setIsFitX(true);
         }
         setIsNearingX(true);
       }
 
       if (isNearingAxisYByBox(5.5)) {
-        if (isNearingAxisYByBox(1.5)) {
+        if (isNearingAxisYByBox(1.1)) {
           setIsFitY(true);
         }
         setIsNearingY(true);
@@ -85,7 +85,7 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
       if (isNearingAxisX(6) || isNearingAxisY(6)) {
         // 커서에 따라 평행선 변경
         if (isNearingAxisX(6) && isNearingAxisY(6)) {
-          if (isNearingAxisX(0.2) || isNearingAxisY(0.2)) {
+          if (isNearingAxisX(0.1) || isNearingAxisY(0.1)) {
             setIsFitX(true);
             setIsFitY(true);
           }
@@ -94,13 +94,13 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
           return;
         }
         if (isNearingAxisX(6)) {
-          if (isNearingAxisX(0.2)) {
+          if (isNearingAxisX(0.1)) {
             setIsFitX(true);
           }
           setIsNearingX(true);
         }
         if (isNearingAxisY(6)) {
-          if (isNearingAxisY(0.2)) {
+          if (isNearingAxisY(0.1)) {
             setIsFitY(true);
           }
           setIsNearingY(true);
@@ -130,7 +130,6 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
         const [x, y] = getPosition(e);
         const positionLeft = x - frameWidth / 2;
         const positionTop = y - frameHeight / 2;
-
         checkNearingCenterForMouse(x, y);
         checkNearingParallelForBox();
         setCanvasPosition({ ...canvasPosition, top: positionTop, left: positionLeft });
@@ -139,7 +138,7 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
         if (ctx) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.strokeStyle = '#333';
-          ctx.strokeRect(x - frameWidth / 2, y - frameHeight / 2, frameWidth, frameHeight);
+          ctx.strokeRect(positionLeft, positionTop, frameWidth, frameHeight);
           ctx.stroke();
         }
       }
