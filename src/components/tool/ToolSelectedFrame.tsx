@@ -23,6 +23,92 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
     width: 0,
     height: 0,
   });
+  const [centerX] = useGlobalState<number>('centerX');
+  const [centerY] = useGlobalState<number>('centerY');
+  const [, setIsNearingX] = useGlobalState('isNearingX', false);
+  const [, setIsNearingY] = useGlobalState('isNearingY', false);
+  const [, setIsFitX] = useGlobalState('isFitX', false);
+  const [, setIsFitY] = useGlobalState('isFitY', false);
+
+  // 액자의 크기에 맞춰 x, y선 평행 TODO: 추후 모든 액자에.. 요 기능을 담아야지않을까?
+  const checkNearingParallelForBox = useCallback(() => {
+    if (!canvasFrameSizeInfo || !canvasPosition || !centerX || !centerY) return;
+
+    const { width, height } = canvasFrameSizeInfo;
+    const { left, top } = canvasPosition;
+    const right = left + width;
+    const bottom = top + height;
+
+    const isNearingAxisXByBox = (conditionValue: number) =>
+      Math.abs(right - centerX) < conditionValue || Math.abs(left - centerX) < conditionValue;
+    const isNearingAxisYByBox = (conditionValue: number) =>
+      Math.abs(top - centerY - 32) < conditionValue || Math.abs(bottom - centerY - 32) < conditionValue;
+    if (isNearingAxisXByBox(5.5) || isNearingAxisYByBox(5.5)) {
+      if (isNearingAxisXByBox(5.5) && isNearingAxisYByBox(5.5)) {
+        if (isNearingAxisXByBox(1.1) || isNearingAxisYByBox(1.1)) {
+          setIsFitX(true);
+          setIsFitY(true);
+        }
+        setIsNearingX(true);
+        setIsNearingY(true);
+        return;
+      }
+      if (isNearingAxisXByBox(5.5)) {
+        if (isNearingAxisXByBox(1.1)) {
+          setIsFitX(true);
+        }
+        setIsNearingX(true);
+      }
+
+      if (isNearingAxisYByBox(5.5)) {
+        if (isNearingAxisYByBox(1.1)) {
+          setIsFitY(true);
+        }
+        setIsNearingY(true);
+      }
+    }
+  }, [canvasFrameSizeInfo, canvasPosition, centerX, centerY, setIsFitX, setIsFitY, setIsNearingX, setIsNearingY]);
+
+  // 커서가 x, y축 중 하나라도 정 중앙에 위치하게 되면 평행선을 solid로 바꿉니다.
+  const checkNearingCenterForMouse = useCallback(
+    (cursorX: number, cursorY: number) => {
+      const isNearingAxisX = (conditionValue: number) => Math.abs(cursorX - window.innerWidth / 2) < conditionValue;
+      const isNearingAxisY = (conditionValue: number) =>
+        Math.abs(cursorY - 32 - window.innerHeight / 2) < conditionValue;
+
+      // 초기 시작시 false로 초기화.
+      setIsNearingX(false);
+      setIsNearingY(false);
+      setIsFitX(false);
+      setIsFitY(false);
+
+      if (isNearingAxisX(6) || isNearingAxisY(6)) {
+        // 커서에 따라 평행선 변경
+        if (isNearingAxisX(6) && isNearingAxisY(6)) {
+          if (isNearingAxisX(0.1) || isNearingAxisY(0.1)) {
+            setIsFitX(true);
+            setIsFitY(true);
+          }
+          setIsNearingX(true);
+          setIsNearingY(true);
+          return;
+        }
+        if (isNearingAxisX(6)) {
+          if (isNearingAxisX(0.1)) {
+            setIsFitX(true);
+          }
+          setIsNearingX(true);
+        }
+        if (isNearingAxisY(6)) {
+          if (isNearingAxisY(0.1)) {
+            setIsFitY(true);
+          }
+          setIsNearingY(true);
+        }
+      }
+    },
+    [setIsFitX, setIsFitY, setIsNearingX, setIsNearingY],
+  );
 
   const getPosition = useCallback((event: MouseEvent) => {
     const x = event.clientX;
@@ -44,27 +130,30 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
         const [x, y] = getPosition(e);
         const positionLeft = x - frameWidth / 2;
         const positionTop = y - frameHeight / 2;
-
+        checkNearingCenterForMouse(x, y);
+        checkNearingParallelForBox();
         setCanvasPosition({ ...canvasPosition, top: positionTop, left: positionLeft });
         setCanvasFrameSizeInfo({ ...canvasFrameSizeInfo, width: frameWidth, height: frameHeight });
 
         if (ctx) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.strokeStyle = '#333';
-          ctx.strokeRect(x - frameWidth / 2, y - frameHeight / 2, frameWidth, frameHeight);
+          ctx.strokeRect(positionLeft, positionTop, frameWidth, frameHeight);
           ctx.stroke();
         }
       }
       requestAnimationFrame(() => handleDrawingFrame);
     },
     [
-      canvasFrameSizeInfo,
-      canvasPosition,
-      frameHeight,
       frameWidth,
+      frameHeight,
       getPosition,
-      setCanvasFrameSizeInfo,
+      checkNearingCenterForMouse,
+      checkNearingParallelForBox,
       setCanvasPosition,
+      canvasPosition,
+      setCanvasFrameSizeInfo,
+      canvasFrameSizeInfo,
     ],
   );
 

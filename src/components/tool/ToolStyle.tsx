@@ -15,7 +15,7 @@ export const FactoryHeader = styled.div`
   width: 100%;
   background-color: ${({ theme }) => theme.color.white};
   position: fixed;
-  z-index: 33;
+  z-index: 34;
   top: 0px;
   flex-direction: column;
 `;
@@ -115,7 +115,7 @@ export const SelectedFrameWrapper = styled.div`
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 1;
+    z-index: 34;
   }
 `;
 
@@ -178,6 +178,10 @@ export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
 
 export const ImageWrapper = styled.div<{
   bgColor?: string;
+  isNearingX?: boolean;
+  isNearingY?: boolean;
+  isFitX?: boolean;
+  isFitY?: boolean;
   imgUploadLoading?: boolean;
   cmd?: ResizeCmd | null;
 }>`
@@ -191,6 +195,36 @@ export const ImageWrapper = styled.div<{
   text-align: center;
   position: relative;
   min-height: 100vh;
+
+  ${({ isNearingX, isFitX, theme }) =>
+    isNearingX &&
+    css`
+      &:before {
+        position: absolute;
+        width: 2px;
+        top: 0;
+        height: 100%;
+        content: '';
+        border: 1px ${isFitX ? 'solid' : 'dashed'} ${theme.color.primary};
+        z-index: 33;
+      }
+    `}
+
+  ${({ isNearingY, isFitY, theme }) =>
+    isNearingY &&
+    css`
+      &:after {
+        position: absolute;
+        width: 100%;
+        top: (50% - 105px);
+        transform: translateY(-50%);
+        height: 2px;
+        content: '';
+        z-index: 33;
+        border: 1px ${isFitY ? 'solid' : 'dashed'} ${theme.color.primary};
+      }
+    `}
+
 
   ${({ imgUploadLoading }) =>
     imgUploadLoading &&
