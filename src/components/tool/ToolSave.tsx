@@ -6,6 +6,7 @@ import Loading from '../common/Loading';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import AppTable from '../antd/AppTable';
+import { BillTotal } from './ToolStyle';
 
 const AntdInput = styled(Input)<{ isRequired: boolean }>`
   ${({ isRequired, theme }) =>
@@ -45,9 +46,10 @@ interface Info {
 interface Props {
   yourPriceList: [string, any][];
   selectedFrameList: HTMLCanvasElement[];
+  totalPrice: number;
 }
 
-const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
+const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
   const [info, setInfo] = useState<Info | null>(null);
   const [userNameEmpty, setUserNameEmpty] = useState({ isRequired: false, extra: '' });
   const [emailEmpty, setEmailEmpty] = useState({ isRequired: false, extra: '' });
@@ -166,13 +168,16 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
           </Form.Item>
         </form>
         {selectedFrameList.length ? (
-          <AppTable
-            dataSource={yourPriceList.map(([key, value]) => {
-              return { name: key, ...value };
-            })}
-            columns={SaveModalOrderColumns}
-            pagination={false}
-          />
+          <>
+            <AppTable
+              dataSource={yourPriceList.map(([key, value]) => {
+                return { name: key, ...value };
+              })}
+              columns={SaveModalOrderColumns}
+              pagination={false}
+            />
+            <BillTotal>총 {totalPrice.toLocaleString()}원</BillTotal>
+          </>
         ) : (
           <div style={{ textAlign: 'center' }}>생성하신 액자가 없으시네요! 액자를 만들어 주셔야 진행됩니다.</div>
         )}

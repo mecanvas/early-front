@@ -606,4 +606,5 @@ export const BillTotal = styled.div`
   border-top: 1px solid ${({ theme }) => theme.color.gray300};
   text-align: right;
   font-weight: bold;
+  font-size: 18px;
 `;

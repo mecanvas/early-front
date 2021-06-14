@@ -750,7 +750,13 @@ const Tool = () => {
               <Button type="text" onClick={handleSaveCanvas}>
                 저장
               </Button>
-              {isSaveCanvas && <ToolSave yourPriceList={yourPriceList} selectedFrameList={selectedFrameList} />}
+              {isSaveCanvas && (
+                <ToolSave
+                  totalPrice={framePrice.reduce((acc, cur) => (acc += cur.price), 0)}
+                  yourPriceList={yourPriceList}
+                  selectedFrameList={selectedFrameList}
+                />
+              )}
             </div>
           </FactoryUtills>
           <FactoryTool>
