@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
-import { useGlobalState } from 'src/hooks';
-import { CanvasFrameSizeInfo, CanvasPosition } from 'src/interfaces/ToolInterface';
+import { useGetScollPosition, useGlobalState } from 'src/hooks';
+import { CanvasFramePositionList, CanvasFrameSizeInfo, CanvasPosition } from 'src/interfaces/ToolInterface';
 import { SelectedFrameWrapper } from './ToolStyle';
 
 interface Props {
@@ -14,7 +14,7 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
   const selectFrameRef = useRef<HTMLCanvasElement>(null);
   const frameWidth = useMemo(() => width || 0, [width]);
   const frameHeight = useMemo(() => height || 0, [height]);
-
+  const [scrollX, scrollY] = useGetScollPosition();
   const [canvasPosition, setCanvasPosition] = useGlobalState<CanvasPosition>('canvasPosition', {
     left: 0,
     top: 0,
@@ -23,6 +23,8 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
     width: 0,
     height: 0,
   });
+  const [canvasFramePositionList] = useGlobalState<CanvasFramePositionList[]>('canvasFramePositionList');
+
   const [centerX] = useGlobalState<number>('centerX');
   const [centerY] = useGlobalState<number>('centerY');
   const [, setIsNearingX] = useGlobalState('isNearingX', false);
@@ -135,11 +137,70 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
         setCanvasPosition({ ...canvasPosition, top: positionTop, left: positionLeft });
         setCanvasFrameSizeInfo({ ...canvasFrameSizeInfo, width: frameWidth, height: frameHeight });
 
+        const oCanvas = document.createElement('canvas');
+        oCanvas.width = canvasWidth;
+        oCanvas.height = canvasHeight;
+        const oCtx = oCanvas.getContext('2d');
+        if (oCtx) {
+          oCtx.clearRect(0, 0, canvas.width, canvas.height);
+          oCtx.fillStyle = '#333';
+          oCtx.fillRect(x, y, 3, canvas.height);
+          oCtx.strokeRect(x, y, 3, canvas.height);
+          oCtx.stroke();
+        }
         if (ctx) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.strokeStyle = '#333';
           ctx.strokeRect(positionLeft, positionTop, frameWidth, frameHeight);
           ctx.stroke();
+
+          // checkNearingParallelForEachBox();
+          if (canvasFramePositionList) {
+            canvasFramePositionList.forEach((list) => {
+              const top = positionTop + scrollY;
+              const left = positionLeft + scrollX;
+              const right = left + list.width;
+              const bottom = top + list.height;
+
+              console.log(
+                'left',
+                left - list.left,
+                'right',
+                right - list.left + list.width,
+                'top',
+                top - list.top,
+                'bottom',
+                bottom - list.top - list.height,
+              );
+              const isNearingRight = (conditionValue: number) => Math.abs(right - list.left) < conditionValue;
+              const isNearingLeft = (conditionValue: number) =>
+                (left - list.left <= 0 + conditionValue && left - list.left < conditionValue) ||
+                left - list.left <= list.width + conditionValue;
+              const isNearingTop = (conditionValue: number) => Math.abs(top - list.top) < conditionValue;
+              const isNearingBottom = (conditionValue: number) =>
+                Math.abs(bottom - list.top - list.height) < conditionValue;
+            });
+          }
+
+          // top
+          ctx.fillStyle = '#1a4ead';
+          ctx.fillRect(0, positionTop, canvas.width, 1);
+
+          //  right
+          ctx.fillStyle = '#1a4ead';
+          ctx.fillRect(positionLeft + frameWidth, 0, 1, canvas.height);
+
+          //  bottom
+          ctx.fillRect(0, positionTop + frameHeight, canvas.width, 1);
+
+          //  left
+          ctx.fillRect(positionLeft, 0, 1, canvas.height);
+
+          //  centerX
+          ctx.fillRect(0, positionTop + frameHeight / 2, canvas.width, 1);
+
+          //  centerY
+          ctx.fillRect(positionLeft + frameWidth / 2, 0, 1, canvas.height);
         }
       }
       requestAnimationFrame(() => handleDrawingFrame);
@@ -154,6 +215,9 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
       canvasPosition,
       setCanvasFrameSizeInfo,
       canvasFrameSizeInfo,
+      canvasFramePositionList,
+      scrollY,
+      scrollX,
     ],
   );
 
