@@ -24,10 +24,6 @@ const Success = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!isDone) {
-    return null;
-  }
-
   return (
     <Result
       status="success"
