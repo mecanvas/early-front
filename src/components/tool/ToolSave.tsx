@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import Loading from '../common/Loading';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import { InfoOutlined } from '@ant-design/icons';
+import AppTable from '../antd/AppTable';
 
 const AntdInput = styled(Input)<{ isRequired: boolean }>`
   ${({ isRequired, theme }) =>
@@ -28,6 +28,13 @@ const AntdSelect = styled(Select)<{ isRequired: boolean }>`
           border: 1px solid inherit;
         `}
 `;
+
+const SaveModalOrderColumns = [
+  { title: '호수', dataIndex: 'name', key: 'name' },
+  { title: '실측', dataIndex: 'cm', key: 'cm' },
+  { title: '개수', dataIndex: 'quantity', key: 'quantity' },
+  { title: '가격', dataIndex: 'price', key: 'price', render: (price: number) => price.toLocaleString() },
+];
 
 interface Info {
   [key: string]: any;
@@ -110,6 +117,8 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
     }
   }, [isDone, router]);
 
+  console.log(yourPriceList);
+
   return (
     <>
       <Modal
@@ -157,17 +166,13 @@ const ToolSave = ({ yourPriceList, selectedFrameList }: Props) => {
           </Form.Item>
         </form>
         {selectedFrameList.length ? (
-          <>
-            <div>생성하신 액자가 맞으신가요?</div>
-            {yourPriceList?.map(([key, value], index) => (
-              <div key={index}>
-                <div>{key}</div>
-                <div>
-                  {value.price.toLocaleString()} x {value.quantity}개
-                </div>
-              </div>
-            ))}
-          </>
+          <AppTable
+            dataSource={yourPriceList.map(([key, value]) => {
+              return { name: key, ...value };
+            })}
+            columns={SaveModalOrderColumns}
+            pagination={false}
+          />
         ) : (
           <div style={{ textAlign: 'center' }}>생성하신 액자가 없으시네요! 액자를 만들어 주셔야 진행됩니다.</div>
         )}

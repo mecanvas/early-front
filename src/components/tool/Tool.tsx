@@ -181,7 +181,7 @@ const Tool = () => {
       framePrice.reduce((acc: { [key: string]: any }, cur) => {
         const name = cur.name;
         if (!acc[name]) {
-          acc[name] = { quantity: 1, price: cur.price };
+          acc[name] = { quantity: 1, price: cur.price, cm: cur.cm };
           return acc;
         }
         acc[name].quantity++;
@@ -496,9 +496,9 @@ const Tool = () => {
   const insertFrameToCanvas = useCallback(async () => {
     if (imgNode.current && selectedFrameInfo) {
       //  액자의 가격을 price에 넣기
-      const { name, price } = selectedFrameInfo;
+      const { name, price, cm } = selectedFrameInfo;
       const id = Date.now();
-      setFramePrice([{ name, price, id }, ...framePrice]);
+      setFramePrice([{ name, price, id, cm }, ...framePrice]);
       createImageCanvas(id);
       createCanvasForSave(id);
     }
