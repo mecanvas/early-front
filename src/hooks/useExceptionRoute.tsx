@@ -7,12 +7,13 @@ export const useExceptionRoute = () => {
   const [exceptionRoute, setExceptionRoute] = useState(false);
 
   const except = useCallback(() => {
-    exceptionRoutes.forEach((route) => {
+    setExceptionRoute(false);
+    for (const route of exceptionRoutes) {
       if (asPath === route) {
         setExceptionRoute(true);
-        return;
+        break;
       }
-    });
+    }
   }, [asPath]);
 
   useEffect(() => {
