@@ -696,12 +696,14 @@ const Tool = () => {
   return (
     <>
       <ToolContainer>
-        <ToolFrameList
-          frameSize={frameSize}
-          attribute={frameAttribute}
-          onClick={handleFrameSelect}
-          onChangeVertical={handleChangeVertical}
-        ></ToolFrameList>
+        {imgUploadUrl && (
+          <ToolFrameList
+            frameSize={frameSize}
+            attribute={frameAttribute}
+            onClick={handleFrameSelect}
+            onChangeVertical={handleChangeVertical}
+          ></ToolFrameList>
+        )}
 
         {/* 사진 조절하는 툴바들 */}
         <FactoryHeader>
