@@ -109,7 +109,7 @@ const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
     if (!info.email)
       return setOrderRouteEmpty({ ...orderRouteEmpty, isRequired: true, extra: '주문 경로를 선택해 주세요!' });
     if (!info.email.includes('@') || !info.email.includes('.'))
-      return setEmailEmpty({ ...emailEmpty, isRequired: true, extra: '올바른 이메일을 적어주세요.' });
+      return setEmailEmpty({ ...emailEmpty, isRequired: true, extra: '이메일을 올바르게 적어주세요.' });
     canvasToImage(selectedFrameList, info.username, info.email);
   }, [info, userNameEmpty, emailEmpty, orderRouteEmpty, canvasToImage, selectedFrameList]);
 
