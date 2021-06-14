@@ -3,6 +3,13 @@ import '@emotion/react';
 declare module '@emotion/react' {
   export interface Theme {
     [key: string]: any;
+    size: {
+      xs: string;
+      sm: string;
+      md: string;
+      lg: string;
+      xl: string;
+    };
     color: {
       white: string;
       gray000: string;
