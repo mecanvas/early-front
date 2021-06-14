@@ -30,6 +30,7 @@ export interface CanvasFrameSizeInfo {
 
 export interface FramePrice {
   name: string;
+  cm: string; // 16cm x 16cm
   price: number;
   id: number;
 }

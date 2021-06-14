@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { Button } from 'antd';
+import { useExceptionRoute } from 'src/hooks/useExceptionRoute';
 
 const HeaderContainer = styled.header`
   width: 100%;
@@ -18,13 +19,14 @@ const Header = styled.div`
 `;
 
 const AppHeader = () => {
+  const { exceptionRoute } = useExceptionRoute();
   const router = useRouter();
 
   const handlePushCustomPage = useCallback(() => {
     router.push('/tool');
   }, [router]);
 
-  if (router.asPath === '/tool') {
+  if (exceptionRoute) {
     return null;
   }
 

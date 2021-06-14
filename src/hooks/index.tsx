@@ -92,7 +92,7 @@ export const useCanvasToServer = () => {
     setEmail(email);
     const sendToCanvas = async () => {
       setLoading(true);
-
+      setIsDone(false);
       try {
         await canvas.forEach(async (node, index) => {
           const { dataset } = node;
@@ -136,10 +136,10 @@ export const useCanvasToServer = () => {
                 return [...prev, dataset.paper];
               });
             }
-            setIsSave(true);
           }
-          setIsDone(true);
         });
+        setIsSave(true);
+        setIsDone(true);
       } catch (err) {
         alert('저장에 실패했습니다. 다시 시도해주세요.');
         setIsSave(false);
@@ -170,5 +170,5 @@ export const useCanvasToServer = () => {
     saveCanvas();
   }, [email, fileList, isSave, paperSize, username, imgUploadUrl]);
 
-  return { canvasToImage, loading, isDone };
+  return { canvasToImage, loading, isDone, setIsDone };
 };

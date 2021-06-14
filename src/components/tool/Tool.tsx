@@ -154,7 +154,7 @@ const Tool = () => {
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
 
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState('saveModal', false);
-  const [isDone, setIsDone] = useGlobalState('isDone');
+
   // 액자 사이즈들 변경
   const [frameAttribute, setFrameAttribute] = useState<'정방' | '해경' | '인물' | '풍경'>('정방');
 
@@ -181,7 +181,7 @@ const Tool = () => {
       framePrice.reduce((acc: { [key: string]: any }, cur) => {
         const name = cur.name;
         if (!acc[name]) {
-          acc[name] = { quantity: 1, price: cur.price };
+          acc[name] = { quantity: 1, price: cur.price, cm: cur.cm };
           return acc;
         }
         acc[name].quantity++;
@@ -496,9 +496,9 @@ const Tool = () => {
   const insertFrameToCanvas = useCallback(async () => {
     if (imgNode.current && selectedFrameInfo) {
       //  액자의 가격을 price에 넣기
-      const { name, price } = selectedFrameInfo;
+      const { name, price, cm } = selectedFrameInfo;
       const id = Date.now();
-      setFramePrice([{ name, price, id }, ...framePrice]);
+      setFramePrice([{ name, price, id, cm }, ...framePrice]);
       createImageCanvas(id);
       createCanvasForSave(id);
     }
@@ -683,13 +683,6 @@ const Tool = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (isDone) {
-      setIsDone(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // 정가운데값 구하기
   useEffect(() => {
     const imgWrapper = imgWrapperRef.current;
@@ -750,7 +743,13 @@ const Tool = () => {
               <Button type="text" onClick={handleSaveCanvas}>
                 저장
               </Button>
-              {isSaveCanvas && <ToolSave yourPriceList={yourPriceList} selectedFrameList={selectedFrameList} />}
+              {isSaveCanvas && (
+                <ToolSave
+                  totalPrice={framePrice.reduce((acc, cur) => (acc += cur.price), 0)}
+                  yourPriceList={yourPriceList}
+                  selectedFrameList={selectedFrameList}
+                />
+              )}
             </div>
           </FactoryUtills>
           <FactoryTool>
