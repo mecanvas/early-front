@@ -38,9 +38,3 @@ export interface CanvasPosition {
   left: number;
   top: number;
 }
-
-export interface CanvasFramePositionList {
-  id: number;
-  left: number;
-  top: number;
-}

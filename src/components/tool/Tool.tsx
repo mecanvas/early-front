@@ -33,14 +33,7 @@ import ToolSave from './ToolSave';
 import { cmToPx } from 'src/utils/cmToPx';
 import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
 import ToolFrameList from './ToolFrameList';
-import {
-  FrameSize,
-  CanvasPosition,
-  CanvasFramePositionList,
-  FramePrice,
-  CanvasFrameSizeInfo,
-  ResizeCmd,
-} from 'src/interfaces/ToolInterface';
+import { FrameSize, CanvasPosition, FramePrice, CanvasFrameSizeInfo, ResizeCmd } from 'src/interfaces/ToolInterface';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 import ToolSelectedFrame from './ToolSelectedFrame';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
@@ -144,6 +137,7 @@ const Tool = () => {
 
   const imgWrapperRef = useRef<HTMLDivElement>(null);
   const imgNode = useRef<HTMLImageElement>(null);
+
   const [imgUploadUrl, setImgUploadUrl] = useGlobalState('imgUploadUrl', '');
   const [imgUploadLoading, setImgUploadLoading] = useState(false);
 
@@ -153,7 +147,7 @@ const Tool = () => {
   const [resizeHeight, setResizeHeight] = useState(0);
   const [ratioPersist, setRatioPersist] = useState(true);
   const [imgModalResizeOpen, setImgModalResizeOpen] = useState(false);
-  const [canvasFramePositionList, setCanvasFramePositionList] = useState<CanvasFramePositionList[]>([]);
+  const [canvasFramePositionList, setCanvasFramePositionList] = useState<number[]>([]);
   const [selectedFrameList, setSelectedFrameList] = useState<HTMLCanvasElement[]>([]);
   const [yourSelectedFrame, setYourSelectedFrame] = useState<CanvasFrameSizeInfo | null>(null);
 
@@ -163,6 +157,14 @@ const Tool = () => {
   const [isDone, setIsDone] = useGlobalState('isDone');
   // 액자 사이즈들 변경
   const [frameAttribute, setFrameAttribute] = useState<'정방' | '해경' | '인물' | '풍경'>('정방');
+
+  // 가운데 근접 컨트롤
+  const [, setCenterX] = useGlobalState<number>('centerX', 0);
+  const [, setCenterY] = useGlobalState<number>('centerY', 0);
+  const [isNearingX, setIsNearingX] = useGlobalState<boolean>('isNearingX');
+  const [isNearingY, setIsNearingY] = useGlobalState<boolean>('isNearingY');
+  const [isFitX, setIsFitX] = useGlobalState<boolean>('isFitX');
+  const [isFitY, setIsFitY] = useGlobalState<boolean>('isFitY');
 
   const handleChangeVertical = useCallback(() => {
     setChangeVertical((prev) => !prev);
@@ -365,7 +367,7 @@ const Tool = () => {
           }
         });
         setFramePrice((prev) => prev.filter((lst) => lst.id !== +e.target.id));
-        setCanvasFramePositionList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
+        setCanvasFramePositionList((prev) => prev.filter((lst) => lst !== +e.target.id));
         setSelectedFrameList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
       }
     },
@@ -381,7 +383,7 @@ const Tool = () => {
       const imgBoxId = +(imgBox.childNodes[0] as any).id;
       imgBox?.removeChild(imgBox.childNodes[0]);
       setFramePrice(framePrice.slice(1));
-      setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== imgBoxId));
+      setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst !== imgBoxId));
       setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== imgBoxId));
     }
   }, [framePrice, canvasFramePositionList, selectedFrameList]);
@@ -406,7 +408,6 @@ const Tool = () => {
       const scaleX = image.naturalWidth / image.width;
       const scaleY = image.naturalHeight / image.height;
       const oCtx = oCanvas.getContext('2d');
-
       const pixelRatio = window.devicePixelRatio;
 
       oCanvas.width = frameWidth * pixelRatio;
@@ -438,6 +439,7 @@ const Tool = () => {
       const { width: frameWidth, height: frameHeight } = canvasFrameSizeInfo;
       const { left, top, width, height } = imgNode.current.getBoundingClientRect();
       const { left: canvasLeft, top: canvasTop } = canvasPosition;
+
       // 크롭된 이미지를 담을 캔버스 생성
       const div = document.createElement('div');
       const deleteBtn = document.createElement('div');
@@ -471,7 +473,7 @@ const Tool = () => {
       );
 
       // 만든 캔버스 액자의 포지션이 어떤지 설정해주기, 왜 와이? 리사이즈 시 위치 바꾸기 위함
-      setCanvasFramePositionList([...canvasFramePositionList, { left: canvasLeft, top: canvasTop, id }]);
+      setCanvasFramePositionList([...canvasFramePositionList, id]);
 
       div.append(cropImage);
       div.append(deleteBtn);
@@ -506,10 +508,14 @@ const Tool = () => {
   const handleFrameRelease = useCallback(() => {
     if (!isSelectFrame) return;
     insertFrameToCanvas();
+    setIsNearingX(false);
+    setIsNearingY(false);
+    setIsFitX(false);
+    setIsFitY(false);
     setIsSelectFrame(() => false);
     setSelectedFrameInfo(() => null);
     setYourSelectedFrame(() => null);
-  }, [isSelectFrame, insertFrameToCanvas]);
+  }, [isSelectFrame, insertFrameToCanvas, setIsNearingX, setIsNearingY, setIsFitX, setIsFitY]);
 
   //   액자를 클릭하묜?
   const handleFrameSelect = useCallback(
@@ -524,11 +530,6 @@ const Tool = () => {
 
         const seletctedName = frameSize.filter((lst) => {
           if (lst.name === value) {
-            // const naturalWidth = el.naturalWidth / width > 1 ? el.naturalWidth / width : 1;
-            // const naturalHeight = el.naturalHeight / height > 1 ? el.naturalHeight / height : 1;
-            // const newWidth = (+lst.size.width.replace('px', '') * 2) / naturalWidth;
-            // const newHeight = (+lst.size.height.replace('px', '') * 2) / naturalHeight;
-            // setYourSelectedFrame({ width: `${newWidth}px`, height: `${newHeight}px` });
             setYourSelectedFrame({
               width: +lst.size.width.replace('px', ''),
               height: +lst.size.height.replace('px', ''),
@@ -586,8 +587,20 @@ const Tool = () => {
     setIsPreview((prev) => !prev);
   }, [imgUploadUrl]);
 
+  const getImgWrapperSizeForParallel = useCallback(() => {
+    const imgWrapper = imgWrapperRef.current;
+    if (!imgWrapper) return;
+    const { width, height } = imgWrapper.getBoundingClientRect();
+    const centerX = width / 2;
+    const centerY = height / 2;
+    setCenterX(centerX);
+    setCenterY(centerY);
+    requestAnimationFrame(getImgWrapperSizeForParallel);
+  }, [setCenterX, setCenterY]);
+
   // 리사이즈시에도 동일하게 움직일 수 있도록 설정
   const handleFramePositionReletive = useCallback(() => {
+    getImgWrapperSizeForParallel();
     if (imgNode.current) {
       const { left: imgLeft, top: imgTop } = imgNode.current.getBoundingClientRect();
       const cropImg = document.querySelectorAll('.cropped-img');
@@ -603,7 +616,7 @@ const Tool = () => {
       });
       requestAnimationFrame(() => handleFramePositionReletive);
     }
-  }, [scrollX, scrollY]);
+  }, [scrollX, scrollY, getImgWrapperSizeForParallel]);
 
   // 컬러 체이닞
   const handleColorChange = useCallback((color: ColorResult) => {
@@ -655,11 +668,13 @@ const Tool = () => {
   useEffect(() => {
     if (window) {
       window.addEventListener('resize', handleFramePositionReletive);
+      requestAnimationFrame(handleFramePositionReletive);
     }
     return () => {
       window.removeEventListener('resize', handleFramePositionReletive);
     };
-  }, [handleFramePositionReletive]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (isSaveCanvas) {
@@ -672,6 +687,16 @@ const Tool = () => {
     if (isDone) {
       setIsDone(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 정가운데값 구하기
+  useEffect(() => {
+    const imgWrapper = imgWrapperRef.current;
+    if (!imgWrapper) return;
+    const { width, height } = imgWrapper.getBoundingClientRect();
+    setCenterX(width / 2);
+    setCenterY(height / 2);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -810,6 +835,10 @@ const Tool = () => {
           onMouseMove={handleImgResize}
           ref={imgWrapperRef}
           bgColor={bgColor}
+          isNearingX={isNearingX || false}
+          isNearingY={isNearingY || false}
+          isFitX={isFitX || false}
+          isFitY={isFitY || false}
           onMouseUp={handleImgResizeEnd}
           onMouseLeave={handleImgResizeEnd}
           cmd={resizeCmd}
