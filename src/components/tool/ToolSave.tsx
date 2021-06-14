@@ -168,8 +168,8 @@ const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
         {selectedFrameList.length ? (
           <>
             <AppTable
-              dataSource={yourPriceList.map(([key, value]) => {
-                return { name: key, ...value };
+              dataSource={yourPriceList.map(([key, value], index) => {
+                return { name: key, ...value, key: index };
               })}
               columns={SaveModalOrderColumns}
               pagination={false}
