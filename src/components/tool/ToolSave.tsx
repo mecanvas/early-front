@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Modal, Input, Form, Select } from 'antd';
 import { useCanvasToServer, useGlobalState } from 'src/hooks';
 import { useRouter } from 'next/router';
-import Loading from '../common/Loading';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import AppTable from '../antd/AppTable';
@@ -110,6 +109,7 @@ const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
       return setOrderRouteEmpty({ ...orderRouteEmpty, isRequired: true, extra: '주문 경로를 선택해 주세요!' });
     if (!info.email.includes('@') || !info.email.includes('.'))
       return setEmailEmpty({ ...emailEmpty, isRequired: true, extra: '이메일을 올바르게 적어주세요.' });
+
     canvasToImage(selectedFrameList, info.username, info.email);
   }, [info, userNameEmpty, emailEmpty, orderRouteEmpty, canvasToImage, selectedFrameList]);
 
@@ -117,9 +117,8 @@ const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
     if (isDone) {
       router.push('/success');
     }
-  }, [isDone, router]);
-
-  console.log(yourPriceList);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDone]);
 
   return (
     <>
@@ -132,7 +131,6 @@ const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
         okText="확인"
         cancelText="취소"
       >
-        <Loading loading={loading} />
         <form onChange={handleFormChange}>
           <Form.Item labelCol={{ span: 4 }} label="이름" extra={userNameEmpty.extra}>
             <AntdInput

@@ -154,7 +154,7 @@ const Tool = () => {
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
 
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState('saveModal', false);
-  const [isDone, setIsDone] = useGlobalState('isDone');
+
   // 액자 사이즈들 변경
   const [frameAttribute, setFrameAttribute] = useState<'정방' | '해경' | '인물' | '풍경'>('정방');
 
@@ -679,13 +679,6 @@ const Tool = () => {
   useEffect(() => {
     if (isSaveCanvas) {
       setIsSaveCanvas(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (isDone) {
-      setIsDone(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
