@@ -59,6 +59,10 @@ export const FactoryTool = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
   justify-content: center;
 
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+    justify-content: space-around;
+  }
+
   & > div:nth-of-type(1) {
     display: flex;
     justify-content: center;
@@ -83,6 +87,18 @@ export const FrameTool = styled.div`
   position: absolute;
   right: 0;
   display: flex;
+
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+    justify-content: center;
+    padding: 0.3em 0;
+    border-top: 1px solid ${({ theme }) => theme.color.gray400};
+    background-color: ${({ theme }) => theme.color.white};
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
 
   button {
     display: flex;
@@ -196,6 +212,10 @@ export const ImageWrapper = styled.div<{
   position: relative;
   min-height: 100vh;
 
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+    flex-direction: row;
+  }
+
   ${({ isNearingX, isFitX, theme }) =>
     isNearingX &&
     css`
@@ -245,6 +265,10 @@ export const ImageWrapper = styled.div<{
   }}
 
   img {
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      max-width: 96vw;
+    }
+
     max-height: ${() => 'calc(100vh - 170px)'};
   }
 
