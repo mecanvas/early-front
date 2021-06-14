@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
+import { useExceptionRoute } from 'src/hooks/useExceptionRoute';
 
 const FooterContainer = styled.footer`
   width: 100%;
@@ -13,6 +14,12 @@ const Footer = styled.div`
 `;
 
 const AppFooter = () => {
+  const { exceptionRoute } = useExceptionRoute();
+
+  if (exceptionRoute) {
+    return null;
+  }
+
   return (
     <FooterContainer>
       <Footer>&copy; mecanvas 2021</Footer>

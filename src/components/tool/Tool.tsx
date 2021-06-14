@@ -1,112 +1,144 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useGetCursorPosition, useGetScollPosition, useGlobalState } from 'src/hooks';
+import { useGetScollPosition, useGlobalState } from 'src/hooks';
 import axios from 'axios';
 import ToolColorPalette from './ToolColorPalette';
 import {
   ToolContainer,
-  YouSelectedFrame,
   ImageWrapper,
-  VersatileWrapper,
-  Factory,
-  FactoryTitle,
-  FrameWrapper,
-  FrameSize,
-  FrameSizeName,
+  BillTotal,
   BillInfomation,
   DropZone,
   CanvasInfomationWrapper,
   DropZoneDiv,
-  BackIcon,
   ImgControlelr,
+  FactoryHeader,
+  FactoryTool,
+  FrameTool,
+  ImageShowingWidthHeight,
+  FactoryUtills,
+  Bill,
 } from './ToolStyle';
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Modal, notification, Popover, Upload, Checkbox, Input } from 'antd';
+import { Button, Modal, Popover, Upload, Checkbox, Input } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import { theme } from 'src/style/theme';
 import { useRouter } from 'next/router';
 import Loading from '../common/Loading';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit } from '@fortawesome/free-regular-svg-icons';
-import { faHome, faPaintRoller, faPlus, faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faSquare } from '@fortawesome/free-regular-svg-icons';
+import { faPaintRoller, faUndo, faImage, faCompress } from '@fortawesome/free-solid-svg-icons';
 import ToolSave from './ToolSave';
-
-interface PaperSize {
-  name: string;
-  size: {
-    width: string;
-    height: string;
-  };
-  price: number;
-}
-
-interface SelectedFrameInfo {
-  width: string;
-  height: string;
-}
-
-interface FramePrice {
-  name: string;
-  price: number;
-  id: number;
-}
-
-interface FramePosition {
-  left: string;
-  top: string;
-}
-
-interface CanvasFramePositionList {
-  id: number;
-  left: number;
-  top: number;
-}
+import { cmToPx } from 'src/utils/cmToPx';
+import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
+import ToolFrameList from './ToolFrameList';
+import { FrameSize, CanvasPosition, FramePrice, CanvasFrameSizeInfo, ResizeCmd } from 'src/interfaces/ToolInterface';
+import { imgSizeChecker } from 'src/utils/imgSizeChecker';
+import ToolSelectedFrame from './ToolSelectedFrame';
+import { getOriginRatio } from 'src/utils/getOriginRatio';
 
 const Tool = () => {
   const router = useRouter();
-  const paperSize = useMemo<PaperSize[]>(
+  const [changeVertical, setChangeVertical] = useState(false);
+
+  const frameSize = useMemo<FrameSize[]>(
     () => [
       {
-        name: '10x10',
-        // 10cm X 10cm
+        name: 'S-1호',
+        attribute: '정방',
+        cm: '16cm X 16cm',
         size: {
-          width: `${377.95275590551 / 3}px`,
-          height: `${377.95275590551 / 3}px`,
+          width: `${cmToPx(16)}px`,
+          height: `${cmToPx(16)}px`,
         },
         price: 55000,
       },
       {
-        name: '20x20',
-        // 20cm X 20cm
+        name: 'S-2호',
+        attribute: '정방',
+        cm: '19cm X 19cm',
         size: {
-          width: `${755.90551181102 / 3}px`,
-          height: `${755.90551181102 / 3}px`,
+          width: `${cmToPx(19)}px`,
+          height: `${cmToPx(19)}px`,
         },
         price: 40000,
       },
       {
-        name: '30x30',
-        // 30cm X 30cm
+        name: 'S-4호',
+        attribute: '정방',
+        cm: '24cm X 24cm',
         size: {
-          width: `${1133.8582677165 / 3}px`,
-          height: `${1133.8582677165 / 3}px`,
+          width: `${cmToPx(24)}px`,
+          height: `${cmToPx(24)}px`,
+        },
+        price: 30000,
+      },
+      {
+        name: 'P-2호',
+        attribute: '풍경',
+        cm: !changeVertical ? '16cm X 25.8cm' : '25.8cm X 16cm',
+        size: {
+          width: `${cmToPx(!changeVertical ? 16 : 25.8)}px`,
+          height: `${cmToPx(!changeVertical ? 25.8 : 16)}px`,
+        },
+        price: 30000,
+      },
+      {
+        name: 'P-4호',
+        attribute: '풍경',
+        cm: !changeVertical ? '21.2cm X 33.3cm' : '33.3cm X 21.2cm',
+        size: {
+          width: `${cmToPx(!changeVertical ? 21.2 : 33.3)}px`,
+          height: `${cmToPx(!changeVertical ? 33.3 : 21.2)}px`,
+        },
+        price: 30000,
+      },
+      {
+        name: 'F-2호',
+        attribute: '인물',
+        cm: !changeVertical ? '18cm X 25.8cm' : '25.8cm X 18cm',
+        size: {
+          width: `${cmToPx(!changeVertical ? 18 : 25.8)}px`,
+          height: `${cmToPx(!changeVertical ? 25.8 : 18)}px`,
+        },
+        price: 40000,
+      },
+      {
+        name: 'F-4호',
+        attribute: '인물',
+        cm: !changeVertical ? '24cm X 33.3cm' : '33.3cm X 24cm',
+        size: {
+          width: `${cmToPx(!changeVertical ? 24 : 33.3)}px`,
+          height: `${cmToPx(!changeVertical ? 33.3 : 24)}px`,
+        },
+        price: 40000,
+      },
+      {
+        name: 'M-4호',
+        attribute: '해경',
+        cm: !changeVertical ? '19cm X 33.3cm' : '33.3cm X 19cm',
+        size: {
+          width: `${cmToPx(!changeVertical ? 19 : 33.3)}px`,
+          height: `${cmToPx(!changeVertical ? 33.3 : 19)}px`,
         },
         price: 30000,
       },
     ],
-    [],
+    [changeVertical],
   );
 
-  const [selectedFrame, setSelectedFrame] = useState(false); // 골랐는지 상태 여부
-  const [selectedFrameInfo, setSelectedFrameInfo] = useState<PaperSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
-  const [selectedFramePosition, setSelectedFramePosition] = useState<FramePosition | null>(null); // top, letf 위치 조절
-  const [cursorX, cursorY] = useGetCursorPosition(selectedFrame);
+  const [isSelectFrame, setIsSelectFrame] = useState(false); // 골랐는지 상태 여부
+  const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
+  const [canvasPosition] = useGlobalState<CanvasPosition>('canvasPosition');
+  const [canvasFrameSizeInfo] = useGlobalState<CanvasFrameSizeInfo>('canvasFrameSizeInfo');
+
   const [scrollX, scrollY] = useGetScollPosition();
 
   const imgWrapperRef = useRef<HTMLDivElement>(null);
   const imgNode = useRef<HTMLImageElement>(null);
-  const [imgUploadUrl, setImgUploadUrl] = useState('');
+
+  const [imgUploadUrl, setImgUploadUrl] = useGlobalState('imgUploadUrl', '');
   const [imgUploadLoading, setImgUploadLoading] = useState(false);
 
   const [originWidth, setOriginWidth] = useState(0);
@@ -115,15 +147,33 @@ const Tool = () => {
   const [resizeHeight, setResizeHeight] = useState(0);
   const [ratioPersist, setRatioPersist] = useState(true);
   const [imgModalResizeOpen, setImgModalResizeOpen] = useState(false);
-  const [canvasFramePositionList, setCanvasFramePositionList] = useState<CanvasFramePositionList[]>([]);
+  const [canvasFramePositionList, setCanvasFramePositionList] = useState<number[]>([]);
   const [selectedFrameList, setSelectedFrameList] = useState<HTMLCanvasElement[]>([]);
-  const [yourSelectedFrame, setYourSelectedFrame] = useState<SelectedFrameInfo | null>(null);
-
-  const youSelectedFrameRef = useRef<HTMLDivElement>(null);
+  const [yourSelectedFrame, setYourSelectedFrame] = useState<CanvasFrameSizeInfo | null>(null);
 
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
 
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState('saveModal', false);
+
+  // 액자 사이즈들 변경
+  const [frameAttribute, setFrameAttribute] = useState<'정방' | '해경' | '인물' | '풍경'>('정방');
+
+  // 가운데 근접 컨트롤
+  const [, setCenterX] = useGlobalState<number>('centerX', 0);
+  const [, setCenterY] = useGlobalState<number>('centerY', 0);
+  const [isNearingX, setIsNearingX] = useGlobalState<boolean>('isNearingX');
+  const [isNearingY, setIsNearingY] = useGlobalState<boolean>('isNearingY');
+  const [isFitX, setIsFitX] = useGlobalState<boolean>('isFitX');
+  const [isFitY, setIsFitY] = useGlobalState<boolean>('isFitY');
+
+  const handleChangeVertical = useCallback(() => {
+    setChangeVertical((prev) => !prev);
+  }, []);
+
+  const handleGetFrameAttribute = useCallback((e) => {
+    const { value } = e.currentTarget;
+    setFrameAttribute(value);
+  }, []);
 
   // 고른 액자의 이름과 수량
   const yourPriceList = useMemo(() => {
@@ -131,7 +181,7 @@ const Tool = () => {
       framePrice.reduce((acc: { [key: string]: any }, cur) => {
         const name = cur.name;
         if (!acc[name]) {
-          acc[name] = { quantity: 1, price: cur.price };
+          acc[name] = { quantity: 1, price: cur.price, cm: cur.cm };
           return acc;
         }
         acc[name].quantity++;
@@ -150,47 +200,69 @@ const Tool = () => {
   // const [frameBorderColor, setFrameBorderColor] = useState('#333');
 
   const [isResizeStart, setIsResizeStart] = useState(false);
-  const [resizeCmd, setResizeCmd] = useState<'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null>(null);
+  const [resizeCmd, setResizeCmd] = useState<ResizeCmd | null>(null);
   const [isResizeMode, setIsResizeMode] = useState(false);
 
-  const positioningImageResize = useCallback(
-    (resizeCmd: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null, x: number, y: number) => {
-      if (!imgNode.current) return;
-      const { width, height, left, top, right } = imgNode.current.getBoundingClientRect();
-      const absX = Math.abs(x - Math.ceil(left));
-      const absY = Math.abs(height + Math.ceil(top - y));
-      const absLeftX = Math.abs(x - Math.ceil(right));
-      const absBottomY = Math.abs(y + height - (top + height)); // bottom - top <- 이거 풀어씀.
-      let newWidth = width;
-      let newHeight = height;
-      switch (resizeCmd) {
-        case 'bottom-right':
-          newWidth = absX;
-          newHeight = absBottomY;
-          break;
-        case 'top-right':
-          newHeight = absY;
-          newWidth = absX;
-          break;
-        case 'bottom-left':
-          newWidth = absLeftX;
-          newHeight = absBottomY;
-          break;
-        case 'top-left':
-          newHeight = absY;
-          newWidth = absLeftX;
-          break;
-        default:
-          break;
-      }
+  const positioningImageResize = useCallback((resizeCmd: ResizeCmd | null, x: number, y: number) => {
+    if (!imgNode.current) return;
+    const { width, height, left, top, right } = imgNode.current.getBoundingClientRect();
+    const absX = Math.abs(x - Math.ceil(left));
+    const absY = Math.abs(height + Math.ceil(top - y));
+    const absLeftX = Math.abs(x - Math.ceil(right));
+    const absBottomY = Math.abs(y + height - (top + height)); // bottom - top <- 이거 풀어씀.
 
-      imgNode.current.style.width = `${newWidth}px`;
-      imgNode.current.style.height = `${newHeight}px`;
-      setResizeWidth(newWidth);
-      setResizeHeight(newHeight);
-    },
-    [],
-  );
+    let newWidth = width;
+    let newHeight = height;
+
+    const getNewHeight = (x: number) => {
+      return (x * height) / width;
+    };
+
+    switch (resizeCmd) {
+      case 'bottom-right':
+        newHeight = getNewHeight(absX);
+        newWidth = absX;
+        break;
+      case 'top-right':
+        newHeight = getNewHeight(absX);
+        newWidth = absX;
+        break;
+      case 'bottom-left':
+        newHeight = getNewHeight(absLeftX);
+        newWidth = absLeftX;
+        break;
+      case 'top-left':
+        newHeight = getNewHeight(absLeftX);
+        newWidth = absLeftX;
+        break;
+      case 'bottom-center':
+        newHeight = absBottomY;
+        break;
+      case 'top-center':
+        newHeight = absY;
+        break;
+      case 'right':
+        newWidth = absX;
+        break;
+      case 'left':
+        newWidth = absLeftX;
+        break;
+      default:
+        break;
+    }
+
+    setResizeWidth(newWidth);
+    setResizeHeight(newHeight);
+    requestAnimationFrame(() => positioningImageResize);
+  }, []);
+
+  const handleImgRatioSetting = useCallback(() => {
+    const [w, h] = getOriginRatio(originWidth, originHeight);
+    const newWidth = w * resizeHeight;
+    const newHeight = h * newWidth;
+    setResizeWidth(+newWidth.toFixed());
+    setResizeHeight(+newHeight.toFixed());
+  }, [originHeight, originWidth, resizeHeight]);
 
   const handleResizeMode = useCallback((e) => {
     e.stopPropagation();
@@ -232,6 +304,7 @@ const Tool = () => {
   // 이미지 업로드
   const handleImgReUpload = useCallback(
     async (file: RcFile) => {
+      if (!imgSizeChecker(file)) return;
       setImgUploadLoading(true);
       try {
         if (imgWrapperRef.current) {
@@ -240,37 +313,44 @@ const Tool = () => {
           await axios.post('/canvas/img', fd).then((res) => setImgUploadUrl(res.data || ''));
         }
       } catch (err) {
+        alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
         console.error(err);
       } finally {
         setImgUploadLoading(false);
       }
       return false;
     },
-    [imgWrapperRef],
+    [setImgUploadUrl],
   );
 
-  const handleImgDropUpload = useCallback(async (acceptedFiles) => {
-    if (!acceptedFiles[0].type.includes('image')) {
-      return alert('이미지 파일이 아닌건 지원하지 않습니다.');
-    }
-    if (acceptedFiles[0].type.includes('svg')) {
-      return alert('svg 파일은 지원하지 않습니다.');
-    }
-    setImgUploadLoading(true);
-    try {
-      if (imgWrapperRef.current) {
-        const file = acceptedFiles[0];
-        const fd = new FormData();
-        fd.append('image', file);
-
-        await axios.post('/canvas/img', fd).then((res) => setImgUploadUrl(res.data || ''));
+  const handleImgDropUpload = useCallback(
+    async (acceptedFiles) => {
+      if (!acceptedFiles[0].type.includes('image')) {
+        return alert('이미지 파일이 아닌건 지원하지 않습니다.');
       }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setImgUploadLoading(false);
-    }
-  }, []);
+      if (acceptedFiles[0].type.includes('svg')) {
+        return alert('svg 파일은 지원하지 않습니다.');
+      }
+      if (!imgSizeChecker(acceptedFiles[0])) return;
+
+      setImgUploadLoading(true);
+      try {
+        if (imgWrapperRef.current) {
+          const file = acceptedFiles[0];
+          const fd = new FormData();
+          fd.append('image', file);
+
+          await axios.post('/canvas/img', fd).then((res) => setImgUploadUrl(res.data || ''));
+        }
+      } catch (err) {
+        alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
+        console.error(err);
+      } finally {
+        setImgUploadLoading(false);
+      }
+    },
+    [setImgUploadUrl],
+  );
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: handleImgDropUpload });
 
   const handleDeleteCanvas = useCallback(
@@ -291,7 +371,7 @@ const Tool = () => {
           }
         });
         setFramePrice((prev) => prev.filter((lst) => lst.id !== +e.target.id));
-        setCanvasFramePositionList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
+        setCanvasFramePositionList((prev) => prev.filter((lst) => lst !== +e.target.id));
         setSelectedFrameList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
       }
     },
@@ -301,13 +381,13 @@ const Tool = () => {
   const handleImgGoBack = useCallback(() => {
     if (imgWrapperRef.current) {
       const { current: imgBox } = imgWrapperRef;
-      if (imgBox.childNodes.length <= 2) {
-        return notification.info({ message: '존재하는 액자가 없습니다.', placement: 'bottomLeft' });
+      if (imgBox.childNodes.length < 2) {
+        return;
       }
       const imgBoxId = +(imgBox.childNodes[0] as any).id;
       imgBox?.removeChild(imgBox.childNodes[0]);
       setFramePrice(framePrice.slice(1));
-      setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== imgBoxId));
+      setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst !== imgBoxId));
       setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== imgBoxId));
     }
   }, [framePrice, canvasFramePositionList, selectedFrameList]);
@@ -315,18 +395,19 @@ const Tool = () => {
   // 이미지 저장을 위한 캔버스 생성 (스프라이트 기법으로 이미지 저장은 안되기 때문에 품질이 깨지더라도 이 방법 사용합니다.)
   const createCanvasForSave = useCallback(
     (id: number) => {
-      if (!youSelectedFrameRef.current || !imgNode.current || !selectedFrameInfo) return;
+      if (!canvasFrameSizeInfo || !imgNode.current || !selectedFrameInfo || !canvasPosition) return;
 
       const { name } = selectedFrameInfo;
-      const { width: frameWidth, height: frameHeight } = youSelectedFrameRef.current.getBoundingClientRect();
+      const { width: frameWidth, height: frameHeight } = canvasFrameSizeInfo;
       const { left, top } = imgNode.current.getBoundingClientRect();
-
+      const { left: canvasLeft, top: canvasTop } = canvasPosition;
       const image = imgNode.current;
       const oCanvas = document.createElement('canvas');
       oCanvas.id = id.toString();
       oCanvas.dataset.paper = name;
-      const cropX = cursorX - left - frameWidth / 2;
-      const cropY = cursorY - top - frameHeight / 2;
+      oCanvas.dataset.bgColor = bgColor;
+      const cropX = canvasLeft - left;
+      const cropY = canvasTop - top;
 
       const scaleX = image.naturalWidth / image.width;
       const scaleY = image.naturalHeight / image.height;
@@ -353,14 +434,15 @@ const Tool = () => {
 
       setSelectedFrameList([...selectedFrameList, oCanvas]);
     },
-    [cursorX, cursorY, selectedFrameInfo, selectedFrameList],
+    [bgColor, canvasFrameSizeInfo, canvasPosition, selectedFrameInfo, selectedFrameList],
   );
 
   const createImageCanvas = useCallback(
     (id: number) => {
-      if (!youSelectedFrameRef.current || !imgNode.current) return;
-      const { width: frameWidth, height: frameHeight } = youSelectedFrameRef.current.getBoundingClientRect();
+      if (!isSelectFrame || !imgNode.current || !canvasPosition || !canvasFrameSizeInfo) return;
+      const { width: frameWidth, height: frameHeight } = canvasFrameSizeInfo;
       const { left, top, width, height } = imgNode.current.getBoundingClientRect();
+      const { left: canvasLeft, top: canvasTop } = canvasPosition;
 
       // 크롭된 이미지를 담을 캔버스 생성
       const div = document.createElement('div');
@@ -371,12 +453,10 @@ const Tool = () => {
       div.classList.add('cropped-img');
       div.style.width = `${frameWidth}px`;
       div.style.height = `${frameHeight}px`;
-      const canvasLeftPosition = cursorX - frameWidth / 2;
-      const canvasTopPosition = cursorY - frameHeight / 2;
-      div.style.left = `${canvasLeftPosition + scrollX}px`;
-      div.style.top = `${canvasTopPosition + scrollY}px`;
-      div.setAttribute('data-originleft', `${canvasLeftPosition - left}`);
-      div.setAttribute('data-origintop', `${canvasTopPosition - top}`);
+      div.style.left = `${canvasLeft + scrollX}px`;
+      div.style.top = `${canvasTop + scrollY}px`;
+      div.setAttribute('data-originleft', `${canvasLeft - left}`);
+      div.setAttribute('data-origintop', `${canvasTop - top}`);
       div.id = id.toString();
 
       // 크롭된 이미지 생성 (화질 구지 방지를 위해 스프라이트 기법 사용)
@@ -388,8 +468,8 @@ const Tool = () => {
         background-color : ${bgColor};
         background-repeat : no-repeat;
         background-size: ${width}px ${height}px; 
-        background-position-x: ${-canvasLeftPosition + left}px;
-        background-position-y: ${-canvasTopPosition + top}px;
+        background-position-x: ${-canvasLeft + left}px;
+        background-position-y: ${-canvasTop + top}px;
         width: ${100}%;
         height: ${100}%;
         box-shadow : 0 0 7px #333 inset, 0 0 6px #ededed;
@@ -397,25 +477,32 @@ const Tool = () => {
       );
 
       // 만든 캔버스 액자의 포지션이 어떤지 설정해주기, 왜 와이? 리사이즈 시 위치 바꾸기 위함
-      setCanvasFramePositionList([
-        ...canvasFramePositionList,
-        { left: canvasLeftPosition, top: canvasTopPosition, id },
-      ]);
+      setCanvasFramePositionList([...canvasFramePositionList, id]);
 
       div.append(cropImage);
       div.append(deleteBtn);
       imgWrapperRef.current?.prepend(div);
     },
-    [handleDeleteCanvas, cursorX, cursorY, scrollX, scrollY, imgUploadUrl, bgColor, canvasFramePositionList],
+    [
+      isSelectFrame,
+      canvasPosition,
+      canvasFrameSizeInfo,
+      handleDeleteCanvas,
+      scrollX,
+      scrollY,
+      imgUploadUrl,
+      bgColor,
+      canvasFramePositionList,
+    ],
   );
 
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
   const insertFrameToCanvas = useCallback(async () => {
-    if (youSelectedFrameRef.current && imgNode.current && selectedFrameInfo) {
+    if (imgNode.current && selectedFrameInfo) {
       //  액자의 가격을 price에 넣기
-      const { name, price } = selectedFrameInfo;
+      const { name, price, cm } = selectedFrameInfo;
       const id = Date.now();
-      setFramePrice([{ name, price, id }, ...framePrice]);
+      setFramePrice([{ name, price, id, cm }, ...framePrice]);
       createImageCanvas(id);
       createCanvasForSave(id);
     }
@@ -423,13 +510,16 @@ const Tool = () => {
 
   //   따라다니는 액자를 재클릭하면 insert하고 사라짐.
   const handleFrameRelease = useCallback(() => {
-    if (!selectedFrame) return;
+    if (!isSelectFrame) return;
     insertFrameToCanvas();
-    setSelectedFrame(() => false);
+    setIsNearingX(false);
+    setIsNearingY(false);
+    setIsFitX(false);
+    setIsFitY(false);
+    setIsSelectFrame(() => false);
     setSelectedFrameInfo(() => null);
-    setSelectedFramePosition(() => null);
     setYourSelectedFrame(() => null);
-  }, [selectedFrame, insertFrameToCanvas]);
+  }, [isSelectFrame, insertFrameToCanvas, setIsNearingX, setIsNearingY, setIsFitX, setIsFitY]);
 
   //   액자를 클릭하묜?
   const handleFrameSelect = useCallback(
@@ -442,21 +532,20 @@ const Tool = () => {
         el.style.width = `${width}px`;
         el.style.height = `${height}px`;
 
-        const naturalWidth = el.naturalWidth / width > 1 ? el.naturalWidth / width : 1;
-        const naturalHeight = el.naturalHeight / height > 1 ? el.naturalHeight / height : 1;
-        const seletctedName = paperSize.filter((lst) => {
+        const seletctedName = frameSize.filter((lst) => {
           if (lst.name === value) {
-            const newWidth = (+lst.size.width.replace('px', '') * 3) / naturalWidth;
-            const newHeight = (+lst.size.height.replace('px', '') * 3) / naturalHeight;
-            setYourSelectedFrame({ width: `${newWidth}px`, height: `${newHeight}px` });
-            setSelectedFrame(() => true);
+            setYourSelectedFrame({
+              width: +lst.size.width.replace('px', ''),
+              height: +lst.size.height.replace('px', ''),
+            });
             return lst;
           }
         });
+        setIsSelectFrame(() => true);
         setSelectedFrameInfo(seletctedName[0]);
       }
     },
-    [paperSize],
+    [frameSize],
   );
 
   const handleResizeReset = useCallback(() => {
@@ -494,20 +583,28 @@ const Tool = () => {
   }, []);
 
   const handleModalResizeOk = useCallback(() => {
-    if (imgNode.current) {
-      imgNode.current.style.width = `${resizeWidth}px`;
-      imgNode.current.style.height = `${resizeHeight}px`;
-      setImgModalResizeOpen((prev) => !prev);
-    }
-  }, [resizeWidth, resizeHeight]);
+    setImgModalResizeOpen((prev) => !prev);
+  }, []);
 
   const handleImgPreview = useCallback(() => {
     if (!imgUploadUrl) return;
     setIsPreview((prev) => !prev);
   }, [imgUploadUrl]);
 
+  const getImgWrapperSizeForParallel = useCallback(() => {
+    const imgWrapper = imgWrapperRef.current;
+    if (!imgWrapper) return;
+    const { width, height } = imgWrapper.getBoundingClientRect();
+    const centerX = width / 2;
+    const centerY = height / 2;
+    setCenterX(centerX);
+    setCenterY(centerY);
+    requestAnimationFrame(getImgWrapperSizeForParallel);
+  }, [setCenterX, setCenterY]);
+
   // 리사이즈시에도 동일하게 움직일 수 있도록 설정
   const handleFramePositionReletive = useCallback(() => {
+    getImgWrapperSizeForParallel();
     if (imgNode.current) {
       const { left: imgLeft, top: imgTop } = imgNode.current.getBoundingClientRect();
       const cropImg = document.querySelectorAll('.cropped-img');
@@ -521,8 +618,9 @@ const Tool = () => {
           (node as HTMLDivElement).style.top = top;
         }
       });
+      requestAnimationFrame(() => handleFramePositionReletive);
     }
-  }, [scrollX, scrollY]);
+  }, [scrollX, scrollY, getImgWrapperSizeForParallel]);
 
   // 컬러 체이닞
   const handleColorChange = useCallback((color: ColorResult) => {
@@ -539,15 +637,15 @@ const Tool = () => {
     setIsSaveCanvas(true);
   }, [setIsSaveCanvas]);
 
-  // 액자 클릭시 움직이는 로직
   useEffect(() => {
-    if (selectedFrame && yourSelectedFrame) {
-      const { width, height } = yourSelectedFrame;
-      const x = cursorX + scrollX - +width.replace('px', '') / 2;
-      const y = cursorY + scrollY - +height.replace('px', '') / 2;
-      setSelectedFramePosition({ left: `${x}px`, top: `${y}px` });
+    if (!imgNode.current) return;
+    if (resizeWidth) {
+      imgNode.current.style.width = `${resizeWidth}px`;
     }
-  }, [selectedFrame, yourSelectedFrame, cursorX, cursorY, scrollX, scrollY]);
+    if (resizeHeight) {
+      imgNode.current.style.height = `${filterOverMaxHeight(resizeHeight)}px`;
+    }
+  }, [resizeWidth, resizeHeight]);
 
   useEffect(() => {
     if (imgNode.current) {
@@ -563,8 +661,8 @@ const Tool = () => {
       el.style.height = '';
       el.src = imgUploadUrl;
       el.onload = () => {
-        setOriginWidth(el.width);
-        setOriginHeight(el.height);
+        setOriginWidth(el.naturalWidth || el.width);
+        setOriginHeight(el.naturalHeight || el.height);
         setResizeWidth(el.width);
         setResizeHeight(el.height);
       };
@@ -574,11 +672,13 @@ const Tool = () => {
   useEffect(() => {
     if (window) {
       window.addEventListener('resize', handleFramePositionReletive);
+      requestAnimationFrame(handleFramePositionReletive);
     }
     return () => {
       window.removeEventListener('resize', handleFramePositionReletive);
     };
-  }, [handleFramePositionReletive]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (isSaveCanvas) {
@@ -587,69 +687,155 @@ const Tool = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 정가운데값 구하기
+  useEffect(() => {
+    const imgWrapper = imgWrapperRef.current;
+    if (!imgWrapper) return;
+    const { width, height } = imgWrapper.getBoundingClientRect();
+    setCenterX(width / 2);
+    setCenterY(height / 2);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    setImgUploadUrl('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
-      <BackIcon type="primary" onClick={handlePushMainPage}>
-        <FontAwesomeIcon style={{ fontSize: '18px' }} icon={faHome} fill={theme.color.white} />
-      </BackIcon>
-
-      {/* 사진 조절하는 툴바들 */}
-
-      <Factory>
-        <Button onClick={handleImgGoBack}>
-          <FontAwesomeIcon icon={faUndo} />
-        </Button>
-        <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
-          <Button>
-            <FontAwesomeIcon icon={faPlus} />
-          </Button>
-        </Upload>
-        <Popover
-          style={{ padding: 0 }}
-          trigger="click"
-          placement="bottom"
-          content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
-        >
-          <Button>
-            <FontAwesomeIcon icon={faPaintRoller} />
-          </Button>
-        </Popover>
-      </Factory>
-
-      {<Loading loading={imgUploadLoading} />}
-      <Modal
-        visible={imgModalResizeOpen}
-        onOk={handleModalResizeOk}
-        onCancel={handleModalResize}
-        title="이미지의 너비와 높이를 입력하세요."
-      >
-        <div>
-          <form onChange={handleChangeImgSize}>
-            <Input type="text" name="width" value={resizeWidth || ''} addonBefore="너비" addonAfter="px" />
-            <Input type="text" name="height" value={resizeHeight || ''} addonBefore="높이" addonAfter="px" />
-          </form>
-
-          <div style={{ textAlign: 'right' }}>
-            <Checkbox defaultChecked={ratioPersist} onChange={handleRatioPersist}>
-              너비에 비율을 맞춥니다.
-            </Checkbox>
-          </div>
-          <div style={{ textAlign: 'right', marginTop: '6px' }}>
-            <Button onClick={handleResizeReset}>원래의 이미지 크기로 되돌립니다.</Button>
-          </div>
-        </div>
-      </Modal>
-
       <ToolContainer>
-        {selectedFrame && selectedFramePosition && yourSelectedFrame && (
-          <YouSelectedFrame
-            // border={frameBorderColor}
-            ref={youSelectedFrameRef}
-            onClick={handleFrameRelease}
-            {...yourSelectedFrame}
-            {...selectedFramePosition}
-          ></YouSelectedFrame>
+        {imgUploadUrl && (
+          <ToolFrameList
+            frameSize={frameSize}
+            attribute={frameAttribute}
+            onClick={handleFrameSelect}
+            onChangeVertical={handleChangeVertical}
+          ></ToolFrameList>
         )}
+
+        {/* 사진 조절하는 툴바들 */}
+        <FactoryHeader>
+          <FactoryUtills>
+            <h1 onClick={handlePushMainPage}>Early</h1>
+            <div>
+              <Popover
+                style={{ padding: 0 }}
+                content={
+                  yourPriceList.length ? (
+                    <CanvasInfomationWrapper>
+                      {/* 사용한 액자 x 수량 */}
+                      <BillInfomation>
+                        <Bill>
+                          {yourPriceList.map(([key, value], index) => (
+                            <div key={index}>
+                              <div>{key}</div>
+                              <div>
+                                {value.price.toLocaleString()} x {value.quantity}개
+                              </div>
+                            </div>
+                          ))}
+                        </Bill>
+                        <BillTotal>
+                          {framePrice.reduce((acc, cur) => (acc += cur.price), 0).toLocaleString()}원
+                        </BillTotal>
+                      </BillInfomation>
+                    </CanvasInfomationWrapper>
+                  ) : (
+                    '제작하신 액자가 없습니다.'
+                  )
+                }
+              >
+                <Button type="text">예상가격</Button>
+              </Popover>
+              <Button onClick={handleImgPreview} type={!isPreview ? 'default' : 'primary'}>
+                {!isPreview ? '미리보기' : '이미지로'}
+              </Button>
+              <Button type="text" onClick={handleSaveCanvas}>
+                저장
+              </Button>
+              {isSaveCanvas && (
+                <ToolSave
+                  totalPrice={framePrice.reduce((acc, cur) => (acc += cur.price), 0)}
+                  yourPriceList={yourPriceList}
+                  selectedFrameList={selectedFrameList}
+                />
+              )}
+            </div>
+          </FactoryUtills>
+          <FactoryTool>
+            <div>
+              <Button type="text" style={{ opacity: selectedFrameList.length ? 1 : 0.4 }} onClick={handleImgGoBack}>
+                <FontAwesomeIcon icon={faUndo} />
+                <small>실행취소</small>
+              </Button>
+              <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
+                <Button type="text">
+                  <FontAwesomeIcon icon={faImage} />
+                  <small>변경</small>
+                </Button>
+              </Upload>
+              <Popover
+                style={{ padding: 0 }}
+                trigger="click"
+                placement="bottom"
+                content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
+              >
+                <Button type="text">
+                  <FontAwesomeIcon icon={faPaintRoller} />
+                  <small>배경</small>
+                </Button>
+              </Popover>
+
+              <Button type="text" onClick={handleImgRatioSetting}>
+                <FontAwesomeIcon icon={faCompress} />
+                <small>비율 맞추기</small>
+              </Button>
+            </div>
+            <FrameTool>
+              <Button type="text" onClick={handleGetFrameAttribute} value="정방">
+                <FontAwesomeIcon icon={faSquare} />
+                <small>정방</small>
+              </Button>
+              <Button type="text" onClick={handleGetFrameAttribute} value="인물">
+                <FontAwesomeIcon icon={faSquare} />
+                <small>인물</small>
+              </Button>
+              <Button type="text" onClick={handleGetFrameAttribute} value="해경">
+                <FontAwesomeIcon icon={faSquare} />
+                <small>해경</small>
+              </Button>
+              <Button type="text" onClick={handleGetFrameAttribute} value="풍경">
+                <FontAwesomeIcon icon={faSquare} />
+                <small>풍경</small>
+              </Button>
+            </FrameTool>
+          </FactoryTool>
+        </FactoryHeader>
+
+        {<Loading loading={imgUploadLoading} />}
+        <Modal
+          visible={imgModalResizeOpen}
+          onOk={handleModalResizeOk}
+          onCancel={handleModalResize}
+          title="이미지의 너비와 높이를 입력하세요."
+        >
+          <div>
+            <form onChange={handleChangeImgSize}>
+              <Input type="text" name="width" value={resizeWidth || ''} addonBefore="너비" addonAfter="px" />
+              <Input type="text" name="height" value={resizeHeight || ''} addonBefore="높이" addonAfter="px" />
+            </form>
+
+            <div style={{ textAlign: 'right' }}>
+              <Checkbox defaultChecked={ratioPersist} onChange={handleRatioPersist}>
+                너비에 비율을 맞춥니다.
+              </Checkbox>
+            </div>
+            <div style={{ textAlign: 'right', marginTop: '6px' }}>
+              <Button onClick={handleResizeReset}>원래의 이미지 크기로 되돌립니다.</Button>
+            </div>
+          </div>
+        </Modal>
 
         <ImageWrapper
           imgUploadLoading={imgUploadLoading}
@@ -660,12 +846,28 @@ const Tool = () => {
           onTouchMove={handleImgResize}
           ref={imgWrapperRef}
           bgColor={bgColor}
+          isNearingX={isNearingX || false}
+          isNearingY={isNearingY || false}
+          isFitX={isFitX || false}
+          isFitY={isFitY || false}
           onMouseUp={handleImgResizeEnd}
+          onMouseLeave={handleImgResizeEnd}
           cmd={resizeCmd}
         >
           {imgUploadUrl ? (
             <>
-              {isResizeStart && <small>{`${resizeWidth.toFixed()}px X ${resizeHeight.toFixed()}px`}</small>}
+              {isSelectFrame && <ToolSelectedFrame {...yourSelectedFrame} onClick={handleFrameRelease} />}
+
+              {isResizeMode && (
+                <>
+                  <ImageShowingWidthHeight>
+                    {`${resizeWidth.toFixed()}px X ${resizeHeight.toFixed()}px`}
+                    <span onClick={handleModalResize}>
+                      <FontAwesomeIcon icon={faEdit} />
+                    </span>
+                  </ImageShowingWidthHeight>
+                </>
+              )}
               <ImgControlelr data-layout="inner" isResizeStart={isResizeMode} cmd={resizeCmd}>
                 <img
                   onMouseUp={handleImgResizeEnd}
@@ -677,70 +879,25 @@ const Tool = () => {
                 />
                 {isResizeMode ? (
                   <>
-                    <div data-cmd="top-left" onMouseDown={handleImgResizeStart} onTouchEnd={handleImgResizeStart}></div>
-                    <div
-                      data-cmd="top-right"
-                      onMouseDown={handleImgResizeStart}
-                      onTouchEnd={handleImgResizeStart}
-                    ></div>
-                    <div
-                      data-cmd="bottom-left"
-                      onMouseDown={handleImgResizeStart}
-                      onTouchEnd={handleImgResizeStart}
-                    ></div>
-                    <div
-                      data-cmd="bottom-right"
-                      onMouseDown={handleImgResizeStart}
-                      onTouchEnd={handleImgResizeStart}
-                    ></div>
-                    <span onClick={handleModalResize}>
-                      <FontAwesomeIcon icon={faEdit} />
-                    </span>
+                    <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="top-center" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
+
+                    <div data-cmd="right" onMouseDown={handleImgResizeStart}></div>
+
+                    <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="bottom-center" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
+
+                    <div data-cmd="left" onMouseDown={handleImgResizeStart}></div>
                   </>
                 ) : (
                   <button type="button" onClick={handleResizeMode}></button>
                 )}
               </ImgControlelr>
-              <VersatileWrapper>
-                <FrameWrapper
-                  children={paperSize.map((paper, index) => (
-                    <FrameSize key={index} data-value={paper.name} {...paper.size} onClick={handleFrameSelect}>
-                      <FrameSizeName>{paper.name}</FrameSizeName>
-                    </FrameSize>
-                  ))}
-                />
-                <CanvasInfomationWrapper>
-                  {/* 사용한 액자 x 수량 */}
-                  <BillInfomation>
-                    <div>
-                      {yourPriceList.map(([key, value], index) => (
-                        <div
-                          style={{ display: 'flex', justifyContent: 'space-between', width: '100%', padding: '0 3px' }}
-                          key={index}
-                        >
-                          <div>{key}</div>
-                          <div>
-                            {value.price.toLocaleString()} x {value.quantity}개
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <FactoryTitle>
-                      예상 가격 <div>{framePrice.reduce((acc, cur) => (acc += cur.price), 0).toLocaleString()}원</div>
-                    </FactoryTitle>
-                  </BillInfomation>
-                  <div>
-                    <Button onClick={handleImgPreview}>미리보기 </Button>
-                    <Button type="primary" onClick={handleSaveCanvas}>
-                      저장
-                    </Button>
-                    {isSaveCanvas && <ToolSave yourPriceList={yourPriceList} selectedFrameList={selectedFrameList} />}
-                  </div>
-                </CanvasInfomationWrapper>
-              </VersatileWrapper>
             </>
           ) : (
-            <ImageWrapper imgUploadLoading={imgUploadLoading}>
+            <>
               <DropZone {...getRootProps()}>
                 <input {...getInputProps()} accept="image/*" />
                 <DropZoneDiv isDragActive={isDragActive}>
@@ -748,7 +905,7 @@ const Tool = () => {
                   <p>이미지를 드롭하거나 첨부하세요!</p>
                 </DropZoneDiv>
               </DropZone>
-            </ImageWrapper>
+            </>
           )}
         </ImageWrapper>
       </ToolContainer>

@@ -1,41 +1,121 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Button, Card } from 'antd';
+import { ResizeCmd } from 'src/interfaces/ToolInterface';
 
 export const ToolContainer = styled.div`
   width: 100%;
   margin: 0 auto;
   display: flex;
+  overflow-x: hidden;
+  position: relative;
 `;
 
-export const BackIcon = styled(Button)`
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  position: absolute;
-  z-index: 3;
-  top: 10px;
-  left: 10px;
-  svg {
-    path {
+export const FactoryHeader = styled.div`
+  display: flex;
+  width: 100%;
+  background-color: ${({ theme }) => theme.color.white};
+  position: fixed;
+  z-index: 34;
+  top: 0px;
+  flex-direction: column;
+`;
+
+export const FactoryUtills = styled.div`
+  height: 64px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 3em;
+  align-items: center;
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
+  h1 {
+    margin: 0;
+    padding: 0.4em;
+    text-align: center;
+  }
+
+  & > div {
+    display: flex;
+    button {
+      span {
+        font-weight: 500;
+        font-size: 15px;
+      }
+    }
+    button + button {
+      margin-left: 6px;
+    }
+
+    /* 저장 버튼 */
+    button:nth-of-type(3) {
+      background-color: ${({ theme }) => theme.color.secondary};
       color: ${({ theme }) => theme.color.white};
     }
   }
 `;
 
-export const Factory = styled.div`
+export const FactoryTool = styled.div`
   display: flex;
-  position: absolute;
-  right: 10px;
-  z-index: 33;
-  top: 10px;
-  button {
-    svg {
-      font-size: 16px;
-      path {
-        fill: ${({ theme }) => theme.color.primary};
+  align-items: center;
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
+  justify-content: center;
+
+  & > div:nth-of-type(1) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    button {
+      small {
+        margin-left: 3px;
+        font-size: 12px;
+        color: ${({ theme }) => theme.color.gray800};
+      }
+      svg {
+        font-size: 16px;
+        path {
+          fill: ${({ theme }) => theme.color.secondarydark};
+        }
       }
     }
+  }
+`;
+
+export const FrameTool = styled.div`
+  position: absolute;
+  right: 0;
+  display: flex;
+
+  button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+      font-size: 18px;
+      path {
+      }
+    }
+
+    small {
+      margin-left: 3px;
+      font-size: 12px;
+      color: ${({ theme }) => theme.color.gray800};
+    }
+  }
+`;
+
+export const SelectedFrameWrapper = styled.div`
+  width: 100%;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 115px 10px 50px 10px;
+
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 34;
   }
 `;
 
@@ -98,37 +178,59 @@ export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
 
 export const ImageWrapper = styled.div<{
   bgColor?: string;
+  isNearingX?: boolean;
+  isNearingY?: boolean;
+  isFitX?: boolean;
+  isFitY?: boolean;
   imgUploadLoading?: boolean;
-  cmd?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
+  cmd?: ResizeCmd | null;
 }>`
   background-color: ${({ bgColor }) => bgColor};
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 15px 0;
+  padding: 115px 10px 50px 10px;
   margin: 0 auto;
   text-align: center;
   position: relative;
   min-height: 100vh;
+
+  ${({ isNearingX, isFitX, theme }) =>
+    isNearingX &&
+    css`
+      &:before {
+        position: absolute;
+        width: 2px;
+        top: 0;
+        height: 100%;
+        content: '';
+        border: 1px ${isFitX ? 'solid' : 'dashed'} ${theme.color.primary};
+        z-index: 33;
+      }
+    `}
+
+  ${({ isNearingY, isFitY, theme }) =>
+    isNearingY &&
+    css`
+      &:after {
+        position: absolute;
+        width: 100%;
+        top: (50% - 105px);
+        transform: translateY(-50%);
+        height: 2px;
+        content: '';
+        z-index: 33;
+        border: 1px ${isFitY ? 'solid' : 'dashed'} ${theme.color.primary};
+      }
+    `}
+
 
   ${({ imgUploadLoading }) =>
     imgUploadLoading &&
     css`
       opacity: 0.3;
     `}
-
-  small {
-    position: absolute;
-    top: 25px;
-    z-index: 3;
-    padding: 8px;
-    font-weight: bold;
-    border: 1px solid ${({ theme }) => theme.color.primary};
-    border-radius: 20px;
-    background-color: ${({ theme }) => theme.color.secondarybg};
-    color: ${({ theme }) => theme.color.primary};
-  }
 
   ${({ cmd }) => {
     if (!cmd) return;
@@ -143,8 +245,9 @@ export const ImageWrapper = styled.div<{
   }}
 
   img {
-    max-height: 100vh;
+    max-height: ${() => 'calc(100vh - 170px)'};
   }
+
   .cropped-img {
     position: absolute;
     z-index: 3;
@@ -178,9 +281,44 @@ export const ImageWrapper = styled.div<{
   }
 `;
 
+export const ImageShowingWidthHeight = styled.small`
+  position: absolute;
+  top: 110px;
+  z-index: 33;
+  padding: 8px;
+  font-weight: bold;
+  border: 1px solid ${({ theme }) => theme.color.primary};
+  border-radius: 20px;
+  background-color: ${({ theme }) => theme.color.secondarybg};
+  color: ${({ theme }) => theme.color.primary};
+
+  /* 사진 edit btn */
+  span {
+    position: absolute;
+    cursor: pointer;
+    right: -35px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    border: 1px solid ${({ theme }) => theme.color.primary};
+    background-color: ${({ theme }) => theme.color.secondarybg};
+    svg {
+      font-size: 16px;
+
+      path {
+        fill: ${({ theme }) => theme.color.primary};
+      }
+    }
+  }
+`;
+
 export const ImgControlelr = styled.div<{
   isResizeStart: boolean;
-  cmd: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
+  cmd: ResizeCmd | null;
 }>`
   position: relative;
   border: ${({ theme, isResizeStart }) => isResizeStart && `2px solid ${theme.color.cyan}`};
@@ -200,6 +338,18 @@ export const ImgControlelr = styled.div<{
         cursor: nwse-resize;
       `;
     }
+    if (cmd === 'right' || cmd === 'left') {
+      return css`
+        cursor: ew-resize;
+      `;
+    }
+
+    if (cmd === 'bottom-center' || cmd === 'top-center') {
+      return css`
+        cursor: ns-resize;
+      `;
+    }
+
     return css`
       cursor: nesw-resize;
     `;
@@ -213,6 +363,7 @@ button {
     height: 100%;
     top: 0;
     left: 0;
+    cursor: pointer;
   }
 
   /* top-left */
@@ -228,8 +379,21 @@ button {
     cursor: nwse-resize;
   }
 
-  /* top-right */
+  /* top-center */
   div:nth-of-type(2) {
+    position: absolute;
+    top: -3px;
+    transform: translateX(-50%);
+    left: 50%;
+    width: 20px;
+    height: 5px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
+    cursor: ns-resize;
+  }
+
+  /* top-right */
+  div:nth-of-type(3) {
     position: absolute;
     top: -4px;
     right: -4px;
@@ -241,8 +405,21 @@ button {
     cursor: nesw-resize;
   }
 
+  /* right */
+  div:nth-of-type(4) {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: -3px;
+    width: 5px;
+    height: 20px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
+    cursor: ew-resize;
+  }
+
   /* bottom-left */
-  div:nth-of-type(3) {
+  div:nth-of-type(5) {
     position: absolute;
     bottom: -4px;
     left: -4px;
@@ -254,8 +431,21 @@ button {
     cursor: nesw-resize;
   }
 
+  /* bottom-center */
+  div:nth-of-type(6) {
+    position: absolute;
+    bottom: -3px;
+    transform: translateX(-50%);
+    left: 50%;
+    width: 20px;
+    height: 5px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
+    cursor: ns-resize;
+  }
+
   /* bottom-right */
-  div:nth-of-type(4) {
+  div:nth-of-type(7) {
     position: absolute;
     bottom: -4px;
     right: -4px;
@@ -267,39 +457,17 @@ button {
     cursor: nwse-resize;
   }
 
-  /* edit btn */
-  span {
+  /* left */
+  div:nth-of-type(8) {
     position: absolute;
-    bottom: -30px;
-    left: 50%;
-    cursor: pointer;
-    svg {
-      font-size: 18px;
-
-      path {
-        fill: ${({ theme }) => theme.color.yellow};
-      }
-    }
-  }
-`;
-
-export const VersatileWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  z-index: 3;
-  padding: 4px;
-  position: absolute;
-  top: 50px;
-  right: 4px;
-`;
-
-export const FactoryTitle = styled.div`
-  width: 100%;
-  display: flex;
-  margin-bottom: 3px;
-  font-size: 14px;
-  div {
-    margin-left: auto;
+    bottom: 50%;
+    transform: translateY(50%);
+    width: 5px;
+    height: 20px;
+    left: -3px;
+    background: ${({ theme }) => theme.color.white};
+    border: 1px solid ${({ theme }) => theme.color.blue};
+    cursor: ew-resize;
   }
 `;
 
@@ -327,23 +495,70 @@ export const ColorPaletteFreeColor = styled.div`
   border-top: 1px solid #dbdbdb;
 `;
 
-export const FrameWrapper = styled(Card)`
-  border: 1px solid #dbdbdb;
-  margin-top: 6px;
-  div {
+export const FrameWrapper = styled.div`
+  & > div {
+    position: absolute;
+    top: 115px;
+    right: 5px;
+    z-index: 30;
+    text-align: center;
+    border: 1px solid ${({ theme }) => theme.color.gray300};
+    background-color: ${({ theme }) => theme.color.white};
+    border-radius: 20px;
+    padding: 1em;
     display: flex;
-    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    & > div {
+      flex-direction: column;
+      display: flex;
+    }
   }
 
-  div + div {
-    margin-left: 8px;
+  /* 접는 아이콘 */
+  & > span {
+    z-index: 33;
+    cursor: pointer;
+    position: fixed;
+    top: 118px;
+    right: 20px;
+    fill: ${({ theme }) => theme.color.secondarydark};
+    padding: 3px 6px;
+    border-radius: 20px;
+    &:hover {
+      background-color: ${({ theme }) => theme.color.gray300};
+    }
+  }
+
+  small {
+    font-size: 8px;
+  }
+
+  button {
+    width: 80px;
+    height: 30px;
+    font-size: 14px;
+    padding: 0;
+    margin-top: 10px;
+
+    svg {
+      font-size: 12px;
+      path {
+        fill: ${({ theme }) => theme.color.secondary};
+      }
+    }
   }
 `;
 
-export const FrameSize = styled.div<{ width: string; height: string }>`
+export const FrameSizeList = styled.div<{ width: string; height: string }>`
   width: ${({ width }) => `${+width.replace('px', '') / 5}px`};
   height: ${({ height }) => `${+height.replace('px', '') / 5}px`};
-  border: 1px solid #333;
+  z-index: 30;
+  background-color: ${({ theme }) => theme.color.secondarybg};
+  cursor: pointer;
+  margin: 10px 10px 5px 10px;
   position: relative;
 `;
 
@@ -352,37 +567,44 @@ export const FrameSizeName = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  display: flex !important;
+  font-size: 12px;
 `;
 
 export const CanvasInfomationWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 8px;
-  border-radius: 4px;
-  button {
-    width: 100%;
-  }
-
-  div {
-    display: flex;
-  }
+  width: 200px;
 `;
 
 export const BillInfomation = styled.div`
   display: flex;
   flex-direction: column;
   background-color: ${({ theme }) => theme.color.white};
-  padding: 6px 8px;
-  border-bottom: 1px solid #dbdbdb;
-  margin-bottom: 8px;
-  border-radius: 4px;
+`;
 
-  & > div:nth-of-type(1) {
+export const Bill = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.3em;
+
+  div {
     display: flex;
-    flex-direction: column;
-    & > div:last-child {
-      margin-bottom: 4px;
-      border-bottom: 1px solid ${({ theme }) => theme.color.gray400};
-    }
+    justify-content: space-between;
+    color: ${({ theme }) => theme.color.gray700};
   }
+
+  /* 액자 이름 */
+  & > div > div:nth-of-type(1) {
+    font-weight: bold;
+  }
+`;
+
+export const BillTotal = styled.div`
+  width: 100%;
+  padding-top: 0.3em;
+  border-top: 1px solid ${({ theme }) => theme.color.gray300};
+  text-align: right;
+  font-weight: bold;
+  font-size: 18px;
 `;
