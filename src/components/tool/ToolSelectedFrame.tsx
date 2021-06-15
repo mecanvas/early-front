@@ -7,10 +7,11 @@ import { isMobile } from 'react-device-detect';
 interface Props {
   width?: number;
   height?: number;
+  isMobileSelectFrame: boolean;
   onClick: () => void;
 }
 
-const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
+const ToolSelectedFrame = memo(({ width, height, onClick, isMobileSelectFrame }: Props) => {
   const selectFrameWrapper = useRef<HTMLDivElement>(null);
   const selectFrameRef = useRef<HTMLCanvasElement>(null);
   const frameWidth = useMemo(() => width || 0, [width]);
@@ -30,6 +31,7 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
   const [, setIsNearingY] = useGlobalState('isNearingY', false);
   const [, setIsFitX] = useGlobalState('isFitX', false);
   const [, setIsFitY] = useGlobalState('isFitY', false);
+  const [isMobileFrame, setIsMobileFrame] = useGlobalState('isMobileFrame', false);
 
   // 액자의 크기에 맞춰 x, y선 평행 TODO: 추후 모든 액자에.. 요 기능을 담아야지않을까?
   const checkNearingParallelForBox = useCallback(() => {
@@ -126,21 +128,16 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
     (e: MouseEvent | TouchEvent) => {
       const canvas = selectFrameRef.current;
       const canvasWrapper = selectFrameWrapper.current;
-
+      // 모바일일때 액자를 눌러야 발생하게끔.
+      if (isMobile && !isMobileFrame) {
+        setIsMobileFrame(true);
+      }
       if (canvas && canvasWrapper) {
         if (!frameWidth || !frameHeight) return;
         const { width: canvasWidth, height: canvasHeight } = canvasWrapper.getBoundingClientRect();
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
         const ctx = canvas.getContext('2d');
-        if (e instanceof TouchEvent) {
-          if (ctx) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = '#333';
-            ctx.strokeRect(0, 100, frameWidth, frameHeight);
-            ctx.stroke();
-          }
-        }
 
         const [x, y] = getPosition(e);
         const positionLeft = x - frameWidth / 2;
@@ -160,6 +157,8 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
       requestAnimationFrame(() => handleDrawingFrame);
     },
     [
+      setIsMobileFrame,
+      isMobileFrame,
       frameWidth,
       frameHeight,
       getPosition,
@@ -183,7 +182,7 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
     };
   }, [handleDrawingFrame, height, width]);
 
-  useEffect(() => {
+  const createInitialFrame = useCallback(() => {
     if (!isMobile) return;
     if (!selectFrameWrapper.current || !selectFrameRef.current) return;
     const canvas = selectFrameRef.current;
@@ -195,9 +194,19 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
     if (ctx) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.strokeStyle = '#333';
-      ctx.strokeRect(0, 105, frameWidth, frameHeight);
+      ctx.strokeRect(canvasWidth / 2, canvasHeight / 2, frameWidth, frameHeight);
       ctx.stroke();
     }
+  }, [frameHeight, frameWidth]);
+
+  useEffect(() => {
+    if (isMobileSelectFrame) {
+      createInitialFrame();
+    }
+  }, [createInitialFrame, isMobileSelectFrame]);
+
+  useEffect(() => {
+    createInitialFrame();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

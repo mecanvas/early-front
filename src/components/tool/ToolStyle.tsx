@@ -15,7 +15,7 @@ export const FactoryHeader = styled.div`
   width: 100%;
   background-color: ${({ theme }) => theme.color.white};
   position: fixed;
-  z-index: 34;
+  z-index: 340;
   top: 0px;
   flex-direction: column;
 `;

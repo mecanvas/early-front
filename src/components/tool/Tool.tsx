@@ -129,6 +129,8 @@ const Tool = () => {
   );
 
   const [isSelectFrame, setIsSelectFrame] = useState(false); // 골랐는지 상태 여부
+  const [isMobileSelectFrame, setIsMobileSelectFrame] = useState(false); // 모바일 전용, 액자 선택시 그려주기 위함임.
+
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
   const [canvasPosition] = useGlobalState<CanvasPosition>('canvasPosition');
   const [canvasFrameSizeInfo] = useGlobalState<CanvasFrameSizeInfo>('canvasFrameSizeInfo');
@@ -150,6 +152,7 @@ const Tool = () => {
   const [canvasFramePositionList, setCanvasFramePositionList] = useState<number[]>([]);
   const [selectedFrameList, setSelectedFrameList] = useState<HTMLCanvasElement[]>([]);
   const [yourSelectedFrame, setYourSelectedFrame] = useState<CanvasFrameSizeInfo | null>(null);
+  const [isMobileFrame, setIsMobileFrame] = useGlobalState('isMobileFrame');
 
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
 
@@ -510,7 +513,7 @@ const Tool = () => {
   );
 
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
-  const insertFrameToCanvas = useCallback(async () => {
+  const insertFrameToCanvas = useCallback(() => {
     if (imgNode.current && selectedFrameInfo) {
       //  액자의 가격을 price에 넣기
       const { name, price, cm } = selectedFrameInfo;
@@ -523,16 +526,28 @@ const Tool = () => {
 
   //   따라다니는 액자를 재클릭하면 insert하고 사라짐.
   const handleFrameRelease = useCallback(() => {
+    if (!isMobileFrame) return;
     if (!isSelectFrame) return;
     insertFrameToCanvas();
+    setIsMobileFrame(false);
     setIsNearingX(false);
     setIsNearingY(false);
     setIsFitX(false);
     setIsFitY(false);
     setIsSelectFrame(() => false);
+    setIsMobileSelectFrame(() => false);
     setSelectedFrameInfo(() => null);
     setYourSelectedFrame(() => null);
-  }, [isSelectFrame, insertFrameToCanvas, setIsNearingX, setIsNearingY, setIsFitX, setIsFitY]);
+  }, [
+    isSelectFrame,
+    isMobileFrame,
+    setIsMobileFrame,
+    insertFrameToCanvas,
+    setIsNearingX,
+    setIsNearingY,
+    setIsFitX,
+    setIsFitY,
+  ]);
 
   //   액자를 클릭하묜?
   const handleFrameSelect = useCallback(
@@ -540,6 +555,9 @@ const Tool = () => {
       const { value } = e.currentTarget.dataset;
       const el = imgNode.current;
 
+      if (isSelectFrame) {
+        setIsMobileSelectFrame(true);
+      }
       if (el) {
         const seletctedName = frameSize.filter((lst) => {
           if (lst.name === value) {
@@ -554,7 +572,7 @@ const Tool = () => {
         setSelectedFrameInfo(seletctedName[0]);
       }
     },
-    [frameSize],
+    [frameSize, isSelectFrame],
   );
 
   const handleResizeReset = useCallback(() => {
@@ -865,7 +883,13 @@ const Tool = () => {
         >
           {imgUploadUrl ? (
             <>
-              {isSelectFrame && <ToolSelectedFrame {...yourSelectedFrame} onClick={handleFrameRelease} />}
+              {isSelectFrame && (
+                <ToolSelectedFrame
+                  {...yourSelectedFrame}
+                  onClick={handleFrameRelease}
+                  isMobileSelectFrame={isMobileSelectFrame}
+                />
+              )}
 
               {isResizeMode && (
                 <>

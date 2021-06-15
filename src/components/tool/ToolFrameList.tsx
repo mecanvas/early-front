@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { FrameAttributes, FrameSize } from 'src/interfaces/ToolInterface';
 import { FrameWrapper, FrameSizeList, FrameSizeName } from './ToolStyle';
+import { isMobile } from 'react-device-detect';
 
 interface Props extends FrameAttributes {
   frameSize: FrameSize[];
@@ -25,21 +26,21 @@ const ToolFrame = ({ frameSize, attribute, onClick, onChangeVertical }: Props) =
 
   const [frameRendering, api] = useSpring(() => ({
     to: { translateX: 0 },
-    from: { translateX: 200 },
+    from: { translateX: !isMobile ? 200 : window.innerWidth },
     config: { duration: 400 },
   }));
 
   useEffect(() => {
-    api.update({ from: { translateX: 200 }, to: { translateX: 0 } });
+    api.update({ from: { translateX: !isMobile ? 200 : window.innerWidth }, to: { translateX: 0 } });
     api.start();
   }, [attribute, api]);
 
   useEffect(() => {
     if (isFold) {
-      api.update({ from: { translateX: 0 }, to: { translateX: 200 } });
+      api.update({ from: { translateX: 0 }, to: { translateX: !isMobile ? 200 : window.innerWidth } });
       api.start();
     } else {
-      api.update({ from: { translateX: 200 }, to: { translateX: 0 } });
+      api.update({ from: { translateX: !isMobile ? 200 : window.innerWidth }, to: { translateX: 0 } });
       api.start();
     }
   }, [api, isFold]);
