@@ -164,6 +164,7 @@ export const FrameTool = styled.div`
 export const SelectedFrameWrapper = styled.div`
   width: 100%;
   height: 100vh;
+  min-height: -webkit-fill-available;
   position: absolute;
   top: 0;
   left: 0;
@@ -253,6 +254,7 @@ export const ImageWrapper = styled.div<{
   text-align: center;
   position: relative;
   min-height: 100vh;
+  max-height: -webkit-fill-available;
 
   @media all and (max-width: ${({ theme }) => theme.size.md}) {
     flex-direction: row;
