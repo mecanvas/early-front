@@ -204,17 +204,20 @@ const Tool = () => {
   const [isResizeMode, setIsResizeMode] = useState(false);
 
   const positioningImageResize = useCallback((resizeCmd: ResizeCmd | null, x: number, y: number) => {
-    if (!imgNode.current) return;
+    if (!imgNode.current || !resizeCmd) return;
     const { width, height, left, top, right } = imgNode.current.getBoundingClientRect();
     const absX = Math.abs(x - Math.ceil(left));
     const absY = Math.abs(height + Math.ceil(top - y));
     const absLeftX = Math.abs(x - Math.ceil(right));
     const absBottomY = Math.abs(y + height - (top + height)); // bottom - top <- 이거 풀어씀.
 
+    // 모바일에서 계산시 너무 큰 수(?)이라서 nan이 뜨는 듯함. 예외처리해주깅
+    if (isNaN(absX) || isNaN(absY) || isNaN(absLeftX) || isNaN(absBottomY)) return;
+
     let newWidth = width;
     let newHeight = height;
 
-    const getNewHeight = (x: number) => {
+    const getNewHeight = (x: number): number => {
       return (x * height) / width;
     };
 
@@ -889,17 +892,39 @@ const Tool = () => {
                 />
                 {isResizeMode ? (
                   <>
-                    <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="top-center" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
+                    <div
+                      data-cmd="top-left"
+                      onMouseDown={handleImgResizeStart}
+                      onTouchStart={handleImgResizeStart}
+                    ></div>
+                    <div
+                      data-cmd="top-center"
+                      onMouseDown={handleImgResizeStart}
+                      onTouchStart={handleImgResizeStart}
+                    ></div>
+                    <div
+                      data-cmd="top-right"
+                      onMouseDown={handleImgResizeStart}
+                      onTouchStart={handleImgResizeStart}
+                    ></div>
+                    <div data-cmd="right" onMouseDown={handleImgResizeStart} onTouchStart={handleImgResizeStart}></div>
+                    <div
+                      data-cmd="bottom-left"
+                      onMouseDown={handleImgResizeStart}
+                      onTouchStart={handleImgResizeStart}
+                    ></div>
+                    <div
+                      data-cmd="bottom-center"
+                      onMouseDown={handleImgResizeStart}
+                      onTouchStart={handleImgResizeStart}
+                    ></div>
+                    <div
+                      data-cmd="bottom-right"
+                      onMouseDown={handleImgResizeStart}
+                      onTouchStart={handleImgResizeStart}
+                    ></div>
 
-                    <div data-cmd="right" onMouseDown={handleImgResizeStart}></div>
-
-                    <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="bottom-center" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
-
-                    <div data-cmd="left" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="left" onMouseDown={handleImgResizeStart} onTouchStart={handleImgResizeStart}></div>
                   </>
                 ) : (
                   <button type="button" onClick={handleResizeMode}></button>
