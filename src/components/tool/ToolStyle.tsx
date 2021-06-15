@@ -520,20 +520,38 @@ export const ColorPaletteFreeColor = styled.div`
 `;
 
 export const FrameWrapper = styled.div`
+  position: absolute;
+  top: 109px;
+  right: 5px;
+  z-index: 340;
+
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    width: 100%;
+  }
+
   & > div {
-    position: absolute;
-    top: 115px;
-    right: 5px;
-    z-index: 30;
-    text-align: center;
+    border-radius: 20px;
     border: 1px solid ${({ theme }) => theme.color.gray300};
     background-color: ${({ theme }) => theme.color.white};
-    border-radius: 20px;
+    text-align: center;
     padding: 1em;
+    padding-top: 1.5em;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
+
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      flex-direction: row;
+      justify-content: space-evenly;
+      align-items: center;
+      padding: 0.2em;
+
+      div {
+        margin: 0 auto;
+        line-height: 14px;
+      }
+    }
 
     & > div {
       flex-direction: column;
@@ -546,11 +564,16 @@ export const FrameWrapper = styled.div`
     z-index: 33;
     cursor: pointer;
     position: fixed;
-    top: 118px;
+    top: 110px;
     right: 20px;
     fill: ${({ theme }) => theme.color.secondarydark};
     padding: 3px 6px;
     border-radius: 20px;
+
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      padding: 1.5px 3px;
+    }
+
     &:hover {
       background-color: ${({ theme }) => theme.color.gray300};
     }
@@ -565,7 +588,7 @@ export const FrameWrapper = styled.div`
     height: 30px;
     font-size: 14px;
     padding: 0;
-    margin-top: 10px;
+    margin-top: 0.7em;
 
     svg {
       font-size: 12px;
@@ -582,8 +605,12 @@ export const FrameSizeList = styled.div<{ width: string; height: string }>`
   z-index: 30;
   background-color: ${({ theme }) => theme.color.secondarybg};
   cursor: pointer;
-  margin: 10px 10px 5px 10px;
+  margin: 10px auto 5px auto;
   position: relative;
+
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    margin: 5px 2.5px;
+  }
 `;
 
 export const FrameSizeName = styled.div`
@@ -593,6 +620,12 @@ export const FrameSizeName = styled.div`
   transform: translate(-50%, -50%);
   display: flex !important;
   font-size: 12px;
+  width: 100%;
+  justify-content: center;
+
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    font-size: 9px;
+  }
 `;
 
 export const CanvasInfomationWrapper = styled.div`
