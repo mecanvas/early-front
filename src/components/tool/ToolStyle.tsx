@@ -27,10 +27,21 @@ export const FactoryUtills = styled.div`
   padding: 0 3em;
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
+
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    border-bottom: none;
+    height: 40px;
+    padding: 0 0.5em;
+  }
+
   h1 {
     margin: 0;
     padding: 0.4em;
     text-align: center;
+
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      font-size: 22px;
+    }
   }
 
   & > div {
@@ -45,10 +56,38 @@ export const FactoryUtills = styled.div`
       margin-left: 6px;
     }
 
+    /* 예상가격 */
+    button:nth-of-type(1) {
+      @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+        display: none;
+      }
+    }
+
+    /* 미리보기/이미지 버튼 */
+    button:nth-of-type(2) {
+      @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+        padding: 0em 0.6em;
+        height: 30px;
+        span {
+          font-size: 14px;
+          line-height: 30px;
+        }
+      }
+    }
+
     /* 저장 버튼 */
     button:nth-of-type(3) {
       background-color: ${({ theme }) => theme.color.secondary};
       color: ${({ theme }) => theme.color.white};
+
+      @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+        padding: 0em 0.6em;
+        height: 30px;
+        span {
+          line-height: 30px;
+          font-size: 14px;
+        }
+      }
     }
   }
 `;
@@ -59,7 +98,7 @@ export const FactoryTool = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
   justify-content: center;
 
-  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     justify-content: space-around;
   }
 
@@ -75,6 +114,9 @@ export const FactoryTool = styled.div`
       }
       svg {
         font-size: 16px;
+        @media all and (max-width: ${({ theme }) => theme.size.xs}) {
+          font-size: 13px;
+        }
         path {
           fill: ${({ theme }) => theme.color.secondarydark};
         }
@@ -214,6 +256,7 @@ export const ImageWrapper = styled.div<{
 
   @media all and (max-width: ${({ theme }) => theme.size.md}) {
     flex-direction: row;
+    padding: 81px 10px 50px 10px;
   }
 
   ${({ isNearingX, isFitX, theme }) =>
@@ -316,6 +359,16 @@ export const ImageShowingWidthHeight = styled.small`
   background-color: ${({ theme }) => theme.color.secondarybg};
   color: ${({ theme }) => theme.color.primary};
 
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    top: 150px;
+    right: 35px;
+    font-size: 13px;
+  }
+
+  @media all and (max-width: ${({ theme }) => theme.size.xs}) {
+    font-size: 11px;
+  }
+
   /* 사진 edit btn */
   span {
     position: absolute;
@@ -330,9 +383,17 @@ export const ImageShowingWidthHeight = styled.small`
     border-radius: 20px;
     border: 1px solid ${({ theme }) => theme.color.primary};
     background-color: ${({ theme }) => theme.color.secondarybg};
+
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      top: 1px;
+      width: 28px;
+      height: 28px;
+    }
     svg {
       font-size: 16px;
-
+      @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+        font-size: 14px;
+      }
       path {
         fill: ${({ theme }) => theme.color.primary};
       }
@@ -527,6 +588,7 @@ export const FrameWrapper = styled.div`
 
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     width: 100%;
+    top: 81px;
   }
 
   & > div {
@@ -571,6 +633,7 @@ export const FrameWrapper = styled.div`
     border-radius: 20px;
 
     @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      top: 82px;
       padding: 1.5px 3px;
     }
 
@@ -583,12 +646,20 @@ export const FrameWrapper = styled.div`
     font-size: 8px;
   }
 
+  /* 가로/세로 체인지 버튼 */
   button {
     width: 80px;
     height: 30px;
     font-size: 14px;
     padding: 0;
     margin-top: 0.7em;
+
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      padding: 1.5px 3px;
+      position: absolute;
+      right: 14px;
+      width: fit-content;
+    }
 
     svg {
       font-size: 12px;
