@@ -2,6 +2,7 @@ import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useGlobalState } from 'src/hooks';
 import { CanvasFrameSizeInfo, CanvasPosition } from 'src/interfaces/ToolInterface';
 import { SelectedFrameWrapper } from './ToolStyle';
+import { isMobile } from 'react-device-detect';
 
 interface Props {
   width?: number;
@@ -110,14 +111,19 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
     [setIsFitX, setIsFitY, setIsNearingX, setIsNearingY],
   );
 
-  const getPosition = useCallback((event: MouseEvent) => {
+  const getPosition = useCallback((event: MouseEvent | TouchEvent) => {
+    if (event instanceof TouchEvent) {
+      const x = event.changedTouches[0].clientX;
+      const y = event.changedTouches[0].clientY;
+      return [x, y];
+    }
     const x = event.clientX;
     const y = event.clientY;
     return [x, y];
   }, []);
 
   const handleDrawingFrame = useCallback(
-    (e: MouseEvent) => {
+    (e: MouseEvent | TouchEvent) => {
       const canvas = selectFrameRef.current;
       const canvasWrapper = selectFrameWrapper.current;
 
@@ -127,6 +133,15 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
         const ctx = canvas.getContext('2d');
+        if (e instanceof TouchEvent) {
+          if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#333';
+            ctx.strokeRect(0, 100, frameWidth, frameHeight);
+            ctx.stroke();
+          }
+        }
+
         const [x, y] = getPosition(e);
         const positionLeft = x - frameWidth / 2;
         const positionTop = y - frameHeight / 2;
@@ -161,14 +176,34 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
     const canvasWrapper = selectFrameWrapper.current;
     if (!canvasWrapper) return;
     canvasWrapper.addEventListener('mousemove', handleDrawingFrame);
+    canvasWrapper.addEventListener('touchmove', handleDrawingFrame);
     return () => {
       canvasWrapper.removeEventListener('mousemove', handleDrawingFrame);
+      canvasWrapper.removeEventListener('touchmove', handleDrawingFrame);
     };
   }, [handleDrawingFrame, height, width]);
 
+  useEffect(() => {
+    if (!isMobile) return;
+    if (!selectFrameWrapper.current || !selectFrameRef.current) return;
+    const canvas = selectFrameRef.current;
+    const canvasWrapper = selectFrameWrapper.current;
+    const { width: canvasWidth, height: canvasHeight } = canvasWrapper.getBoundingClientRect();
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#333';
+      ctx.strokeRect(0, 105, frameWidth, frameHeight);
+      ctx.stroke();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <SelectedFrameWrapper ref={selectFrameWrapper}>
-      <canvas ref={selectFrameRef} onClick={onClick}></canvas>
+      <canvas ref={selectFrameRef} onMouseDown={onClick} onTouchEnd={onClick}></canvas>
     </SelectedFrameWrapper>
   );
 });

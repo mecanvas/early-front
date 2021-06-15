@@ -541,10 +541,6 @@ const Tool = () => {
       const el = imgNode.current;
 
       if (el) {
-        const { width, height } = el.getBoundingClientRect();
-        el.style.width = `${width}px`;
-        el.style.height = `${height}px`;
-
         const seletctedName = frameSize.filter((lst) => {
           if (lst.name === value) {
             setYourSelectedFrame({
