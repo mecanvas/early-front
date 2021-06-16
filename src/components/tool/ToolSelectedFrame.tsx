@@ -38,11 +38,12 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
     const { left, top } = canvasPosition;
     const right = left + width;
     const bottom = top + height;
+    const diffY = window.innerWidth >= 768 ? 32 : 14;
 
     const isNearingAxisXByBox = (conditionValue: number) =>
       Math.abs(right - centerX) < conditionValue || Math.abs(left - centerX) < conditionValue;
     const isNearingAxisYByBox = (conditionValue: number) =>
-      Math.abs(top - centerY - 32) < conditionValue || Math.abs(bottom - centerY - 32) < conditionValue;
+      Math.abs(top - centerY - diffY) < conditionValue || Math.abs(bottom - centerY - diffY) < conditionValue;
     if (isNearingAxisXByBox(5.5) || isNearingAxisYByBox(5.5)) {
       if (isNearingAxisXByBox(5.5) && isNearingAxisYByBox(5.5)) {
         if (isNearingAxisXByBox(1.1) || isNearingAxisYByBox(1.1)) {
@@ -72,9 +73,11 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
   // 커서가 x, y축 중 하나라도 정 중앙에 위치하게 되면 평행선을 solid로 바꿉니다.
   const checkNearingCenterForMouse = useCallback(
     (cursorX: number, cursorY: number) => {
+      const diffY = window.innerWidth >= 768 ? 32 : 14;
+
       const isNearingAxisX = (conditionValue: number) => Math.abs(cursorX - window.innerWidth / 2) < conditionValue;
       const isNearingAxisY = (conditionValue: number) =>
-        Math.abs(cursorY - 32 - window.innerHeight / 2) < conditionValue;
+        Math.abs(cursorY - diffY - window.innerHeight / 2) < conditionValue;
 
       // 초기 시작시 false로 초기화.
       setIsNearingX(false);
