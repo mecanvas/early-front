@@ -260,9 +260,19 @@ const Tool = () => {
     const [w, h] = getOriginRatio(originWidth, originHeight);
     const newWidth = w * resizeHeight;
     const newHeight = h * newWidth;
+
+    // 너비가 벗어나는 상황에선 너비에 맞춰 높이 비율을 맞춤
+    if (newWidth > window.innerWidth) {
+      const newHeight = h * resizeWidth;
+      const newWidth = w * newHeight;
+      setResizeWidth(+newWidth.toFixed());
+      setResizeHeight(+newHeight.toFixed());
+      return;
+    }
+
     setResizeWidth(+newWidth.toFixed());
     setResizeHeight(+newHeight.toFixed());
-  }, [originHeight, originWidth, resizeHeight]);
+  }, [originHeight, originWidth, resizeHeight, resizeWidth]);
 
   const handleResizeMode = useCallback((e) => {
     e.stopPropagation();
