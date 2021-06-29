@@ -10,7 +10,7 @@ import {
   DropZone,
   CanvasInfomationWrapper,
   DropZoneDiv,
-  ImgControlelr,
+  ImgController,
   FactoryHeader,
   FactoryTool,
   FrameTool,
@@ -37,6 +37,7 @@ import { FrameSize, CanvasPosition, FramePrice, CanvasFrameSizeInfo, ResizeCmd }
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 import ToolSelectedFrame from './ToolSelectedFrame';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
+import { getS3 } from 'src/utils/getS3';
 
 const Tool = () => {
   const router = useRouter();
@@ -844,6 +845,8 @@ const Tool = () => {
         </Modal>
 
         <ImageWrapper
+          isPreview={isPreview}
+          previewBg={getS3('bg1.jpg')}
           imgUploadLoading={imgUploadLoading}
           id="img-box"
           data-component="wrapper"
@@ -873,7 +876,7 @@ const Tool = () => {
                   </ImageShowingWidthHeight>
                 </>
               )}
-              <ImgControlelr data-layout="inner" isResizeStart={isResizeMode} cmd={resizeCmd}>
+              <ImgController data-layout="inner" isResizeStart={isResizeMode} cmd={resizeCmd}>
                 <img
                   onMouseUp={handleImgResizeEnd}
                   ref={imgNode}
@@ -898,7 +901,7 @@ const Tool = () => {
                 ) : (
                   <button type="button" onClick={handleResizeMode}></button>
                 )}
-              </ImgControlelr>
+              </ImgController>
             </>
           ) : (
             <>

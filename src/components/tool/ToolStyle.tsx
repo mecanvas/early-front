@@ -224,8 +224,21 @@ export const ImageWrapper = styled.div<{
   isFitY?: boolean;
   imgUploadLoading?: boolean;
   cmd?: ResizeCmd | null;
+  isPreview?: boolean;
+  previewBg?: string;
 }>`
   background-color: ${({ bgColor }) => bgColor};
+
+  ${({ isPreview, previewBg }) =>
+    isPreview &&
+    previewBg &&
+    css`
+      background-image: url(${previewBg});
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+    `}
+
   width: 100%;
   display: flex;
   justify-content: center;
@@ -370,7 +383,7 @@ export const ImageShowingWidthHeight = styled.small`
   }
 `;
 
-export const ImgControlelr = styled.div<{
+export const ImgController = styled.div<{
   isResizeStart: boolean;
   cmd: ResizeCmd | null;
 }>`
