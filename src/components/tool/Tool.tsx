@@ -876,32 +876,34 @@ const Tool = () => {
                   </ImageShowingWidthHeight>
                 </>
               )}
-              <ImgController data-layout="inner" isResizeStart={isResizeMode} cmd={resizeCmd}>
-                <img
-                  onMouseUp={handleImgResizeEnd}
-                  ref={imgNode}
-                  src={imgUploadUrl}
-                  crossOrigin="anonymous"
-                  alt="캔버스로 만들 이미지"
-                />
-                {isResizeMode ? (
-                  <>
-                    <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="top-center" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
+              {isPreview || (
+                <ImgController data-layout="inner" isResizeStart={isResizeMode} cmd={resizeCmd}>
+                  <img
+                    onMouseUp={handleImgResizeEnd}
+                    ref={imgNode}
+                    src={imgUploadUrl}
+                    crossOrigin="anonymous"
+                    alt="캔버스로 만들 이미지"
+                  />
+                  {isResizeMode ? (
+                    <>
+                      <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
+                      <div data-cmd="top-center" onMouseDown={handleImgResizeStart}></div>
+                      <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
 
-                    <div data-cmd="right" onMouseDown={handleImgResizeStart}></div>
+                      <div data-cmd="right" onMouseDown={handleImgResizeStart}></div>
 
-                    <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="bottom-center" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
+                      <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
+                      <div data-cmd="bottom-center" onMouseDown={handleImgResizeStart}></div>
+                      <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
 
-                    <div data-cmd="left" onMouseDown={handleImgResizeStart}></div>
-                  </>
-                ) : (
-                  <button type="button" onClick={handleResizeMode}></button>
-                )}
-              </ImgController>
+                      <div data-cmd="left" onMouseDown={handleImgResizeStart}></div>
+                    </>
+                  ) : (
+                    <button type="button" onClick={handleResizeMode}></button>
+                  )}
+                </ImgController>
+              )}
             </>
           ) : (
             <>

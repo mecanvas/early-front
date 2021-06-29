@@ -192,6 +192,8 @@ export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: #fff;
+  border: 1px solid #dbdbdb;
   justify-content: center;
   height: 100%;
   p {
