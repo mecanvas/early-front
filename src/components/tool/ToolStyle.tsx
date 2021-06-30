@@ -308,7 +308,14 @@ export const ImageWrapper = styled.div<{
     position: absolute;
     z-index: 3;
     &:hover .cropped-img-delete {
-      display: block;
+      ${({ isPreview }) =>
+        isPreview
+          ? css`
+              display: none;
+            `
+          : css`
+              display: block;
+            `}
     }
   }
   .cropped-img-delete {

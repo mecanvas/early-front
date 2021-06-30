@@ -335,9 +335,7 @@ const Tool = () => {
       if (!acceptedFiles[0].type.includes('image')) {
         return alert('이미지 파일이 아닌건 지원하지 않습니다.');
       }
-      if (acceptedFiles[0].type.includes('svg')) {
-        return alert('svg 파일은 지원하지 않습니다.');
-      }
+
       if (!imgSizeChecker(acceptedFiles[0])) return;
 
       setImgUploadLoading(true);
