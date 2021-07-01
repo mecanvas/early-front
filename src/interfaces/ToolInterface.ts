@@ -1,3 +1,5 @@
+import React from 'react';
+
 export type ResizeCmd =
   | 'top-left'
   | 'top-right'
@@ -38,4 +40,26 @@ export interface FramePrice {
 export interface CanvasPosition {
   left: number;
   top: number;
+}
+
+export interface CroppedFrame {
+  id: string;
+  width: string;
+  height: string;
+  left: string;
+  top: string;
+  dataset: { originleft: string; origintop: string };
+
+  imageCropStyle: {
+    backgroundImage: string;
+    backgroundColor: string;
+    backgroundRepeat: string;
+    backgroundSize: string;
+    backgroundPositionX: string;
+    backgroundPositionY: string;
+    width: string;
+    height: string;
+    boxShadow: string;
+    transform?: string;
+  };
 }

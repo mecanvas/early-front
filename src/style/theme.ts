@@ -2,7 +2,7 @@ export const theme = {
   size: {
     xs: '480px',
     sm: '768px',
-    md: '992px',
+    md: '964px',
     lg: '1200px',
     xl: '1600px',
   },

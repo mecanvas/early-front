@@ -9,3 +9,5 @@ export const API_URL =
 
 // 해당하는 routes들은 false를 반환합니다.
 export const exceptionRoutes = ['/tool', '/404'];
+
+export const S3_URL = 'https://mecanvas-assets.s3.ap-northeast-2.amazonaws.com/assets';

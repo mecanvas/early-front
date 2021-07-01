@@ -192,6 +192,8 @@ export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: #fff;
+  border: 1px solid #dbdbdb;
   justify-content: center;
   height: 100%;
   p {
@@ -224,6 +226,7 @@ export const ImageWrapper = styled.div<{
   isFitY?: boolean;
   imgUploadLoading?: boolean;
   cmd?: ResizeCmd | null;
+  isPreview?: boolean;
 }>`
   background-color: ${({ bgColor }) => bgColor};
   width: 100%;
@@ -292,8 +295,16 @@ export const ImageWrapper = styled.div<{
   .cropped-img {
     position: absolute;
     z-index: 3;
+    box-shadow: 0px 19px 38px rgba(0, 0, 0, 0.3), 15px 5px 38px rgba(0, 0, 0, 0.22);
     &:hover .cropped-img-delete {
-      display: block;
+      ${({ isPreview }) =>
+        isPreview
+          ? css`
+              display: none;
+            `
+          : css`
+              display: block;
+            `}
     }
   }
   .cropped-img-delete {
@@ -370,7 +381,33 @@ export const ImageShowingWidthHeight = styled.small`
   }
 `;
 
-export const ImgControlelr = styled.div<{
+export const PreviewBg = styled.div`
+  position: absolute;
+  top: 115px;
+  min-width: ${({ theme }) => theme.size.md};
+  img {
+    min-height: 626px;
+    object-fit: contain;
+  }
+`;
+
+export const CroppedWrapper = styled.div<{ isPreview: boolean; top?: number; left?: number }>`
+  ${({ isPreview, top, left }) =>
+    isPreview &&
+    left &&
+    top &&
+    css`
+      position: absolute;
+      top: ${top}px;
+      left: ${left}px;
+      transform: scale(0.3);
+      div {
+        box-shadow: 0 19px 38px rgba(0, 0, 0, 0.4), 0 15px 12px rgba(0, 0, 0, 0.32);
+      }
+    `}
+`;
+
+export const ImgController = styled.div<{
   isResizeStart: boolean;
   cmd: ResizeCmd | null;
 }>`
