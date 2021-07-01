@@ -632,7 +632,24 @@ const Tool = () => {
     if (imgNode.current) {
       imgNode.current.style.visibility = isPreview ? 'hidden' : 'visible';
     }
+    if (isPreview) {
+      setCroppedList((prev) =>
+        prev.map((lst) => ({
+          ...lst,
+          transform: `scale(0.3)`,
+        })),
+      );
+    } else {
+      setCroppedList((prev) =>
+        prev.map((lst) => ({
+          ...lst,
+          transform: `scale(1)`,
+        })),
+      );
+    }
   }, [isPreview]);
+
+  console.log(croppedList);
 
   useEffect(() => {
     if (!imgUploadUrl) return;

@@ -1,3 +1,5 @@
+import React from 'react';
+
 export type ResizeCmd =
   | 'top-left'
   | 'top-right'
@@ -58,5 +60,6 @@ export interface CroppedFrame {
     width: string;
     height: string;
     boxShadow: string;
+    transform?: string;
   };
 }
