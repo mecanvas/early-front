@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useGetScollPosition, useGlobalState } from 'src/hooks';
-import { CanvasFramePositionList, CanvasFrameSizeInfo, CanvasPosition } from 'src/interfaces/ToolInterface';
+import { CanvasFrameSizeInfo, CanvasPosition } from 'src/interfaces/ToolInterface';
 import { SelectedFrameWrapper } from './ToolStyle';
 
 interface Props {
@@ -23,7 +23,6 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
     width: 0,
     height: 0,
   });
-  const [canvasFramePositionList] = useGlobalState<CanvasFramePositionList[]>('canvasFramePositionList');
 
   const [centerX] = useGlobalState<number>('centerX');
   const [centerY] = useGlobalState<number>('centerY');
@@ -158,32 +157,32 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
           ctx.stroke();
 
           // checkNearingParallelForEachBox();
-          if (canvasFramePositionList) {
-            canvasFramePositionList.forEach((list) => {
-              const top = positionTop + scrollY;
-              const left = positionLeft + scrollX;
-              const right = left + list.width;
-              const bottom = top + list.height;
+          // if (canvasFramePositionList) {
+          //   canvasFramePositionList.forEach((list) => {
+          //     const top = positionTop + scrollY;
+          //     const left = positionLeft + scrollX;
+          //     const right = left + list.width;
+          //     const bottom = top + list.height;
 
-              console.log(
-                'left',
-                left - list.left,
-                'right',
-                right - list.left + list.width,
-                'top',
-                top - list.top,
-                'bottom',
-                bottom - list.top - list.height,
-              );
-              const isNearingRight = (conditionValue: number) => Math.abs(right - list.left) < conditionValue;
-              const isNearingLeft = (conditionValue: number) =>
-                (left - list.left <= 0 + conditionValue && left - list.left < conditionValue) ||
-                left - list.left <= list.width + conditionValue;
-              const isNearingTop = (conditionValue: number) => Math.abs(top - list.top) < conditionValue;
-              const isNearingBottom = (conditionValue: number) =>
-                Math.abs(bottom - list.top - list.height) < conditionValue;
-            });
-          }
+          //     console.log(
+          //       'left',
+          //       left - list.left,
+          //       'right',
+          //       right - list.left + list.width,
+          //       'top',
+          //       top - list.top,
+          //       'bottom',
+          //       bottom - list.top - list.height,
+          //     );
+          //     const isNearingRight = (conditionValue: number) => Math.abs(right - list.left) < conditionValue;
+          //     const isNearingLeft = (conditionValue: number) =>
+          //       (left - list.left <= 0 + conditionValue && left - list.left < conditionValue) ||
+          //       left - list.left <= list.width + conditionValue;
+          //     const isNearingTop = (conditionValue: number) => Math.abs(top - list.top) < conditionValue;
+          //     const isNearingBottom = (conditionValue: number) =>
+          //       Math.abs(bottom - list.top - list.height) < conditionValue;
+          //   });
+          // }
 
           // top
           ctx.fillStyle = '#1a4ead';
@@ -218,9 +217,6 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
       canvasPosition,
       setCanvasFrameSizeInfo,
       canvasFrameSizeInfo,
-      canvasFramePositionList,
-      scrollY,
-      scrollX,
     ],
   );
 

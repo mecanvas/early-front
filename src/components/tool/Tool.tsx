@@ -41,7 +41,6 @@ import {
   FramePrice,
   CanvasFrameSizeInfo,
   ResizeCmd,
-  CanvasFramePositionList,
   CroppedFrame,
 } from 'src/interfaces/ToolInterface';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
@@ -145,7 +144,7 @@ const Tool = () => {
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
   const [canvasPosition] = useGlobalState<CanvasPosition>('canvasPosition');
   const [canvasFrameSizeInfo] = useGlobalState<CanvasFrameSizeInfo>('canvasFrameSizeInfo');
-  const [croppedList, setCroppedList] = useState<CroppedFrame[]>([]);
+  const [croppedList, setCroppedList] = useGlobalState<CroppedFrame[]>('croppedList', []);
   const [framePreviewMode, setFramePreviewMode] = useState<CanvasPosition | null>(null);
   const [scrollX, scrollY] = useGetScollPosition();
 
@@ -162,10 +161,7 @@ const Tool = () => {
   const [resizeHeight, setResizeHeight] = useState(0);
   const [ratioPersist, setRatioPersist] = useState(true);
   const [imgModalResizeOpen, setImgModalResizeOpen] = useState(false);
-  const [canvasFramePositionList, setCanvasFramePositionList] = useGlobalState<CanvasFramePositionList[]>(
-    'canvasFramePositionList',
-    [],
-  );
+
   const [selectedFrameList, setSelectedFrameList] = useState<HTMLCanvasElement[]>([]);
   const [yourSelectedFrame, setYourSelectedFrame] = useState<CanvasFrameSizeInfo | null>(null);
 
@@ -379,27 +375,25 @@ const Tool = () => {
 
   const handleDeleteCanvas = useCallback(
     (e) => {
-      setCroppedList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
-      setFramePrice((prev) => prev.filter((lst) => lst.id !== +e.target.id));
-      if (canvasFramePositionList) {
-        setCanvasFramePositionList(canvasFramePositionList?.filter((lst) => lst.id !== +e.target.id));
+      if (croppedList) {
+        setCroppedList(croppedList.filter((lst) => +lst.id !== +e.target.id));
+        setFramePrice((prev) => prev.filter((lst) => lst.id !== +e.target.id));
+        setSelectedFrameList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
       }
-      setSelectedFrameList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
     },
-    [canvasFramePositionList, setCanvasFramePositionList],
+    [croppedList, setCroppedList],
   );
 
   const handleImgGoBack = useCallback(() => {
-    if (imgWrapperRef.current && canvasFramePositionList) {
+    if (imgWrapperRef.current) {
       const { current: imgBox } = imgWrapperRef;
       const imgBoxId = +(imgBox.childNodes[0] as any).id;
-      if (!imgBoxId) return;
-      setCroppedList((prev) => prev.filter((lst) => +lst.id !== imgBoxId));
+      if (!imgBoxId || !croppedList) return;
+      setCroppedList(croppedList.filter((lst) => +lst.id !== imgBoxId));
       setFramePrice(framePrice.slice(1));
-      setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== imgBoxId));
       setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== imgBoxId));
     }
-  }, [framePrice, setCanvasFramePositionList, canvasFramePositionList, selectedFrameList]);
+  }, [croppedList, framePrice, selectedFrameList, setCroppedList]);
 
   // 이미지 저장을 위한 캔버스 생성 (스프라이트 기법으로 이미지 저장은 안되기 때문에 품질이 깨지더라도 이 방법 사용합니다.)
   const createCanvasForSave = useCallback(
@@ -448,8 +442,7 @@ const Tool = () => {
 
   const createImageCanvas = useCallback(
     async (id: number) => {
-      if (!isSelectFrame || !imgNode.current || !canvasPosition || !canvasFrameSizeInfo || !canvasFramePositionList)
-        return;
+      if (!isSelectFrame || !imgNode.current || !canvasPosition || !canvasFrameSizeInfo || !croppedList) return;
       const { width: frameWidth, height: frameHeight } = canvasFrameSizeInfo;
       const { left, top, width, height } = imgNode.current.getBoundingClientRect();
       const { left: canvasLeft, top: canvasTop } = canvasPosition;
@@ -477,22 +470,17 @@ const Tool = () => {
       // 자른 액자 배열로 저장
       setCroppedList([cropped, ...croppedList]);
       // 만든 캔버스 액자의 포지션이 어떤지 설정해주기, 왜 와이? 리사이즈 시 위치 바꾸기 위함
-      setCanvasFramePositionList([
-        ...canvasFramePositionList,
-        { width: frameWidth, height: frameHeight, left: canvasLeft + scrollX, top: canvasTop + scrollY, id },
-      ]);
     },
     [
       isSelectFrame,
       canvasPosition,
       canvasFrameSizeInfo,
+      croppedList,
       scrollX,
       scrollY,
       imgUploadUrl,
       bgColor,
-      croppedList,
-      setCanvasFramePositionList,
-      canvasFramePositionList,
+      setCroppedList,
     ],
   );
 
@@ -611,11 +599,11 @@ const Tool = () => {
     }
     getImgWrapperSizeForParallel();
 
-    if (imgNode.current) {
+    if (imgNode.current && croppedList) {
       const { left: imgLeft, top: imgTop } = imgNode.current.getBoundingClientRect();
 
-      setCroppedList((prev) =>
-        prev.map((lst) => ({
+      setCroppedList(
+        croppedList.map((lst) => ({
           ...lst,
           left: `${+lst.dataset.originleft + imgLeft + scrollX}px`,
           top: `${+lst.dataset.origintop + imgTop + scrollY}px`,
@@ -628,7 +616,7 @@ const Tool = () => {
       const { left } = previewBgRef.current.getBoundingClientRect();
       setFramePreviewMode({ ...framePreviewMode, top: 140, left: left + 75 });
     }
-  }, [getImgWrapperSizeForParallel, setIsNoContent, scrollX, scrollY, framePreviewMode]);
+  }, [getImgWrapperSizeForParallel, croppedList, setIsNoContent, setCroppedList, scrollX, scrollY, framePreviewMode]);
 
   // 컬러 체이닞
   const handleColorChange = useCallback((color: ColorResult) => {
@@ -895,7 +883,7 @@ const Tool = () => {
             </PreviewBg>
           )}
           <CroppedWrapper isPreview={isPreview || false} top={framePreviewMode?.top} left={framePreviewMode?.left}>
-            {croppedList.map(({ dataset, id, imageCropStyle, ...style }) => (
+            {croppedList?.map(({ dataset, id, imageCropStyle, ...style }) => (
               <div
                 key={id}
                 id={id}

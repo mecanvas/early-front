@@ -42,14 +42,6 @@ export interface CanvasPosition {
   top: number;
 }
 
-export interface CanvasFramePositionList {
-  id: number;
-  width: number;
-  height: number;
-  left: number;
-  top: number;
-}
-
 export interface CroppedFrame {
   id: string;
   width: string;
