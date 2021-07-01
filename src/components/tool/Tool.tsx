@@ -144,7 +144,7 @@ const Tool = () => {
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
   const [canvasPosition] = useGlobalState<CanvasPosition>('canvasPosition');
   const [canvasFrameSizeInfo] = useGlobalState<CanvasFrameSizeInfo>('canvasFrameSizeInfo');
-  const [croppedList, setCroppedList] = useGlobalState<CroppedFrame[]>('croppedList', []);
+  const [croppedList, setCroppedList] = useState<CroppedFrame[]>([]);
   const [framePreviewMode, setFramePreviewMode] = useState<CanvasPosition | null>(null);
   const [scrollX, scrollY] = useGetScollPosition();
 
@@ -469,7 +469,6 @@ const Tool = () => {
 
       // 자른 액자 배열로 저장
       setCroppedList([cropped, ...croppedList]);
-      // 만든 캔버스 액자의 포지션이 어떤지 설정해주기, 왜 와이? 리사이즈 시 위치 바꾸기 위함
     },
     [
       isSelectFrame,
@@ -599,11 +598,11 @@ const Tool = () => {
     }
     getImgWrapperSizeForParallel();
 
-    if (imgNode.current && croppedList) {
+    if (imgNode.current) {
       const { left: imgLeft, top: imgTop } = imgNode.current.getBoundingClientRect();
 
-      setCroppedList(
-        croppedList.map((lst) => ({
+      setCroppedList((prev) =>
+        prev.map((lst) => ({
           ...lst,
           left: `${+lst.dataset.originleft + imgLeft + scrollX}px`,
           top: `${+lst.dataset.origintop + imgTop + scrollY}px`,
@@ -899,7 +898,9 @@ const Tool = () => {
           </CroppedWrapper>
           {imgUploadUrl ? (
             <>
-              {isSelectFrame && <ToolSelectedFrame {...yourSelectedFrame} onClick={handleFrameRelease} />}
+              {isSelectFrame && (
+                <ToolSelectedFrame croppedList={croppedList} {...yourSelectedFrame} onClick={handleFrameRelease} />
+              )}
 
               {isResizeMode && (
                 <>

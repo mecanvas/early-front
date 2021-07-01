@@ -9,9 +9,10 @@ interface Props {
   width?: number;
   height?: number;
   onClick: () => void;
+  croppedList: CroppedFrame[];
 }
 
-const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
+const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) => {
   const selectFrameWrapper = useRef<HTMLDivElement>(null);
   const selectFrameRef = useRef<HTMLCanvasElement>(null);
   const frameWidth = useMemo(() => width || 0, [width]);
@@ -25,7 +26,6 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
     width: 0,
     height: 0,
   });
-  const [croppedList] = useGlobalState<CroppedFrame[]>('croppedList');
   const [isNearing, setIsNearing] = useState<{
     top: boolean;
     right: boolean;
@@ -189,10 +189,10 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
               const isNearingCenterY = (conditionValue: number) => Math.abs(left / 2 - cropLeft / 2) < conditionValue;
 
               setIsNearing({
-                top: isNearingTop(1),
-                right: isNearingRight(1),
-                left: isNearingLeft(1),
-                bottom: isNearingBottom(1),
+                top: isNearingTop(2),
+                right: isNearingRight(2),
+                left: isNearingLeft(2),
+                bottom: isNearingBottom(2),
                 centerX: isNearingCenterX(0.5),
                 centerY: isNearingCenterY(0.5),
               });
