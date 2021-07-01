@@ -615,7 +615,7 @@ const Tool = () => {
       const { left } = previewBgRef.current.getBoundingClientRect();
       setFramePreviewMode({ ...framePreviewMode, top: 140, left: left + 75 });
     }
-  }, [getImgWrapperSizeForParallel, croppedList, setIsNoContent, setCroppedList, scrollX, scrollY, framePreviewMode]);
+  }, [getImgWrapperSizeForParallel, setIsNoContent, setCroppedList, scrollX, scrollY, framePreviewMode]);
 
   // 컬러 체이닞
   const handleColorChange = useCallback((color: ColorResult) => {
