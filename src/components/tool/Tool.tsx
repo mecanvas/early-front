@@ -47,6 +47,7 @@ import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 import ToolSelectedFrame from './ToolSelectedFrame';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getS3 } from 'src/utils/getS3';
+import { ImgToDataURL } from 'src/utils/ImgToDataURL';
 
 const Tool = () => {
   const router = useRouter();
@@ -437,7 +438,7 @@ const Tool = () => {
   );
 
   const createImageCanvas = useCallback(
-    (id: number) => {
+    async (id: number) => {
       if (!isSelectFrame || !imgNode.current || !canvasPosition || !canvasFrameSizeInfo) return;
       const { width: frameWidth, height: frameHeight } = canvasFrameSizeInfo;
       const { left, top, width, height } = imgNode.current.getBoundingClientRect();
@@ -451,7 +452,7 @@ const Tool = () => {
         top: `${canvasTop + scrollY}px`,
         dataset: { originleft: `${canvasLeft - left}`, origintop: `${canvasTop - top}` },
         imageCropStyle: {
-          backgroundImage: `url(${imgUploadUrl})`,
+          backgroundImage: `url(${await ImgToDataURL(imgUploadUrl || '')})`,
           backgroundColor: `${bgColor}`,
           backgroundRepeat: `no-repeat`,
           backgroundSize: `${width}px ${height}px`,
@@ -610,8 +611,8 @@ const Tool = () => {
       requestAnimationFrame(() => handleFramePositionRelative);
     }
     if (previewBgRef.current) {
-      const { left, top } = previewBgRef.current.getBoundingClientRect();
-      setFramePreviewMode({ ...framePreviewMode, top, left });
+      const { left } = previewBgRef.current.getBoundingClientRect();
+      setFramePreviewMode({ ...framePreviewMode, top: 140, left: left + 75 });
     }
   }, [getImgWrapperSizeForParallel, setIsNoContent, scrollX, scrollY, framePreviewMode]);
 
@@ -648,7 +649,7 @@ const Tool = () => {
     if (isPreview) {
       if (previewBgRef.current) {
         const { left } = previewBgRef.current.getBoundingClientRect();
-        setFramePreviewMode({ ...framePreviewMode, top: 105, left });
+        setFramePreviewMode({ ...framePreviewMode, top: 140, left: left + 75 });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -705,19 +706,6 @@ const Tool = () => {
 
   return (
     <>
-      {isNoContent && (
-        <div
-          style={{
-            position: 'fixed',
-            width: '100%',
-            height: '100vh',
-            top: 0,
-            backgroundColor: 'black',
-          }}
-        >
-          노컨텐츠!!
-        </div>
-      )}
       <ToolContainer>
         {imgUploadUrl && (
           <ToolFrameList
@@ -826,6 +814,25 @@ const Tool = () => {
             </FrameTool>
           </FactoryTool>
         </FactoryHeader>
+
+        {isNoContent && (
+          <div
+            style={{
+              position: 'fixed',
+              marginTop: '105px',
+              width: '100%',
+              height: '100vh',
+              top: 0,
+              zIndex: 999,
+              backgroundColor: '#fff',
+              color: 'black',
+            }}
+          >
+            <Button style={{ position: 'relative', top: '30%', left: '50%', transform: 'translateX(-50%)' }}>
+              최소한의 크기로 키워주세요.
+            </Button>
+          </div>
+        )}
 
         {<Loading loading={imgUploadLoading} />}
         <Modal
