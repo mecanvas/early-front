@@ -3,9 +3,15 @@ const withLess = require('@zeit/next-less');
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
+const { merge } = require('webpack-merge');
+const webpackConfig = require('./webpack.config');
 
 const nextConfig = {
   target: 'serverless',
+  compress: true,
+  webpack(config) {
+    return merge(config, webpackConfig);
+  },
 };
 
 module.exports = withPlugins(

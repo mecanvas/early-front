@@ -10,13 +10,15 @@ import {
   DropZone,
   CanvasInfomationWrapper,
   DropZoneDiv,
-  ImgControlelr,
+  ImgController,
   FactoryHeader,
   FactoryTool,
   FrameTool,
   ImageShowingWidthHeight,
   FactoryUtills,
   Bill,
+  CroppedWrapper,
+  PreviewBg,
 } from './ToolStyle';
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
@@ -40,10 +42,13 @@ import {
   CanvasFrameSizeInfo,
   ResizeCmd,
   CanvasFramePositionList,
+  CroppedFrame,
 } from 'src/interfaces/ToolInterface';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 import ToolSelectedFrame from './ToolSelectedFrame';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
+import { getS3 } from 'src/utils/getS3';
+import { ImgToDataURL } from 'src/utils/ImgToDataURL';
 
 const Tool = () => {
   const router = useRouter();
@@ -135,15 +140,18 @@ const Tool = () => {
     [changeVertical],
   );
 
+  const [isNoContent, setIsNoContent] = useGlobalState<boolean>('isNoContent', false);
   const [isSelectFrame, setIsSelectFrame] = useState(false); // 골랐는지 상태 여부
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
   const [canvasPosition] = useGlobalState<CanvasPosition>('canvasPosition');
   const [canvasFrameSizeInfo] = useGlobalState<CanvasFrameSizeInfo>('canvasFrameSizeInfo');
-
+  const [croppedList, setCroppedList] = useState<CroppedFrame[]>([]);
+  const [framePreviewMode, setFramePreviewMode] = useState<CanvasPosition | null>(null);
   const [scrollX, scrollY] = useGetScollPosition();
 
   const imgWrapperRef = useRef<HTMLDivElement>(null);
   const imgNode = useRef<HTMLImageElement>(null);
+  const previewBgRef = useRef<HTMLImageElement>(null);
 
   const [imgUploadUrl, setImgUploadUrl] = useGlobalState('imgUploadUrl', '');
   const [imgUploadLoading, setImgUploadLoading] = useState(false);
@@ -164,7 +172,7 @@ const Tool = () => {
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
 
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState('saveModal', false);
-  const [isDone, setIsDone] = useGlobalState('isDone');
+
   // 액자 사이즈들 변경
   const [frameAttribute, setFrameAttribute] = useState<'정방' | '해경' | '인물' | '풍경'>('정방');
 
@@ -175,6 +183,9 @@ const Tool = () => {
   const [isNearingY, setIsNearingY] = useGlobalState<boolean>('isNearingY');
   const [isFitX, setIsFitX] = useGlobalState<boolean>('isFitX');
   const [isFitY, setIsFitY] = useGlobalState<boolean>('isFitY');
+
+  // 미리보기
+  const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview', false);
 
   const handleChangeVertical = useCallback(() => {
     setChangeVertical((prev) => !prev);
@@ -191,7 +202,7 @@ const Tool = () => {
       framePrice.reduce((acc: { [key: string]: any }, cur) => {
         const name = cur.name;
         if (!acc[name]) {
-          acc[name] = { quantity: 1, price: cur.price };
+          acc[name] = { quantity: 1, price: cur.price, cm: cur.cm };
           return acc;
         }
         acc[name].quantity++;
@@ -199,7 +210,6 @@ const Tool = () => {
       }, {}),
     );
   }, [framePrice]);
-  const [isPreview, setIsPreview] = useState(false);
 
   const handlePushMainPage = useCallback(() => {
     router.push('/');
@@ -270,9 +280,19 @@ const Tool = () => {
     const [w, h] = getOriginRatio(originWidth, originHeight);
     const newWidth = w * resizeHeight;
     const newHeight = h * newWidth;
+
+    // 너비가 벗어나는 상황에선 너비에 맞춰 높이 비율을 맞춤
+    if (newWidth > window.innerWidth) {
+      const newHeight = h * resizeWidth;
+      const newWidth = w * newHeight;
+      setResizeWidth(+newWidth.toFixed());
+      setResizeHeight(+newHeight.toFixed());
+      return;
+    }
+
     setResizeWidth(+newWidth.toFixed());
     setResizeHeight(+newHeight.toFixed());
-  }, [originHeight, originWidth, resizeHeight]);
+  }, [originHeight, originWidth, resizeHeight, resizeWidth]);
 
   const handleResizeMode = useCallback((e) => {
     e.stopPropagation();
@@ -334,9 +354,7 @@ const Tool = () => {
       if (!acceptedFiles[0].type.includes('image')) {
         return alert('이미지 파일이 아닌건 지원하지 않습니다.');
       }
-      if (acceptedFiles[0].type.includes('svg')) {
-        return alert('svg 파일은 지원하지 않습니다.');
-      }
+
       if (!imgSizeChecker(acceptedFiles[0])) return;
 
       setImgUploadLoading(true);
@@ -361,37 +379,22 @@ const Tool = () => {
 
   const handleDeleteCanvas = useCallback(
     (e) => {
-      if (imgWrapperRef.current && canvasFramePositionList) {
-        const { current: imgBox } = imgWrapperRef;
-        if (imgBox.childNodes.length <= 1) {
-          if (!isPreview) {
-            return;
-          }
-          if (imgBox.childNodes.length === 0) {
-            return;
-          }
-        }
-        imgBox.childNodes.forEach((node) => {
-          if ((node as HTMLElement).id === e.target.id) {
-            imgBox.removeChild(node);
-          }
-        });
-        setFramePrice((prev) => prev.filter((lst) => lst.id !== +e.target.id));
-        setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== +e.target.id));
-        setSelectedFrameList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
+      setCroppedList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
+      setFramePrice((prev) => prev.filter((lst) => lst.id !== +e.target.id));
+      if (canvasFramePositionList) {
+        setCanvasFramePositionList(canvasFramePositionList?.filter((lst) => lst.id !== +e.target.id));
       }
+      setSelectedFrameList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
     },
-    [isPreview, setCanvasFramePositionList, canvasFramePositionList],
+    [canvasFramePositionList, setCanvasFramePositionList],
   );
 
   const handleImgGoBack = useCallback(() => {
     if (imgWrapperRef.current && canvasFramePositionList) {
       const { current: imgBox } = imgWrapperRef;
-      if (imgBox.childNodes.length < 2) {
-        return;
-      }
       const imgBoxId = +(imgBox.childNodes[0] as any).id;
-      imgBox?.removeChild(imgBox.childNodes[0]);
+      if (!imgBoxId) return;
+      setCroppedList((prev) => prev.filter((lst) => +lst.id !== imgBoxId));
       setFramePrice(framePrice.slice(1));
       setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst.id !== imgBoxId));
       setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== imgBoxId));
@@ -444,66 +447,52 @@ const Tool = () => {
   );
 
   const createImageCanvas = useCallback(
-    (id: number) => {
+    async (id: number) => {
       if (!isSelectFrame || !imgNode.current || !canvasPosition || !canvasFrameSizeInfo || !canvasFramePositionList)
         return;
       const { width: frameWidth, height: frameHeight } = canvasFrameSizeInfo;
       const { left, top, width, height } = imgNode.current.getBoundingClientRect();
       const { left: canvasLeft, top: canvasTop } = canvasPosition;
 
-      // 크롭된 이미지를 담을 캔버스 생성
-      const div = document.createElement('div');
-      const deleteBtn = document.createElement('div');
-      deleteBtn.classList.add('cropped-img-delete');
-      deleteBtn.addEventListener('click', handleDeleteCanvas);
-      deleteBtn.id = id.toString();
-      div.classList.add('cropped-img');
-      div.style.width = `${frameWidth}px`;
-      div.style.height = `${frameHeight}px`;
-      div.style.left = `${canvasLeft + scrollX}px`;
-      div.style.top = `${canvasTop + scrollY}px`;
-      div.setAttribute('data-originleft', `${canvasLeft - left}`);
-      div.setAttribute('data-origintop', `${canvasTop - top}`);
-      div.id = id.toString();
+      const cropped: CroppedFrame = {
+        id: id.toString(),
+        width: `${frameWidth}px`,
+        height: `${frameHeight}px`,
+        left: `${canvasLeft + scrollX}px`,
+        top: `${canvasTop + scrollY}px`,
+        dataset: { originleft: `${canvasLeft - left}`, origintop: `${canvasTop - top}` },
+        imageCropStyle: {
+          backgroundImage: `url(${await ImgToDataURL(imgUploadUrl || '')})`,
+          backgroundColor: `${bgColor}`,
+          backgroundRepeat: `no-repeat`,
+          backgroundSize: `${width}px ${height}px`,
+          backgroundPositionX: `${-canvasLeft + left}px`,
+          backgroundPositionY: `${-canvasTop + top}px`,
+          width: `${100}%`,
+          height: `${100}%`,
+          boxShadow: `0 0 7px #333 inset, 0 0 6px #ededed`,
+        },
+      };
 
-      // 크롭된 이미지 생성 (화질 구지 방지를 위해 스프라이트 기법 사용)
-      const cropImage = new Image();
-      cropImage.setAttribute(
-        'style',
-        `
-        background-image : url(${imgUploadUrl});
-        background-color : ${bgColor};
-        background-repeat : no-repeat;
-        background-size: ${width}px ${height}px; 
-        background-position-x: ${-canvasLeft + left}px;
-        background-position-y: ${-canvasTop + top}px;
-        width: ${100}%;
-        height: ${100}%;
-        box-shadow : 0 0 7px #333 inset, 0 0 6px #ededed;
-        `,
-      );
-
+      // 자른 액자 배열로 저장
+      setCroppedList([cropped, ...croppedList]);
       // 만든 캔버스 액자의 포지션이 어떤지 설정해주기, 왜 와이? 리사이즈 시 위치 바꾸기 위함
       setCanvasFramePositionList([
         ...canvasFramePositionList,
         { width: frameWidth, height: frameHeight, left: canvasLeft + scrollX, top: canvasTop + scrollY, id },
       ]);
-
-      div.append(cropImage);
-      div.append(deleteBtn);
-      imgWrapperRef.current?.prepend(div);
     },
     [
       isSelectFrame,
       canvasPosition,
       canvasFrameSizeInfo,
-      canvasFramePositionList,
-      handleDeleteCanvas,
       scrollX,
       scrollY,
       imgUploadUrl,
       bgColor,
+      croppedList,
       setCanvasFramePositionList,
+      canvasFramePositionList,
     ],
   );
 
@@ -511,9 +500,9 @@ const Tool = () => {
   const insertFrameToCanvas = useCallback(async () => {
     if (imgNode.current && selectedFrameInfo) {
       //  액자의 가격을 price에 넣기
-      const { name, price } = selectedFrameInfo;
+      const { name, price, cm } = selectedFrameInfo;
       const id = Date.now();
-      setFramePrice([{ name, price, id }, ...framePrice]);
+      setFramePrice([{ name, price, id, cm }, ...framePrice]);
       createImageCanvas(id);
       createCanvasForSave(id);
     }
@@ -599,8 +588,8 @@ const Tool = () => {
 
   const handleImgPreview = useCallback(() => {
     if (!imgUploadUrl) return;
-    setIsPreview((prev) => !prev);
-  }, [imgUploadUrl]);
+    setIsPreview(!isPreview);
+  }, [imgUploadUrl, isPreview, setIsPreview]);
 
   const getImgWrapperSizeForParallel = useCallback(() => {
     const imgWrapper = imgWrapperRef.current;
@@ -614,24 +603,32 @@ const Tool = () => {
   }, [setCenterX, setCenterY]);
 
   // 리사이즈시에도 동일하게 움직일 수 있도록 설정
-  const handleFramePositionReletive = useCallback(() => {
+  const handleFramePositionRelative = useCallback(() => {
+    if (window.innerWidth <= +theme.size.md.replace('px', '')) {
+      setIsNoContent(true);
+    } else {
+      setIsNoContent(false);
+    }
     getImgWrapperSizeForParallel();
+
     if (imgNode.current) {
       const { left: imgLeft, top: imgTop } = imgNode.current.getBoundingClientRect();
-      const cropImg = document.querySelectorAll('.cropped-img');
-      cropImg.forEach((node) => {
-        if (!node) return;
-        const { originleft, origintop } = (node as HTMLDivElement).dataset;
-        if (originleft && origintop) {
-          const left = `${+originleft + imgLeft + scrollX}px`;
-          const top = `${+origintop + imgTop + scrollY}px`;
-          (node as HTMLDivElement).style.left = left;
-          (node as HTMLDivElement).style.top = top;
-        }
-      });
-      requestAnimationFrame(() => handleFramePositionReletive);
+
+      setCroppedList((prev) =>
+        prev.map((lst) => ({
+          ...lst,
+          left: `${+lst.dataset.originleft + imgLeft + scrollX}px`,
+          top: `${+lst.dataset.origintop + imgTop + scrollY}px`,
+        })),
+      );
+
+      requestAnimationFrame(() => handleFramePositionRelative);
     }
-  }, [scrollX, scrollY, getImgWrapperSizeForParallel]);
+    if (previewBgRef.current) {
+      const { left } = previewBgRef.current.getBoundingClientRect();
+      setFramePreviewMode({ ...framePreviewMode, top: 140, left: left + 75 });
+    }
+  }, [getImgWrapperSizeForParallel, setIsNoContent, scrollX, scrollY, framePreviewMode]);
 
   // 컬러 체이닞
   const handleColorChange = useCallback((color: ColorResult) => {
@@ -662,6 +659,14 @@ const Tool = () => {
     if (imgNode.current) {
       imgNode.current.style.visibility = isPreview ? 'hidden' : 'visible';
     }
+
+    if (isPreview) {
+      if (previewBgRef.current) {
+        const { left } = previewBgRef.current.getBoundingClientRect();
+        setFramePreviewMode({ ...framePreviewMode, top: 140, left: left + 75 });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPreview]);
 
   useEffect(() => {
@@ -682,11 +687,11 @@ const Tool = () => {
 
   useEffect(() => {
     if (window) {
-      window.addEventListener('resize', handleFramePositionReletive);
-      requestAnimationFrame(handleFramePositionReletive);
+      window.addEventListener('resize', handleFramePositionRelative);
+      requestAnimationFrame(handleFramePositionRelative);
     }
     return () => {
-      window.removeEventListener('resize', handleFramePositionReletive);
+      window.removeEventListener('resize', handleFramePositionRelative);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -694,13 +699,6 @@ const Tool = () => {
   useEffect(() => {
     if (isSaveCanvas) {
       setIsSaveCanvas(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (isDone) {
-      setIsDone(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -715,15 +713,22 @@ const Tool = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    setImgUploadUrl('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <ToolContainer>
-        <ToolFrameList
-          frameSize={frameSize}
-          attribute={frameAttribute}
-          onClick={handleFrameSelect}
-          onChangeVertical={handleChangeVertical}
-        ></ToolFrameList>
+        {imgUploadUrl && (
+          <ToolFrameList
+            frameSize={frameSize}
+            attribute={frameAttribute}
+            onClick={handleFrameSelect}
+            onChangeVertical={handleChangeVertical}
+          ></ToolFrameList>
+        )}
 
         {/* 사진 조절하는 툴바들 */}
         <FactoryHeader>
@@ -765,7 +770,13 @@ const Tool = () => {
               <Button type="text" onClick={handleSaveCanvas}>
                 저장
               </Button>
-              {isSaveCanvas && <ToolSave yourPriceList={yourPriceList} selectedFrameList={selectedFrameList} />}
+              {isSaveCanvas && (
+                <ToolSave
+                  totalPrice={framePrice.reduce((acc, cur) => (acc += cur.price), 0)}
+                  yourPriceList={yourPriceList}
+                  selectedFrameList={selectedFrameList}
+                />
+              )}
             </div>
           </FactoryUtills>
           <FactoryTool>
@@ -818,6 +829,25 @@ const Tool = () => {
           </FactoryTool>
         </FactoryHeader>
 
+        {isNoContent && (
+          <div
+            style={{
+              position: 'fixed',
+              marginTop: '105px',
+              width: '100%',
+              height: '100vh',
+              top: 0,
+              zIndex: 999,
+              backgroundColor: '#fff',
+              color: 'black',
+            }}
+          >
+            <Button style={{ position: 'relative', top: '30%', left: '50%', transform: 'translateX(-50%)' }}>
+              최소한의 크기로 키워주세요.
+            </Button>
+          </div>
+        )}
+
         {<Loading loading={imgUploadLoading} />}
         <Modal
           visible={imgModalResizeOpen}
@@ -843,6 +873,7 @@ const Tool = () => {
         </Modal>
 
         <ImageWrapper
+          isPreview={isPreview || false}
           imgUploadLoading={imgUploadLoading}
           id="img-box"
           data-component="wrapper"
@@ -858,6 +889,26 @@ const Tool = () => {
           onMouseLeave={handleImgResizeEnd}
           cmd={resizeCmd}
         >
+          {isPreview && (
+            <PreviewBg ref={previewBgRef}>
+              <img src={getS3('bg1.jpg')} alt="미리보기배경" />
+            </PreviewBg>
+          )}
+          <CroppedWrapper isPreview={isPreview || false} top={framePreviewMode?.top} left={framePreviewMode?.left}>
+            {croppedList.map(({ dataset, id, imageCropStyle, ...style }) => (
+              <div
+                key={id}
+                id={id}
+                style={style}
+                data-originleft={dataset.originleft}
+                data-origintop={dataset.origintop}
+                className="cropped-img"
+              >
+                <img style={imageCropStyle} />
+                <div id={id} className="cropped-img-delete" onClick={handleDeleteCanvas}></div>
+              </div>
+            ))}
+          </CroppedWrapper>
           {imgUploadUrl ? (
             <>
               {isSelectFrame && <ToolSelectedFrame {...yourSelectedFrame} onClick={handleFrameRelease} />}
@@ -872,32 +923,34 @@ const Tool = () => {
                   </ImageShowingWidthHeight>
                 </>
               )}
-              <ImgControlelr data-layout="inner" isResizeStart={isResizeMode} cmd={resizeCmd}>
-                <img
-                  onMouseUp={handleImgResizeEnd}
-                  ref={imgNode}
-                  src={imgUploadUrl}
-                  crossOrigin="anonymous"
-                  alt="캔버스로 만들 이미지"
-                />
-                {isResizeMode ? (
-                  <>
-                    <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="top-center" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
+              {isPreview || (
+                <ImgController data-layout="inner" isResizeStart={isResizeMode} cmd={resizeCmd}>
+                  <img
+                    onMouseUp={handleImgResizeEnd}
+                    ref={imgNode}
+                    src={imgUploadUrl}
+                    crossOrigin="anonymous"
+                    alt="캔버스로 만들 이미지"
+                  />
+                  {isResizeMode ? (
+                    <>
+                      <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
+                      <div data-cmd="top-center" onMouseDown={handleImgResizeStart}></div>
+                      <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
 
-                    <div data-cmd="right" onMouseDown={handleImgResizeStart}></div>
+                      <div data-cmd="right" onMouseDown={handleImgResizeStart}></div>
 
-                    <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="bottom-center" onMouseDown={handleImgResizeStart}></div>
-                    <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
+                      <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
+                      <div data-cmd="bottom-center" onMouseDown={handleImgResizeStart}></div>
+                      <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
 
-                    <div data-cmd="left" onMouseDown={handleImgResizeStart}></div>
-                  </>
-                ) : (
-                  <button type="button" onClick={handleResizeMode}></button>
-                )}
-              </ImgControlelr>
+                      <div data-cmd="left" onMouseDown={handleImgResizeStart}></div>
+                    </>
+                  ) : (
+                    <button type="button" onClick={handleResizeMode}></button>
+                  )}
+                </ImgController>
+              )}
             </>
           ) : (
             <>

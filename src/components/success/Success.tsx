@@ -5,7 +5,7 @@ import { useGlobalState } from 'src/hooks';
 
 const Success = () => {
   const router = useRouter();
-  const [isDone] = useGlobalState('isDone');
+  const [isDone, setIsDone] = useGlobalState<boolean>('isDone');
 
   const handleRouterByKey = useCallback(
     (e) => {
@@ -16,16 +16,13 @@ const Success = () => {
   );
 
   useEffect(() => {
-    if (!window) return;
     if (!isDone) {
-      window.alert('접근 권한이 없습니다.');
-      router.push('/');
+      router.replace('/404');
+      return;
     }
-  }, [router, isDone]);
-
-  if (!isDone) {
-    return null;
-  }
+    setIsDone(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Result

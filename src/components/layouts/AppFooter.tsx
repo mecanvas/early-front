@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { useRouter } from 'next/router';
+import { useExceptionRoute } from 'src/hooks/useExceptionRoute';
 
 const FooterContainer = styled.footer`
   width: 100%;
@@ -14,9 +14,9 @@ const Footer = styled.div`
 `;
 
 const AppFooter = () => {
-  const router = useRouter();
+  const { exceptionRoute } = useExceptionRoute();
 
-  if (router.asPath === '/tool') {
+  if (exceptionRoute) {
     return null;
   }
 

@@ -15,7 +15,7 @@ export const FactoryHeader = styled.div`
   width: 100%;
   background-color: ${({ theme }) => theme.color.white};
   position: fixed;
-  z-index: 34;
+  z-index: 340;
   top: 0px;
   flex-direction: column;
 `;
@@ -27,12 +27,19 @@ export const FactoryUtills = styled.div`
   padding: 0 3em;
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    border-bottom: none;
+    height: 40px;
+    padding: 0 0.5em;
+  }
   h1 {
     margin: 0;
     padding: 0.4em;
     text-align: center;
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      font-size: 22px;
+    }
   }
-
   & > div {
     display: flex;
     button {
@@ -44,11 +51,35 @@ export const FactoryUtills = styled.div`
     button + button {
       margin-left: 6px;
     }
-
+    /* 예상가격 */
+    button:nth-of-type(1) {
+      @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+        display: none;
+      }
+    }
+    /* 미리보기/이미지 버튼 */
+    button:nth-of-type(2) {
+      @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+        padding: 0em 0.6em;
+        height: 30px;
+        span {
+          font-size: 14px;
+          line-height: 30px;
+        }
+      }
+    }
     /* 저장 버튼 */
     button:nth-of-type(3) {
       background-color: ${({ theme }) => theme.color.secondary};
       color: ${({ theme }) => theme.color.white};
+      @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+        padding: 0em 0.6em;
+        height: 30px;
+        span {
+          line-height: 30px;
+          font-size: 14px;
+        }
+      }
     }
   }
 `;
@@ -58,7 +89,9 @@ export const FactoryTool = styled.div`
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
   justify-content: center;
-
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    justify-content: space-around;
+  }
   & > div:nth-of-type(1) {
     display: flex;
     justify-content: center;
@@ -71,6 +104,9 @@ export const FactoryTool = styled.div`
       }
       svg {
         font-size: 16px;
+        @media all and (max-width: ${({ theme }) => theme.size.xs}) {
+          font-size: 13px;
+        }
         path {
           fill: ${({ theme }) => theme.color.secondarydark};
         }
@@ -83,18 +119,26 @@ export const FrameTool = styled.div`
   position: absolute;
   right: 0;
   display: flex;
-
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+    justify-content: center;
+    padding: 0.3em 0;
+    border-top: 1px solid ${({ theme }) => theme.color.gray400};
+    background-color: ${({ theme }) => theme.color.white};
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
   button {
     display: flex;
     justify-content: center;
     align-items: center;
-
     svg {
       font-size: 18px;
       path {
       }
     }
-
     small {
       margin-left: 3px;
       font-size: 12px;
@@ -106,11 +150,11 @@ export const FrameTool = styled.div`
 export const SelectedFrameWrapper = styled.div`
   width: 100%;
   height: 100vh;
+  min-height: -webkit-fill-available;
   position: absolute;
   top: 0;
   left: 0;
   padding: 115px 10px 50px 10px;
-
   canvas {
     position: absolute;
     top: 0;
@@ -148,17 +192,16 @@ export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: #fff;
+  border: 1px solid #dbdbdb;
   justify-content: center;
   height: 100%;
-
   p {
     margin-top: 6px;
   }
-
   &:hover {
     opacity: 0.4;
   }
-
   ${({ isDragActive }) =>
     isDragActive
       ? css`
@@ -167,7 +210,6 @@ export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
       : css`
           opacity: 1;
         `}
-
   *  > svg {
     font-size: 50px;
     path {
@@ -184,6 +226,7 @@ export const ImageWrapper = styled.div<{
   isFitY?: boolean;
   imgUploadLoading?: boolean;
   cmd?: ResizeCmd | null;
+  isPreview?: boolean;
 }>`
   background-color: ${({ bgColor }) => bgColor};
   width: 100%;
@@ -195,7 +238,11 @@ export const ImageWrapper = styled.div<{
   text-align: center;
   position: relative;
   min-height: 100vh;
-
+  max-height: -webkit-fill-available;
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+    flex-direction: row;
+    padding: 81px 10px 50px 10px;
+  }
   ${({ isNearingX, isFitX, theme }) =>
     isNearingX &&
     css`
@@ -209,7 +256,6 @@ export const ImageWrapper = styled.div<{
         z-index: 33;
       }
     `}
-
   ${({ isNearingY, isFitY, theme }) =>
     isNearingY &&
     css`
@@ -224,14 +270,11 @@ export const ImageWrapper = styled.div<{
         border: 1px ${isFitY ? 'solid' : 'dashed'} ${theme.color.primary};
       }
     `}
-
-
   ${({ imgUploadLoading }) =>
     imgUploadLoading &&
     css`
       opacity: 0.3;
     `}
-
   ${({ cmd }) => {
     if (!cmd) return;
     if (cmd === 'top-left' || cmd === 'bottom-right') {
@@ -243,16 +286,25 @@ export const ImageWrapper = styled.div<{
       cursor: nesw-resize;
     `;
   }}
-
   img {
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      max-width: 96vw;
+    }
     max-height: ${() => 'calc(100vh - 170px)'};
   }
-
   .cropped-img {
     position: absolute;
     z-index: 3;
+    box-shadow: 0px 19px 38px rgba(0, 0, 0, 0.3), 15px 5px 38px rgba(0, 0, 0, 0.22);
     &:hover .cropped-img-delete {
-      display: block;
+      ${({ isPreview }) =>
+        isPreview
+          ? css`
+              display: none;
+            `
+          : css`
+              display: block;
+            `}
     }
   }
   .cropped-img-delete {
@@ -274,7 +326,6 @@ export const ImageWrapper = styled.div<{
       bottom: 0;
       background: rgba(0, 0, 0, 0.4);
     }
-
     &.position {
       left: 0 !important;
     }
@@ -291,7 +342,14 @@ export const ImageShowingWidthHeight = styled.small`
   border-radius: 20px;
   background-color: ${({ theme }) => theme.color.secondarybg};
   color: ${({ theme }) => theme.color.primary};
-
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    top: 150px;
+    right: 35px;
+    font-size: 13px;
+  }
+  @media all and (max-width: ${({ theme }) => theme.size.xs}) {
+    font-size: 11px;
+  }
   /* 사진 edit btn */
   span {
     position: absolute;
@@ -306,9 +364,16 @@ export const ImageShowingWidthHeight = styled.small`
     border-radius: 20px;
     border: 1px solid ${({ theme }) => theme.color.primary};
     background-color: ${({ theme }) => theme.color.secondarybg};
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      top: 1px;
+      width: 28px;
+      height: 28px;
+    }
     svg {
       font-size: 16px;
-
+      @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+        font-size: 14px;
+      }
       path {
         fill: ${({ theme }) => theme.color.primary};
       }
@@ -316,13 +381,38 @@ export const ImageShowingWidthHeight = styled.small`
   }
 `;
 
-export const ImgControlelr = styled.div<{
+export const PreviewBg = styled.div`
+  position: absolute;
+  top: 115px;
+  min-width: ${({ theme }) => theme.size.md};
+  img {
+    min-height: 626px;
+    object-fit: contain;
+  }
+`;
+
+export const CroppedWrapper = styled.div<{ isPreview: boolean; top?: number; left?: number }>`
+  ${({ isPreview, top, left }) =>
+    isPreview &&
+    left &&
+    top &&
+    css`
+      position: absolute;
+      top: ${top}px;
+      left: ${left}px;
+      transform: scale(0.3);
+      div {
+        box-shadow: 0 19px 38px rgba(0, 0, 0, 0.4), 0 15px 12px rgba(0, 0, 0, 0.32);
+      }
+    `}
+`;
+
+export const ImgController = styled.div<{
   isResizeStart: boolean;
   cmd: ResizeCmd | null;
 }>`
   position: relative;
   border: ${({ theme, isResizeStart }) => isResizeStart && `2px solid ${theme.color.cyan}`};
-
   ${({ isResizeStart }) =>
     isResizeStart &&
     css`
@@ -330,7 +420,6 @@ export const ImgControlelr = styled.div<{
         opacity: 0.4;
       }
     `}
-
   ${({ cmd }) => {
     if (!cmd) return;
     if (cmd === 'top-left' || cmd === 'bottom-right') {
@@ -343,18 +432,15 @@ export const ImgControlelr = styled.div<{
         cursor: ew-resize;
       `;
     }
-
     if (cmd === 'bottom-center' || cmd === 'top-center') {
       return css`
         cursor: ns-resize;
       `;
     }
-
     return css`
       cursor: nesw-resize;
     `;
   }}
-
 /* 클릭 시 resize mode on */
 button {
     all: unset;
@@ -365,7 +451,6 @@ button {
     left: 0;
     cursor: pointer;
   }
-
   /* top-left */
   div:nth-of-type(1) {
     position: absolute;
@@ -378,7 +463,6 @@ button {
     border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: nwse-resize;
   }
-
   /* top-center */
   div:nth-of-type(2) {
     position: absolute;
@@ -391,7 +475,6 @@ button {
     border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: ns-resize;
   }
-
   /* top-right */
   div:nth-of-type(3) {
     position: absolute;
@@ -404,7 +487,6 @@ button {
     border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: nesw-resize;
   }
-
   /* right */
   div:nth-of-type(4) {
     position: absolute;
@@ -417,7 +499,6 @@ button {
     border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: ew-resize;
   }
-
   /* bottom-left */
   div:nth-of-type(5) {
     position: absolute;
@@ -430,7 +511,6 @@ button {
     border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: nesw-resize;
   }
-
   /* bottom-center */
   div:nth-of-type(6) {
     position: absolute;
@@ -443,7 +523,6 @@ button {
     border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: ns-resize;
   }
-
   /* bottom-right */
   div:nth-of-type(7) {
     position: absolute;
@@ -456,7 +535,6 @@ button {
     border: 1px solid ${({ theme }) => theme.color.blue};
     cursor: nwse-resize;
   }
-
   /* left */
   div:nth-of-type(8) {
     position: absolute;
@@ -496,53 +574,74 @@ export const ColorPaletteFreeColor = styled.div`
 `;
 
 export const FrameWrapper = styled.div`
+  position: absolute;
+  top: 109px;
+  right: 5px;
+  z-index: 340;
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    width: 100%;
+    top: 81px;
+  }
   & > div {
-    position: absolute;
-    top: 115px;
-    right: 5px;
-    z-index: 30;
-    text-align: center;
+    border-radius: 20px;
     border: 1px solid ${({ theme }) => theme.color.gray300};
     background-color: ${({ theme }) => theme.color.white};
-    border-radius: 20px;
+    text-align: center;
     padding: 1em;
+    padding-top: 1.5em;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      flex-direction: row;
+      justify-content: space-evenly;
+      align-items: center;
+      padding: 0.2em;
+      div {
+        margin: 0 auto;
+        line-height: 14px;
+      }
+    }
     & > div {
       flex-direction: column;
       display: flex;
     }
   }
-
   /* 접는 아이콘 */
   & > span {
     z-index: 33;
     cursor: pointer;
     position: fixed;
-    top: 118px;
+    top: 110px;
     right: 20px;
     fill: ${({ theme }) => theme.color.secondarydark};
     padding: 3px 6px;
     border-radius: 20px;
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      top: 82px;
+      padding: 1.5px 3px;
+    }
     &:hover {
       background-color: ${({ theme }) => theme.color.gray300};
     }
   }
-
   small {
     font-size: 8px;
   }
-
+  /* 가로/세로 체인지 버튼 */
   button {
     width: 80px;
     height: 30px;
     font-size: 14px;
     padding: 0;
-    margin-top: 10px;
-
+    margin-top: 0.7em;
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      padding: 1.5px 3px;
+      position: absolute;
+      right: 14px;
+      width: fit-content;
+    }
     svg {
       font-size: 12px;
       path {
@@ -558,8 +657,11 @@ export const FrameSizeList = styled.div<{ width: string; height: string }>`
   z-index: 30;
   background-color: ${({ theme }) => theme.color.secondarybg};
   cursor: pointer;
-  margin: 10px 10px 5px 10px;
+  margin: 10px auto 5px auto;
   position: relative;
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    margin: 5px 2.5px;
+  }
 `;
 
 export const FrameSizeName = styled.div`
@@ -569,6 +671,11 @@ export const FrameSizeName = styled.div`
   transform: translate(-50%, -50%);
   display: flex !important;
   font-size: 12px;
+  width: 100%;
+  justify-content: center;
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    font-size: 9px;
+  }
 `;
 
 export const CanvasInfomationWrapper = styled.div`
@@ -587,13 +694,11 @@ export const Bill = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 0.3em;
-
   div {
     display: flex;
     justify-content: space-between;
     color: ${({ theme }) => theme.color.gray700};
   }
-
   /* 액자 이름 */
   & > div > div:nth-of-type(1) {
     font-weight: bold;
@@ -606,4 +711,5 @@ export const BillTotal = styled.div`
   border-top: 1px solid ${({ theme }) => theme.color.gray300};
   text-align: right;
   font-weight: bold;
+  font-size: 18px;
 `;
