@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button } from 'antd';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { animated, useSpring } from 'react-spring';
+import { useGlobalState } from 'src/hooks';
 import { FrameAttributes, FrameSize } from 'src/interfaces/ToolInterface';
 import { FrameWrapper, FrameSizeList, FrameSizeName } from './ToolStyle';
 
@@ -18,7 +19,7 @@ const ToolFrame = ({ frameSize, attribute, onClick, onChangeVertical }: Props) =
   }, [attribute, frameSize]);
 
   const [isFold, setIsFold] = useState(false);
-
+  const [isPreview] = useGlobalState('isPreview');
   const handleFoldFrameList = useCallback(() => {
     setIsFold((prev) => !prev);
   }, []);
@@ -43,6 +44,16 @@ const ToolFrame = ({ frameSize, attribute, onClick, onChangeVertical }: Props) =
       api.start();
     }
   }, [api, isFold]);
+
+  useEffect(() => {
+    if (isPreview) {
+      api.update({ from: { translateX: 0 }, to: { translateX: 200 } });
+      api.start();
+    } else {
+      api.update({ from: { translateX: 200 }, to: { translateX: 0 } });
+      api.start();
+    }
+  }, [api, isPreview]);
 
   return (
     <FrameWrapper>
