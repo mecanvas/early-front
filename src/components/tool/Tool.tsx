@@ -17,6 +17,8 @@ import {
   ImageShowingWidthHeight,
   FactoryUtills,
   Bill,
+  CroppedWrapper,
+  PreviewBg,
 } from './ToolStyle';
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
@@ -136,15 +138,18 @@ const Tool = () => {
     [changeVertical],
   );
 
+  const [isNoContent, setIsNoContent] = useGlobalState<boolean>('isNoContent', false);
   const [isSelectFrame, setIsSelectFrame] = useState(false); // 골랐는지 상태 여부
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
   const [canvasPosition] = useGlobalState<CanvasPosition>('canvasPosition');
   const [canvasFrameSizeInfo] = useGlobalState<CanvasFrameSizeInfo>('canvasFrameSizeInfo');
   const [croppedList, setCroppedList] = useState<CroppedFrame[]>([]);
+  const [framePreviewMode, setFramePreviewMode] = useState<CanvasPosition | null>(null);
   const [scrollX, scrollY] = useGetScollPosition();
 
   const imgWrapperRef = useRef<HTMLDivElement>(null);
   const imgNode = useRef<HTMLImageElement>(null);
+  const previewBgRef = useRef<HTMLImageElement>(null);
 
   const [imgUploadUrl, setImgUploadUrl] = useGlobalState('imgUploadUrl', '');
   const [imgUploadLoading, setImgUploadLoading] = useState(false);
@@ -476,8 +481,6 @@ const Tool = () => {
     ],
   );
 
-  console.log(croppedList);
-
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
   const insertFrameToCanvas = useCallback(async () => {
     if (imgNode.current && selectedFrameInfo) {
@@ -585,7 +588,12 @@ const Tool = () => {
   }, [setCenterX, setCenterY]);
 
   // 리사이즈시에도 동일하게 움직일 수 있도록 설정
-  const handleFramePositionReletive = useCallback(() => {
+  const handleFramePositionRelative = useCallback(() => {
+    if (window.innerWidth <= +theme.size.md.replace('px', '')) {
+      setIsNoContent(true);
+    } else {
+      setIsNoContent(false);
+    }
     getImgWrapperSizeForParallel();
 
     if (imgNode.current) {
@@ -599,9 +607,13 @@ const Tool = () => {
         })),
       );
 
-      requestAnimationFrame(() => handleFramePositionReletive);
+      requestAnimationFrame(() => handleFramePositionRelative);
     }
-  }, [getImgWrapperSizeForParallel, scrollX, scrollY]);
+    if (previewBgRef.current) {
+      const { left, top } = previewBgRef.current.getBoundingClientRect();
+      setFramePreviewMode({ ...framePreviewMode, top, left });
+    }
+  }, [getImgWrapperSizeForParallel, setIsNoContent, scrollX, scrollY, framePreviewMode]);
 
   // 컬러 체이닞
   const handleColorChange = useCallback((color: ColorResult) => {
@@ -632,24 +644,15 @@ const Tool = () => {
     if (imgNode.current) {
       imgNode.current.style.visibility = isPreview ? 'hidden' : 'visible';
     }
-    if (isPreview) {
-      setCroppedList((prev) =>
-        prev.map((lst) => ({
-          ...lst,
-          transform: `scale(0.3)`,
-        })),
-      );
-    } else {
-      setCroppedList((prev) =>
-        prev.map((lst) => ({
-          ...lst,
-          transform: `scale(1)`,
-        })),
-      );
-    }
-  }, [isPreview]);
 
-  console.log(croppedList);
+    if (isPreview) {
+      if (previewBgRef.current) {
+        const { left } = previewBgRef.current.getBoundingClientRect();
+        setFramePreviewMode({ ...framePreviewMode, top: 105, left });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPreview]);
 
   useEffect(() => {
     if (!imgUploadUrl) return;
@@ -669,11 +672,11 @@ const Tool = () => {
 
   useEffect(() => {
     if (window) {
-      window.addEventListener('resize', handleFramePositionReletive);
-      requestAnimationFrame(handleFramePositionReletive);
+      window.addEventListener('resize', handleFramePositionRelative);
+      requestAnimationFrame(handleFramePositionRelative);
     }
     return () => {
-      window.removeEventListener('resize', handleFramePositionReletive);
+      window.removeEventListener('resize', handleFramePositionRelative);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -702,6 +705,19 @@ const Tool = () => {
 
   return (
     <>
+      {isNoContent && (
+        <div
+          style={{
+            position: 'fixed',
+            width: '100%',
+            height: '100vh',
+            top: 0,
+            backgroundColor: 'black',
+          }}
+        >
+          노컨텐츠!!
+        </div>
+      )}
       <ToolContainer>
         {imgUploadUrl && (
           <ToolFrameList
@@ -837,7 +853,6 @@ const Tool = () => {
 
         <ImageWrapper
           isPreview={isPreview || false}
-          previewBg={getS3('bg1.jpg')}
           imgUploadLoading={imgUploadLoading}
           id="img-box"
           data-component="wrapper"
@@ -853,19 +868,26 @@ const Tool = () => {
           onMouseLeave={handleImgResizeEnd}
           cmd={resizeCmd}
         >
-          {croppedList.map(({ dataset, id, imageCropStyle, ...style }) => (
-            <div
-              key={id}
-              id={id}
-              style={style}
-              data-originleft={dataset.originleft}
-              data-origintop={dataset.origintop}
-              className="cropped-img"
-            >
-              <img style={imageCropStyle} />
-              <div id={id} className="cropped-img-delete" onClick={handleDeleteCanvas}></div>
-            </div>
-          ))}
+          {isPreview && (
+            <PreviewBg ref={previewBgRef}>
+              <img src={getS3('bg1.jpg')} alt="미리보기배경" />
+            </PreviewBg>
+          )}
+          <CroppedWrapper isPreview={isPreview || false} top={framePreviewMode?.top} left={framePreviewMode?.left}>
+            {croppedList.map(({ dataset, id, imageCropStyle, ...style }) => (
+              <div
+                key={id}
+                id={id}
+                style={style}
+                data-originleft={dataset.originleft}
+                data-origintop={dataset.origintop}
+                className="cropped-img"
+              >
+                <img style={imageCropStyle} />
+                <div id={id} className="cropped-img-delete" onClick={handleDeleteCanvas}></div>
+              </div>
+            ))}
+          </CroppedWrapper>
           {imgUploadUrl ? (
             <>
               {isSelectFrame && <ToolSelectedFrame {...yourSelectedFrame} onClick={handleFrameRelease} />}

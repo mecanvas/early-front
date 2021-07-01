@@ -227,20 +227,8 @@ export const ImageWrapper = styled.div<{
   imgUploadLoading?: boolean;
   cmd?: ResizeCmd | null;
   isPreview?: boolean;
-  previewBg?: string;
 }>`
   background-color: ${({ bgColor }) => bgColor};
-
-  ${({ isPreview, previewBg }) =>
-    isPreview &&
-    previewBg &&
-    css`
-      background-image: url(${previewBg});
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: contain;
-    `}
-
   width: 100%;
   display: flex;
   justify-content: center;
@@ -390,6 +378,26 @@ export const ImageShowingWidthHeight = styled.small`
       }
     }
   }
+`;
+
+export const PreviewBg = styled.div`
+  position: absolute;
+  img {
+    object-fit: contain;
+  }
+`;
+
+export const CroppedWrapper = styled.div<{ isPreview: boolean; top?: number; left?: number }>`
+  ${({ isPreview, top, left }) =>
+    isPreview &&
+    left &&
+    top &&
+    css`
+      position: absolute;
+      top: ${top}px;
+      left: ${left}px;
+      transform: scale(0.3);
+    `}
 `;
 
 export const ImgController = styled.div<{
