@@ -31,15 +31,11 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
     right: boolean;
     bottom: boolean;
     left: boolean;
-    centerX: boolean;
-    centerY: boolean;
   }>({
     top: false,
     right: false,
     bottom: false,
     left: false,
-    centerX: false,
-    centerY: false,
   });
   const [centerX] = useGlobalState<number>('centerX');
   const [centerY] = useGlobalState<number>('centerY');
@@ -185,21 +181,17 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
                 Math.abs(bottom - cropBottom) < conditionValue || Math.abs(bottom - cropTop) < conditionValue;
               const isNearingTop = (conditionValue: number) =>
                 Math.abs(top - cropTop) < conditionValue || Math.abs(top - cropBottom) < conditionValue;
-              const isNearingCenterX = (conditionValue: number) => Math.abs(top / 2 - cropTop / 2) < conditionValue;
-              const isNearingCenterY = (conditionValue: number) => Math.abs(left / 2 - cropLeft / 2) < conditionValue;
 
               setIsNearing({
                 top: isNearingTop(2),
                 right: isNearingRight(2),
                 left: isNearingLeft(2),
                 bottom: isNearingBottom(2),
-                centerX: isNearingCenterX(0.5),
-                centerY: isNearingCenterY(0.5),
               });
             });
           }
 
-          const { top, right, left, bottom, centerX, centerY } = isNearing;
+          const { top, right, left, bottom } = isNearing;
           // top
           if (top) {
             ctx.fillStyle = `${theme.color.primary}`;
@@ -224,17 +216,17 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
             ctx.fillRect(positionLeft, 0, 1, canvas.height);
           }
 
-          //  centerX
-          if (centerX) {
-            ctx.fillStyle = `${theme.color.primary}`;
-            ctx.fillRect(0, positionTop + frameHeight / 2, canvas.width, 1);
-          }
+          // //  centerX
+          // if (centerX) {
+          //   ctx.fillStyle = `${theme.color.primary}`;
+          //   ctx.fillRect(0, positionTop + frameHeight / 2, canvas.width, 1);
+          // }
 
-          //  centerY
-          if (centerY) {
-            ctx.fillStyle = `${theme.color.secondary}`;
-            ctx.fillRect(positionLeft + frameWidth / 2, 0, 1, canvas.height);
-          }
+          // //  centerY
+          // if (centerY) {
+          //   ctx.fillStyle = `${theme.color.secondary}`;
+          //   ctx.fillRect(positionLeft + frameWidth / 2, 0, 1, canvas.height);
+          // }
         }
       }
       requestAnimationFrame(() => handleDrawingFrame);
