@@ -715,7 +715,7 @@ const Tool = () => {
 
   return (
     <>
-      {isGridGuideLine && (
+      {imgUploadUrl && isGridGuideLine && !isPreview && (
         <div
           style={{
             position: 'fixed',
