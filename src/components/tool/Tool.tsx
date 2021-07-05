@@ -49,6 +49,7 @@ import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getS3 } from 'src/utils/getS3';
 import { ImgToDataURL } from 'src/utils/ImgToDataURL';
 import { replacePx } from 'src/utils/replacePx';
+import { useProgress } from 'src/hooks/useProgress';
 
 const Tool = () => {
   const router = useRouter();
@@ -139,6 +140,8 @@ const Tool = () => {
     ],
     [changeVertical],
   );
+
+  const { getProgressGage, progressPercentage } = useProgress();
 
   const [isNoContent, setIsNoContent] = useGlobalState<boolean>('isNoContent', false);
   const [isSelectFrame, setIsSelectFrame] = useState(false); // 골랐는지 상태 여부
@@ -343,7 +346,11 @@ const Tool = () => {
         if (imgWrapperRef.current) {
           const fd = new FormData();
           fd.append('image', file);
-          await axios.post('/canvas/img', fd).then((res) => setImgUploadUrl(res.data || ''));
+          await axios
+            .post('/canvas/img', fd, {
+              onUploadProgress: getProgressGage,
+            })
+            .then((res) => setImgUploadUrl(res.data || ''));
         }
       } catch (err) {
         alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
@@ -353,7 +360,7 @@ const Tool = () => {
       }
       return false;
     },
-    [setImgUploadUrl],
+    [getProgressGage, setImgUploadUrl],
   );
 
   const handleImgDropUpload = useCallback(
@@ -371,7 +378,14 @@ const Tool = () => {
           const fd = new FormData();
           fd.append('image', file);
 
-          await axios.post('/canvas/img', fd).then((res) => setImgUploadUrl(res.data || ''));
+          await axios
+            .post('/canvas/img', fd, {
+              onUploadProgress: getProgressGage,
+            })
+            .then((res) => {
+              console.log(res);
+              setImgUploadUrl(res.data || '');
+            });
         }
       } catch (err) {
         alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
@@ -380,7 +394,7 @@ const Tool = () => {
         setImgUploadLoading(false);
       }
     },
-    [setImgUploadUrl],
+    [getProgressGage, setImgUploadUrl],
   );
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: handleImgDropUpload });
 
@@ -878,7 +892,7 @@ const Tool = () => {
           </div>
         )}
 
-        {<Loading loading={imgUploadLoading} />}
+        {<Loading progressPercentage={progressPercentage} loading={imgUploadLoading} />}
         <Modal
           visible={imgModalResizeOpen}
           onOk={handleModalResizeOk}
