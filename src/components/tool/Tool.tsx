@@ -30,7 +30,7 @@ import { useRouter } from 'next/router';
 import Loading from '../common/Loading';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSquare } from '@fortawesome/free-regular-svg-icons';
-import { faPaintRoller, faUndo, faImage, faCompress } from '@fortawesome/free-solid-svg-icons';
+import { faPaintRoller, faUndo, faImage, faCompress, faRulerHorizontal } from '@fortawesome/free-solid-svg-icons';
 import ToolSave from './ToolSave';
 import { cmToPx } from 'src/utils/cmToPx';
 import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
@@ -168,6 +168,12 @@ const Tool = () => {
 
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
 
+  // 눈금 간격 라인 표시
+  const [isGridGuideLine, setIsGridGuideLine] = useState(false);
+  const [gridGuideLine, setGridGuideLine] = useState<any[]>([]);
+  const [gridWidth, setGridWidth] = useState(0);
+  const [gridHeight, setGridHeight] = useState(0);
+
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState('saveModal', false);
 
   // 액자 사이즈들 변경
@@ -183,6 +189,10 @@ const Tool = () => {
 
   // 미리보기
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview', false);
+
+  const handleShowGridGuideLine = useCallback(() => {
+    setIsGridGuideLine((prev) => !prev);
+  }, []);
 
   const handleChangeVertical = useCallback(() => {
     setChangeVertical((prev) => !prev);
@@ -650,13 +660,25 @@ const Tool = () => {
       el.style.height = '';
       el.src = imgUploadUrl;
       el.onload = () => {
-        setOriginWidth(el.naturalWidth || el.width);
-        setOriginHeight(el.naturalHeight || el.height);
+        setOriginWidth(el.naturalWidth < 1000 ? el.naturalWidth : el.width);
+        setOriginHeight(el.naturalHeight < 700 ? el.naturalHeight : el.height);
         setResizeWidth(el.width);
         setResizeHeight(el.height);
       };
     }
   }, [imgUploadUrl]);
+
+  useEffect(() => {
+    const imgWrapper = imgWrapperRef.current;
+    if (!imgWrapper) return;
+    if (isGridGuideLine) {
+      const { width, height } = imgWrapper.getBoundingClientRect();
+
+      setGridWidth(Math.floor(width / 48));
+      setGridHeight(Math.floor(height / 36));
+      setGridGuideLine(new Array(Math.floor((width / 48) * (height / 36))).fill(undefined).map((_, index) => index));
+    }
+  }, [isGridGuideLine]);
 
   useEffect(() => {
     if (window) {
@@ -693,6 +715,26 @@ const Tool = () => {
 
   return (
     <>
+      {imgUploadUrl && isGridGuideLine && !isPreview && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '105px',
+            overflow: 'hidden',
+            right: 0,
+            width: '100%',
+            height: '100vh',
+            display: 'grid',
+            zIndex: 1,
+            gridTemplateColumns: `repeat(${gridWidth}, 1fr)`,
+            gridTemplateRows: `repeat(${gridHeight}, 1fr)`,
+          }}
+        >
+          {gridGuideLine.map(() => (
+            <div style={{ border: '1px dashed #dbdbdb' }}></div>
+          ))}
+        </div>
+      )}
       <ToolContainer>
         {imgUploadUrl && (
           <ToolFrameList
@@ -754,6 +796,16 @@ const Tool = () => {
           </FactoryUtills>
           <FactoryTool>
             <div>
+              {isResizeMode && (
+                <>
+                  <ImageShowingWidthHeight>
+                    {`${resizeWidth.toFixed()}px X ${resizeHeight.toFixed()}px`}
+                    <span onClick={handleModalResize}>
+                      <FontAwesomeIcon icon={faEdit} />
+                    </span>
+                  </ImageShowingWidthHeight>
+                </>
+              )}
               <Button type="text" style={{ opacity: selectedFrameList.length ? 1 : 0.4 }} onClick={handleImgGoBack}>
                 <FontAwesomeIcon icon={faUndo} />
                 <small>실행취소</small>
@@ -775,6 +827,11 @@ const Tool = () => {
                   <small>배경</small>
                 </Button>
               </Popover>
+
+              <Button type="text" onClick={handleShowGridGuideLine}>
+                <FontAwesomeIcon icon={faRulerHorizontal} />
+                <small>눈금자</small>
+              </Button>
 
               <Button type="text" onClick={handleImgRatioSetting}>
                 <FontAwesomeIcon icon={faCompress} />
@@ -840,7 +897,7 @@ const Tool = () => {
               </Checkbox>
             </div>
             <div style={{ textAlign: 'right', marginTop: '6px' }}>
-              <Button onClick={handleResizeReset}>원래의 이미지 크기로 되돌립니다.</Button>
+              <Button onClick={handleResizeReset}>이미지 초기 사이즈로 되돌립니다.</Button>
             </div>
           </div>
         </Modal>
@@ -888,16 +945,6 @@ const Tool = () => {
                 <ToolSelectedFrame croppedList={croppedList} {...yourSelectedFrame} onClick={handleFrameRelease} />
               )}
 
-              {isResizeMode && (
-                <>
-                  <ImageShowingWidthHeight>
-                    {`${resizeWidth.toFixed()}px X ${resizeHeight.toFixed()}px`}
-                    <span onClick={handleModalResize}>
-                      <FontAwesomeIcon icon={faEdit} />
-                    </span>
-                  </ImageShowingWidthHeight>
-                </>
-              )}
               {isPreview || (
                 <ImgController data-layout="inner" isResizeStart={isResizeMode} cmd={resizeCmd}>
                   <img
