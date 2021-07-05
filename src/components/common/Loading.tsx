@@ -52,6 +52,10 @@ const LoaderContainer = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  max-width: 250px;
+  margin: 0 auto;
+  width: 100%;
+  text-align: center;
 `;
 
 const Loader = styled.div`
@@ -60,7 +64,6 @@ const Loader = styled.div`
   border: 4px solid ${({ theme }) => theme.color.primary};
   display: inline-block;
   position: relative;
-  left: 50px;
   top: 50%;
   animation: ${LoaderAnimation} 2s infinite ease;
   margin-bottom: 12px;
@@ -76,24 +79,28 @@ const Loader = styled.div`
 interface Props {
   loading: boolean;
   text?: string;
+  progressPercentage?: number;
 }
 
-const Loading = ({ loading, text }: Props) => {
+const Loading = ({ loading, text, progressPercentage }: Props) => {
   const textAni = useSpring({
     to: { opacity: 1, translateY: 0 },
     from: { opacity: 0, translateY: 20 },
     delay: 500,
     config: { duration: 1000 },
   });
+
   if (!loading) {
     return null;
   }
+
   return (
     <LoaderContainer>
       <Loader>
         <span></span>
       </Loader>
-      <animated.p style={textAni}>{text ? text : '잠시만 기다려 주세요.'}</animated.p>
+      <animated.p style={textAni}>{text ? text : '잠시만 기다려 주세요. '}</animated.p>
+      <h5>{progressPercentage}%</h5>
     </LoaderContainer>
   );
 };

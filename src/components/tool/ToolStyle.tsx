@@ -275,7 +275,7 @@ export const ImageWrapper = styled.div<{
   ${({ imgUploadLoading }) =>
     imgUploadLoading &&
     css`
-      opacity: 0.3;
+      opacity: 0.2;
     `}
   ${({ cmd }) => {
     if (!cmd) return;
