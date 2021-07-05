@@ -48,6 +48,7 @@ import ToolSelectedFrame from './ToolSelectedFrame';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getS3 } from 'src/utils/getS3';
 import { ImgToDataURL } from 'src/utils/ImgToDataURL';
+import { replacePx } from 'src/utils/replacePx';
 
 const Tool = () => {
   const router = useRouter();
@@ -507,8 +508,8 @@ const Tool = () => {
         const seletctedName = frameSize.filter((lst) => {
           if (lst.name === value) {
             setYourSelectedFrame({
-              width: +lst.size.width.replace('px', ''),
-              height: +lst.size.height.replace('px', ''),
+              width: replacePx(lst.size.width),
+              height: replacePx(lst.size.height),
             });
             return lst;
           }
@@ -576,7 +577,7 @@ const Tool = () => {
 
   // 리사이즈시에도 동일하게 움직일 수 있도록 설정
   const handleFramePositionRelative = useCallback(() => {
-    if (window.innerWidth <= +theme.size.md.replace('px', '')) {
+    if (window.innerWidth <= replacePx(theme.size.md)) {
       setIsNoContent(true);
     } else {
       setIsNoContent(false);

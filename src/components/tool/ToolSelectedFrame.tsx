@@ -160,7 +160,6 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
           ctx.strokeRect(positionLeft, positionTop, frameWidth, frameHeight);
           ctx.stroke();
 
-          // checkNearingParallelForEachBox();
           if (croppedList && croppedList.length) {
             for (const list of croppedList) {
               const cropWidth = replacePx(list.width);
@@ -175,6 +174,7 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
               const right = left + frameWidth;
               const bottom = top + frameHeight;
 
+              // TODO: 로직 추상화 작업
               const isNearingRight = (conditionValue: number) => {
                 if (Math.abs(right - cropRight) < conditionValue) {
                   setFixX(right - cropRight);
