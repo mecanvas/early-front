@@ -1,20 +1,23 @@
-import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
-import { useGlobalState } from 'src/hooks';
-import { CanvasFrameSizeInfo, CanvasPosition } from 'src/interfaces/ToolInterface';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useGetScollPosition, useGlobalState } from 'src/hooks';
+import { CanvasFrameSizeInfo, CanvasPosition, CroppedFrame } from 'src/interfaces/ToolInterface';
+import { theme } from 'src/style/theme';
+import { replacePx } from 'src/utils/replacePx';
 import { SelectedFrameWrapper } from './ToolStyle';
 
 interface Props {
   width?: number;
   height?: number;
   onClick: () => void;
+  croppedList: CroppedFrame[];
 }
 
-const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
+const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) => {
   const selectFrameWrapper = useRef<HTMLDivElement>(null);
   const selectFrameRef = useRef<HTMLCanvasElement>(null);
   const frameWidth = useMemo(() => width || 0, [width]);
   const frameHeight = useMemo(() => height || 0, [height]);
-
+  const [scrollX, scrollY] = useGetScollPosition();
   const [canvasPosition, setCanvasPosition] = useGlobalState<CanvasPosition>('canvasPosition', {
     left: 0,
     top: 0,
@@ -23,6 +26,19 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
     width: 0,
     height: 0,
   });
+  const [isNearing, setIsNearing] = useState<{
+    top: boolean;
+    right: boolean;
+    bottom: boolean;
+    left: boolean;
+  }>({
+    top: false,
+    right: false,
+    bottom: false,
+    left: false,
+  });
+  const [fixX, setFixX] = useState<number>(0);
+  const [fixY, setFixY] = useState<number>(0);
   const [centerX] = useGlobalState<number>('centerX');
   const [centerY] = useGlobalState<number>('centerY');
   const [, setIsNearingX] = useGlobalState('isNearingX', false);
@@ -131,8 +147,8 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
         canvas.height = canvasHeight;
         const ctx = canvas.getContext('2d');
         const [x, y] = getPosition(e);
-        const positionLeft = x - frameWidth / 2;
-        const positionTop = y - frameHeight / 2;
+        const positionLeft = x - frameWidth / 2 - fixX;
+        const positionTop = y - frameHeight / 2 - fixY;
         checkNearingCenterForMouse(x, y);
         checkNearingParallelForBox();
         setCanvasPosition({ ...canvasPosition, top: positionTop, left: positionLeft });
@@ -143,6 +159,102 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
           ctx.strokeStyle = '#333';
           ctx.strokeRect(positionLeft, positionTop, frameWidth, frameHeight);
           ctx.stroke();
+
+          if (croppedList && croppedList.length) {
+            for (const list of croppedList) {
+              const cropWidth = replacePx(list.width);
+              const cropHeight = replacePx(list.height);
+              const cropLeft = replacePx(list.left);
+              const cropRight = cropLeft + cropWidth;
+              const cropTop = replacePx(list.top);
+              const cropBottom = cropTop + cropHeight;
+
+              const top = positionTop + scrollY;
+              const left = positionLeft + scrollX;
+              const right = left + frameWidth;
+              const bottom = top + frameHeight;
+
+              // TODO: 로직 추상화 작업
+              const isNearingRight = (conditionValue: number) => {
+                if (Math.abs(right - cropRight) < conditionValue) {
+                  setFixX(right - cropRight);
+                  return true;
+                }
+                if (Math.abs(right - cropLeft) < conditionValue) {
+                  setFixX(right - cropLeft);
+                  return true;
+                }
+                return false;
+              };
+              const isNearingLeft = (conditionValue: number) => {
+                if (Math.abs(left - cropLeft) < conditionValue) {
+                  setFixX(left - cropLeft);
+                  return true;
+                }
+                if (Math.abs(left - cropRight) < conditionValue) {
+                  setFixX(left - cropRight);
+                  return true;
+                }
+                return false;
+              };
+
+              const isNearingBottom = (conditionValue: number) => {
+                if (Math.abs(bottom - cropBottom) < conditionValue) {
+                  setFixY(bottom - cropBottom);
+                  return true;
+                }
+                if (Math.abs(left - cropTop) < conditionValue) {
+                  setFixY(bottom - cropTop);
+                  return true;
+                }
+                return false;
+              };
+
+              const isNearingTop = (conditionValue: number) => {
+                if (Math.abs(top - cropTop) < conditionValue) {
+                  setFixY(top - cropTop);
+                  return true;
+                }
+                if (Math.abs(top - cropBottom) < conditionValue) {
+                  setFixY(top - cropBottom);
+                  return true;
+                }
+                return false;
+              };
+
+              setIsNearing({
+                top: isNearingTop(1.5),
+                right: isNearingRight(1.5),
+                left: isNearingLeft(1.5),
+                bottom: isNearingBottom(1.5),
+              });
+            }
+          }
+
+          const { top, right, left, bottom } = isNearing;
+          // top
+          if (top) {
+            ctx.fillStyle = `${theme.color.primary}`;
+            ctx.fillRect(0, positionTop, canvas.width, 1);
+          }
+
+          //  right
+          if (right) {
+            ctx.fillStyle = `${theme.color.primary}`;
+            ctx.fillRect(positionLeft + frameWidth, 0, 1, canvas.height);
+          }
+
+          //  bottom
+          if (bottom) {
+            ctx.fillStyle = `${theme.color.primary}`;
+            ctx.fillRect(0, positionTop + frameHeight, canvas.width, 1);
+          }
+
+          //  left
+          if (left) {
+            ctx.fillStyle = `${theme.color.primary}`;
+            ctx.fillRect(positionLeft, 0, 1, canvas.height);
+          }
         }
       }
       requestAnimationFrame(() => handleDrawingFrame);
@@ -157,6 +269,12 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
       canvasPosition,
       setCanvasFrameSizeInfo,
       canvasFrameSizeInfo,
+      croppedList,
+      isNearing,
+      scrollY,
+      fixX,
+      fixY,
+      scrollX,
     ],
   );
 

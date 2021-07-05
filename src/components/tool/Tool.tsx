@@ -48,6 +48,7 @@ import ToolSelectedFrame from './ToolSelectedFrame';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getS3 } from 'src/utils/getS3';
 import { ImgToDataURL } from 'src/utils/ImgToDataURL';
+import { replacePx } from 'src/utils/replacePx';
 
 const Tool = () => {
   const router = useRouter();
@@ -161,7 +162,7 @@ const Tool = () => {
   const [resizeHeight, setResizeHeight] = useState(0);
   const [ratioPersist, setRatioPersist] = useState(true);
   const [imgModalResizeOpen, setImgModalResizeOpen] = useState(false);
-  const [canvasFramePositionList, setCanvasFramePositionList] = useState<number[]>([]);
+
   const [selectedFrameList, setSelectedFrameList] = useState<HTMLCanvasElement[]>([]);
   const [yourSelectedFrame, setYourSelectedFrame] = useState<CanvasFrameSizeInfo | null>(null);
 
@@ -373,24 +374,22 @@ const Tool = () => {
   );
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: handleImgDropUpload });
 
-  const handleDeleteCanvas = useCallback((e) => {
-    setCroppedList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
-    setFramePrice((prev) => prev.filter((lst) => lst.id !== +e.target.id));
-    setCanvasFramePositionList((prev) => prev.filter((lst) => lst !== +e.target.id));
-    setSelectedFrameList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
-  }, []);
+  const handleDeleteCanvas = useCallback(
+    (e) => {
+      if (croppedList) {
+        setCroppedList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
+        setFramePrice((prev) => prev.filter((lst) => lst.id !== +e.target.id));
+        setSelectedFrameList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
+      }
+    },
+    [croppedList],
+  );
 
   const handleImgGoBack = useCallback(() => {
-    if (imgWrapperRef.current) {
-      const { current: imgBox } = imgWrapperRef;
-      const imgBoxId = +(imgBox.childNodes[0] as any).id;
-      if (!imgBoxId) return;
-      setCroppedList((prev) => prev.filter((lst) => +lst.id !== imgBoxId));
-      setFramePrice(framePrice.slice(1));
-      setCanvasFramePositionList(canvasFramePositionList.filter((lst) => lst !== imgBoxId));
-      setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== imgBoxId));
-    }
-  }, [framePrice, canvasFramePositionList, selectedFrameList]);
+    setCroppedList((prev) => prev.slice(0, -1));
+    setFramePrice((prev) => prev.slice(0, -1));
+    setSelectedFrameList((prev) => prev.slice(0, -1));
+  }, []);
 
   // 이미지 저장을 위한 캔버스 생성 (스프라이트 기법으로 이미지 저장은 안되기 때문에 품질이 깨지더라도 이 방법 사용합니다.)
   const createCanvasForSave = useCallback(
@@ -439,7 +438,7 @@ const Tool = () => {
 
   const createImageCanvas = useCallback(
     async (id: number) => {
-      if (!isSelectFrame || !imgNode.current || !canvasPosition || !canvasFrameSizeInfo) return;
+      if (!isSelectFrame || !imgNode.current || !canvasPosition || !canvasFrameSizeInfo || !croppedList) return;
       const { width: frameWidth, height: frameHeight } = canvasFrameSizeInfo;
       const { left, top, width, height } = imgNode.current.getBoundingClientRect();
       const { left: canvasLeft, top: canvasTop } = canvasPosition;
@@ -465,21 +464,9 @@ const Tool = () => {
       };
 
       // 자른 액자 배열로 저장
-      setCroppedList([cropped, ...croppedList]);
-      // 만든 캔버스 액자의 포지션이 어떤지 설정해주기, 왜 와이? 리사이즈 시 위치 바꾸기 위함
-      setCanvasFramePositionList([...canvasFramePositionList, id]);
+      setCroppedList([...croppedList, cropped]);
     },
-    [
-      isSelectFrame,
-      canvasPosition,
-      canvasFrameSizeInfo,
-      scrollX,
-      scrollY,
-      imgUploadUrl,
-      bgColor,
-      canvasFramePositionList,
-      croppedList,
-    ],
+    [isSelectFrame, canvasPosition, canvasFrameSizeInfo, croppedList, scrollX, scrollY, imgUploadUrl, bgColor],
   );
 
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
@@ -488,7 +475,7 @@ const Tool = () => {
       //  액자의 가격을 price에 넣기
       const { name, price, cm } = selectedFrameInfo;
       const id = Date.now();
-      setFramePrice([{ name, price, id, cm }, ...framePrice]);
+      setFramePrice([...framePrice, { name, price, id, cm }]);
       createImageCanvas(id);
       createCanvasForSave(id);
     }
@@ -521,8 +508,8 @@ const Tool = () => {
         const seletctedName = frameSize.filter((lst) => {
           if (lst.name === value) {
             setYourSelectedFrame({
-              width: +lst.size.width.replace('px', ''),
-              height: +lst.size.height.replace('px', ''),
+              width: replacePx(lst.size.width),
+              height: replacePx(lst.size.height),
             });
             return lst;
           }
@@ -590,7 +577,7 @@ const Tool = () => {
 
   // 리사이즈시에도 동일하게 움직일 수 있도록 설정
   const handleFramePositionRelative = useCallback(() => {
-    if (window.innerWidth <= +theme.size.md.replace('px', '')) {
+    if (window.innerWidth <= replacePx(theme.size.md)) {
       setIsNoContent(true);
     } else {
       setIsNoContent(false);
@@ -881,7 +868,7 @@ const Tool = () => {
             </PreviewBg>
           )}
           <CroppedWrapper isPreview={isPreview || false} top={framePreviewMode?.top} left={framePreviewMode?.left}>
-            {croppedList.map(({ dataset, id, imageCropStyle, ...style }) => (
+            {croppedList?.map(({ dataset, id, imageCropStyle, ...style }) => (
               <div
                 key={id}
                 id={id}
@@ -897,7 +884,9 @@ const Tool = () => {
           </CroppedWrapper>
           {imgUploadUrl ? (
             <>
-              {isSelectFrame && <ToolSelectedFrame {...yourSelectedFrame} onClick={handleFrameRelease} />}
+              {isSelectFrame && (
+                <ToolSelectedFrame croppedList={croppedList} {...yourSelectedFrame} onClick={handleFrameRelease} />
+              )}
 
               {isResizeMode && (
                 <>

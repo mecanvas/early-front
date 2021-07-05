@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
+import { replacePx } from 'src/utils/replacePx';
 
 export const ToolContainer = styled.div`
   width: 100%;
@@ -652,8 +653,8 @@ export const FrameWrapper = styled.div`
 `;
 
 export const FrameSizeList = styled.div<{ width: string; height: string }>`
-  width: ${({ width }) => `${+width.replace('px', '') / 5}px`};
-  height: ${({ height }) => `${+height.replace('px', '') / 5}px`};
+  width: ${({ width }) => `${replacePx(width) / 5}px`};
+  height: ${({ height }) => `${replacePx(height) / 5}px`};
   z-index: 30;
   background-color: ${({ theme }) => theme.color.secondarybg};
   cursor: pointer;
