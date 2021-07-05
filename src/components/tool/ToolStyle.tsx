@@ -155,6 +155,7 @@ export const SelectedFrameWrapper = styled.div`
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 1;
   padding: 115px 10px 50px 10px;
   canvas {
     position: absolute;

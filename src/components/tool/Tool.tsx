@@ -168,6 +168,12 @@ const Tool = () => {
 
   const [framePrice, setFramePrice] = useState<FramePrice[]>([]);
 
+  // 눈금 간격 라인 표시
+  const [isGridGuideLine, setIsGridGuideLine] = useState(false);
+  const [gridGuideLine, setGridGuideLine] = useState<any[]>([]);
+  const [innerWidth, setInnerWidth] = useState(0);
+  const [innerHeight, setInnerHeight] = useState(0);
+
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState('saveModal', false);
 
   // 액자 사이즈들 변경
@@ -183,6 +189,10 @@ const Tool = () => {
 
   // 미리보기
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview', false);
+
+  const handleShowGridGuideLine = useCallback(() => {
+    setIsGridGuideLine((prev) => !prev);
+  }, []);
 
   const handleChangeVertical = useCallback(() => {
     setChangeVertical((prev) => !prev);
@@ -659,6 +669,18 @@ const Tool = () => {
   }, [imgUploadUrl]);
 
   useEffect(() => {
+    const imgWrapper = imgWrapperRef.current;
+    if (!imgWrapper) return;
+    if (isGridGuideLine) {
+      const { width, height } = imgWrapper.getBoundingClientRect();
+
+      setInnerWidth(Math.floor(width / 48));
+      setInnerHeight(Math.floor(height / 36));
+      setGridGuideLine(new Array(Math.floor((width / 48) * (height / 36))).fill(undefined).map((_, index) => index));
+    }
+  }, [isGridGuideLine]);
+
+  useEffect(() => {
     if (window) {
       window.addEventListener('resize', handleFramePositionRelative);
       requestAnimationFrame(handleFramePositionRelative);
@@ -693,6 +715,26 @@ const Tool = () => {
 
   return (
     <>
+      {isGridGuideLine && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '105px',
+            overflow: 'hidden',
+            right: 0,
+            width: '100%',
+            height: '100vh',
+            display: 'grid',
+            zIndex: 1,
+            gridTemplateColumns: `repeat(${innerWidth}, 1fr)`,
+            gridTemplateRows: `repeat(${innerHeight}, 1fr)`,
+          }}
+        >
+          {gridGuideLine.map(() => (
+            <div style={{ border: '1px dashed #dbdbdb' }}></div>
+          ))}
+        </div>
+      )}
       <ToolContainer>
         {imgUploadUrl && (
           <ToolFrameList
@@ -775,6 +817,11 @@ const Tool = () => {
                   <small>배경</small>
                 </Button>
               </Popover>
+
+              <Button type="text" onClick={handleShowGridGuideLine}>
+                <FontAwesomeIcon icon={faPaintRoller} />
+                <small>눈금자</small>
+              </Button>
 
               <Button type="text" onClick={handleImgRatioSetting}>
                 <FontAwesomeIcon icon={faCompress} />
