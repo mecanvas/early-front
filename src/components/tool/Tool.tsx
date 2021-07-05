@@ -660,8 +660,8 @@ const Tool = () => {
       el.style.height = '';
       el.src = imgUploadUrl;
       el.onload = () => {
-        setOriginWidth(el.naturalWidth || el.width);
-        setOriginHeight(el.naturalHeight || el.height);
+        setOriginWidth(el.naturalWidth < 1000 ? el.naturalWidth : el.width);
+        setOriginHeight(el.naturalHeight < 700 ? el.naturalHeight : el.height);
         setResizeWidth(el.width);
         setResizeHeight(el.height);
       };
@@ -796,6 +796,16 @@ const Tool = () => {
           </FactoryUtills>
           <FactoryTool>
             <div>
+              {isResizeMode && (
+                <>
+                  <ImageShowingWidthHeight>
+                    {`${resizeWidth.toFixed()}px X ${resizeHeight.toFixed()}px`}
+                    <span onClick={handleModalResize}>
+                      <FontAwesomeIcon icon={faEdit} />
+                    </span>
+                  </ImageShowingWidthHeight>
+                </>
+              )}
               <Button type="text" style={{ opacity: selectedFrameList.length ? 1 : 0.4 }} onClick={handleImgGoBack}>
                 <FontAwesomeIcon icon={faUndo} />
                 <small>실행취소</small>
@@ -887,7 +897,7 @@ const Tool = () => {
               </Checkbox>
             </div>
             <div style={{ textAlign: 'right', marginTop: '6px' }}>
-              <Button onClick={handleResizeReset}>원래의 이미지 크기로 되돌립니다.</Button>
+              <Button onClick={handleResizeReset}>이미지 초기 사이즈로 되돌립니다.</Button>
             </div>
           </div>
         </Modal>
@@ -935,16 +945,6 @@ const Tool = () => {
                 <ToolSelectedFrame croppedList={croppedList} {...yourSelectedFrame} onClick={handleFrameRelease} />
               )}
 
-              {isResizeMode && (
-                <>
-                  <ImageShowingWidthHeight>
-                    {`${resizeWidth.toFixed()}px X ${resizeHeight.toFixed()}px`}
-                    <span onClick={handleModalResize}>
-                      <FontAwesomeIcon icon={faEdit} />
-                    </span>
-                  </ImageShowingWidthHeight>
-                </>
-              )}
               {isPreview || (
                 <ImgController data-layout="inner" isResizeStart={isResizeMode} cmd={resizeCmd}>
                   <img

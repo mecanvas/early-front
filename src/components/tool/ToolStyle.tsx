@@ -336,7 +336,7 @@ export const ImageWrapper = styled.div<{
 
 export const ImageShowingWidthHeight = styled.small`
   position: absolute;
-  top: 110px;
+  top: 10px;
   z-index: 33;
   padding: 8px;
   font-weight: bold;
@@ -345,8 +345,7 @@ export const ImageShowingWidthHeight = styled.small`
   background-color: ${({ theme }) => theme.color.secondarybg};
   color: ${({ theme }) => theme.color.primary};
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-    top: 150px;
-    right: 35px;
+    top: 5px;
     font-size: 13px;
   }
   @media all and (max-width: ${({ theme }) => theme.size.xs}) {
@@ -356,7 +355,7 @@ export const ImageShowingWidthHeight = styled.small`
   span {
     position: absolute;
     cursor: pointer;
-    right: -35px;
+    right: -34px;
     top: 0;
     width: 30px;
     height: 30px;
