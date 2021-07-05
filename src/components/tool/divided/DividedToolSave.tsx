@@ -4,8 +4,8 @@ import { useCanvasToServer, useGlobalState } from 'src/hooks';
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import AppTable from '../antd/AppTable';
-import { BillTotal } from './ToolStyle';
+import { BillTotal } from './DividedToolStyle';
+import AppTable from 'src/components/antd/AppTable';
 
 const AntdInput = styled(Input)<{ isRequired: boolean }>`
   ${({ isRequired, theme }) =>

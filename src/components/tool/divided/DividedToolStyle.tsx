@@ -33,14 +33,7 @@ export const FactoryUtills = styled.div`
     height: 40px;
     padding: 0 0.5em;
   }
-  h1 {
-    margin: 0;
-    padding: 0.4em;
-    text-align: center;
-    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-      font-size: 22px;
-    }
-  }
+
   & > div {
     display: flex;
     button {

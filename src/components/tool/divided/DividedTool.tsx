@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useGetScollPosition, useGlobalState } from 'src/hooks';
 import axios from 'axios';
-import ToolColorPalette from './ToolColorPalette';
+import ToolColorPalette from './DividedToolColorPalette';
 import {
   ToolContainer,
   ImageWrapper,
@@ -19,7 +19,7 @@ import {
   Bill,
   CroppedWrapper,
   PreviewBg,
-} from './ToolStyle';
+} from './DividedToolStyle';
 import { ColorResult } from 'react-color';
 import { useDropzone } from 'react-dropzone';
 import { PlusOutlined } from '@ant-design/icons';
@@ -27,14 +27,14 @@ import { Button, Modal, Popover, Upload, Checkbox, Input } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import { theme } from 'src/style/theme';
 import { useRouter } from 'next/router';
-import Loading from '../common/Loading';
+import Loading from '../../common/Loading';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSquare } from '@fortawesome/free-regular-svg-icons';
 import { faPaintRoller, faUndo, faImage, faCompress, faRulerHorizontal } from '@fortawesome/free-solid-svg-icons';
-import ToolSave from './ToolSave';
+import ToolSave from './DividedToolSave';
 import { cmToPx } from 'src/utils/cmToPx';
 import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
-import ToolFrameList from './ToolFrameList';
+import ToolFrameList from './DividedToolFrameList';
 import {
   FrameSize,
   CanvasPosition,
@@ -44,12 +44,13 @@ import {
   CroppedFrame,
 } from 'src/interfaces/ToolInterface';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
-import ToolSelectedFrame from './ToolSelectedFrame';
+import ToolSelectedFrame from './DividedToolSelectedFrame';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getS3 } from 'src/utils/getS3';
 import { ImgToDataURL } from 'src/utils/ImgToDataURL';
 import { replacePx } from 'src/utils/replacePx';
 import { useProgress } from 'src/hooks/useProgress';
+import Logo from 'src/components/layouts/Logo';
 
 const Tool = () => {
   const router = useRouter();
@@ -762,7 +763,9 @@ const Tool = () => {
         {/* 사진 조절하는 툴바들 */}
         <FactoryHeader>
           <FactoryUtills>
-            <h1 onClick={handlePushMainPage}>Early</h1>
+            <div onClick={handlePushMainPage}>
+              <Logo />
+            </div>
             <div>
               <Popover
                 style={{ padding: 0 }}

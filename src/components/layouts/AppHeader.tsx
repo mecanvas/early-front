@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
 import { Button } from 'antd';
 import { useExceptionRoute } from 'src/hooks/useExceptionRoute';
+import Logo from './Logo';
 
 const HeaderContainer = styled.header`
   width: 100%;
@@ -16,15 +17,23 @@ const Header = styled.div`
   align-items: center;
   justify-content: space-between;
   margin: 0 auto;
+
+  button {
+    margin-left: 3px;
+  }
 `;
 
 const AppHeader = () => {
   const { exceptionRoute } = useExceptionRoute();
   const router = useRouter();
 
-  const handlePushCustomPage = useCallback(() => {
-    router.push('/tool');
-  }, [router]);
+  const handlePushCustomPage = useCallback(
+    (e) => {
+      const { key } = e.currentTarget.dataset;
+      router.push(`/tool/${key}`);
+    },
+    [router],
+  );
 
   if (exceptionRoute) {
     return null;
@@ -34,10 +43,15 @@ const AppHeader = () => {
     <HeaderContainer>
       <Header>
         <>
-          <h4>MeCanvas</h4>
-          <Button type="primary" onClick={handlePushCustomPage}>
-            Canvas
-          </Button>
+          <Logo />
+          <div>
+            <Button type="primary" data-key="single" onClick={handlePushCustomPage}>
+              단일
+            </Button>
+            <Button type="primary" data-key="divided" onClick={handlePushCustomPage}>
+              분할
+            </Button>
+          </div>
         </>
       </Header>
     </HeaderContainer>

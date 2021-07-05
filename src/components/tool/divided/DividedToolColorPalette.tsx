@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { ColorPaletteFreeColor, ColorPaletteWrapper } from './ToolStyle';
+import { ColorPaletteFreeColor, ColorPaletteWrapper } from './DividedToolStyle';
 import { CirclePicker, ColorResult, ChromePicker } from 'react-color';
 import { CaretDownOutlined } from '@ant-design/icons';
 import { Popover } from 'antd';

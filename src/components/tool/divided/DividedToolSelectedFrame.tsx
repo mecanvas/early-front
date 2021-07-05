@@ -3,7 +3,7 @@ import { useGetScollPosition, useGlobalState } from 'src/hooks';
 import { CanvasFrameSizeInfo, CanvasPosition, CroppedFrame } from 'src/interfaces/ToolInterface';
 import { theme } from 'src/style/theme';
 import { replacePx } from 'src/utils/replacePx';
-import { SelectedFrameWrapper } from './ToolStyle';
+import { SelectedFrameWrapper } from './DividedToolStyle';
 
 interface Props {
   width?: number;
