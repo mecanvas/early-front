@@ -30,7 +30,7 @@ import { useRouter } from 'next/router';
 import Loading from '../common/Loading';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSquare } from '@fortawesome/free-regular-svg-icons';
-import { faPaintRoller, faUndo, faImage, faCompress } from '@fortawesome/free-solid-svg-icons';
+import { faPaintRoller, faUndo, faImage, faCompress, faRulerHorizontal } from '@fortawesome/free-solid-svg-icons';
 import ToolSave from './ToolSave';
 import { cmToPx } from 'src/utils/cmToPx';
 import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
@@ -171,8 +171,8 @@ const Tool = () => {
   // 눈금 간격 라인 표시
   const [isGridGuideLine, setIsGridGuideLine] = useState(false);
   const [gridGuideLine, setGridGuideLine] = useState<any[]>([]);
-  const [innerWidth, setInnerWidth] = useState(0);
-  const [innerHeight, setInnerHeight] = useState(0);
+  const [gridWidth, setGridWidth] = useState(0);
+  const [gridHeight, setGridHeight] = useState(0);
 
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState('saveModal', false);
 
@@ -674,8 +674,8 @@ const Tool = () => {
     if (isGridGuideLine) {
       const { width, height } = imgWrapper.getBoundingClientRect();
 
-      setInnerWidth(Math.floor(width / 48));
-      setInnerHeight(Math.floor(height / 36));
+      setGridWidth(Math.floor(width / 48));
+      setGridHeight(Math.floor(height / 36));
       setGridGuideLine(new Array(Math.floor((width / 48) * (height / 36))).fill(undefined).map((_, index) => index));
     }
   }, [isGridGuideLine]);
@@ -726,8 +726,8 @@ const Tool = () => {
             height: '100vh',
             display: 'grid',
             zIndex: 1,
-            gridTemplateColumns: `repeat(${innerWidth}, 1fr)`,
-            gridTemplateRows: `repeat(${innerHeight}, 1fr)`,
+            gridTemplateColumns: `repeat(${gridWidth}, 1fr)`,
+            gridTemplateRows: `repeat(${gridHeight}, 1fr)`,
           }}
         >
           {gridGuideLine.map(() => (
@@ -819,7 +819,7 @@ const Tool = () => {
               </Popover>
 
               <Button type="text" onClick={handleShowGridGuideLine}>
-                <FontAwesomeIcon icon={faPaintRoller} />
+                <FontAwesomeIcon icon={faRulerHorizontal} />
                 <small>눈금자</small>
               </Button>
 
