@@ -376,24 +376,19 @@ const Tool = () => {
   const handleDeleteCanvas = useCallback(
     (e) => {
       if (croppedList) {
-        setCroppedList(croppedList.filter((lst) => +lst.id !== +e.target.id));
+        setCroppedList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
         setFramePrice((prev) => prev.filter((lst) => lst.id !== +e.target.id));
         setSelectedFrameList((prev) => prev.filter((lst) => +lst.id !== +e.target.id));
       }
     },
-    [croppedList, setCroppedList],
+    [croppedList],
   );
 
   const handleImgGoBack = useCallback(() => {
-    if (imgWrapperRef.current) {
-      const { current: imgBox } = imgWrapperRef;
-      const imgBoxId = +(imgBox.childNodes[0] as any).id;
-      if (!imgBoxId || !croppedList) return;
-      setCroppedList(croppedList.filter((lst) => +lst.id !== imgBoxId));
-      setFramePrice(framePrice.slice(1));
-      setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== imgBoxId));
-    }
-  }, [croppedList, framePrice, selectedFrameList, setCroppedList]);
+    setCroppedList((prev) => prev.slice(0, -1));
+    setFramePrice((prev) => prev.slice(0, -1));
+    setSelectedFrameList((prev) => prev.slice(0, -1));
+  }, []);
 
   // 이미지 저장을 위한 캔버스 생성 (스프라이트 기법으로 이미지 저장은 안되기 때문에 품질이 깨지더라도 이 방법 사용합니다.)
   const createCanvasForSave = useCallback(
@@ -468,7 +463,7 @@ const Tool = () => {
       };
 
       // 자른 액자 배열로 저장
-      setCroppedList([cropped, ...croppedList]);
+      setCroppedList([...croppedList, cropped]);
     },
     [
       isSelectFrame,
@@ -489,7 +484,7 @@ const Tool = () => {
       //  액자의 가격을 price에 넣기
       const { name, price, cm } = selectedFrameInfo;
       const id = Date.now();
-      setFramePrice([{ name, price, id, cm }, ...framePrice]);
+      setFramePrice([...framePrice, { name, price, id, cm }]);
       createImageCanvas(id);
       createCanvasForSave(id);
     }
