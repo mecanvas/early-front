@@ -465,17 +465,7 @@ const Tool = () => {
       // 자른 액자 배열로 저장
       setCroppedList([...croppedList, cropped]);
     },
-    [
-      isSelectFrame,
-      canvasPosition,
-      canvasFrameSizeInfo,
-      croppedList,
-      scrollX,
-      scrollY,
-      imgUploadUrl,
-      bgColor,
-      setCroppedList,
-    ],
+    [isSelectFrame, canvasPosition, canvasFrameSizeInfo, croppedList, scrollX, scrollY, imgUploadUrl, bgColor],
   );
 
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
@@ -610,7 +600,7 @@ const Tool = () => {
       const { left } = previewBgRef.current.getBoundingClientRect();
       setFramePreviewMode({ ...framePreviewMode, top: 140, left: left + 75 });
     }
-  }, [getImgWrapperSizeForParallel, setIsNoContent, setCroppedList, scrollX, scrollY, framePreviewMode]);
+  }, [getImgWrapperSizeForParallel, setIsNoContent, scrollX, scrollY, framePreviewMode]);
 
   // 컬러 체이닞
   const handleColorChange = useCallback((color: ColorResult) => {
