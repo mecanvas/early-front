@@ -37,6 +37,8 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
     bottom: false,
     left: false,
   });
+  const [fixX, setFixX] = useState<number>(0);
+  const [fixY, setFixY] = useState<number>(0);
   const [centerX] = useGlobalState<number>('centerX');
   const [centerY] = useGlobalState<number>('centerY');
   const [, setIsNearingX] = useGlobalState('isNearingX', false);
@@ -145,8 +147,8 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
         canvas.height = canvasHeight;
         const ctx = canvas.getContext('2d');
         const [x, y] = getPosition(e);
-        const positionLeft = x - frameWidth / 2;
-        const positionTop = y - frameHeight / 2;
+        const positionLeft = x - frameWidth / 2 - fixX;
+        const positionTop = y - frameHeight / 2 - fixY;
         checkNearingCenterForMouse(x, y);
         checkNearingParallelForBox();
         setCanvasPosition({ ...canvasPosition, top: positionTop, left: positionLeft });
@@ -160,7 +162,7 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
 
           // checkNearingParallelForEachBox();
           if (croppedList && croppedList.length) {
-            croppedList.forEach((list) => {
+            for (const list of croppedList) {
               const cropWidth = replacePx(list.width);
               const cropHeight = replacePx(list.height);
               const cropLeft = replacePx(list.left);
@@ -173,22 +175,60 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
               const right = left + frameWidth;
               const bottom = top + frameHeight;
 
-              const isNearingRight = (conditionValue: number) =>
-                Math.abs(right - cropRight) < conditionValue || Math.abs(right - cropLeft) < conditionValue;
-              const isNearingLeft = (conditionValue: number) =>
-                Math.abs(left - cropLeft) < conditionValue || Math.abs(left - cropRight) < conditionValue;
-              const isNearingBottom = (conditionValue: number) =>
-                Math.abs(bottom - cropBottom) < conditionValue || Math.abs(bottom - cropTop) < conditionValue;
-              const isNearingTop = (conditionValue: number) =>
-                Math.abs(top - cropTop) < conditionValue || Math.abs(top - cropBottom) < conditionValue;
+              const isNearingRight = (conditionValue: number) => {
+                if (Math.abs(right - cropRight) < conditionValue) {
+                  setFixX(right - cropRight);
+                  return true;
+                }
+                if (Math.abs(right - cropLeft) < conditionValue) {
+                  setFixX(right - cropLeft);
+                  return true;
+                }
+                return false;
+              };
+              const isNearingLeft = (conditionValue: number) => {
+                if (Math.abs(left - cropLeft) < conditionValue) {
+                  setFixX(left - cropLeft);
+                  return true;
+                }
+                if (Math.abs(left - cropRight) < conditionValue) {
+                  setFixX(left - cropRight);
+                  return true;
+                }
+                return false;
+              };
+
+              const isNearingBottom = (conditionValue: number) => {
+                if (Math.abs(bottom - cropBottom) < conditionValue) {
+                  setFixY(bottom - cropBottom);
+                  return true;
+                }
+                if (Math.abs(left - cropTop) < conditionValue) {
+                  setFixY(bottom - cropTop);
+                  return true;
+                }
+                return false;
+              };
+
+              const isNearingTop = (conditionValue: number) => {
+                if (Math.abs(top - cropTop) < conditionValue) {
+                  setFixY(top - cropTop);
+                  return true;
+                }
+                if (Math.abs(top - cropBottom) < conditionValue) {
+                  setFixY(top - cropBottom);
+                  return true;
+                }
+                return false;
+              };
 
               setIsNearing({
-                top: isNearingTop(2),
-                right: isNearingRight(2),
-                left: isNearingLeft(2),
-                bottom: isNearingBottom(2),
+                top: isNearingTop(1.5),
+                right: isNearingRight(1.5),
+                left: isNearingLeft(1.5),
+                bottom: isNearingBottom(1.5),
               });
-            });
+            }
           }
 
           const { top, right, left, bottom } = isNearing;
@@ -215,18 +255,6 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
             ctx.fillStyle = `${theme.color.primary}`;
             ctx.fillRect(positionLeft, 0, 1, canvas.height);
           }
-
-          // //  centerX
-          // if (centerX) {
-          //   ctx.fillStyle = `${theme.color.primary}`;
-          //   ctx.fillRect(0, positionTop + frameHeight / 2, canvas.width, 1);
-          // }
-
-          // //  centerY
-          // if (centerY) {
-          //   ctx.fillStyle = `${theme.color.secondary}`;
-          //   ctx.fillRect(positionLeft + frameWidth / 2, 0, 1, canvas.height);
-          // }
         }
       }
       requestAnimationFrame(() => handleDrawingFrame);
@@ -244,6 +272,8 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
       croppedList,
       isNearing,
       scrollY,
+      fixX,
+      fixY,
       scrollX,
     ],
   );
