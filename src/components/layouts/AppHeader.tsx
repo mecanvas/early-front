@@ -7,7 +7,8 @@ import Logo from './Logo';
 
 const HeaderContainer = styled.header`
   width: 100%;
-  padding: 0.4em;
+  height: 64px;
+  padding: 0 3em;
   background-color: ${({ theme }) => theme.color.white};
 `;
 

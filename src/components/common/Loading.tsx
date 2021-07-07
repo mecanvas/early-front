@@ -100,7 +100,7 @@ const Loading = ({ loading, text, progressPercentage }: Props) => {
         <span></span>
       </Loader>
       <animated.p style={textAni}>{text ? text : '잠시만 기다려 주세요. '}</animated.p>
-      <h5>{progressPercentage}%</h5>
+      {progressPercentage && <h5>{progressPercentage}%</h5>}
     </LoaderContainer>
   );
 };

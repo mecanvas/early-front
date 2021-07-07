@@ -11,7 +11,7 @@ export const ToolContainer = styled.div`
   position: relative;
 `;
 
-export const FactoryHeader = styled.div`
+export const ToolHeaderWrapper = styled.div`
   display: flex;
   width: 100%;
   background-color: ${({ theme }) => theme.color.white};
@@ -21,7 +21,7 @@ export const FactoryHeader = styled.div`
   flex-direction: column;
 `;
 
-export const FactoryUtills = styled.div`
+export const ToolHeaderMenu = styled.div`
   height: 64px;
   display: flex;
   justify-content: space-between;
@@ -113,17 +113,7 @@ export const FrameTool = styled.div`
   position: absolute;
   right: 0;
   display: flex;
-  @media all and (max-width: ${({ theme }) => theme.size.md}) {
-    bottom: 0;
-    position: fixed;
-    width: 100%;
-    justify-content: center;
-    padding: 0.3em 0;
-    border-top: 1px solid ${({ theme }) => theme.color.gray400};
-    background-color: ${({ theme }) => theme.color.white};
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
-  }
+
   button {
     display: flex;
     justify-content: center;
@@ -138,6 +128,18 @@ export const FrameTool = styled.div`
       font-size: 12px;
       color: ${({ theme }) => theme.color.gray800};
     }
+  }
+
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+    justify-content: center;
+    padding: 0.3em 0;
+    border-top: 1px solid ${({ theme }) => theme.color.gray400};
+    background-color: ${({ theme }) => theme.color.white};
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
   }
 `;
 

@@ -43,17 +43,17 @@ interface Info {
 }
 
 interface Props {
-  yourPriceList: [string, any][];
-  selectedFrameList: HTMLCanvasElement[];
-  totalPrice: number;
+  yourPriceList?: [string, any][];
+  totalPrice?: number;
 }
 
-const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
+const ToolSave = ({ yourPriceList, totalPrice }: Props) => {
   const [info, setInfo] = useState<Info | null>(null);
   const [userNameEmpty, setUserNameEmpty] = useState({ isRequired: false, extra: '' });
   const [emailEmpty, setEmailEmpty] = useState({ isRequired: false, extra: '' });
   const [orderRouteEmpty, setOrderRouteEmpty] = useState({ isRequired: false, extra: '' });
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
+  const [selectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
   const { canvasToImage, loading, isDone } = useCanvasToServer();
   const router = useRouter();
 
@@ -97,6 +97,7 @@ const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
   );
 
   const handleSendToConfirm = useCallback(() => {
+    if (!selectedFrameList) return;
     if (!info) {
       setUserNameEmpty({ ...userNameEmpty, isRequired: true, extra: '이름을 입력해 주세요!' });
       setEmailEmpty({ ...emailEmpty, isRequired: true, extra: '이메일을 입력해 주세요!' });
@@ -111,7 +112,7 @@ const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
       return setEmailEmpty({ ...emailEmpty, isRequired: true, extra: '이메일을 올바르게 적어주세요.' });
 
     canvasToImage(selectedFrameList, info.username, info.email);
-  }, [info, userNameEmpty, emailEmpty, orderRouteEmpty, canvasToImage, selectedFrameList]);
+  }, [selectedFrameList, info, userNameEmpty, emailEmpty, orderRouteEmpty, canvasToImage]);
 
   useEffect(() => {
     if (isDone) {
@@ -165,16 +166,16 @@ const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
             </AntdSelect>
           </Form.Item>
         </form>
-        {selectedFrameList.length ? (
+        {selectedFrameList?.length ? (
           <>
             <AppTable
-              dataSource={yourPriceList.map(([key, value], index) => {
+              dataSource={yourPriceList?.map(([key, value], index) => {
                 return { name: key, ...value, key: index };
               })}
               columns={SaveModalOrderColumns}
               pagination={false}
             />
-            <BillTotal>총 {totalPrice.toLocaleString()}원</BillTotal>
+            <BillTotal>총 {totalPrice?.toLocaleString()}원</BillTotal>
           </>
         ) : (
           <div style={{ textAlign: 'center' }}>생성하신 액자가 없으시네요! 액자를 만들어 주셔야 진행됩니다.</div>
