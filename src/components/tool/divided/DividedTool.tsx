@@ -34,7 +34,7 @@ import { ImgToDataURL } from 'src/utils/ImgToDataURL';
 import { replacePx } from 'src/utils/replacePx';
 import { useProgress } from 'src/hooks/useProgress';
 import ToolHeader from '../ToolHeader';
-import ToolFactory from '../ToolFactory';
+import DividedToolFactory from './DividedToolFactory';
 
 const Tool = () => {
   const [changeVertical, setChangeVertical] = useState(false);
@@ -631,7 +631,7 @@ const Tool = () => {
         {/* 사진 조절하는 툴바들 */}
         <ToolHeaderWrapper>
           <ToolHeader />
-          <ToolFactory />
+          <DividedToolFactory />
         </ToolHeaderWrapper>
 
         {isNoContent && (

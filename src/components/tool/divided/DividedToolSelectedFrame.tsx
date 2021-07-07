@@ -46,7 +46,6 @@ const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
   const [, setIsFitX] = useGlobalState('isFitX', false);
   const [, setIsFitY] = useGlobalState('isFitY', false);
 
-  // 액자의 크기에 맞춰 x, y선 평행 TODO: 추후 모든 액자에.. 요 기능을 담아야지않을까?
   const checkNearingParallelForBox = useCallback(() => {
     if (!canvasFrameSizeInfo || !canvasPosition || !centerX || !centerY) return;
 

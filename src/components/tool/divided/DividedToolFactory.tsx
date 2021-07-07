@@ -18,8 +18,8 @@ import { useProgress } from 'src/hooks/useProgress';
 import { CroppedFrame, FramePrice } from 'src/interfaces/ToolInterface';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
-import ToolColorPalette from './divided/DividedToolColorPalette';
-import { FactoryTool, FrameTool, ImageShowingWidthHeight } from './divided/DividedToolStyle';
+import ToolColorPalette from './DividedToolColorPalette';
+import { FactoryTool, FrameTool, ImageShowingWidthHeight } from './DividedToolStyle';
 
 const ToolFactory = () => {
   const [originWidth] = useGlobalState<number>('originWidth');
