@@ -242,7 +242,7 @@ const Tool = () => {
     [setResizeHeight, setResizeWidth],
   );
 
-  const handleResizeMode = useCallback(
+  const handleResizeModeStart = useCallback(
     (e) => {
       e.stopPropagation();
       const { component } = e.currentTarget.dataset;
@@ -660,7 +660,7 @@ const Tool = () => {
           imgUploadLoading={imgUploadLoading || false}
           id="img-box"
           data-component="wrapper"
-          onClick={handleResizeMode}
+          onClick={handleResizeModeStart}
           onMouseMove={handleImgResize}
           ref={imgWrapperRef}
           bgColor={bgColor || theme.color.white}
@@ -720,7 +720,7 @@ const Tool = () => {
                       <div data-cmd="left" onMouseDown={handleImgResizeStart}></div>
                     </>
                   ) : (
-                    <button type="button" onClick={handleResizeMode}></button>
+                    <button type="button" onClick={handleResizeModeStart}></button>
                   )}
                 </ImgController>
               )}
