@@ -3,11 +3,15 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { useGlobalState } from 'src/hooks';
+import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
 
 export const ImgController = styled.div<{
   cmd: ResizeCmd | null;
 }>`
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 2px solid ${({ theme }) => theme.color.cyan};
 
   ${({ cmd }) => {
@@ -149,7 +153,7 @@ button {
 
 interface Props {
   children: React.ReactChild;
-  imgRef: RefObject<any>;
+  imgRef: RefObject<HTMLCanvasElement>;
   wrapperRef: RefObject<any>;
 }
 
@@ -157,13 +161,6 @@ const SingleImgSizeController = ({ children, imgRef, wrapperRef }: Props) => {
   // const [isResizeMode, setIsResizeMode] = useGlobalState('isResizeMode', false);
   const [isResizeStart, setIsResizeStart] = useState(false);
   const [resizeCmd, setResizeCmd] = useGlobalState<ResizeCmd | null>('resizeCmd', null);
-
-  const [resizeWidth, setResizeWidth] = useState(
-    imgRef && imgRef.current ? imgRef.current.getBoundingClientRect().width : 0,
-  );
-  const [resizeHeight, setResizeHeight] = useState(
-    imgRef && imgRef.current ? imgRef.current.getBoundingClientRect().height : 0,
-  );
 
   const positioningImageResize = useCallback(
     (resizeCmd: ResizeCmd | null, x: number, y: number) => {
@@ -215,8 +212,21 @@ const SingleImgSizeController = ({ children, imgRef, wrapperRef }: Props) => {
           break;
       }
 
-      setResizeWidth(newWidth);
-      setResizeHeight(newHeight);
+      const { url } = imgRef.current.dataset;
+      const imgCtx = imgRef.current.getContext('2d');
+      if (imgCtx && url) {
+        const img = new Image();
+        img.src = url;
+        img.onload = () => {
+          if (!imgRef.current) return;
+          imgCtx.clearRect(0, 0, imgRef.current.width, imgRef.current.height);
+          imgRef.current.width = newWidth;
+          imgRef.current.height = filterOverMaxHeight(newHeight);
+          imgCtx.imageSmoothingQuality = 'high';
+          imgCtx.drawImage(img, 0, 0, newWidth, filterOverMaxHeight(newHeight));
+        };
+      }
+
       requestAnimationFrame(() => positioningImageResize);
     },
     [imgRef],
@@ -263,15 +273,8 @@ const SingleImgSizeController = ({ children, imgRef, wrapperRef }: Props) => {
   }, [setResizeCmd]);
 
   useEffect(() => {
-    if (!imgRef || !imgRef.current || !resizeWidth || !resizeHeight) return;
-    imgRef.current.style.width = `${resizeWidth}px`;
-    imgRef.current.style.height = `${resizeHeight}px`;
-  }, [resizeWidth, resizeHeight, imgRef]);
-
-  useEffect(() => {
     if (!imgRef || !imgRef.current) return;
-    setResizeWidth(imgRef.current.style.width);
-    setResizeHeight(imgRef.current.style.height);
+
     imgRef.current.onmouseup = handleImgResizeEnd;
   }, [handleImgResizeEnd, imgRef]);
 

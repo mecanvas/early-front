@@ -16,6 +16,7 @@ import { useGlobalState } from 'src/hooks';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { theme } from 'src/style/theme';
+import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
 
 const SingleToolFactory = styled.div`
   display: flex;
@@ -69,10 +70,10 @@ const SingleImageCanvas = styled.div<{ clicked: boolean }>`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: calc(100vh - 105px);
+  height: calc(98vh - 105px);
 
-  img {
-    max-height: calc(100vh - 105px);
+  canvas {
+    max-height: calc(98vh - 105px);
     cursor: pointer;
     ${({ clicked }) =>
       clicked
@@ -88,9 +89,12 @@ const SingleImageCanvas = styled.div<{ clicked: boolean }>`
 const SingleTool = () => {
   const singleCanvasFrameWrapperRef = useRef<HTMLDivElement>(null);
   const singleCanvasFrameRef = useRef<HTMLCanvasElement>(null);
-  const singleImgRef = useRef<HTMLImageElement>(null);
+  const ImageCanvasRef = useRef<HTMLCanvasElement>(null);
+  const singleImgWrapperRef = useRef<HTMLDivElement>(null);
   const [wrapperWidth, setWrapperWidth] = useState(0);
   const [wrapperHeight, setWrapperHeight] = useState(0);
+  const [originWidth, setOriginWidth] = useState(0);
+  const [originHeight, setOriginHeight] = useState(0);
   const [resizeCmd] = useGlobalState<ResizeCmd>('resizeCmd');
 
   const { getProgressGage, progressPercentage } = useProgress();
@@ -100,6 +104,24 @@ const SingleTool = () => {
 
   const [singleFrameWidth, setSingleFrameWidth] = useState(0);
   const [singleFrameHeight, setSingleFrameHeight] = useState(0);
+
+  const getPosition = useCallback((event: MouseEvent) => {
+    const x = event.clientX;
+    const y = event.clientY;
+    return [x, y];
+  }, []);
+
+  const handleToImageInWrapper = useCallback(
+    (e) => {
+      if (!isMovingImage) return;
+      const [x, y] = getPosition(e);
+      console.log(x, y);
+      if (singleImgWrapperRef.current) {
+        singleImgWrapperRef.current.style.transform = `translate(${x}px, ${y}px)`;
+      }
+    },
+    [getPosition, isMovingImage],
+  );
 
   const handleCreateSingleFrame = useCallback(() => {
     setSingleFrameWidth(500);
@@ -133,7 +155,7 @@ const SingleTool = () => {
         setImgUploadLoading(false);
       }
     },
-    [createCanvasInImage, getProgressGage],
+    [getProgressGage],
   );
 
   const handleMoveSingleImage = useCallback((e) => {
@@ -146,21 +168,63 @@ const SingleTool = () => {
   }, []);
 
   const handleImgRatioSetting = useCallback(() => {
-    if (!singleImgRef.current) return;
-    const imgNode = singleImgRef.current;
-    const { width: currentWidth, height: currentHeight } = imgNode.getBoundingClientRect();
-    const originWidth = imgNode.naturalWidth;
-    const originHeight = imgNode.naturalHeight;
-    const [w, h] = getOriginRatio(originWidth, originHeight, currentWidth, currentHeight);
+    if (!ImageCanvasRef.current) return;
+    const canvas = ImageCanvasRef.current;
+    const {
+      width,
+      height,
+      dataset: { url },
+    } = canvas;
+    const [w, h] = getOriginRatio(originWidth, originHeight, width, height);
 
-    singleImgRef.current.style.width = `${w}px`;
-    singleImgRef.current.style.height = `${h}px`;
-  }, []);
+    const imgCtx = canvas.getContext('2d');
+
+    if (imgCtx && url) {
+      const img = new Image();
+      img.src = url;
+      img.onload = () => {
+        imgCtx.imageSmoothingQuality = 'high';
+        imgCtx.clearRect(0, 0, width, height);
+        canvas.width = w;
+        canvas.height = h;
+        imgCtx.drawImage(img, 0, 0, w, h);
+      };
+    }
+  }, [originHeight, originWidth]);
+
+  const drawingImage = useCallback(
+    (resizeWidth?: number, resizeHeight?: number) => {
+      const imgCanvas = ImageCanvasRef.current;
+      if (!imgCanvas || !wrapperWidth || !wrapperHeight) return;
+
+      const imgCtx = imgCanvas.getContext('2d');
+      if (imgCtx) {
+        const img = new Image();
+        img.src = singleImgUploadUrl;
+        img.onload = () => {
+          const { naturalWidth, naturalHeight } = img;
+          setOriginWidth(naturalWidth);
+          setOriginHeight(naturalHeight);
+          const [w, h] = getOriginRatio(
+            naturalWidth,
+            naturalHeight,
+            resizeWidth || wrapperWidth,
+            resizeHeight || wrapperHeight,
+          );
+          imgCtx.imageSmoothingQuality = 'high';
+          imgCanvas.width = w;
+          imgCanvas.height = filterOverMaxHeight(h);
+          imgCtx.drawImage(img, 0, 0, w, filterOverMaxHeight(h));
+        };
+      }
+    },
+    [singleImgUploadUrl, wrapperHeight, wrapperWidth],
+  );
 
   // 어떤 액자를 할지 클릭하면 그 액자에 맞는 사이즈로 canvas 액자 출력
   useEffect(() => {
     const sCanvas = singleCanvasFrameRef.current;
-    if (!sCanvas || !wrapperWidth || !wrapperHeight || !singleFrameWidth || !singleFrameHeight) return;
+    if (!sCanvas || !singleFrameWidth || !singleFrameHeight) return;
     sCanvas.width = singleFrameWidth;
     sCanvas.height = singleFrameHeight;
     const sCtx = sCanvas.getContext('2d');
@@ -171,14 +235,11 @@ const SingleTool = () => {
       sCtx.lineWidth = 6;
       sCtx.strokeRect(0, 0, singleFrameWidth, singleFrameHeight);
     }
-  }, [
-    singleCanvasFrameRef,
-    singleCanvasFrameWrapperRef,
-    singleFrameHeight,
-    singleFrameWidth,
-    wrapperHeight,
-    wrapperWidth,
-  ]);
+  }, [singleCanvasFrameRef, singleCanvasFrameWrapperRef, singleFrameHeight, singleFrameWidth]);
+
+  useEffect(() => {
+    drawingImage();
+  }, [singleImgUploadUrl, wrapperWidth, wrapperHeight, drawingImage]);
 
   useEffect(() => {
     const sCanvasWrapper = singleCanvasFrameWrapperRef.current;
@@ -216,6 +277,7 @@ const SingleTool = () => {
         ref={singleCanvasFrameWrapperRef}
         clicked={isMovingImage}
         data-component="wrapper"
+        onMouseMove={isMovingImage ? handleToImageInWrapper : undefined}
         onMouseUp={handleMoveCancelSingleImage}
       >
         <SingleCanvasFrame
@@ -227,12 +289,11 @@ const SingleTool = () => {
 
         {singleImgUploadUrl && (
           <SingleImageCanvas clicked={isMovingImage}>
-            <SingleImgSizeController imgRef={singleImgRef} wrapperRef={singleCanvasFrameWrapperRef}>
+            <SingleImgSizeController imgRef={ImageCanvasRef} wrapperRef={singleCanvasFrameWrapperRef}>
               <>
-                <img
-                  ref={singleImgRef}
-                  src={singleImgUploadUrl}
-                  alt="캔버스로 만들 이미지"
+                <canvas
+                  data-url={singleImgUploadUrl}
+                  ref={ImageCanvasRef}
                   onMouseDown={handleMoveSingleImage}
                   onMouseUp={handleMoveCancelSingleImage}
                 />
