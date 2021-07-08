@@ -9,11 +9,12 @@ import axios from 'axios';
 import { useProgress } from 'src/hooks/useProgress';
 import Loading from 'src/components/common/Loading';
 import Upload, { RcFile } from 'antd/lib/upload';
-import { faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faCompress, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { css } from '@emotion/react';
 import SingleImgSizeController from 'src/components/common/SingleImgSizeController';
 import { useGlobalState } from 'src/hooks';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
+import { getOriginRatio } from 'src/utils/getOriginRatio';
 
 const SingleToolFactory = styled.div`
   display: flex;
@@ -148,6 +149,18 @@ const SingleTool = () => {
     setIsMovingImage(false);
   }, []);
 
+  const handleImgRatioSetting = useCallback(() => {
+    if (!singleImgRef.current) return;
+    const imgNode = singleImgRef.current;
+    const { width: currentWidth, height: currentHeight } = imgNode.getBoundingClientRect();
+    const originWidth = imgNode.naturalWidth;
+    const originHeight = imgNode.naturalHeight;
+    const [w, h] = getOriginRatio(originWidth, originHeight, currentWidth, currentHeight);
+
+    singleImgRef.current.style.width = `${w}px`;
+    singleImgRef.current.style.height = `${h}px`;
+  }, []);
+
   // 어떤 액자를 할지 클릭하면 그 액자에 맞는 사이즈로 canvas 액자 출력
   useEffect(() => {
     const sCanvas = singleCanvasFrameRef.current;
@@ -187,6 +200,10 @@ const SingleTool = () => {
         <Button type="text" onClick={handleCreateSingleFrame}>
           <FontAwesomeIcon icon={faSquare} />
           <small>첨부하기</small>
+        </Button>
+        <Button type="text" onClick={handleImgRatioSetting}>
+          <FontAwesomeIcon icon={faCompress} />
+          <small>비율 맞추기</small>
         </Button>
         <Upload accept="image/*" beforeUpload={handleSingleImgUpload} showUploadList={false}>
           <Button type="text">

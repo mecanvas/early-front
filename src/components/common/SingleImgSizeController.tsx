@@ -43,6 +43,7 @@ button {
   }
   /* top-left */
   div:nth-of-type(1) {
+    z-index: 10;
     position: absolute;
     top: -4px;
     left: -4px;
@@ -55,6 +56,7 @@ button {
   }
   /* top-center */
   div:nth-of-type(2) {
+    z-index: 10;
     position: absolute;
     top: -3px;
     transform: translateX(-50%);
@@ -67,6 +69,7 @@ button {
   }
   /* top-right */
   div:nth-of-type(3) {
+    z-index: 10;
     position: absolute;
     top: -4px;
     right: -4px;
@@ -79,6 +82,7 @@ button {
   }
   /* right */
   div:nth-of-type(4) {
+    z-index: 10;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -91,6 +95,7 @@ button {
   }
   /* bottom-left */
   div:nth-of-type(5) {
+    z-index: 10;
     position: absolute;
     bottom: -4px;
     left: -4px;
@@ -103,6 +108,7 @@ button {
   }
   /* bottom-center */
   div:nth-of-type(6) {
+    z-index: 10;
     position: absolute;
     bottom: -3px;
     transform: translateX(-50%);
@@ -115,6 +121,7 @@ button {
   }
   /* bottom-right */
   div:nth-of-type(7) {
+    z-index: 10;
     position: absolute;
     bottom: -4px;
     right: -4px;
@@ -127,6 +134,7 @@ button {
   }
   /* left */
   div:nth-of-type(8) {
+    z-index: 10;
     position: absolute;
     bottom: 50%;
     transform: translateY(50%);
@@ -218,6 +226,7 @@ const SingleImgSizeController = ({ children, imgRef, wrapperRef }: Props) => {
     (e) => {
       if (!isResizeStart) return;
       if (imgRef.current) {
+        e.preventDefault();
         const { clientY, clientX } = e || e.nativeEvent;
         if (clientY && clientX && resizeCmd) {
           positioningImageResize(resizeCmd, clientX, clientY);
@@ -254,7 +263,7 @@ const SingleImgSizeController = ({ children, imgRef, wrapperRef }: Props) => {
   }, [setResizeCmd]);
 
   useEffect(() => {
-    if (!imgRef || !imgRef.current) return;
+    if (!imgRef || !imgRef.current || !resizeWidth || !resizeHeight) return;
     imgRef.current.style.width = `${resizeWidth}px`;
     imgRef.current.style.height = `${resizeHeight}px`;
   }, [resizeWidth, resizeHeight, imgRef]);

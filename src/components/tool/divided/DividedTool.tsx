@@ -259,6 +259,7 @@ const Tool = () => {
     (e) => {
       if (!isResizeStart && !isResizeMode) return;
       if (imgNode.current) {
+        e.preventDefault();
         const { clientY, clientX } = e.nativeEvent;
 
         positioningImageResize(resizeCmd, clientX, clientY);

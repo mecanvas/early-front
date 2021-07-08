@@ -1,8 +1,8 @@
 export const getOriginRatio = (
-  originWidth: number,
-  originHeight: number,
-  resizeWidth?: number,
-  resizeHeight?: number,
+  originWidth: number, // naturalWidth
+  originHeight: number, // naturalHeight
+  resizeWidth?: number, // currentWidth
+  resizeHeight?: number, // currentHeight
 ) => {
   const wRatio = originWidth / originHeight;
   const hRatio = originHeight / originWidth;
