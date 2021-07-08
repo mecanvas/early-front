@@ -15,6 +15,7 @@ import SingleImgSizeController from 'src/components/common/SingleImgSizeControll
 import { useGlobalState } from 'src/hooks';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
+import { theme } from 'src/style/theme';
 
 const SingleToolFactory = styled.div`
   display: flex;
@@ -100,8 +101,6 @@ const SingleTool = () => {
   const [singleFrameWidth, setSingleFrameWidth] = useState(0);
   const [singleFrameHeight, setSingleFrameHeight] = useState(0);
 
-  const createCanvasInImage = useCallback(() => {}, []);
-
   const handleCreateSingleFrame = useCallback(() => {
     setSingleFrameWidth(500);
     setSingleFrameHeight(500);
@@ -126,9 +125,6 @@ const SingleTool = () => {
           })
           .then((res) => {
             setSingleimgUploadUrl(res.data || '');
-            if (res.data) {
-              createCanvasInImage();
-            }
           });
       } catch (err) {
         alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
@@ -169,9 +165,10 @@ const SingleTool = () => {
     sCanvas.height = singleFrameHeight;
     const sCtx = sCanvas.getContext('2d');
     sCanvas.style.cursor = 'pointer';
-
+    sCanvas.style.zIndex = '10';
     if (sCtx) {
-      sCtx.strokeStyle = '#333';
+      sCtx.strokeStyle = theme.color.primary;
+      sCtx.lineWidth = 6;
       sCtx.strokeRect(0, 0, singleFrameWidth, singleFrameHeight);
     }
   }, [
