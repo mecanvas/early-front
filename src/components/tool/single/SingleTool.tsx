@@ -19,6 +19,7 @@ import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
 import { frameSize } from 'src/constants';
 import { FrameSizeName } from '../divided/DividedToolStyle';
 import { replacePx } from 'src/utils/replacePx';
+import { cmToPx } from 'src/utils/cmToPx';
 
 const SingleToolContainer = styled.div`
   background-color: ${({ theme }) => theme.color.gray100};
@@ -189,9 +190,12 @@ const SingleTool = () => {
   const singleCanvasFrameRef = useRef<HTMLDivElement>(null);
   const ImageCanvasRef = useRef<HTMLCanvasElement>(null);
   const [controllerNode, setControllerNode] = useState<HTMLDivElement | null>(null);
-  const controllerRef = useCallback((node) => {
+
+  const controllerRef = useCallback((node: HTMLDivElement | null) => {
+    if (!node) return;
     setControllerNode(node);
   }, []);
+
   const [wrapperWidth, setWrapperWidth] = useState(0);
   const [wrapperHeight, setWrapperHeight] = useState(0);
   const [originWidth, setOriginWidth] = useState(0);
@@ -213,6 +217,11 @@ const SingleTool = () => {
     const x = event.clientX;
     const y = event.clientY;
     return [x, y];
+  }, []);
+
+  const createInitFrame = useCallback(() => {
+    setSingleFrameWidth(cmToPx(16) * 1.5);
+    setSingleFrameHeight(cmToPx(16) * 1.5);
   }, []);
 
   const handleSelectFrame = useCallback((e) => {
@@ -319,13 +328,14 @@ const SingleTool = () => {
         img.src = singleImgUploadUrl;
         img.onload = () => {
           const { naturalWidth, naturalHeight } = img;
+
           setOriginWidth(naturalWidth);
           setOriginHeight(naturalHeight);
           const [w, h] = getOriginRatio(
             naturalWidth,
             naturalHeight,
-            resizeWidth || wrapperWidth,
-            resizeHeight || wrapperHeight,
+            resizeWidth || singleFrameWidth || wrapperWidth,
+            resizeHeight || singleFrameHeight || wrapperHeight,
           );
           imgCtx.imageSmoothingQuality = 'high';
           imgCanvas.width = w;
@@ -348,6 +358,8 @@ const SingleTool = () => {
     const { width, height } = sCanvasWrapper.getBoundingClientRect();
     setWrapperWidth(width);
     setWrapperHeight(height);
+    createInitFrame();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
