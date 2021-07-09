@@ -221,6 +221,7 @@ const SingleTool = () => {
   }, []);
 
   const createInitFrame = useCallback(() => {
+    // 정방 s-1호로 초기 생성
     setSingleFrameWidth(cmToPx(16) * 1.5);
     setSingleFrameHeight(cmToPx(16) * 1.5);
   }, []);
