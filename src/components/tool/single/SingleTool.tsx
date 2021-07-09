@@ -45,7 +45,7 @@ const SingleCanvasField = styled.div`
   background-color: ${({ theme }) => theme.color.white};
 `;
 
-const SingleCanvasFrameWrapper = styled.div<{ clicked: boolean; cmd: ResizeCmd | null }>`
+const SingleWrapper = styled.div<{ clicked: boolean; cmd: ResizeCmd | null }>`
   width: 100%;
   min-height: calc(100vh - 105px);
   max-height: calc(100vh - 105px);
@@ -74,7 +74,7 @@ const SingleCanvasFrameWrapper = styled.div<{ clicked: boolean; cmd: ResizeCmd |
   }}
 `;
 
-const SingleCanvasFrame = styled.div<{ isImgUploadUrl: boolean; width: number; height: number }>`
+const SingleSelectedFrame = styled.div<{ isImgUploadUrl: boolean; width: number; height: number }>`
   position: absolute;
   ${({ width, height }) =>
     width &&
@@ -129,7 +129,7 @@ const SingleCanvasFrame = styled.div<{ isImgUploadUrl: boolean; width: number; h
   }
 `;
 
-const SingleImageCanvas = styled.div<{ clicked: boolean }>`
+const SingleImageWrapper = styled.div<{ clicked: boolean }>`
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -151,7 +151,7 @@ const SingleImageCanvas = styled.div<{ clicked: boolean }>`
   }
 `;
 
-const SingleFrameListWrapper = styled.div`
+const SingleFrameListHeader = styled.div`
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -187,8 +187,8 @@ const SingleFrameList = styled.div<{ width: string; height: string }>`
 `;
 
 const SingleTool = () => {
-  const singleCanvasFrameWrapperRef = useRef<HTMLDivElement>(null);
-  const singleCanvasFrameRef = useRef<HTMLDivElement>(null);
+  const singleWrapperRef = useRef<HTMLDivElement>(null);
+  const singleSelectedFrameRef = useRef<HTMLDivElement>(null);
   const ImageCanvasRef = useRef<HTMLCanvasElement>(null);
   const [controllerNode, setControllerNode] = useState<HTMLDivElement | null>(null);
 
@@ -240,9 +240,9 @@ const SingleTool = () => {
 
   const handleToImageInWrapper = useCallback(
     (e) => {
-      if (!controllerNode || !singleCanvasFrameWrapperRef.current) return;
+      if (!controllerNode || !singleWrapperRef.current) return;
       const [cursorX, cursorY] = getPosition(e);
-      const { width, height } = singleCanvasFrameWrapperRef.current.getBoundingClientRect();
+      const { width, height } = singleWrapperRef.current.getBoundingClientRect();
 
       const x = cursorX - width + 60;
       const y = cursorY - height / 2 - 95;
@@ -356,7 +356,7 @@ const SingleTool = () => {
   }, [singleImgUploadUrl, wrapperWidth, wrapperHeight, drawingImage, controllerNode]);
 
   useEffect(() => {
-    const sCanvasWrapper = singleCanvasFrameWrapperRef.current;
+    const sCanvasWrapper = singleWrapperRef.current;
     if (!sCanvasWrapper) return;
 
     const { width, height } = sCanvasWrapper.getBoundingClientRect();
@@ -386,7 +386,9 @@ const SingleTool = () => {
           </Button>
         </Upload>
       </SingleToolFactory>
-      <SingleFrameListWrapper>
+
+      {/* 액자 리스트 선택 */}
+      <SingleFrameListHeader>
         <div>
           <Button type="text" onClick={handleGetFrameAttribute} value="정방">
             <FontAwesomeIcon icon={faSquare} />
@@ -415,21 +417,22 @@ const SingleTool = () => {
             </div>
           ))}
         </SingleFrameListGrid>
-      </SingleFrameListWrapper>
+      </SingleFrameListHeader>
 
-      {/* 사진이 들어갈 액자  */}
+      {/* 본격적인 툴  */}
       <SingleCanvasField>
-        <SingleCanvasFrameWrapper
+        <SingleWrapper
           cmd={resizeCmd ?? null}
-          ref={singleCanvasFrameWrapperRef}
+          ref={singleWrapperRef}
           clicked={isMovingImage}
           onMouseMove={isMovingImage ? handleToImageInWrapper : undefined}
           onMouseUp={handleMoveCancelSingleImage}
           onMouseLeave={handleMoveCancelSingleImage}
         >
-          <SingleCanvasFrame
+          {/* 선택한 액자 렌더링  */}
+          <SingleSelectedFrame
             isImgUploadUrl={singleImgUploadUrl ? true : false}
-            ref={singleCanvasFrameRef}
+            ref={singleSelectedFrameRef}
             width={singleFrameWidth}
             height={singleFrameHeight}
           >
@@ -437,28 +440,27 @@ const SingleTool = () => {
             <span></span>
             <span></span>
             <span></span>
-          </SingleCanvasFrame>
+          </SingleSelectedFrame>
 
+          {/* 첨부한 이미지 렌더링 */}
           {singleImgUploadUrl && (
-            <SingleImageCanvas clicked={isMovingImage}>
+            <SingleImageWrapper clicked={isMovingImage}>
               <SingleImgSizeController
                 controllerRef={(node) => controllerRef(node)}
                 isMovingImage={isMovingImage}
                 imgRef={ImageCanvasRef}
-                wrapperRef={singleCanvasFrameWrapperRef}
+                wrapperRef={singleWrapperRef}
               >
-                <>
-                  <canvas
-                    data-url={singleImgUploadUrl}
-                    ref={ImageCanvasRef}
-                    onMouseDown={handleMoveSingleImage}
-                    onMouseUp={handleMoveCancelSingleImage}
-                  />
-                </>
+                <canvas
+                  data-url={singleImgUploadUrl}
+                  ref={ImageCanvasRef}
+                  onMouseDown={handleMoveSingleImage}
+                  onMouseUp={handleMoveCancelSingleImage}
+                />
               </SingleImgSizeController>
-            </SingleImageCanvas>
+            </SingleImageWrapper>
           )}
-        </SingleCanvasFrameWrapper>
+        </SingleWrapper>
       </SingleCanvasField>
     </SingleToolContainer>
   );
