@@ -22,10 +22,11 @@ export const ToolHeaderWrapper = styled.div`
 `;
 
 export const ToolHeaderMenu = styled.div`
-  height: 64px;
+  background-color: ${({ theme }) => theme.color.white};
+  height: 54px;
   display: flex;
   justify-content: space-between;
-  padding: 0 3em;
+  padding: 0 2em;
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
@@ -151,7 +152,7 @@ export const SelectedFrameWrapper = styled.div`
   top: 0;
   left: 0;
   z-index: 1;
-  padding: 115px 10px 50px 10px;
+  padding: 95px 10px 50px 10px;
   canvas {
     position: absolute;
     top: 0;
@@ -230,7 +231,7 @@ export const ImageWrapper = styled.div<{
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 115px 10px 50px 10px;
+  padding: 95px 10px 50px 10px;
   margin: 0 auto;
   text-align: center;
   position: relative;
@@ -259,7 +260,7 @@ export const ImageWrapper = styled.div<{
       &:after {
         position: absolute;
         width: 100%;
-        top: (50% - 105px);
+        top: (50% - 95px);
         transform: translateY(-50%);
         height: 2px;
         content: '';
@@ -379,7 +380,7 @@ export const ImageShowingWidthHeight = styled.small`
 
 export const PreviewBg = styled.div`
   position: absolute;
-  top: 115px;
+  top: 95px;
   min-width: ${({ theme }) => theme.size.md};
   img {
     min-height: 626px;

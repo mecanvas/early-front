@@ -148,7 +148,7 @@ const Tool = () => {
   const [resizeWidth, setResizeWidth] = useGlobalState<number>('resizeWidth', 0);
   const [resizeHeight, setResizeHeight] = useGlobalState<number>('resizeHeight', 0);
 
-  const [croppedList, setCroppedList] = useGlobalState<CroppedFrame[]>('croppedList', []);
+  const [croppedList, setCroppedList] = useState<CroppedFrame[]>([]);
   const [selectedFrameList, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList', []);
   const [framePrice, setFramePrice] = useGlobalState<FramePrice[]>('framePrice', []);
   const [yourSelectedFrame, setYourSelectedFrame] = useState<CanvasFrameSizeInfo | null>(null);
@@ -299,7 +299,6 @@ const Tool = () => {
               onUploadProgress: getProgressGage,
             })
             .then((res) => {
-              console.log(res);
               setImgUploadUrl(res.data || '');
             });
         }
@@ -321,7 +320,7 @@ const Tool = () => {
       setFramePrice(framePrice.filter((lst) => lst.id !== +e.target.id));
       setSelectedFrameList(selectedFrameList.filter((lst) => +lst.id !== +e.target.id));
     },
-    [croppedList, framePrice, selectedFrameList, setCroppedList, setFramePrice, setSelectedFrameList],
+    [croppedList, framePrice, selectedFrameList, setFramePrice, setSelectedFrameList],
   );
 
   // 이미지 저장을 위한 캔버스 생성 (스프라이트 기법으로 이미지 저장은 안되기 때문에 품질이 깨지더라도 이 방법 사용합니다.)
@@ -403,17 +402,7 @@ const Tool = () => {
       // 자른 액자 배열로 저장
       setCroppedList([...croppedList, cropped]);
     },
-    [
-      isSelectFrame,
-      canvasPosition,
-      canvasFrameSizeInfo,
-      croppedList,
-      scrollX,
-      scrollY,
-      imgUploadUrl,
-      bgColor,
-      setCroppedList,
-    ],
+    [isSelectFrame, canvasPosition, canvasFrameSizeInfo, croppedList, scrollX, scrollY, imgUploadUrl, bgColor],
   );
 
   //   액자를 사진 속에 눌렀을떄 이미지 크롭
@@ -490,9 +479,10 @@ const Tool = () => {
 
     if (imgNode.current) {
       const { left: imgLeft, top: imgTop } = imgNode.current.getBoundingClientRect();
-      if (!croppedList) return;
-      setCroppedList(
-        croppedList.map((lst) => ({
+      console.log(croppedList);
+      if (!croppedList.length) return;
+      setCroppedList((prev) =>
+        prev.map((lst) => ({
           ...lst,
           left: `${+lst.dataset.originleft + imgLeft + scrollX}px`,
           top: `${+lst.dataset.origintop + imgTop + scrollY}px`,
@@ -505,7 +495,7 @@ const Tool = () => {
       const { left } = previewBgRef.current.getBoundingClientRect();
       setFramePreviewMode({ ...framePreviewMode, top: 140, left: left + 75 });
     }
-  }, [getImgWrapperSizeForParallel, setIsNoContent, croppedList, setCroppedList, scrollX, scrollY, framePreviewMode]);
+  }, [getImgWrapperSizeForParallel, setIsNoContent, croppedList, scrollX, scrollY, framePreviewMode]);
 
   // const handleFrameColorChange = useCallback((color: ColorResult) => {
   //   const { hex } = color;
@@ -567,7 +557,6 @@ const Tool = () => {
   useEffect(() => {
     if (window) {
       window.addEventListener('resize', handleFramePositionRelative);
-      requestAnimationFrame(handleFramePositionRelative);
     }
     return () => {
       window.removeEventListener('resize', handleFramePositionRelative);
@@ -603,7 +592,7 @@ const Tool = () => {
         <div
           style={{
             position: 'fixed',
-            top: '105px',
+            top: '95px',
             overflow: 'hidden',
             right: 0,
             width: '100%',
@@ -632,14 +621,14 @@ const Tool = () => {
         {/* 사진 조절하는 툴바들 */}
         <ToolHeaderWrapper>
           <ToolHeader />
-          <DividedToolFactory />
+          <DividedToolFactory croppedList={croppedList} setCroppedList={setCroppedList} />
         </ToolHeaderWrapper>
 
         {isNoContent && (
           <div
             style={{
               position: 'fixed',
-              marginTop: '105px',
+              marginTop: '95px',
               width: '100%',
               height: '100vh',
               top: 0,
@@ -695,7 +684,9 @@ const Tool = () => {
           </CroppedWrapper>
           {imgUploadUrl ? (
             <>
-              {isSelectFrame && <ToolSelectedFrame {...yourSelectedFrame} onClick={handleFrameRelease} />}
+              {isSelectFrame && (
+                <ToolSelectedFrame croppedList={croppedList} {...yourSelectedFrame} onClick={handleFrameRelease} />
+              )}
 
               {isPreview || (
                 <ImgController data-layout="inner" isResizeStart={isResizeMode || false} cmd={resizeCmd}>

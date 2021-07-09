@@ -9,15 +9,15 @@ interface Props {
   width?: number;
   height?: number;
   onClick: () => void;
+  croppedList: CroppedFrame[];
 }
 
-const ToolSelectedFrame = memo(({ width, height, onClick }: Props) => {
+const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) => {
   const selectFrameWrapper = useRef<HTMLDivElement>(null);
   const selectFrameRef = useRef<HTMLCanvasElement>(null);
   const frameWidth = useMemo(() => width || 0, [width]);
   const frameHeight = useMemo(() => height || 0, [height]);
   const [scrollX, scrollY] = useGetScollPosition();
-  const [croppedList] = useGlobalState<CroppedFrame[]>('croppedList');
   const [canvasPosition, setCanvasPosition] = useGlobalState<CanvasPosition>('canvasPosition', {
     left: 0,
     top: 0,

@@ -21,7 +21,12 @@ import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 import ToolColorPalette from './DividedToolColorPalette';
 import { FactoryTool, FrameTool, ImageShowingWidthHeight } from './DividedToolStyle';
 
-const ToolFactory = () => {
+interface Props {
+  croppedList: CroppedFrame[];
+  setCroppedList: React.Dispatch<React.SetStateAction<CroppedFrame[]>>;
+}
+
+const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
   const [originWidth] = useGlobalState<number>('originWidth');
   const [originHeight] = useGlobalState<number>('originHeight');
   const [resizeWidth, setResizeWidth] = useGlobalState<number>('resizeWidth');
@@ -34,7 +39,6 @@ const ToolFactory = () => {
   const [, setImgUploadLoading] = useGlobalState<boolean>('imgUploadLoading');
   const [selectedFrameList, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
   const [framePrice, setFramePrice] = useGlobalState<FramePrice[]>('framePrice');
-  const [croppedList, setCroppedList] = useGlobalState<CroppedFrame[]>('croppedList');
 
   const { getProgressGage } = useProgress();
   const [ratioPersist, setRatioPersist] = useState(true);
