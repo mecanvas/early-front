@@ -11,31 +11,45 @@ import Loading from 'src/components/common/Loading';
 import Upload, { RcFile } from 'antd/lib/upload';
 import { faCompress, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { css } from '@emotion/react';
-import SingleImgSizeController from 'src/components/common/SingleImgSizeController';
+import SingleImgSizeController from 'src/components/tool/single/SingleImgSizeController';
 import { useGlobalState } from 'src/hooks';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
-import { theme } from 'src/style/theme';
 import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
 import { frameSize } from 'src/constants';
 import { FrameSizeName } from '../divided/DividedToolStyle';
 import { replacePx } from 'src/utils/replacePx';
 
+const SingleToolContainer = styled.div`
+  background-color: ${({ theme }) => theme.color.gray100};
+`;
+
 const SingleToolFactory = styled.div`
   display: flex;
   justify-content: center;
   border-bottom: 1px solid #dbdbdb;
+  background-color: ${({ theme }) => theme.color.white};
 `;
 
-const SingleCanvasFrameWrapper = styled.div<{ clicked: boolean; cmd: ResizeCmd | null }>`
+const SingleCanvasField = styled.div`
   min-height: calc(100vh - 105px);
   max-height: calc(100vh - 105px);
+  max-width: 1000px;
   width: 100%;
   margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: ${({ theme }) => theme.color.white};
+`;
 
+const SingleCanvasFrameWrapper = styled.div<{ clicked: boolean; cmd: ResizeCmd | null }>`
+  width: 100%;
+  min-height: calc(100vh - 105px);
+  max-height: calc(100vh - 105px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   ${({ clicked }) =>
     clicked
       ? css`
@@ -58,17 +72,63 @@ const SingleCanvasFrameWrapper = styled.div<{ clicked: boolean; cmd: ResizeCmd |
   }}
 `;
 
-const SingleCanvasFrame = styled.canvas<{ isImgUploadUrl: boolean }>`
+const SingleCanvasFrame = styled.div<{ isImgUploadUrl: boolean; width: number; height: number }>`
   position: absolute;
-  z-index: 1;
+  ${({ width, height }) =>
+    width &&
+    height &&
+    css`
+      width: ${width}px;
+      height: ${height}px;
+    `}
   ${({ isImgUploadUrl }) =>
     isImgUploadUrl ||
     css`
       cursor: default !important;
     `}
+
+/* top */
+    span:nth-of-type(1) {
+    z-index: 15;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 4px;
+    background-color: ${({ theme }) => theme.color.primary};
+  }
+  /* right */
+  span:nth-of-type(2) {
+    z-index: 15;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background-color: ${({ theme }) => theme.color.primary};
+  }
+  /* bottom */
+  span:nth-of-type(3) {
+    z-index: 15;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 4px;
+    background-color: ${({ theme }) => theme.color.primary};
+  }
+  /* left */
+  span:nth-of-type(4) {
+    z-index: 15;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background-color: ${({ theme }) => theme.color.primary};
+  }
 `;
 
 const SingleImageCanvas = styled.div<{ clicked: boolean }>`
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -94,16 +154,24 @@ const SingleFrameListWrapper = styled.div`
   display: flex;
   flex-direction: column;
   right: 0;
-  top: 64px;
+  background-color: ${({ theme }) => theme.color.white};
+  top: 54px;
 `;
 
 const SingleFrameListGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   border: 1px solid #dbdbdb;
   justify-content: center;
   align-items: center;
   padding: 0.6em;
+
+  div {
+    flex: 1;
+    text-align: center;
+    small {
+      font-size: 9px;
+    }
+  }
 `;
 
 const SingleFrameList = styled.div<{ width: string; height: string }>`
@@ -118,7 +186,7 @@ const SingleFrameList = styled.div<{ width: string; height: string }>`
 
 const SingleTool = () => {
   const singleCanvasFrameWrapperRef = useRef<HTMLDivElement>(null);
-  const singleCanvasFrameRef = useRef<HTMLCanvasElement>(null);
+  const singleCanvasFrameRef = useRef<HTMLDivElement>(null);
   const ImageCanvasRef = useRef<HTMLCanvasElement>(null);
   const [controllerNode, setControllerNode] = useState<HTMLDivElement | null>(null);
   const controllerRef = useCallback((node) => {
@@ -141,21 +209,20 @@ const SingleTool = () => {
   const [frameAttributes, setFrameAttributes] = useState<any>('정방');
   const frameList = useMemo(() => frameSize().filter((lst) => lst.attribute === frameAttributes), [frameAttributes]);
 
-  // const [cursorX, cursorY] = useGetCursorPosition(isMovingImage);
-  const [emptyX] = useGlobalState<number>('emptyX');
-  const [emptyY] = useGlobalState<number>('emptyY');
-
   const getPosition = useCallback((event: MouseEvent) => {
     const x = event.clientX;
     const y = event.clientY;
     return [x, y];
   }, []);
 
-  const handleSelectFrame = useCallback((e) => {}, []);
+  const handleSelectFrame = useCallback((e) => {
+    const { width, height } = e.currentTarget.dataset;
+    setSingleFrameWidth(replacePx(width) * 1.5);
+    setSingleFrameHeight(replacePx(height) * 1.5);
+  }, []);
 
   const handleGetFrameAttribute = useCallback((e) => {
     const { value } = e.currentTarget;
-    console.log(value);
     if (value) {
       setFrameAttributes(value);
     }
@@ -163,24 +230,19 @@ const SingleTool = () => {
 
   const handleToImageInWrapper = useCallback(
     (e) => {
-      if (!isMovingImage || !controllerNode || !ImageCanvasRef.current || !emptyX || !emptyY) return;
+      if (!controllerNode || !singleCanvasFrameWrapperRef.current) return;
       const [cursorX, cursorY] = getPosition(e);
-      const { width, height } = controllerNode.getBoundingClientRect();
-      const g = cursorX - width / 2 - emptyX;
-      const h = cursorY - height / 2 - emptyY;
+      const { width, height } = singleCanvasFrameWrapperRef.current.getBoundingClientRect();
 
-      controllerNode.style.transform = `translate(${g}px, ${h}px)`;
-      // controllerNode.style.position = 'relative';
-      // controllerNode.style.left = `${g}px`;
-      // controllerNode.style.top = `${h}px`;
+      const x = cursorX - width + 60;
+      const y = cursorY - height / 2 - 95;
+
+      controllerNode.style.position = 'relative';
+      controllerNode.style.left = `${x}px`;
+      controllerNode.style.top = `${y}px`;
     },
-    [controllerNode, emptyX, emptyY, getPosition, isMovingImage],
+    [controllerNode, getPosition],
   );
-
-  const handleCreateSingleFrame = useCallback(() => {
-    setSingleFrameWidth(500);
-    setSingleFrameHeight(500);
-  }, []);
 
   const handleSingleImgUpload = useCallback(
     async (file: RcFile) => {
@@ -276,26 +338,6 @@ const SingleTool = () => {
   );
 
   useEffect(() => {
-    if (!isMovingImage) return;
-  }, [isMovingImage]);
-
-  // 어떤 액자를 할지 클릭하면 그 액자에 맞는 사이즈로 canvas 액자 출력
-  useEffect(() => {
-    const sCanvas = singleCanvasFrameRef.current;
-    if (!sCanvas || !singleFrameWidth || !singleFrameHeight) return;
-    sCanvas.width = singleFrameWidth;
-    sCanvas.height = singleFrameHeight;
-    const sCtx = sCanvas.getContext('2d');
-    sCanvas.style.cursor = 'pointer';
-    sCanvas.style.zIndex = '10';
-    if (sCtx) {
-      sCtx.strokeStyle = theme.color.primary;
-      sCtx.lineWidth = 6;
-      sCtx.strokeRect(0, 0, singleFrameWidth, singleFrameHeight);
-    }
-  }, [singleCanvasFrameRef, singleCanvasFrameWrapperRef, singleFrameHeight, singleFrameWidth]);
-
-  useEffect(() => {
     drawingImage();
   }, [singleImgUploadUrl, wrapperWidth, wrapperHeight, drawingImage]);
 
@@ -309,14 +351,10 @@ const SingleTool = () => {
   }, []);
 
   return (
-    <>
+    <SingleToolContainer>
       <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
       <ToolHeader />
       <SingleToolFactory>
-        <Button type="text" onClick={handleCreateSingleFrame}>
-          <FontAwesomeIcon icon={faSquare} />
-          <small>첨부하기</small>
-        </Button>
         <Button type="text" onClick={handleImgRatioSetting}>
           <FontAwesomeIcon icon={faCompress} />
           <small>비율 맞추기</small>
@@ -349,55 +387,60 @@ const SingleTool = () => {
         </div>
         <SingleFrameListGrid>
           {frameList.map((lst, index) => (
-            <SingleFrameList
-              key={index}
-              data-value={lst.name}
-              data-attribute={lst.attribute}
-              {...lst.size}
-              onClick={handleSelectFrame}
-            >
-              <FrameSizeName>{lst.name}</FrameSizeName>
-            </SingleFrameList>
+            <div key={index} data-width={lst.size.width} data-height={lst.size.height} onClick={handleSelectFrame}>
+              <SingleFrameList {...lst.size}>
+                <FrameSizeName>{lst.name}</FrameSizeName>
+              </SingleFrameList>
+              <small>{lst.cm}</small>
+            </div>
           ))}
         </SingleFrameListGrid>
       </SingleFrameListWrapper>
 
       {/* 사진이 들어갈 액자  */}
-      <SingleCanvasFrameWrapper
-        cmd={resizeCmd ?? null}
-        ref={singleCanvasFrameWrapperRef}
-        clicked={isMovingImage}
-        onMouseMove={isMovingImage ? handleToImageInWrapper : undefined}
-        onMouseUp={handleMoveCancelSingleImage}
-      >
-        <SingleCanvasFrame
-          isImgUploadUrl={singleImgUploadUrl ? true : false}
-          ref={singleCanvasFrameRef}
-          onMouseDown={handleMoveSingleImage}
+      <SingleCanvasField>
+        <SingleCanvasFrameWrapper
+          cmd={resizeCmd ?? null}
+          ref={singleCanvasFrameWrapperRef}
+          clicked={isMovingImage}
+          onMouseMove={isMovingImage ? handleToImageInWrapper : undefined}
           onMouseUp={handleMoveCancelSingleImage}
-        ></SingleCanvasFrame>
+          onMouseLeave={handleMoveCancelSingleImage}
+        >
+          <SingleCanvasFrame
+            isImgUploadUrl={singleImgUploadUrl ? true : false}
+            ref={singleCanvasFrameRef}
+            width={singleFrameWidth}
+            height={singleFrameHeight}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </SingleCanvasFrame>
 
-        {singleImgUploadUrl && (
-          <SingleImageCanvas clicked={isMovingImage}>
-            <SingleImgSizeController
-              controllerRef={(node) => controllerRef(node)}
-              isMovingImage={isMovingImage}
-              imgRef={ImageCanvasRef}
-              wrapperRef={singleCanvasFrameWrapperRef}
-            >
-              <>
-                <canvas
-                  data-url={singleImgUploadUrl}
-                  ref={ImageCanvasRef}
-                  onMouseDown={handleMoveSingleImage}
-                  onMouseUp={handleMoveCancelSingleImage}
-                />
-              </>
-            </SingleImgSizeController>
-          </SingleImageCanvas>
-        )}
-      </SingleCanvasFrameWrapper>
-    </>
+          {singleImgUploadUrl && (
+            <SingleImageCanvas clicked={isMovingImage}>
+              <SingleImgSizeController
+                controllerRef={(node) => controllerRef(node)}
+                isMovingImage={isMovingImage}
+                imgRef={ImageCanvasRef}
+                wrapperRef={singleCanvasFrameWrapperRef}
+              >
+                <>
+                  <canvas
+                    data-url={singleImgUploadUrl}
+                    ref={ImageCanvasRef}
+                    onMouseDown={handleMoveSingleImage}
+                    onMouseUp={handleMoveCancelSingleImage}
+                  />
+                </>
+              </SingleImgSizeController>
+            </SingleImageCanvas>
+          )}
+        </SingleCanvasFrameWrapper>
+      </SingleCanvasField>
+    </SingleToolContainer>
   );
 };
 

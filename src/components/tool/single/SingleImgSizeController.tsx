@@ -164,8 +164,6 @@ const SingleImgSizeController = ({ children, controllerRef, imgRef, wrapperRef, 
   // const [isResizeMode, setIsResizeMode] = useState(false);
   const [isResizeStart, setIsResizeStart] = useState(false);
   const [resizeCmd, setResizeCmd] = useGlobalState<ResizeCmd | null>('resizeCmd', null);
-  const [, setEmptyX] = useGlobalState('emptyX', 0);
-  const [, setEmptyY] = useGlobalState('emptyY', 0);
   const positioningImageResize = useCallback(
     (resizeCmd: ResizeCmd | null, x: number, y: number) => {
       if (!imgRef || !imgRef.current) return;
@@ -281,15 +279,6 @@ const SingleImgSizeController = ({ children, controllerRef, imgRef, wrapperRef, 
     wrapperRef.current.onmousemove = handleImgResize;
     wrapperRef.current.onmouseup = handleImgResizeEnd;
   }, [handleImgResize, handleImgResizeEnd, imgRef, wrapperRef]);
-
-  useEffect(() => {
-    if (!isMovingImage || !imgRef.current) return;
-    const img = imgRef.current;
-    const { left, top } = img.getBoundingClientRect();
-    setEmptyX(left);
-    setEmptyY(top);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMovingImage]);
 
   return (
     <ImgController cmd={resizeCmd ?? null} ref={controllerRef}>
