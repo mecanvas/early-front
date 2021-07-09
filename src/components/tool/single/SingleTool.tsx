@@ -20,6 +20,7 @@ import { frameSize } from 'src/constants';
 import { FrameSizeName } from '../divided/DividedToolStyle';
 import { replacePx } from 'src/utils/replacePx';
 import { cmToPx } from 'src/utils/cmToPx';
+import { FullscreenOutlined } from '@ant-design/icons';
 
 const SingleToolContainer = styled.div`
   background-color: ${({ theme }) => theme.color.gray100};
@@ -292,40 +293,15 @@ const SingleTool = () => {
     setIsMovingImage(false);
   }, []);
 
-  const handleImgRatioSetting = useCallback(() => {
-    if (!ImageCanvasRef.current) return;
-    const canvas = ImageCanvasRef.current;
-    const {
-      width,
-      height,
-      dataset: { url },
-    } = canvas;
-    const [w, h] = getOriginRatio(originWidth, originHeight, width, height);
-
-    const imgCtx = canvas.getContext('2d');
-
-    if (imgCtx && url) {
-      const img = new Image();
-      img.src = url;
-      img.onload = () => {
-        imgCtx.imageSmoothingQuality = 'high';
-        imgCtx.clearRect(0, 0, width, height);
-        canvas.width = w;
-        canvas.height = h;
-        imgCtx.drawImage(img, 0, 0, w, h);
-      };
-    }
-  }, [originHeight, originWidth]);
-
   const drawingImage = useCallback(
-    (resizeWidth?: number, resizeHeight?: number) => {
+    (resizeWidth?: number, resizeHeight?: number, url?: string) => {
       const imgCanvas = ImageCanvasRef.current;
       if (!imgCanvas || !wrapperWidth || !wrapperHeight) return;
 
       const imgCtx = imgCanvas.getContext('2d');
       if (imgCtx) {
         const img = new Image();
-        img.src = singleImgUploadUrl;
+        img.src = url || singleImgUploadUrl;
         img.onload = () => {
           const { naturalWidth, naturalHeight } = img;
 
@@ -337,19 +313,47 @@ const SingleTool = () => {
             resizeWidth || singleFrameWidth || wrapperWidth,
             resizeHeight || singleFrameHeight || wrapperHeight,
           );
-          imgCtx.imageSmoothingQuality = 'high';
           imgCanvas.width = w;
           imgCanvas.height = filterOverMaxHeight(h);
+          imgCtx.clearRect(0, 0, wrapperWidth, wrapperHeight);
+          imgCtx.imageSmoothingQuality = 'high';
           imgCtx.drawImage(img, 0, 0, w, filterOverMaxHeight(h));
         };
       }
     },
-    [singleImgUploadUrl, wrapperHeight, wrapperWidth],
+    [singleFrameHeight, singleFrameWidth, singleImgUploadUrl, wrapperHeight, wrapperWidth],
   );
+
+  const handleImgRatioSetting = useCallback(() => {
+    if (!ImageCanvasRef.current || !controllerNode) return;
+    const canvas = ImageCanvasRef.current;
+    const {
+      width,
+      height,
+      dataset: { url },
+    } = canvas;
+    const [w, h] = getOriginRatio(originWidth, originHeight, width, height);
+    drawingImage(w, h, url);
+  }, [controllerNode, drawingImage, originHeight, originWidth]);
+
+  const handleRatioForFrame = useCallback(() => {
+    const [w, h] = getOriginRatio(originWidth, originHeight, singleFrameWidth, singleFrameHeight);
+    drawingImage(w, h);
+    if (controllerNode) {
+      controllerNode.style.position = 'relative';
+      controllerNode.style.left = `${0}px`;
+      controllerNode.style.top = `${0}px`;
+    }
+  }, [controllerNode, drawingImage, originHeight, originWidth, singleFrameHeight, singleFrameWidth]);
 
   useEffect(() => {
     drawingImage();
-  }, [singleImgUploadUrl, wrapperWidth, wrapperHeight, drawingImage]);
+    if (controllerNode) {
+      controllerNode.style.position = 'relative';
+      controllerNode.style.left = `${0}px`;
+      controllerNode.style.top = `${0}px`;
+    }
+  }, [singleImgUploadUrl, wrapperWidth, wrapperHeight, drawingImage, controllerNode]);
 
   useEffect(() => {
     const sCanvasWrapper = singleCanvasFrameWrapperRef.current;
@@ -367,6 +371,10 @@ const SingleTool = () => {
       <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
       <ToolHeader />
       <SingleToolFactory>
+        <Button type="text" onClick={handleRatioForFrame}>
+          <FullscreenOutlined />
+          <small>액자에 끼우기</small>
+        </Button>
         <Button type="text" onClick={handleImgRatioSetting}>
           <FontAwesomeIcon icon={faCompress} />
           <small>비율 맞추기</small>
