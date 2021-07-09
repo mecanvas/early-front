@@ -27,7 +27,7 @@ const SingleToolFactory = styled.div`
 const SingleCanvasFrameWrapper = styled.div<{ clicked: boolean; cmd: ResizeCmd | null }>`
   min-height: calc(100vh - 105px);
   max-height: calc(100vh - 105px);
-  width: 98%;
+  width: 100%;
   margin: 0 auto;
   display: flex;
   justify-content: center;
@@ -90,7 +90,10 @@ const SingleTool = () => {
   const singleCanvasFrameWrapperRef = useRef<HTMLDivElement>(null);
   const singleCanvasFrameRef = useRef<HTMLCanvasElement>(null);
   const ImageCanvasRef = useRef<HTMLCanvasElement>(null);
-  const singleImgWrapperRef = useRef<HTMLDivElement>(null);
+  const [controllerNode, setControllerNode] = useState<HTMLDivElement | null>(null);
+  const controllerRef = useCallback((node) => {
+    setControllerNode(node);
+  }, []);
   const [wrapperWidth, setWrapperWidth] = useState(0);
   const [wrapperHeight, setWrapperHeight] = useState(0);
   const [originWidth, setOriginWidth] = useState(0);
@@ -105,6 +108,10 @@ const SingleTool = () => {
   const [singleFrameWidth, setSingleFrameWidth] = useState(0);
   const [singleFrameHeight, setSingleFrameHeight] = useState(0);
 
+  // const [cursorX, cursorY] = useGetCursorPosition(isMovingImage);
+  const [emptyX] = useGlobalState<number>('emptyX');
+  const [emptyY] = useGlobalState<number>('emptyY');
+
   const getPosition = useCallback((event: MouseEvent) => {
     const x = event.clientX;
     const y = event.clientY;
@@ -113,14 +120,18 @@ const SingleTool = () => {
 
   const handleToImageInWrapper = useCallback(
     (e) => {
-      if (!isMovingImage) return;
-      const [x, y] = getPosition(e);
-      console.log(x, y);
-      if (singleImgWrapperRef.current) {
-        singleImgWrapperRef.current.style.transform = `translate(${x}px, ${y}px)`;
-      }
+      if (!isMovingImage || !controllerNode || !ImageCanvasRef.current || !emptyX || !emptyY) return;
+      const [cursorX, cursorY] = getPosition(e);
+      const { width, height } = controllerNode.getBoundingClientRect();
+      const g = cursorX - width / 2 - emptyX;
+      const h = cursorY - height / 2 - emptyY;
+
+      controllerNode.style.transform = `translate(${g}px, ${h}px)`;
+      // controllerNode.style.position = 'relative';
+      // controllerNode.style.left = `${g}px`;
+      // controllerNode.style.top = `${h}px`;
     },
-    [getPosition, isMovingImage],
+    [controllerNode, emptyX, emptyY, getPosition, isMovingImage],
   );
 
   const handleCreateSingleFrame = useCallback(() => {
@@ -221,6 +232,10 @@ const SingleTool = () => {
     [singleImgUploadUrl, wrapperHeight, wrapperWidth],
   );
 
+  useEffect(() => {
+    if (!isMovingImage) return;
+  }, [isMovingImage]);
+
   // 어떤 액자를 할지 클릭하면 그 액자에 맞는 사이즈로 canvas 액자 출력
   useEffect(() => {
     const sCanvas = singleCanvasFrameRef.current;
@@ -276,7 +291,6 @@ const SingleTool = () => {
         cmd={resizeCmd ?? null}
         ref={singleCanvasFrameWrapperRef}
         clicked={isMovingImage}
-        data-component="wrapper"
         onMouseMove={isMovingImage ? handleToImageInWrapper : undefined}
         onMouseUp={handleMoveCancelSingleImage}
       >
@@ -289,7 +303,12 @@ const SingleTool = () => {
 
         {singleImgUploadUrl && (
           <SingleImageCanvas clicked={isMovingImage}>
-            <SingleImgSizeController imgRef={ImageCanvasRef} wrapperRef={singleCanvasFrameWrapperRef}>
+            <SingleImgSizeController
+              controllerRef={(node) => controllerRef(node)}
+              isMovingImage={isMovingImage}
+              imgRef={ImageCanvasRef}
+              wrapperRef={singleCanvasFrameWrapperRef}
+            >
               <>
                 <canvas
                   data-url={singleImgUploadUrl}

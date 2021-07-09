@@ -8,7 +8,7 @@ import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
 export const ImgController = styled.div<{
   cmd: ResizeCmd | null;
 }>`
-  position: relative;
+  position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,7 +36,7 @@ export const ImgController = styled.div<{
     `;
   }}
   /* 클릭 시 resize mode on */
-button {
+/* button {
     all: unset;
     position: absolute;
     width: 100%;
@@ -44,10 +44,11 @@ button {
     top: 0;
     left: 0;
     cursor: pointer;
-  }
+    z-index: 11;
+  } */
   /* top-left */
   div:nth-of-type(1) {
-    z-index: 10;
+    z-index: 12;
     position: absolute;
     top: -4px;
     left: -4px;
@@ -60,7 +61,7 @@ button {
   }
   /* top-center */
   div:nth-of-type(2) {
-    z-index: 10;
+    z-index: 12;
     position: absolute;
     top: -3px;
     transform: translateX(-50%);
@@ -73,7 +74,7 @@ button {
   }
   /* top-right */
   div:nth-of-type(3) {
-    z-index: 10;
+    z-index: 12;
     position: absolute;
     top: -4px;
     right: -4px;
@@ -86,7 +87,7 @@ button {
   }
   /* right */
   div:nth-of-type(4) {
-    z-index: 10;
+    z-index: 12;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -99,7 +100,7 @@ button {
   }
   /* bottom-left */
   div:nth-of-type(5) {
-    z-index: 10;
+    z-index: 12;
     position: absolute;
     bottom: -4px;
     left: -4px;
@@ -112,7 +113,7 @@ button {
   }
   /* bottom-center */
   div:nth-of-type(6) {
-    z-index: 10;
+    z-index: 12;
     position: absolute;
     bottom: -3px;
     transform: translateX(-50%);
@@ -125,7 +126,7 @@ button {
   }
   /* bottom-right */
   div:nth-of-type(7) {
-    z-index: 10;
+    z-index: 12;
     position: absolute;
     bottom: -4px;
     right: -4px;
@@ -138,7 +139,7 @@ button {
   }
   /* left */
   div:nth-of-type(8) {
-    z-index: 10;
+    z-index: 12;
     position: absolute;
     bottom: 50%;
     transform: translateY(50%);
@@ -155,13 +156,16 @@ interface Props {
   children: React.ReactChild;
   imgRef: RefObject<HTMLCanvasElement>;
   wrapperRef: RefObject<any>;
+  isMovingImage: boolean;
+  controllerRef: (node: any) => any;
 }
 
-const SingleImgSizeController = ({ children, imgRef, wrapperRef }: Props) => {
-  // const [isResizeMode, setIsResizeMode] = useGlobalState('isResizeMode', false);
+const SingleImgSizeController = ({ children, controllerRef, imgRef, wrapperRef, isMovingImage }: Props) => {
+  // const [isResizeMode, setIsResizeMode] = useState(false);
   const [isResizeStart, setIsResizeStart] = useState(false);
   const [resizeCmd, setResizeCmd] = useGlobalState<ResizeCmd | null>('resizeCmd', null);
-
+  const [, setEmptyX] = useGlobalState('emptyX', 0);
+  const [, setEmptyY] = useGlobalState('emptyY', 0);
   const positioningImageResize = useCallback(
     (resizeCmd: ResizeCmd | null, x: number, y: number) => {
       if (!imgRef || !imgRef.current) return;
@@ -222,6 +226,7 @@ const SingleImgSizeController = ({ children, imgRef, wrapperRef }: Props) => {
           imgCtx.clearRect(0, 0, imgRef.current.width, imgRef.current.height);
           imgRef.current.width = newWidth;
           imgRef.current.height = filterOverMaxHeight(newHeight);
+
           imgCtx.imageSmoothingQuality = 'high';
           imgCtx.drawImage(img, 0, 0, newWidth, filterOverMaxHeight(newHeight));
         };
@@ -246,17 +251,9 @@ const SingleImgSizeController = ({ children, imgRef, wrapperRef }: Props) => {
     [isResizeStart, positioningImageResize, resizeCmd, imgRef],
   );
 
-  // const handleResizeModeStart = useCallback(
-  //   (e) => {
-  //     const { component } = e.currentTarget.dataset;
-  //     if (component === 'wrapper') {
-  //       return setIsResizeMode(false);
-  //     }
-
-  //     setIsResizeMode(!isResizeMode);
-  //   },
-  //   [isResizeMode, setIsResizeMode],
-  // );
+  // const handleResizeModeStart = useCallback((e) => {
+  //   setIsResizeMode((prev) => !prev);
+  // }, []);
 
   const handleImgResizeStart = useCallback(
     (e) => {
@@ -279,29 +276,39 @@ const SingleImgSizeController = ({ children, imgRef, wrapperRef }: Props) => {
   }, [handleImgResizeEnd, imgRef]);
 
   useEffect(() => {
-    if (!wrapperRef || !wrapperRef.current) return;
-    // wrapperRef.current.onclick = handleResizeModeStart;
+    if (!wrapperRef || !wrapperRef.current || !imgRef.current) return;
 
     wrapperRef.current.onmousemove = handleImgResize;
     wrapperRef.current.onmouseup = handleImgResizeEnd;
-  }, [handleImgResize, handleImgResizeEnd, wrapperRef]);
+  }, [handleImgResize, handleImgResizeEnd, imgRef, wrapperRef]);
+
+  useEffect(() => {
+    if (!isMovingImage || !imgRef.current) return;
+    const img = imgRef.current;
+    const { left, top } = img.getBoundingClientRect();
+    setEmptyX(left);
+    setEmptyY(top);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMovingImage]);
 
   return (
-    <ImgController cmd={resizeCmd ?? null}>
+    <ImgController cmd={resizeCmd ?? null} ref={controllerRef}>
       {children}
-      <>
-        <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
-        <div data-cmd="top-center" onMouseDown={handleImgResizeStart}></div>
-        <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
+      {isMovingImage ? null : (
+        <>
+          <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
+          <div data-cmd="top-center" onMouseDown={handleImgResizeStart}></div>
+          <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
 
-        <div data-cmd="right" onMouseDown={handleImgResizeStart}></div>
+          <div data-cmd="right" onMouseDown={handleImgResizeStart}></div>
 
-        <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
-        <div data-cmd="bottom-center" onMouseDown={handleImgResizeStart}></div>
-        <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
+          <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
+          <div data-cmd="bottom-center" onMouseDown={handleImgResizeStart}></div>
+          <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
 
-        <div data-cmd="left" onMouseDown={handleImgResizeStart}></div>
-      </>
+          <div data-cmd="left" onMouseDown={handleImgResizeStart}></div>
+        </>
+      )}
     </ImgController>
   );
 };
