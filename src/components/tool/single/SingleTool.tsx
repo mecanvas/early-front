@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import ToolHeader from '../ToolHeader';
 import { Button } from 'antd';
@@ -17,6 +17,9 @@ import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { theme } from 'src/style/theme';
 import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
+import { frameSize } from 'src/constants';
+import { FrameSizeName } from '../divided/DividedToolStyle';
+import { replacePx } from 'src/utils/replacePx';
 
 const SingleToolFactory = styled.div`
   display: flex;
@@ -86,6 +89,33 @@ const SingleImageCanvas = styled.div<{ clicked: boolean }>`
   }
 `;
 
+const SingleFrameListWrapper = styled.div`
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  top: 64px;
+`;
+
+const SingleFrameListGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid #dbdbdb;
+  justify-content: center;
+  align-items: center;
+  padding: 0.6em;
+`;
+
+const SingleFrameList = styled.div<{ width: string; height: string }>`
+  position: relative;
+  cursor: pointer;
+  margin: 0 auto;
+  margin-top: 0.4em;
+  width: ${({ width }) => `${replacePx(width) / 4}px`};
+  height: ${({ height }) => `${replacePx(height) / 4}px`};
+  border: 1px solid ${({ theme }) => theme.color.gray300};
+`;
+
 const SingleTool = () => {
   const singleCanvasFrameWrapperRef = useRef<HTMLDivElement>(null);
   const singleCanvasFrameRef = useRef<HTMLCanvasElement>(null);
@@ -108,6 +138,9 @@ const SingleTool = () => {
   const [singleFrameWidth, setSingleFrameWidth] = useState(0);
   const [singleFrameHeight, setSingleFrameHeight] = useState(0);
 
+  const [frameAttributes, setFrameAttributes] = useState<any>('정방');
+  const frameList = useMemo(() => frameSize().filter((lst) => lst.attribute === frameAttributes), [frameAttributes]);
+
   // const [cursorX, cursorY] = useGetCursorPosition(isMovingImage);
   const [emptyX] = useGlobalState<number>('emptyX');
   const [emptyY] = useGlobalState<number>('emptyY');
@@ -116,6 +149,16 @@ const SingleTool = () => {
     const x = event.clientX;
     const y = event.clientY;
     return [x, y];
+  }, []);
+
+  const handleSelectFrame = useCallback((e) => {}, []);
+
+  const handleGetFrameAttribute = useCallback((e) => {
+    const { value } = e.currentTarget;
+    console.log(value);
+    if (value) {
+      setFrameAttributes(value);
+    }
   }, []);
 
   const handleToImageInWrapper = useCallback(
@@ -285,6 +328,39 @@ const SingleTool = () => {
           </Button>
         </Upload>
       </SingleToolFactory>
+      <SingleFrameListWrapper>
+        <div>
+          <Button type="text" onClick={handleGetFrameAttribute} value="정방">
+            <FontAwesomeIcon icon={faSquare} />
+            <small>정방</small>
+          </Button>
+          <Button type="text" onClick={handleGetFrameAttribute} value="인물">
+            <FontAwesomeIcon icon={faSquare} />
+            <small>인물</small>
+          </Button>
+          <Button type="text" onClick={handleGetFrameAttribute} value="해경">
+            <FontAwesomeIcon icon={faSquare} />
+            <small>해경</small>
+          </Button>
+          <Button type="text" onClick={handleGetFrameAttribute} value="풍경">
+            <FontAwesomeIcon icon={faSquare} />
+            <small>풍경</small>
+          </Button>
+        </div>
+        <SingleFrameListGrid>
+          {frameList.map((lst, index) => (
+            <SingleFrameList
+              key={index}
+              data-value={lst.name}
+              data-attribute={lst.attribute}
+              {...lst.size}
+              onClick={handleSelectFrame}
+            >
+              <FrameSizeName>{lst.name}</FrameSizeName>
+            </SingleFrameList>
+          ))}
+        </SingleFrameListGrid>
+      </SingleFrameListWrapper>
 
       {/* 사진이 들어갈 액자  */}
       <SingleCanvasFrameWrapper
