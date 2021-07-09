@@ -7,7 +7,11 @@ import Logo from '../layouts/Logo';
 import ToolSave from './divided/DividedToolSave';
 import { ToolHeaderMenu, CanvasInfomationWrapper, BillInfomation, Bill, BillTotal } from './divided/DividedToolStyle';
 
-const ToolHeader = () => {
+interface Props {
+  singlePrice?: string;
+}
+
+const ToolHeader = ({ singlePrice }: Props) => {
   const router = useRouter();
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
@@ -47,33 +51,38 @@ const ToolHeader = () => {
         <Logo />
       </div>
       <div>
-        <Popover
-          style={{ padding: 0 }}
-          content={
-            yourPriceList?.length ? (
-              <CanvasInfomationWrapper>
-                {/* 사용한 액자 x 수량 */}
-                <BillInfomation>
-                  <Bill>
-                    {yourPriceList.map(([key, value], index) => (
-                      <div key={index}>
-                        <div>{key}</div>
-                        <div>
-                          {value.price.toLocaleString()} x {value.quantity}개
+        {singlePrice ? (
+          <Button type="text">{singlePrice}원</Button>
+        ) : (
+          <Popover
+            style={{ padding: 0 }}
+            content={
+              yourPriceList?.length ? (
+                <CanvasInfomationWrapper>
+                  {/* 사용한 액자 x 수량 */}
+                  <BillInfomation>
+                    <Bill>
+                      {yourPriceList.map(([key, value], index) => (
+                        <div key={index}>
+                          <div>{key}</div>
+                          <div>
+                            {value.price.toLocaleString()} x {value.quantity}개
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </Bill>
-                  <BillTotal>{framePrice?.reduce((acc, cur) => (acc += cur.price), 0).toLocaleString()}원</BillTotal>
-                </BillInfomation>
-              </CanvasInfomationWrapper>
-            ) : (
-              '제작하신 액자가 없습니다.'
-            )
-          }
-        >
-          <Button type="text">예상가격</Button>
-        </Popover>
+                      ))}
+                    </Bill>
+                    <BillTotal>{framePrice?.reduce((acc, cur) => (acc += cur.price), 0).toLocaleString()}원</BillTotal>
+                  </BillInfomation>
+                </CanvasInfomationWrapper>
+              ) : (
+                '제작하신 액자가 없습니다.'
+              )
+            }
+          >
+            <Button type="text">예상가격</Button>
+          </Popover>
+        )}
+
         <Button onClick={handleImgPreview} type={!isPreview ? 'default' : 'primary'}>
           {!isPreview ? '미리보기' : '이미지로'}
         </Button>

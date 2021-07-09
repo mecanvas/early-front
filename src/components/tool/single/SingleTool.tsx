@@ -213,6 +213,7 @@ const SingleTool = () => {
 
   const [frameAttributes, setFrameAttributes] = useState<any>('정방');
   const frameList = useMemo(() => frameSize().filter((lst) => lst.attribute === frameAttributes), [frameAttributes]);
+  const [singlePrice, setSinglePrice] = useState(0);
 
   const getPosition = useCallback((event: MouseEvent) => {
     const x = event.clientX;
@@ -224,12 +225,14 @@ const SingleTool = () => {
     // 정방 s-1호로 초기 생성
     setSingleFrameWidth(cmToPx(16) * 1.5);
     setSingleFrameHeight(cmToPx(16) * 1.5);
+    setSinglePrice(20000);
   }, []);
 
   const handleSelectFrame = useCallback((e) => {
-    const { width, height } = e.currentTarget.dataset;
+    const { width, height, price } = e.currentTarget.dataset;
     setSingleFrameWidth(replacePx(width) * 1.5);
     setSingleFrameHeight(replacePx(height) * 1.5);
+    setSinglePrice(+price);
   }, []);
 
   const handleGetFrameAttribute = useCallback((e) => {
@@ -370,7 +373,7 @@ const SingleTool = () => {
   return (
     <SingleToolContainer>
       <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
-      <ToolHeader />
+      <ToolHeader singlePrice={singlePrice.toLocaleString()} />
       <SingleToolFactory>
         <Button type="text" onClick={handleRatioForFrame}>
           <FullscreenOutlined />
@@ -410,7 +413,13 @@ const SingleTool = () => {
         </div>
         <SingleFrameListGrid>
           {frameList.map((lst, index) => (
-            <div key={index} data-width={lst.size.width} data-height={lst.size.height} onClick={handleSelectFrame}>
+            <div
+              key={index}
+              data-width={lst.size.width}
+              data-height={lst.size.height}
+              data-price={lst.price}
+              onClick={handleSelectFrame}
+            >
               <SingleFrameList {...lst.size}>
                 <FrameSizeName>{lst.name}</FrameSizeName>
               </SingleFrameList>
