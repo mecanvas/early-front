@@ -95,8 +95,8 @@ const SingleCanvasFrame = styled.div<{ isImgUploadUrl: boolean; width: number; h
     position: absolute;
     top: 0;
     width: 100%;
-    height: 4px;
-    background-color: ${({ theme }) => theme.color.primary};
+    height: 1px;
+    border-top: 4px dashed ${({ theme }) => theme.color.primary};
   }
   /* right */
   span:nth-of-type(2) {
@@ -104,9 +104,9 @@ const SingleCanvasFrame = styled.div<{ isImgUploadUrl: boolean; width: number; h
     position: absolute;
     top: 0;
     right: 0;
-    width: 4px;
+    width: 1px;
     height: 100%;
-    background-color: ${({ theme }) => theme.color.primary};
+    border-right: 4px dashed ${({ theme }) => theme.color.primary};
   }
   /* bottom */
   span:nth-of-type(3) {
@@ -114,8 +114,8 @@ const SingleCanvasFrame = styled.div<{ isImgUploadUrl: boolean; width: number; h
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 4px;
-    background-color: ${({ theme }) => theme.color.primary};
+    height: 1px;
+    border-bottom: 4px dashed ${({ theme }) => theme.color.primary};
   }
   /* left */
   span:nth-of-type(4) {
@@ -123,9 +123,9 @@ const SingleCanvasFrame = styled.div<{ isImgUploadUrl: boolean; width: number; h
     position: absolute;
     left: 0;
     top: 0;
-    width: 4px;
+    width: 1px;
     height: 100%;
-    background-color: ${({ theme }) => theme.color.primary};
+    border-left: 4px dashed ${({ theme }) => theme.color.primary};
   }
 `;
 
