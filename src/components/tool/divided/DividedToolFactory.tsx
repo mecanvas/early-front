@@ -1,5 +1,4 @@
 import {
-  faEdit,
   faUndo,
   faImage,
   faPaintRoller,
@@ -8,18 +7,19 @@ import {
   faSquare,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Upload, Popover, Modal, Checkbox, Input } from 'antd';
+import { Button, Upload, Popover } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import axios from 'axios';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { ColorResult } from 'react-color';
 import { useGlobalState } from 'src/hooks';
 import { useProgress } from 'src/hooks/useProgress';
 import { CroppedFrame, FramePrice } from 'src/interfaces/ToolInterface';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
+import ToolImageResizerModal from '../ToolImageResizerModal';
 import ToolColorPalette from './DividedToolColorPalette';
-import { FactoryTool, FrameTool, ImageShowingWidthHeight } from './DividedToolStyle';
+import { FactoryTool, FrameTool } from './DividedToolStyle';
 
 interface Props {
   croppedList: CroppedFrame[];
@@ -41,8 +41,6 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
   const [framePrice, setFramePrice] = useGlobalState<FramePrice[]>('framePrice');
 
   const { getProgressGage } = useProgress();
-  const [ratioPersist, setRatioPersist] = useState(true);
-  const [imgModalResizeOpen, setImgModalResizeOpen] = useState(false);
 
   const handleImgGoBack = useCallback(() => {
     if (!croppedList?.length || !framePrice?.length || !selectedFrameList?.length) return;
@@ -83,47 +81,6 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
     setResizeHeight(+h.toFixed());
   }, [originHeight, originWidth, resizeHeight, resizeWidth, setResizeHeight, setResizeWidth]);
 
-  const handleResizeReset = useCallback(() => {
-    if (!originWidth || !originHeight) return;
-    setResizeWidth(originWidth);
-    setResizeHeight(originHeight);
-  }, [setResizeWidth, originWidth, setResizeHeight, originHeight]);
-
-  const handleRatioPersist = useCallback(() => {
-    setRatioPersist((prev) => !prev);
-  }, []);
-
-  // 이미지 사이즈를 변경 입력
-  const handleChangeImgSize = useCallback(
-    (e) => {
-      if (!originHeight || !originWidth) return;
-
-      const { name, value } = e.target;
-      if (name === 'width') {
-        setResizeWidth(+value);
-        if (ratioPersist) {
-          const ratioHeight = (+value * originHeight) / originWidth;
-          setResizeHeight(ratioHeight);
-        }
-      }
-      if (name === 'height') {
-        setResizeHeight(+value);
-        if (ratioPersist) {
-          setResizeWidth((+value * originWidth) / originHeight);
-        }
-      }
-    },
-    [originHeight, originWidth, ratioPersist, setResizeHeight, setResizeWidth],
-  );
-
-  const handleModalResize = useCallback(() => {
-    setImgModalResizeOpen((prev) => !prev);
-  }, []);
-
-  const handleModalResizeOk = useCallback(() => {
-    setImgModalResizeOpen((prev) => !prev);
-  }, []);
-
   const handleColorChange = useCallback(
     (color: ColorResult) => {
       const { hex } = color;
@@ -148,16 +105,7 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
     <>
       <FactoryTool>
         <div>
-          {isResizeMode && resizeWidth && resizeHeight && (
-            <>
-              <ImageShowingWidthHeight>
-                {`${resizeWidth?.toFixed()}px X ${resizeHeight?.toFixed()}px`}
-                <span onClick={handleModalResize}>
-                  <FontAwesomeIcon icon={faEdit} />
-                </span>
-              </ImageShowingWidthHeight>
-            </>
-          )}
+          {isResizeMode && resizeWidth && resizeHeight && <ToolImageResizerModal />}
           <Button type="text" style={{ opacity: selectedFrameList?.length ? 1 : 0.4 }} onClick={handleImgGoBack}>
             <FontAwesomeIcon icon={faUndo} />
             <small>실행취소</small>
@@ -209,29 +157,6 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
           </Button>
         </FrameTool>
       </FactoryTool>
-
-      <Modal
-        visible={imgModalResizeOpen}
-        onOk={handleModalResizeOk}
-        onCancel={handleModalResize}
-        title="이미지의 너비와 높이를 입력하세요."
-      >
-        <div>
-          <form onChange={handleChangeImgSize}>
-            <Input type="text" name="width" value={resizeWidth || ''} addonBefore="너비" addonAfter="px" />
-            <Input type="text" name="height" value={resizeHeight || ''} addonBefore="높이" addonAfter="px" />
-          </form>
-
-          <div style={{ textAlign: 'right' }}>
-            <Checkbox defaultChecked={ratioPersist} onChange={handleRatioPersist}>
-              너비에 비율을 맞춥니다.
-            </Checkbox>
-          </div>
-          <div style={{ textAlign: 'right', marginTop: '6px' }}>
-            <Button onClick={handleResizeReset}>이미지 초기 사이즈로 되돌립니다.</Button>
-          </div>
-        </div>
-      </Modal>
     </>
   );
 };

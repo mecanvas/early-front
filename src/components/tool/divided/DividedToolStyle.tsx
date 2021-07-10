@@ -330,54 +330,6 @@ export const ImageWrapper = styled.div<{
   }
 `;
 
-export const ImageShowingWidthHeight = styled.small`
-  position: absolute;
-  top: 10px;
-  z-index: 33;
-  padding: 8px;
-  font-weight: bold;
-  border: 1px solid ${({ theme }) => theme.color.primary};
-  border-radius: 20px;
-  background-color: ${({ theme }) => theme.color.secondarybg};
-  color: ${({ theme }) => theme.color.primary};
-  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-    top: 5px;
-    font-size: 13px;
-  }
-  @media all and (max-width: ${({ theme }) => theme.size.xs}) {
-    font-size: 11px;
-  }
-  /* 사진 edit btn */
-  span {
-    position: absolute;
-    cursor: pointer;
-    right: -34px;
-    top: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 20px;
-    border: 1px solid ${({ theme }) => theme.color.primary};
-    background-color: ${({ theme }) => theme.color.secondarybg};
-    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-      top: 1px;
-      width: 28px;
-      height: 28px;
-    }
-    svg {
-      font-size: 16px;
-      @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-        font-size: 14px;
-      }
-      path {
-        fill: ${({ theme }) => theme.color.primary};
-      }
-    }
-  }
-`;
-
 export const PreviewBg = styled.div`
   position: absolute;
   top: 95px;
