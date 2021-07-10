@@ -174,7 +174,7 @@ const Tool = () => {
   const [isPreview] = useGlobalState<boolean>('isPreview', false);
 
   // 바뀌는 색상
-  const [bgColor] = useGlobalState<string>('bgColor', theme.color.white);
+  const [bgColor] = useGlobalState<string>('bgColor', theme.color.gray100);
   // const [frameBorderColor, setFrameBorderColor] = useState('#333');
 
   // 이미지 크기 조절

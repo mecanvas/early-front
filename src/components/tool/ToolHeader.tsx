@@ -1,5 +1,4 @@
 import { Popover, Button } from 'antd';
-import { useRouter } from 'next/router';
 import React, { useCallback, useMemo } from 'react';
 import { useGlobalState } from 'src/hooks';
 import { FramePrice } from 'src/interfaces/ToolInterface';
@@ -9,10 +8,10 @@ import { ToolHeaderMenu, CanvasInfomationWrapper, BillInfomation, Bill, BillTota
 
 interface Props {
   singlePrice?: string;
+  singleCanvasName?: string;
 }
 
-const ToolHeader = ({ singlePrice }: Props) => {
-  const router = useRouter();
+const ToolHeader = ({ singlePrice, singleCanvasName }: Props) => {
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [framePrice] = useGlobalState<FramePrice[]>('framePrice');
@@ -41,18 +40,15 @@ const ToolHeader = ({ singlePrice }: Props) => {
     setIsPreview(!isPreview);
   }, [isPreview, setIsPreview]);
 
-  const handlePushMainPage = useCallback(() => {
-    router.push('/');
-  }, [router]);
-
   return (
     <ToolHeaderMenu>
-      <div onClick={handlePushMainPage}>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
         <Logo />
-      </div>
-      <div>
-        {singlePrice ? (
-          <Button type="text">{singlePrice}원</Button>
+        {singlePrice && singleCanvasName ? (
+          <div style={{ borderLeft: '1px solid #dbdbdb', paddingLeft: '20px', marginLeft: '20px' }}>
+            <span style={{ marginRight: '-9px' }}>{singleCanvasName} -</span>
+            <Button type="text">{singlePrice}원</Button>
+          </div>
         ) : (
           <Popover
             style={{ padding: 0 }}
@@ -79,10 +75,13 @@ const ToolHeader = ({ singlePrice }: Props) => {
               )
             }
           >
-            <Button type="text">예상가격</Button>
+            <Button type="text" style={{ borderLeft: '1px solid #dbdbdb', paddingLeft: '20px', marginLeft: '20px' }}>
+              예상가격
+            </Button>
           </Popover>
         )}
-
+      </div>
+      <div>
         <Button onClick={handleImgPreview} type={!isPreview ? 'default' : 'primary'}>
           {!isPreview ? '미리보기' : '이미지로'}
         </Button>

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from '@emotion/styled';
+import router, { useRouter } from 'next/router';
 
 const Logos = styled.div`
   font-size: 28px;
@@ -21,8 +22,14 @@ const Logos = styled.div`
 `;
 
 const Logo = () => {
+  const router = useRouter();
+
+  const handlePushMainPage = useCallback(() => {
+    router.push('/');
+  }, [router]);
+
   return (
-    <Logos>
+    <Logos onClick={handlePushMainPage}>
       <span>ㅇ</span>
       <span>ㄹ</span>
     </Logos>

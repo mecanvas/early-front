@@ -70,6 +70,7 @@ const PreviewCanvasWrapper = styled.div<{ isPreview: boolean }>`
           align-items: center;
           canvas {
             display: block;
+            background-color: ${theme.color.white};
             box-shadow: ${theme.canvasShadow};
           }
         `
@@ -149,6 +150,7 @@ const SingleWrapper = styled.div<{
 
 const SingleSelectedFrame = styled.div<{ isImgUploadUrl: boolean; width: number; height: number }>`
   position: absolute;
+  background-color: ${({ theme }) => theme.color.white};
   ${({ width, height }) =>
     width &&
     height &&
@@ -364,6 +366,7 @@ const SingleTool = () => {
   const [frameAttributes, setFrameAttributes] = useState<any>('정방');
   const frameList = useMemo(() => frameSize().filter((lst) => lst.attribute === frameAttributes), [frameAttributes]);
   const [singlePrice, setSinglePrice] = useState(0);
+  const [singleCanvasName, setSingleCanvasName] = useState('정방 S-1호');
 
   const getPosition = useCallback((event: MouseEvent) => {
     const x = event.clientX;
@@ -375,9 +378,10 @@ const SingleTool = () => {
     // 정방 s-1호로 초기 생성
     setSingleFrameWidth(cmToPx(16) * 1.5);
     setSingleFrameHeight(cmToPx(16) * 1.5);
-    setSinglePrice(20000);
     const myFrame = frameSize().filter((lst) => lst.name === 'S-1호');
     setFramePrice(myFrame.map((lst) => ({ id: Date.now(), cm: lst.cm, name: lst.name, price: lst.price })));
+    setSinglePrice(myFrame[0].price);
+    setSingleCanvasName(`${myFrame[0].attribute} ${myFrame[0].name}`);
   }, [setFramePrice]);
 
   const createPreviewCanvas = useCallback(() => {
@@ -439,6 +443,7 @@ const SingleTool = () => {
       setSingleFrameWidth(replacePx(width) * 1.5);
       setSingleFrameHeight(replacePx(height) * 1.5);
       setSinglePrice(+price);
+      setSingleCanvasName(`${myFrame[0].attribute} ${name}`);
     },
     [setFramePrice],
   );
@@ -618,7 +623,7 @@ const SingleTool = () => {
   return (
     <SingleToolContainer>
       <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
-      <ToolHeader singlePrice={singlePrice.toLocaleString()} />
+      <ToolHeader singlePrice={singlePrice.toLocaleString()} singleCanvasName={singleCanvasName} />
       <SingleToolFactory>
         <Button type="text" onClick={handleRatioForFrame}>
           <FullscreenOutlined />
