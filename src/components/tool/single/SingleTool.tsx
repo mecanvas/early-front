@@ -248,7 +248,7 @@ const SingleTool = () => {
       const [cursorX, cursorY] = getPosition(e);
       const { width, height } = singleWrapperRef.current.getBoundingClientRect();
 
-      const x = cursorX - width + 60;
+      const x = cursorX - width + controllerNode.clientWidth / 2 + 60;
       const y = cursorY - height / 2 - 95;
 
       controllerNode.style.position = 'relative';
