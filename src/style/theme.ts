@@ -1,4 +1,5 @@
 export const theme = {
+  canvasShadow: '7px 8px 15px rgba(0, 0, 0, 0.4), 0px 10px 15px rgba(0, 0, 0, 0.32)',
   size: {
     xs: '480px',
     sm: '768px',

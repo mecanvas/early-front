@@ -33,16 +33,48 @@ const SingleToolFactory = styled.div`
   background-color: ${({ theme }) => theme.color.white};
 `;
 
-const SingleCanvasField = styled.div`
+const SingleCanvasField = styled.div<{ isPreview: boolean }>`
   min-height: calc(100vh - 105px);
   max-height: calc(100vh - 105px);
   max-width: 1000px;
   width: 100%;
-  margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   background-color: ${({ theme }) => theme.color.white};
+  margin: 0 auto;
+  ${({ isPreview }) =>
+    isPreview
+      ? css`
+          display: none;
+          & > * {
+            display: none;
+          }
+        `
+      : css`
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        `}
+`;
+
+const PreviewCanvasWrapper = styled.div<{ isPreview: boolean }>`
+  ${({ isPreview, theme }) =>
+    isPreview
+      ? css`
+          width: 100%;
+          min-height: calc(100vh - 105px);
+          max-height: calc(100vh - 105px);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          canvas {
+            display: block;
+            box-shadow: ${theme.canvasShadow};
+          }
+        `
+      : css`
+          canvas {
+            display: none;
+          }
+        `}
 `;
 
 const SingleWrapper = styled.div<{
@@ -235,8 +267,11 @@ const SingleTool = () => {
     setControllerNode(node);
   }, []);
 
-  const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
+  const [isPreview] = useGlobalState<boolean>('isPreview');
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
+  const [resizeWidth, setResizeWidth] = useGlobalState<number>('resizeWidth');
+  const [resizeHeight, setResizeHeight] = useGlobalState<number>('resizeHeight');
   const [wrapperWidth, setWrapperWidth] = useState(0);
   const [wrapperHeight, setWrapperHeight] = useState(0);
   const [originWidth, setOriginWidth] = useState(0);
@@ -271,55 +306,53 @@ const SingleTool = () => {
   }, []);
 
   const createPreviewCanvas = useCallback(() => {
-    if (!singleSelectedFrameRef.current || !ImageCanvasRef.current || !controllerNode) return;
-    const selectedFrame = singleSelectedFrameRef.current;
+    if (!controllerNode || !resizeWidth || !resizeHeight || !previewCanvasRef.current) return;
 
-    const { width, height, left, top } = selectedFrame.getBoundingClientRect();
-    const {
-      left: imgNodeLeft,
-      top: imgNodeTop,
-      width: imgNodeWidth,
-      height: imgNodeHeight,
-    } = ImageCanvasRef.current.getBoundingClientRect();
+    const left = (window.innerWidth - resizeWidth + replacePx(controllerNode.style.left)) / 2;
+    const top = (window.innerHeight - resizeHeight + replacePx(controllerNode.style.top)) / 2;
+    const frameLeft = (window.innerWidth - singleFrameWidth) / 2;
+    const frameTop = (window.innerHeight - singleFrameHeight) / 2;
 
-    // 자를 x의 값
-    console.log('x값', left - imgNodeLeft);
-
-    // 자를 y의 값
-    console.log('y값', top - imgNodeTop);
-
-    const canvas = document.createElement('canvas');
+    const canvas = previewCanvasRef.current;
     const ctx = canvas.getContext('2d');
 
     if (ctx) {
       const img = new Image();
       img.src = singleImgUploadUrl;
       img.onload = () => {
-        const scaleX = img.naturalWidth / width;
-        const scaleY = img.naturalHeight / height;
+        const scaleX = originWidth / resizeWidth;
+        const scaleY = originHeight / resizeHeight;
+        const cropX = frameLeft - left;
+        const cropY = frameTop - top;
         const pixelRatio = window.devicePixelRatio;
-        // replacePx(controllerNode.style.left) * scaleX,
-        // replacePx(controllerNode.style.top) * scaleY,
-        canvas.width = width;
-        canvas.height = height;
+
+        canvas.width = singleFrameWidth * pixelRatio;
+        canvas.height = singleFrameHeight * pixelRatio;
         ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(
           img,
-          left - imgNodeLeft * scaleX,
-          top - imgNodeTop * scaleY,
-          width * scaleX,
-          height * scaleY,
+          cropX * scaleX,
+          cropY * scaleY,
+          singleFrameWidth * scaleX,
+          singleFrameHeight * scaleY,
           0,
           0,
-          imgNodeWidth,
-          imgNodeHeight,
+          singleFrameWidth,
+          singleFrameHeight,
         );
       };
-
-      document.body.prepend(canvas);
     }
-  }, [controllerNode, singleImgUploadUrl]);
+  }, [
+    controllerNode,
+    originHeight,
+    originWidth,
+    resizeHeight,
+    resizeWidth,
+    singleFrameHeight,
+    singleFrameWidth,
+    singleImgUploadUrl,
+  ]);
 
   const handleSelectFrame = useCallback((e) => {
     const { width, height, price } = e.currentTarget.dataset;
@@ -426,13 +459,23 @@ const SingleTool = () => {
           );
           imgCanvas.width = w;
           imgCanvas.height = filterOverMaxHeight(h);
+          setResizeWidth(w);
+          setResizeHeight(filterOverMaxHeight(h));
           imgCtx.clearRect(0, 0, wrapperWidth, wrapperHeight);
           imgCtx.imageSmoothingQuality = 'high';
           imgCtx.drawImage(img, 0, 0, w, filterOverMaxHeight(h));
         };
       }
     },
-    [singleFrameHeight, singleFrameWidth, singleImgUploadUrl, wrapperHeight, wrapperWidth],
+    [
+      setResizeHeight,
+      setResizeWidth,
+      singleFrameHeight,
+      singleFrameWidth,
+      singleImgUploadUrl,
+      wrapperHeight,
+      wrapperWidth,
+    ],
   );
 
   const handleImgRatioSetting = useCallback(() => {
@@ -543,7 +586,10 @@ const SingleTool = () => {
       </SingleFrameListHeader>
 
       {/* 본격적인 툴  */}
-      <SingleCanvasField>
+      <PreviewCanvasWrapper isPreview={isPreview || false}>
+        <canvas ref={previewCanvasRef} />
+      </PreviewCanvasWrapper>
+      <SingleCanvasField isPreview={isPreview || false}>
         <SingleWrapper
           nearingCenterX={nearingCenterX}
           nearingCenterY={nearingCenterY}

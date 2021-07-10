@@ -9,7 +9,6 @@ export const ImgController = styled.div<{
   cmd: ResizeCmd | null;
 }>`
   position: absolute;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -166,6 +165,9 @@ const SingleImgSizeController = ({ children, controllerRef, imgRef, wrapperRef, 
   const [isResizeStart, setIsResizeStart] = useState(false);
   const [resizeCmd, setResizeCmd] = useGlobalState<ResizeCmd | null>('resizeCmd', null);
 
+  const [, setResizeWidth] = useGlobalState('resizeWidth', 0);
+  const [, setResizeHeight] = useGlobalState('resizeHeight', 0);
+
   const positioningImageResize = useCallback(
     (resizeCmd: ResizeCmd | null, x: number, y: number) => {
       if (!imgRef || !imgRef.current) return;
@@ -221,6 +223,8 @@ const SingleImgSizeController = ({ children, controllerRef, imgRef, wrapperRef, 
       if (imgCtx && url) {
         const img = new Image();
         img.src = url;
+        setResizeWidth(newWidth);
+        setResizeHeight(filterOverMaxHeight(newHeight));
         img.onload = () => {
           if (!imgRef.current) return;
           imgCtx.clearRect(0, 0, imgRef.current.width, imgRef.current.height);
@@ -233,7 +237,7 @@ const SingleImgSizeController = ({ children, controllerRef, imgRef, wrapperRef, 
 
       requestAnimationFrame(() => positioningImageResize);
     },
-    [imgRef],
+    [imgRef, setResizeHeight, setResizeWidth],
   );
 
   const handleImgResize = useCallback(
