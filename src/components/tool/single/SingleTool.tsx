@@ -73,6 +73,9 @@ const SingleWrapper = styled.div<{
         position: absolute;
         width: 2px;
         top: 0;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
         height: 100%;
         content: '';
         border: 1px dashed ${theme.color.primary};
@@ -88,6 +91,7 @@ const SingleWrapper = styled.div<{
         width: 100%;
         top: (50% - 95px);
         transform: translateY(-50%);
+        left: 0;
         height: 2px;
         content: '';
         z-index: 33;
@@ -231,6 +235,8 @@ const SingleTool = () => {
     setControllerNode(node);
   }, []);
 
+  const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
+
   const [wrapperWidth, setWrapperWidth] = useState(0);
   const [wrapperHeight, setWrapperHeight] = useState(0);
   const [originWidth, setOriginWidth] = useState(0);
@@ -264,6 +270,57 @@ const SingleTool = () => {
     setSinglePrice(20000);
   }, []);
 
+  const createPreviewCanvas = useCallback(() => {
+    if (!singleSelectedFrameRef.current || !ImageCanvasRef.current || !controllerNode) return;
+    const selectedFrame = singleSelectedFrameRef.current;
+
+    const { width, height, left, top } = selectedFrame.getBoundingClientRect();
+    const {
+      left: imgNodeLeft,
+      top: imgNodeTop,
+      width: imgNodeWidth,
+      height: imgNodeHeight,
+    } = ImageCanvasRef.current.getBoundingClientRect();
+
+    // 자를 x의 값
+    console.log('x값', left - imgNodeLeft);
+
+    // 자를 y의 값
+    console.log('y값', top - imgNodeTop);
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    if (ctx) {
+      const img = new Image();
+      img.src = singleImgUploadUrl;
+      img.onload = () => {
+        const scaleX = img.naturalWidth / width;
+        const scaleY = img.naturalHeight / height;
+        const pixelRatio = window.devicePixelRatio;
+        // replacePx(controllerNode.style.left) * scaleX,
+        // replacePx(controllerNode.style.top) * scaleY,
+        canvas.width = width;
+        canvas.height = height;
+        ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(
+          img,
+          left - imgNodeLeft * scaleX,
+          top - imgNodeTop * scaleY,
+          width * scaleX,
+          height * scaleY,
+          0,
+          0,
+          imgNodeWidth,
+          imgNodeHeight,
+        );
+      };
+
+      document.body.prepend(canvas);
+    }
+  }, [controllerNode, singleImgUploadUrl]);
+
   const handleSelectFrame = useCallback((e) => {
     const { width, height, price } = e.currentTarget.dataset;
     setSingleFrameWidth(replacePx(width) * 1.5);
@@ -282,9 +339,9 @@ const SingleTool = () => {
     (e) => {
       if (!controllerNode || !singleWrapperRef.current) return;
       const [cursorX, cursorY] = getPosition(e);
-      const { width, height } = singleWrapperRef.current.getBoundingClientRect();
+      const { height } = singleWrapperRef.current.getBoundingClientRect();
 
-      const x = cursorX - width + controllerNode.clientWidth / 2 + 60;
+      const x = cursorX - window.innerWidth / 2;
       const y = cursorY - height / 2 - 95;
 
       if (0.5 >= Math.abs(x)) {
@@ -408,6 +465,12 @@ const SingleTool = () => {
       controllerNode.style.top = `${0}px`;
     }
   }, [singleImgUploadUrl, wrapperWidth, wrapperHeight, drawingImage, controllerNode]);
+
+  useEffect(() => {
+    if (isPreview) {
+      createPreviewCanvas();
+    }
+  }, [createPreviewCanvas, isPreview]);
 
   useEffect(() => {
     const sCanvasWrapper = singleWrapperRef.current;
