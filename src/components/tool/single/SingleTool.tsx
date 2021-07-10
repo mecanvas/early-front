@@ -9,7 +9,7 @@ import axios from 'axios';
 import { useProgress } from 'src/hooks/useProgress';
 import Loading from 'src/components/common/Loading';
 import Upload, { RcFile } from 'antd/lib/upload';
-import { faCompress, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faChevronCircleDown, faChevronCircleUp, faCompress, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { css } from '@emotion/react';
 import SingleImgSizeController from 'src/components/tool/single/SingleImgSizeController';
 import { useGlobalState } from 'src/hooks';
@@ -229,17 +229,33 @@ const SingleFrameListHeader = styled.div`
   display: flex;
   flex-direction: column;
   right: 0;
-  background-color: ${({ theme }) => theme.color.white};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
   top: 54px;
 `;
 
-const SingleFrameListGrid = styled.div`
+const SingleFrameListGrid = styled.div<{
+  maxHeight: string;
+  height: string;
+  overflow: string;
+  padding: string;
+}>`
+  /* 스크롤 제거 */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
+  }
+
   display: flex;
-  border: 1px solid #dbdbdb;
+  border: 1px solid ${({ theme }) => theme.color.gray300};
   justify-content: center;
   align-items: center;
-  padding: 0.6em;
-
+  padding: ${({ padding }) => padding};
+  max-height: ${({ maxHeight }) => maxHeight};
+  height: ${({ height }) => height};
+  overflow: ${({ overflow }) => overflow};
+  background-color: ${({ theme }) => theme.color.white};
+  transition: all 500ms ease-in-out;
   div {
     flex: 1;
     text-align: center;
@@ -259,11 +275,62 @@ const SingleFrameList = styled.div<{ width: string; height: string }>`
   border: 1px solid ${({ theme }) => theme.color.gray300};
 `;
 
+const FrameListGridHideButton = styled.div`
+  background-color: ${({ theme }) => theme.color.white};
+  cursor: pointer;
+  padding: 0.4em 0;
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
+  width: 100%;
+  margin-top: 0.2em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  small {
+    margin-left: 3px;
+    margin-bottom: 1px;
+  }
+  svg {
+    margin-top: 1px;
+    font-size: 16px;
+  }
+`;
+
 const SingleTool = () => {
   const singleWrapperRef = useRef<HTMLDivElement>(null);
   const singleSelectedFrameRef = useRef<HTMLDivElement>(null);
   const ImageCanvasRef = useRef<HTMLCanvasElement>(null);
   const [controllerNode, setControllerNode] = useState<HTMLDivElement | null>(null);
+  const [isHideFrameList, setIsHideFrameList] = useState(false);
+  const [frameListAnimation, setFrameListAnimation] = useState({
+    maxHeight: '150px',
+    overflow: 'auto',
+    height: '150px',
+    padding: '0.6em',
+  });
+
+  const handleHideFrameList = useCallback(() => {
+    if (!isHideFrameList) {
+      setFrameListAnimation((prev) => ({
+        ...prev,
+        maxHeight: '0px',
+        height: '0px',
+        overflow: 'hidden',
+        padding: '0em',
+      }));
+    } else {
+      setFrameListAnimation((prev) => ({
+        ...prev,
+        maxHeight: '150px',
+        height: '150px',
+        overflow: 'auto',
+        padding: '0.6em',
+      }));
+    }
+
+    setIsHideFrameList((prev) => !prev);
+  }, [isHideFrameList]);
 
   const controllerRef = useCallback((node: HTMLDivElement | null) => {
     if (!node) return;
@@ -571,7 +638,8 @@ const SingleTool = () => {
             <small>풍경</small>
           </Button>
         </div>
-        <SingleFrameListGrid>
+
+        <SingleFrameListGrid {...frameListAnimation}>
           {frameList.map((lst, index) => (
             <div
               key={index}
@@ -587,6 +655,11 @@ const SingleTool = () => {
             </div>
           ))}
         </SingleFrameListGrid>
+
+        <FrameListGridHideButton onClick={handleHideFrameList}>
+          <FontAwesomeIcon icon={isHideFrameList ? faChevronCircleDown : faChevronCircleUp} />{' '}
+          <small>{isHideFrameList ? '펼치기' : '접기'}</small>
+        </FrameListGridHideButton>
       </SingleFrameListHeader>
 
       {/* 본격적인 툴  */}
