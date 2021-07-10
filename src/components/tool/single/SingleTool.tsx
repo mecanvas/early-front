@@ -13,7 +13,7 @@ import { faChevronCircleDown, faChevronCircleUp, faCompress, faUpload } from '@f
 import { css } from '@emotion/react';
 import SingleImgSizeController from 'src/components/tool/single/SingleImgSizeController';
 import { useGlobalState } from 'src/hooks';
-import { ResizeCmd } from 'src/interfaces/ToolInterface';
+import { FramePrice, ResizeCmd } from 'src/interfaces/ToolInterface';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
 import { frameSize } from 'src/constants';
@@ -340,12 +340,15 @@ const SingleTool = () => {
   const [isPreview] = useGlobalState<boolean>('isPreview');
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
+  const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
+  const [isSaveCanvas] = useGlobalState<boolean>('saveModal');
+  const [, setFramePrice] = useGlobalState<FramePrice[]>('framePrice');
   const [resizeWidth, setResizeWidth] = useGlobalState<number>('resizeWidth');
   const [resizeHeight, setResizeHeight] = useGlobalState<number>('resizeHeight');
   const [wrapperWidth, setWrapperWidth] = useState(0);
   const [wrapperHeight, setWrapperHeight] = useState(0);
-  const [originWidth, setOriginWidth] = useState(0);
-  const [originHeight, setOriginHeight] = useState(0);
+  const [originWidth, setOriginWidth] = useState<number>(0);
+  const [originHeight, setOriginHeight] = useState<number>(0);
   const [resizeCmd] = useGlobalState<ResizeCmd>('resizeCmd');
   const [nearingCenterX, setNearingCenterX] = useState<boolean>(false);
   const [nearingCenterY, setNearingCenterY] = useState<boolean>(false);
@@ -373,10 +376,13 @@ const SingleTool = () => {
     setSingleFrameWidth(cmToPx(16) * 1.5);
     setSingleFrameHeight(cmToPx(16) * 1.5);
     setSinglePrice(20000);
-  }, []);
+    const myFrame = frameSize().filter((lst) => lst.name === 'S-1호');
+    setFramePrice(myFrame.map((lst) => ({ id: Date.now(), cm: lst.cm, name: lst.name, price: lst.price })));
+  }, [setFramePrice]);
 
   const createPreviewCanvas = useCallback(() => {
-    if (!controllerNode || !resizeWidth || !resizeHeight || !previewCanvasRef.current) return;
+    if (!controllerNode || !resizeWidth || !resizeHeight || !previewCanvasRef.current || !originWidth || !originHeight)
+      return;
 
     const left = (window.innerWidth - resizeWidth) / 2 + replacePx(controllerNode.style.left);
     const top = (window.innerHeight - resizeHeight) / 2 + replacePx(controllerNode.style.top);
@@ -394,7 +400,7 @@ const SingleTool = () => {
         const scaleY = originHeight / resizeHeight;
         const cropX = frameLeft - left;
         const cropY = frameTop - top;
-        console.log(cropX);
+
         const pixelRatio = window.devicePixelRatio;
         canvas.width = singleFrameWidth * pixelRatio;
         canvas.height = singleFrameHeight * pixelRatio;
@@ -425,12 +431,17 @@ const SingleTool = () => {
     singleImgUploadUrl,
   ]);
 
-  const handleSelectFrame = useCallback((e) => {
-    const { width, height, price } = e.currentTarget.dataset;
-    setSingleFrameWidth(replacePx(width) * 1.5);
-    setSingleFrameHeight(replacePx(height) * 1.5);
-    setSinglePrice(+price);
-  }, []);
+  const handleSelectFrame = useCallback(
+    (e) => {
+      const { width, height, price, name } = e.currentTarget.dataset;
+      const myFrame = frameSize().filter((lst) => lst.name === name);
+      setFramePrice(myFrame.map((lst) => ({ id: Date.now(), cm: lst.cm, name: lst.name, price: lst.price })));
+      setSingleFrameWidth(replacePx(width) * 1.5);
+      setSingleFrameHeight(replacePx(height) * 1.5);
+      setSinglePrice(+price);
+    },
+    [setFramePrice],
+  );
 
   const handleGetFrameAttribute = useCallback((e) => {
     const { value } = e.currentTarget;
@@ -519,7 +530,6 @@ const SingleTool = () => {
         img.src = url || singleImgUploadUrl;
         img.onload = () => {
           const { naturalWidth, naturalHeight } = img;
-
           setOriginWidth(naturalWidth);
           setOriginHeight(naturalHeight);
           const [w, h] = getOriginRatio(
@@ -570,6 +580,14 @@ const SingleTool = () => {
       controllerNode.style.top = `${0}px`;
     }
   }, [controllerNode, drawingImage, originHeight, originWidth, singleFrameHeight, singleFrameWidth]);
+
+  useEffect(() => {
+    if (isSaveCanvas) {
+      const imgCanvas = ImageCanvasRef.current;
+      setSelectedFrameList(imgCanvas ? [imgCanvas] : []);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSaveCanvas]);
 
   useEffect(() => {
     drawingImage();
@@ -646,6 +664,7 @@ const SingleTool = () => {
               data-width={lst.size.width}
               data-height={lst.size.height}
               data-price={lst.price}
+              data-name={lst.name}
               onClick={handleSelectFrame}
             >
               <SingleFrameList {...lst.size}>

@@ -4,7 +4,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useGlobalState } from 'src/hooks';
 import { FramePrice } from 'src/interfaces/ToolInterface';
 import Logo from '../layouts/Logo';
-import ToolSave from './divided/DividedToolSave';
+import ToolSave from './ToolSave';
 import { ToolHeaderMenu, CanvasInfomationWrapper, BillInfomation, Bill, BillTotal } from './divided/DividedToolStyle';
 
 interface Props {

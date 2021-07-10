@@ -17,7 +17,7 @@ import { useProgress } from 'src/hooks/useProgress';
 import { CroppedFrame, FramePrice } from 'src/interfaces/ToolInterface';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
-import ToolImageResizerModal from '../ToolImageResizerModal';
+import ToolImageResizerModal from './DividedToolImageResizerModal';
 import ToolColorPalette from './DividedToolColorPalette';
 import { FactoryTool, FrameTool } from './DividedToolStyle';
 
