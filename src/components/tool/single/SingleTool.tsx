@@ -43,9 +43,12 @@ const SingleCanvasField = styled.div<{ isPreview: boolean }>`
   ${({ isPreview }) =>
     isPreview
       ? css`
-          display: none;
+          position: absolute;
+          top: 0;
+          visibility: hidden;
           & > * {
-            display: none;
+            position: absolute;
+            visibility: hidden;
           }
         `
       : css`
@@ -308,8 +311,8 @@ const SingleTool = () => {
   const createPreviewCanvas = useCallback(() => {
     if (!controllerNode || !resizeWidth || !resizeHeight || !previewCanvasRef.current) return;
 
-    const left = (window.innerWidth - resizeWidth + replacePx(controllerNode.style.left)) / 2;
-    const top = (window.innerHeight - resizeHeight + replacePx(controllerNode.style.top)) / 2;
+    const left = (window.innerWidth - resizeWidth) / 2 + replacePx(controllerNode.style.left);
+    const top = (window.innerHeight - resizeHeight) / 2 + replacePx(controllerNode.style.top);
     const frameLeft = (window.innerWidth - singleFrameWidth) / 2;
     const frameTop = (window.innerHeight - singleFrameHeight) / 2;
 
@@ -324,10 +327,11 @@ const SingleTool = () => {
         const scaleY = originHeight / resizeHeight;
         const cropX = frameLeft - left;
         const cropY = frameTop - top;
+        console.log(cropX);
         const pixelRatio = window.devicePixelRatio;
-
         canvas.width = singleFrameWidth * pixelRatio;
         canvas.height = singleFrameHeight * pixelRatio;
+        ctx.clearRect(0, 0, singleFrameWidth, singleFrameHeight);
         ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(
