@@ -45,7 +45,12 @@ const SingleCanvasField = styled.div`
   background-color: ${({ theme }) => theme.color.white};
 `;
 
-const SingleWrapper = styled.div<{ clicked: boolean; cmd: ResizeCmd | null }>`
+const SingleWrapper = styled.div<{
+  clicked: boolean;
+  cmd: ResizeCmd | null;
+  nearingCenterX: boolean;
+  nearingCenterY: boolean;
+}>`
   width: 100%;
   min-height: calc(100vh - 105px);
   max-height: calc(100vh - 105px);
@@ -60,6 +65,35 @@ const SingleWrapper = styled.div<{ clicked: boolean; cmd: ResizeCmd | null }>`
       : css`
           cursor: default;
         `}
+
+  ${({ nearingCenterX, theme }) =>
+    nearingCenterX &&
+    css`
+      &:before {
+        position: absolute;
+        width: 2px;
+        top: 0;
+        height: 100%;
+        content: '';
+        border: 1px dashed ${theme.color.primary};
+        z-index: 33;
+      }
+    `}
+
+  ${({ nearingCenterY, theme }) =>
+    nearingCenterY &&
+    css`
+      &:after {
+        position: absolute;
+        width: 100%;
+        top: (50% - 95px);
+        transform: translateY(-50%);
+        height: 2px;
+        content: '';
+        z-index: 33;
+        border: 1px dashed ${theme.color.primary};
+      }
+    `}
 
   ${({ cmd }) => {
     if (!cmd) return;
@@ -202,6 +236,8 @@ const SingleTool = () => {
   const [originWidth, setOriginWidth] = useState(0);
   const [originHeight, setOriginHeight] = useState(0);
   const [resizeCmd] = useGlobalState<ResizeCmd>('resizeCmd');
+  const [nearingCenterX, setNearingCenterX] = useState<boolean>(false);
+  const [nearingCenterY, setNearingCenterY] = useState<boolean>(false);
 
   const { getProgressGage, progressPercentage } = useProgress();
   const [singleImgUploadUrl, setSingleimgUploadUrl] = useState('');
@@ -251,6 +287,18 @@ const SingleTool = () => {
       const x = cursorX - width + controllerNode.clientWidth / 2 + 60;
       const y = cursorY - height / 2 - 95;
 
+      if (0.5 >= Math.abs(x)) {
+        setNearingCenterX(true);
+      } else {
+        setNearingCenterX(false);
+      }
+
+      if (0.5 >= Math.abs(y)) {
+        setNearingCenterY(true);
+      } else {
+        setNearingCenterY(false);
+      }
+
       controllerNode.style.position = 'relative';
       controllerNode.style.left = `${x}px`;
       controllerNode.style.top = `${y}px`;
@@ -295,6 +343,8 @@ const SingleTool = () => {
 
   const handleMoveCancelSingleImage = useCallback(() => {
     setIsMovingImage(false);
+    setNearingCenterX(false);
+    setNearingCenterY(false);
   }, []);
 
   const drawingImage = useCallback(
@@ -432,6 +482,8 @@ const SingleTool = () => {
       {/* 본격적인 툴  */}
       <SingleCanvasField>
         <SingleWrapper
+          nearingCenterX={nearingCenterX}
+          nearingCenterY={nearingCenterY}
           cmd={resizeCmd ?? null}
           ref={singleWrapperRef}
           clicked={isMovingImage}
