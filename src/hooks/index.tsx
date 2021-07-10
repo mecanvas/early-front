@@ -81,15 +81,15 @@ export const useCanvasToServer = () => {
   const [imgUploadUrl] = useGlobalState<string>('imgUploadUrl');
   const [isSave, setIsSave] = useState(false);
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [fileList, setFileList] = useState<File[]>([]);
   const [paperSize, setPaperSize] = useState<string[]>([]);
 
-  const canvasToImage = (canvas: HTMLCanvasElement[], name: string, email: string) => {
+  const canvasToImage = (canvas: HTMLCanvasElement[], name: string, phone: string) => {
     if (!window) return;
     if (!canvas.length) return notification.error({ message: '액자를 만들어주세요.', placement: 'bottomLeft' });
     setUsername(name);
-    setEmail(email);
+    setPhone(phone);
     const sendToCanvas = async () => {
       setLoading(true);
       setIsDone(false);
@@ -157,7 +157,7 @@ export const useCanvasToServer = () => {
     const saveCanvas = async () => {
       const fd = new FormData();
       fd.append('username', username);
-      fd.append('email', email);
+      fd.append('phone', phone);
       fd.append('originImgUrl', imgUploadUrl);
       fileList.forEach((file) => fd.append('image', file));
       fd.append('paperNames', paperSize.join());
@@ -168,7 +168,7 @@ export const useCanvasToServer = () => {
       });
     };
     saveCanvas();
-  }, [email, fileList, isSave, paperSize, username, imgUploadUrl]);
+  }, [phone, fileList, isSave, paperSize, username, imgUploadUrl]);
 
-  return { canvasToImage, loading, isDone, setIsDone };
+  return { canvasToImage, loading, isDone, setIsDone, imgUploadUrl };
 };

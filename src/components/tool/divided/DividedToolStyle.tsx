@@ -11,7 +11,7 @@ export const ToolContainer = styled.div`
   position: relative;
 `;
 
-export const FactoryHeader = styled.div`
+export const ToolHeaderWrapper = styled.div`
   display: flex;
   width: 100%;
   background-color: ${({ theme }) => theme.color.white};
@@ -21,11 +21,12 @@ export const FactoryHeader = styled.div`
   flex-direction: column;
 `;
 
-export const FactoryUtills = styled.div`
-  height: 64px;
+export const ToolHeaderMenu = styled.div`
+  background-color: ${({ theme }) => theme.color.white};
+  height: 54px;
   display: flex;
   justify-content: space-between;
-  padding: 0 3em;
+  padding: 0 2em;
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
@@ -33,14 +34,7 @@ export const FactoryUtills = styled.div`
     height: 40px;
     padding: 0 0.5em;
   }
-  h1 {
-    margin: 0;
-    padding: 0.4em;
-    text-align: center;
-    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-      font-size: 22px;
-    }
-  }
+
   & > div {
     display: flex;
     button {
@@ -120,17 +114,7 @@ export const FrameTool = styled.div`
   position: absolute;
   right: 0;
   display: flex;
-  @media all and (max-width: ${({ theme }) => theme.size.md}) {
-    bottom: 0;
-    position: fixed;
-    width: 100%;
-    justify-content: center;
-    padding: 0.3em 0;
-    border-top: 1px solid ${({ theme }) => theme.color.gray400};
-    background-color: ${({ theme }) => theme.color.white};
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
-  }
+
   button {
     display: flex;
     justify-content: center;
@@ -146,6 +130,18 @@ export const FrameTool = styled.div`
       color: ${({ theme }) => theme.color.gray800};
     }
   }
+
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+    justify-content: center;
+    padding: 0.3em 0;
+    border-top: 1px solid ${({ theme }) => theme.color.gray400};
+    background-color: ${({ theme }) => theme.color.white};
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
 `;
 
 export const SelectedFrameWrapper = styled.div`
@@ -156,7 +152,7 @@ export const SelectedFrameWrapper = styled.div`
   top: 0;
   left: 0;
   z-index: 1;
-  padding: 115px 10px 50px 10px;
+  padding: 95px 10px 50px 10px;
   canvas {
     position: absolute;
     top: 0;
@@ -235,7 +231,7 @@ export const ImageWrapper = styled.div<{
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 115px 10px 50px 10px;
+  padding: 95px 10px 50px 10px;
   margin: 0 auto;
   text-align: center;
   position: relative;
@@ -264,7 +260,7 @@ export const ImageWrapper = styled.div<{
       &:after {
         position: absolute;
         width: 100%;
-        top: (50% - 105px);
+        top: (50% - 95px);
         transform: translateY(-50%);
         height: 2px;
         content: '';
@@ -334,57 +330,9 @@ export const ImageWrapper = styled.div<{
   }
 `;
 
-export const ImageShowingWidthHeight = styled.small`
-  position: absolute;
-  top: 10px;
-  z-index: 33;
-  padding: 8px;
-  font-weight: bold;
-  border: 1px solid ${({ theme }) => theme.color.primary};
-  border-radius: 20px;
-  background-color: ${({ theme }) => theme.color.secondarybg};
-  color: ${({ theme }) => theme.color.primary};
-  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-    top: 5px;
-    font-size: 13px;
-  }
-  @media all and (max-width: ${({ theme }) => theme.size.xs}) {
-    font-size: 11px;
-  }
-  /* 사진 edit btn */
-  span {
-    position: absolute;
-    cursor: pointer;
-    right: -34px;
-    top: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 20px;
-    border: 1px solid ${({ theme }) => theme.color.primary};
-    background-color: ${({ theme }) => theme.color.secondarybg};
-    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-      top: 1px;
-      width: 28px;
-      height: 28px;
-    }
-    svg {
-      font-size: 16px;
-      @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-        font-size: 14px;
-      }
-      path {
-        fill: ${({ theme }) => theme.color.primary};
-      }
-    }
-  }
-`;
-
 export const PreviewBg = styled.div`
   position: absolute;
-  top: 115px;
+  top: 95px;
   min-width: ${({ theme }) => theme.size.md};
   img {
     min-height: 626px;

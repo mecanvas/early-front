@@ -3,7 +3,7 @@ import { useGetScollPosition, useGlobalState } from 'src/hooks';
 import { CanvasFrameSizeInfo, CanvasPosition, CroppedFrame } from 'src/interfaces/ToolInterface';
 import { theme } from 'src/style/theme';
 import { replacePx } from 'src/utils/replacePx';
-import { SelectedFrameWrapper } from './ToolStyle';
+import { SelectedFrameWrapper } from './DividedToolStyle';
 
 interface Props {
   width?: number;
@@ -46,7 +46,6 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
   const [, setIsFitX] = useGlobalState('isFitX', false);
   const [, setIsFitY] = useGlobalState('isFitY', false);
 
-  // 액자의 크기에 맞춰 x, y선 평행 TODO: 추후 모든 액자에.. 요 기능을 담아야지않을까?
   const checkNearingParallelForBox = useCallback(() => {
     if (!canvasFrameSizeInfo || !canvasPosition || !centerX || !centerY) return;
 

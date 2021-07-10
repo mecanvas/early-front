@@ -4,8 +4,13 @@ import { useCanvasToServer, useGlobalState } from 'src/hooks';
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import AppTable from '../antd/AppTable';
-import { BillTotal } from './ToolStyle';
+import { BillTotal } from './divided/DividedToolStyle';
+import AppTable from 'src/components/antd/AppTable';
+
+// Global
+// framePrice
+// isSavaCanvas
+// selectedFrameList
 
 const AntdInput = styled(Input)<{ isRequired: boolean }>`
   ${({ isRequired, theme }) =>
@@ -39,21 +44,21 @@ const SaveModalOrderColumns = [
 interface Info {
   [key: string]: any;
   username: string;
-  email: string;
+  phone: string;
 }
 
 interface Props {
-  yourPriceList: [string, any][];
-  selectedFrameList: HTMLCanvasElement[];
-  totalPrice: number;
+  yourPriceList?: [string, any][];
+  totalPrice?: number;
 }
 
-const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
+const ToolSave = ({ yourPriceList, totalPrice }: Props) => {
   const [info, setInfo] = useState<Info | null>(null);
   const [userNameEmpty, setUserNameEmpty] = useState({ isRequired: false, extra: '' });
-  const [emailEmpty, setEmailEmpty] = useState({ isRequired: false, extra: '' });
+  const [phoneEmpty, setPhoneEmpty] = useState({ isRequired: false, extra: '' });
   const [orderRouteEmpty, setOrderRouteEmpty] = useState({ isRequired: false, extra: '' });
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
+  const [selectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
   const { canvasToImage, loading, isDone } = useCanvasToServer();
   const router = useRouter();
 
@@ -82,8 +87,8 @@ const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
       if (name === 'username') {
         resetEmpty(setUserNameEmpty);
       }
-      if (name === 'email') {
-        resetEmpty(setEmailEmpty);
+      if (name === 'phone') {
+        resetEmpty(setPhoneEmpty);
       }
 
       if (info) {
@@ -97,21 +102,22 @@ const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
   );
 
   const handleSendToConfirm = useCallback(() => {
+    if (!selectedFrameList) return;
     if (!info) {
       setUserNameEmpty({ ...userNameEmpty, isRequired: true, extra: '이름을 입력해 주세요!' });
-      setEmailEmpty({ ...emailEmpty, isRequired: true, extra: '이메일을 입력해 주세요!' });
+      setPhoneEmpty({ ...phoneEmpty, isRequired: true, extra: '핸드폰 번호를 입력해 주세요!' });
       setOrderRouteEmpty({ ...orderRouteEmpty, isRequired: true, extra: '주문 경로를 선택해 주세요!' });
       return;
     }
     if (!info.username) return setUserNameEmpty({ ...userNameEmpty, isRequired: true, extra: '이름을 입력해 주세요!' });
-    if (!info.email) return setEmailEmpty({ ...emailEmpty, isRequired: true, extra: '이메일을 입력해 주세요!' });
-    if (!info.email)
+    if (!info.phone) return setPhoneEmpty({ ...phoneEmpty, isRequired: true, extra: '핸드폰 번호를 입력해 주세요!' });
+    if (!info.phone)
       return setOrderRouteEmpty({ ...orderRouteEmpty, isRequired: true, extra: '주문 경로를 선택해 주세요!' });
-    if (!info.email.includes('@') || !info.email.includes('.'))
-      return setEmailEmpty({ ...emailEmpty, isRequired: true, extra: '이메일을 올바르게 적어주세요.' });
+    if (!info.phone.includes('@') || !info.phone.includes('.'))
+      return setPhoneEmpty({ ...phoneEmpty, isRequired: true, extra: '핸드폰 번호를 올바르게 적어주세요.' });
 
-    canvasToImage(selectedFrameList, info.username, info.email);
-  }, [info, userNameEmpty, emailEmpty, orderRouteEmpty, canvasToImage, selectedFrameList]);
+    canvasToImage(selectedFrameList, info.username, info.phone);
+  }, [selectedFrameList, info, userNameEmpty, phoneEmpty, orderRouteEmpty, canvasToImage]);
 
   useEffect(() => {
     if (isDone) {
@@ -141,12 +147,12 @@ const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
             ></AntdInput>
           </Form.Item>
 
-          <Form.Item labelCol={{ span: 4 }} label="이메일" extra={emailEmpty.extra}>
+          <Form.Item labelCol={{ span: 4 }} label="핸드폰" extra={phoneEmpty.extra}>
             <AntdInput
               allowClear
-              name="email"
-              placeholder="연락 가능한 이메일을 입력해 주세요."
-              isRequired={emailEmpty.isRequired}
+              name="phone"
+              placeholder="- 없이 입력해 주세요."
+              isRequired={phoneEmpty.isRequired}
             ></AntdInput>
           </Form.Item>
 
@@ -165,16 +171,16 @@ const ToolSave = ({ yourPriceList, selectedFrameList, totalPrice }: Props) => {
             </AntdSelect>
           </Form.Item>
         </form>
-        {selectedFrameList.length ? (
+        {selectedFrameList?.length ? (
           <>
             <AppTable
-              dataSource={yourPriceList.map(([key, value], index) => {
+              dataSource={yourPriceList?.map(([key, value], index) => {
                 return { name: key, ...value, key: index };
               })}
               columns={SaveModalOrderColumns}
               pagination={false}
             />
-            <BillTotal>총 {totalPrice.toLocaleString()}원</BillTotal>
+            <BillTotal>총 {totalPrice?.toLocaleString()}원</BillTotal>
           </>
         ) : (
           <div style={{ textAlign: 'center' }}>생성하신 액자가 없으시네요! 액자를 만들어 주셔야 진행됩니다.</div>

@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { useGlobalState } from 'src/hooks';
 import { FrameAttributes, FrameSize } from 'src/interfaces/ToolInterface';
-import { FrameWrapper, FrameSizeList, FrameSizeName } from './ToolStyle';
+import { FrameWrapper, FrameSizeList, FrameSizeName } from './DividedToolStyle';
 
 interface Props extends FrameAttributes {
   frameSize: FrameSize[];
