@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import styled from '@emotion/styled';
-import router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 
 const Logos = styled.div`
   font-size: 28px;
