@@ -170,7 +170,7 @@ const Tool = () => {
   const [isFitY, setIsFitY] = useGlobalState<boolean>('isFitY');
 
   // 미리보기
-  const [isPreview] = useGlobalState<boolean>('isPreview', false);
+  const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview', false);
 
   // 바뀌는 색상
   const [bgColor] = useGlobalState<string>('bgColor', theme.color.gray100);
@@ -590,6 +590,9 @@ const Tool = () => {
 
   useEffect(() => {
     setImgUploadUrl('');
+    return () => {
+      setIsPreview(false);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -696,34 +699,32 @@ const Tool = () => {
                 <ToolSelectedFrame croppedList={croppedList} {...yourSelectedFrame} onClick={handleFrameRelease} />
               )}
 
-              {isPreview || (
-                <ImgController data-layout="inner" isResizeStart={isResizeMode || false} cmd={resizeCmd}>
-                  <img
-                    onMouseUp={handleImgResizeEnd}
-                    ref={imgNode}
-                    src={imgUploadUrl}
-                    crossOrigin="anonymous"
-                    alt="캔버스로 만들 이미지"
-                  />
-                  {isResizeMode ? (
-                    <>
-                      <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
-                      <div data-cmd="top-center" onMouseDown={handleImgResizeStart}></div>
-                      <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
+              <ImgController data-layout="inner" isResizeStart={isResizeMode || false} cmd={resizeCmd}>
+                <img
+                  onMouseUp={handleImgResizeEnd}
+                  ref={imgNode}
+                  src={imgUploadUrl}
+                  crossOrigin="anonymous"
+                  alt="캔버스로 만들 이미지"
+                />
+                {isResizeMode ? (
+                  <>
+                    <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="top-center" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
 
-                      <div data-cmd="right" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="right" onMouseDown={handleImgResizeStart}></div>
 
-                      <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
-                      <div data-cmd="bottom-center" onMouseDown={handleImgResizeStart}></div>
-                      <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="bottom-center" onMouseDown={handleImgResizeStart}></div>
+                    <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
 
-                      <div data-cmd="left" onMouseDown={handleImgResizeStart}></div>
-                    </>
-                  ) : (
-                    <button type="button" onClick={handleResizeModeStart}></button>
-                  )}
-                </ImgController>
-              )}
+                    <div data-cmd="left" onMouseDown={handleImgResizeStart}></div>
+                  </>
+                ) : (
+                  <button type="button" onClick={handleResizeModeStart}></button>
+                )}
+              </ImgController>
             </>
           ) : (
             <>
@@ -735,7 +736,7 @@ const Tool = () => {
               />
             </>
           )}
-          {isDragDrop && imgUploadUrl && (
+          {isDragDrop && imgUploadUrl && !isPreview && (
             <ImageDropZone
               onDrop={handleImgDropUpload}
               isDragDrop={isDragDrop}

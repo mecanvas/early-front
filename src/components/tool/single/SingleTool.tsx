@@ -43,7 +43,6 @@ import ToolColorPalette from '../divided/DividedToolColorPalette';
 import { theme } from 'src/style/theme';
 import { ColorResult } from 'react-color';
 import ImageDropZone from 'src/components/common/ImageDropZone';
-import BoxLoading from 'src/components/common/BoxLoading';
 
 const SingleTool = () => {
   const singleWrapperRef = useRef<HTMLDivElement>(null);
@@ -85,7 +84,7 @@ const SingleTool = () => {
     setControllerNode(node);
   }, []);
 
-  const [isPreview] = useGlobalState<boolean>('isPreview');
+  const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
   const [bgColor, setBgColor] = useState(theme.color.white);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragDrop, setIsDragDrop] = useState(false);
@@ -440,6 +439,11 @@ const SingleTool = () => {
     setWrapperWidth(width);
     setWrapperHeight(height);
     createInitFrame();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    return () => {
+      setIsPreview(false);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
