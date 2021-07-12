@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Image as AntdImage } from 'antd';
 import { useClosePreview } from 'src/hooks/useClosePreview';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
+import { theme } from 'src/style/theme';
 
 interface Props {
   src: string | null;
@@ -35,7 +36,7 @@ const Img = ({ src, alt, width, height, maxHeight = 500, bordered }: Props) => {
 
   return (
     <AntdImage
-      style={bordered ? { border: '1px solid #dbdbdb' } : {}}
+      style={bordered ? { border: `1px solid ${theme.color.gray200}` } : {}}
       preview={{
         mask: '확대',
         onVisibleChange: handleImgPreview,

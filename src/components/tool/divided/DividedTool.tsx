@@ -605,7 +605,7 @@ const Tool = () => {
           }}
         >
           {gridGuideLine.map(() => (
-            <div style={{ border: '1px dashed #dbdbdb' }}></div>
+            <div style={{ border: `1px dashed ${theme.color.gray200}` }}></div>
           ))}
         </div>
       )}

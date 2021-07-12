@@ -5,14 +5,14 @@ import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { replacePx } from 'src/utils/replacePx';
 
 export const SingleToolContainer = styled.div`
-  background-color: ${({ theme }) => theme.color.gray100};
+  background-color: ${({ theme }) => theme.color.gray200};
 `;
 
 export const SingleToolFactory = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  border-bottom: 1px solid #dbdbdb;
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray200};
   background-color: ${({ theme }) => theme.color.white};
   button {
     padding: 5px 1em;
@@ -29,7 +29,7 @@ export const SingleCanvasField = styled.div<{ isPreview: boolean }>`
   max-height: calc(100vh - ${HEADER_HEIGHT}px);
   max-width: 1000px;
   width: 100%;
-  background-color: ${({ theme }) => theme.color.white};
+  background-color: ${({ theme }) => theme.color.gray100};
   margin: 0 auto;
   ${({ isPreview }) =>
     isPreview
@@ -139,9 +139,14 @@ export const SingleWrapper = styled.div<{
   }}
 `;
 
-export const SingleSelectedFrame = styled.div<{ isImgUploadUrl: boolean; width: number; height: number }>`
+export const SingleSelectedFrame = styled.div<{
+  bgColor: string;
+  isImgUploadUrl: boolean;
+  width: number;
+  height: number;
+}>`
   position: absolute;
-  background-color: ${({ theme }) => theme.color.white};
+  background-color: ${({ bgColor }) => bgColor};
   ${({ width, height }) =>
     width &&
     height &&

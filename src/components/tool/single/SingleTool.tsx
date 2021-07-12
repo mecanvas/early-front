@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ToolHeader from '../ToolHeader';
-import { Button } from 'antd';
+import { Button, Popover } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
@@ -13,6 +13,7 @@ import {
   faChevronCircleDown,
   faChevronCircleUp,
   faCompress,
+  faPalette,
   faUpload,
 } from '@fortawesome/free-solid-svg-icons';
 import SingleImgSizeController from 'src/components/tool/single/SingleImgSizeController';
@@ -38,6 +39,9 @@ import {
   SingleSelectedFrame,
   SingleImageWrapper,
 } from './SingleToolStyle';
+import ToolColorPalette from '../divided/DividedToolColorPalette';
+import { theme } from 'src/style/theme';
+import { ColorResult } from 'react-color';
 
 const SingleTool = () => {
   const singleWrapperRef = useRef<HTMLDivElement>(null);
@@ -80,6 +84,7 @@ const SingleTool = () => {
   }, []);
 
   const [isPreview] = useGlobalState<boolean>('isPreview');
+  const [bgColor, setBgColor] = useState(theme.color.gray100);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
@@ -149,6 +154,7 @@ const SingleTool = () => {
         canvas.width = singleFrameWidth;
         canvas.height = singleFrameHeight;
         ctx.clearRect(0, 0, singleFrameWidth, singleFrameHeight);
+
         // ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(
@@ -162,9 +168,15 @@ const SingleTool = () => {
           singleFrameWidth,
           singleFrameHeight,
         );
+
+        // 배경을 칠합니다.
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, singleFrameWidth, singleFrameHeight);
       };
     }
   }, [
+    bgColor,
     controllerNode,
     originHeight,
     originWidth,
@@ -174,6 +186,14 @@ const SingleTool = () => {
     singleFrameWidth,
     singleImgUploadUrl,
   ]);
+
+  const handleColorChange = useCallback(
+    (color: ColorResult) => {
+      const { hex } = color;
+      setBgColor(hex);
+    },
+    [setBgColor],
+  );
 
   const handleHorizontal = useCallback(() => {
     if (controllerNode) {
@@ -386,7 +406,17 @@ const SingleTool = () => {
           <FontAwesomeIcon icon={faAlignCenter} />
           <small>수직</small>
         </Button>
-
+        <Popover
+          style={{ padding: 0 }}
+          trigger="click"
+          placement="bottom"
+          content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
+        >
+          <Button type="text">
+            <FontAwesomeIcon icon={faPalette} />
+            <small>배경</small>
+          </Button>
+        </Popover>
         <Button type="text" onClick={handleRatioForFrame}>
           <FullscreenOutlined />
           <small>액자에 끼우기</small>
@@ -465,6 +495,7 @@ const SingleTool = () => {
         >
           {/* 선택한 액자 렌더링  */}
           <SingleSelectedFrame
+            bgColor={bgColor}
             isImgUploadUrl={singleImgUploadUrl ? true : false}
             ref={singleSelectedFrameRef}
             width={singleFrameWidth}
