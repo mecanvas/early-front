@@ -16,7 +16,7 @@ import { useGlobalState } from 'src/hooks';
 import { FramePrice, ResizeCmd } from 'src/interfaces/ToolInterface';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
-import { frameSize } from 'src/constants';
+import { frameSize, HEADER_HEIGHT } from 'src/constants';
 import { FrameSizeName } from '../divided/DividedToolStyle';
 import { replacePx } from 'src/utils/replacePx';
 import { cmToPx } from 'src/utils/cmToPx';
@@ -31,11 +31,15 @@ const SingleToolFactory = styled.div`
   justify-content: center;
   border-bottom: 1px solid #dbdbdb;
   background-color: ${({ theme }) => theme.color.white};
+  button {
+    padding: 5px 1em;
+    height: 34px;
+  }
 `;
 
 const SingleCanvasField = styled.div<{ isPreview: boolean }>`
-  min-height: calc(100vh - 105px);
-  max-height: calc(100vh - 105px);
+  min-height: calc(100vh - ${HEADER_HEIGHT}px);
+  max-height: calc(100vh - ${HEADER_HEIGHT}px);
   max-width: 1000px;
   width: 100%;
   background-color: ${({ theme }) => theme.color.white};
@@ -63,8 +67,8 @@ const PreviewCanvasWrapper = styled.div<{ isPreview: boolean }>`
     isPreview
       ? css`
           width: 100%;
-          min-height: calc(100vh - 105px);
-          max-height: calc(100vh - 105px);
+          min-height: calc(100vh - ${HEADER_HEIGHT}px);
+          max-height: calc(100vh - ${HEADER_HEIGHT}px);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -88,8 +92,8 @@ const SingleWrapper = styled.div<{
   nearingCenterY: boolean;
 }>`
   width: 100%;
-  min-height: calc(100vh - 105px);
-  max-height: calc(100vh - 105px);
+  min-height: calc(100vh - ${HEADER_HEIGHT}px);
+  max-height: calc(100vh - ${HEADER_HEIGHT}px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -125,7 +129,7 @@ const SingleWrapper = styled.div<{
       &:after {
         position: absolute;
         width: 100%;
-        top: (50% - 95px);
+        top: (50% - ${HEADER_HEIGHT}px);
         transform: translateY(-50%);
         left: 0;
         height: 2px;
@@ -210,10 +214,10 @@ const SingleImageWrapper = styled.div<{ clicked: boolean }>`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: calc(98vh - 105px);
+  height: calc(98vh - ${HEADER_HEIGHT}px);
 
   canvas {
-    max-height: calc(98vh - 105px);
+    max-height: calc(98vh - ${HEADER_HEIGHT}px);
     cursor: pointer;
     ${({ clicked }) =>
       clicked
@@ -232,7 +236,12 @@ const SingleFrameListHeader = styled.div`
   flex-direction: column;
   right: 0;
   border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
-  top: 54px;
+  top: ${HEADER_HEIGHT - 35}px;
+
+  button {
+    padding: 5px 1em;
+    height: 34px;
+  }
 `;
 
 const SingleFrameListGrid = styled.div<{
@@ -281,7 +290,7 @@ const FrameListGridHideButton = styled.div`
   background-color: ${({ theme }) => theme.color.white};
   cursor: pointer;
   padding: 0.4em 0;
-  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
+  border: 1px solid ${({ theme }) => theme.color.gray100};
   width: 100%;
   margin-top: 0.2em;
   display: flex;
@@ -462,7 +471,7 @@ const SingleTool = () => {
       const { height } = singleWrapperRef.current.getBoundingClientRect();
 
       const x = cursorX - window.innerWidth / 2;
-      const y = cursorY - height / 2 - 95;
+      const y = cursorY - height / 2 - HEADER_HEIGHT;
 
       if (0.5 >= Math.abs(x)) {
         setNearingCenterX(true);

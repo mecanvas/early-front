@@ -15,6 +15,8 @@ export const exceptionRoutes = ['/tool/divided', '/tool/single', '/404'];
 
 export const S3_URL = 'https://mecanvas-assets.s3.ap-northeast-2.amazonaws.com/assets';
 
+export const HEADER_HEIGHT = 80;
+
 export const frameSize = (changeVertical?: boolean): FrameSize[] => [
   {
     name: 'S-1호',

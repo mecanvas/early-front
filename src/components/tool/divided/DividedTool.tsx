@@ -35,6 +35,7 @@ import { replacePx } from 'src/utils/replacePx';
 import { useProgress } from 'src/hooks/useProgress';
 import ToolHeader from '../ToolHeader';
 import DividedToolFactory from './DividedToolFactory';
+import { HEADER_HEIGHT } from 'src/constants';
 
 const Tool = () => {
   const [changeVertical, setChangeVertical] = useState(false);
@@ -592,7 +593,7 @@ const Tool = () => {
         <div
           style={{
             position: 'fixed',
-            top: '95px',
+            top: `${HEADER_HEIGHT}px`,
             overflow: 'hidden',
             right: 0,
             width: '100%',
@@ -628,7 +629,7 @@ const Tool = () => {
           <div
             style={{
               position: 'fixed',
-              marginTop: '95px',
+              marginTop: `${HEADER_HEIGHT}px`,
               width: '100%',
               height: '100vh',
               top: 0,
