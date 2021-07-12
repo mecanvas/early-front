@@ -443,6 +443,8 @@ const SingleTool = () => {
 
     return () => {
       setIsPreview(false);
+      setFramePrice([]);
+      setSelectedFrameList([]);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
