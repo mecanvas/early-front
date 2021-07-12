@@ -40,7 +40,7 @@ export const ToolHeaderMenu = styled.div`
     display: flex;
     align-items: center;
     button {
-      padding: 0.3em 1em;
+      padding: 0.4em 1em;
       height: 33px;
       span {
         font-weight: 500;
