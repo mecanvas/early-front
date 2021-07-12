@@ -4,7 +4,12 @@ import styled from '@emotion/styled';
 import React from 'react';
 import { DropEvent, FileRejection, useDropzone } from 'react-dropzone';
 
-const DropZone = styled.div<{ width?: string; height?: string }>`
+const DropZone = styled.div<{ width?: string; height?: string; isDragDrop?: boolean }>`
+  ${({ isDragDrop }) =>
+    isDragDrop &&
+    css`
+      position: absolute;
+    `}
   border: 1px solid ${({ theme }) => theme.color.gray200};
   width: ${({ width }) => (width ? `${width}` : '300px')};
   height: ${({ height }) => (height ? `${height}` : '300px')};
@@ -47,18 +52,21 @@ interface Props {
   text?: string;
   width?: string;
   height?: string;
+  isDragDrop?: boolean;
 }
 
-const ImageDropZone = ({ onDrop, text = '이미지를 드롭하거나 첨부하세요!', width, height }: Props) => {
+const ImageDropZone = ({ isDragDrop, onDrop, text = '이미지를 드롭하거나 첨부하세요!', width, height }: Props) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
-    <DropZone width={width} height={height} {...getRootProps()}>
+    <DropZone isDragDrop={isDragDrop} width={width} height={height} {...getRootProps()}>
       <input {...getInputProps()} accept="image/*" />
-      <DropZoneDiv isDragActive={isDragActive}>
-        <PlusOutlined />
-        <p>{text}</p>
-      </DropZoneDiv>
+      {isDragDrop ? null : (
+        <DropZoneDiv isDragActive={isDragActive}>
+          <PlusOutlined />
+          <p>{text}</p>
+        </DropZoneDiv>
+      )}
     </DropZone>
   );
 };
