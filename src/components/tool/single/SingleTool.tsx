@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ToolHeader from '../ToolHeader';
-import { Button, Popover } from 'antd';
+import { Button, Popover, Spin } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
@@ -43,6 +43,7 @@ import ToolColorPalette from '../divided/DividedToolColorPalette';
 import { theme } from 'src/style/theme';
 import { ColorResult } from 'react-color';
 import ImageDropZone from 'src/components/common/ImageDropZone';
+import BoxLoading from 'src/components/common/BoxLoading';
 
 const SingleTool = () => {
   const singleWrapperRef = useRef<HTMLDivElement>(null);
@@ -531,8 +532,11 @@ const SingleTool = () => {
       {/* 본격적인 툴  */}
       <PreviewCanvasWrapper isPreview={(isPreview && !previewLoading) || false}>
         <canvas ref={previewCanvasRef} />
+        <Spin
+          style={{ position: 'absolute', top: '50%', left: '50%', transform: 'traslate(-50%, -50%)' }}
+          spinning={isPreview ? previewLoading : true}
+        />
       </PreviewCanvasWrapper>
-      {<Loading loading={isPreview ? previewLoading : false} />}
 
       <SingleCanvasField isPreview={isPreview || false} onDragOver={handleDragImage} onMouseLeave={handleDragCancel}>
         <SingleWrapper
