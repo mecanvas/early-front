@@ -87,6 +87,7 @@ const SingleTool = () => {
   const [isPreview] = useGlobalState<boolean>('isPreview');
   const [bgColor, setBgColor] = useState(theme.color.white);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDragDrop, setIsDragDrop] = useState(false);
 
   const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
   const [isSaveCanvas] = useGlobalState<boolean>('saveModal');
@@ -282,10 +283,19 @@ const SingleTool = () => {
         console.error(err);
       } finally {
         setImgUploadLoading(false);
+        setIsDragDrop(false);
       }
     },
     [getProgressGage],
   );
+
+  const handleDragCancel = useCallback(() => {
+    setIsDragDrop(false);
+  }, []);
+
+  const handleDragImage = useCallback(() => {
+    setIsDragDrop(true);
+  }, []);
 
   const handleSingleImgUpload = useCallback(
     async (file: RcFile | any) => {
@@ -519,7 +529,7 @@ const SingleTool = () => {
       <PreviewCanvasWrapper isPreview={isPreview || false}>
         <canvas ref={previewCanvasRef} />
       </PreviewCanvasWrapper>
-      <SingleCanvasField isPreview={isPreview || false}>
+      <SingleCanvasField isPreview={isPreview || false} onDragOver={handleDragImage} onMouseLeave={handleDragCancel}>
         <SingleWrapper
           nearingCenterX={nearingCenterX}
           nearingCenterY={nearingCenterY}
@@ -543,8 +553,13 @@ const SingleTool = () => {
             <span></span>
             <span></span>
           </SingleSelectedFrame>
-          {!singleImgUploadUrl ? (
-            <ImageDropZone width={'100%'} height={`calc(100vh - 80px)`} onDrop={handleSingleImgUpload} />
+          {!singleImgUploadUrl || isDragDrop ? (
+            <ImageDropZone
+              isDragDrop={isDragDrop}
+              width={'100%'}
+              height={`calc(100vh - 80px)`}
+              onDrop={handleSingleImgUpload}
+            />
           ) : null}
 
           {/* 첨부한 이미지 렌더링 */}
