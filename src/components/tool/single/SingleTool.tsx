@@ -88,6 +88,7 @@ const SingleTool = () => {
   const [bgColor, setBgColor] = useState(theme.color.white);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragDrop, setIsDragDrop] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
   const [isSaveCanvas] = useGlobalState<boolean>('saveModal');
@@ -142,6 +143,7 @@ const SingleTool = () => {
 
     const canvas = previewCanvasRef.current;
     const ctx = canvas.getContext('2d');
+    setPreviewLoading(true);
 
     if (ctx) {
       const img = new Image();
@@ -175,6 +177,7 @@ const SingleTool = () => {
         ctx.globalCompositeOperation = 'destination-over';
         ctx.fillStyle = bgColor;
         ctx.fillRect(0, 0, singleFrameWidth, singleFrameHeight);
+        setPreviewLoading(false);
       };
     }
   }, [
@@ -526,9 +529,11 @@ const SingleTool = () => {
       </SingleFrameListHeader>
 
       {/* 본격적인 툴  */}
-      <PreviewCanvasWrapper isPreview={isPreview || false}>
+      <PreviewCanvasWrapper isPreview={(isPreview && !previewLoading) || false}>
         <canvas ref={previewCanvasRef} />
       </PreviewCanvasWrapper>
+      {<Loading loading={isPreview ? previewLoading : false} />}
+
       <SingleCanvasField isPreview={isPreview || false} onDragOver={handleDragImage} onMouseLeave={handleDragCancel}>
         <SingleWrapper
           nearingCenterX={nearingCenterX}
@@ -536,9 +541,10 @@ const SingleTool = () => {
           cmd={resizeCmd ?? null}
           ref={singleWrapperRef}
           clicked={isMovingImage}
+          onDragOver={handleDragImage}
           onMouseMove={isMovingImage ? handleToImageInWrapper : undefined}
           onMouseUp={handleMoveCancelSingleImage}
-          onMouseLeave={handleMoveCancelSingleImage}
+          onMouseLeave={isDragDrop ? handleDragCancel : handleMoveCancelSingleImage}
         >
           {/* 선택한 액자 렌더링  */}
           <SingleSelectedFrame
