@@ -11,11 +11,16 @@ export const SingleToolContainer = styled.div`
 export const SingleToolFactory = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
   border-bottom: 1px solid #dbdbdb;
   background-color: ${({ theme }) => theme.color.white};
   button {
     padding: 5px 1em;
     height: 34px;
+  }
+
+  svg {
+    margin-right: 4px;
   }
 `;
 

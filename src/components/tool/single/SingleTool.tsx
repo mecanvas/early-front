@@ -8,7 +8,13 @@ import axios from 'axios';
 import { useProgress } from 'src/hooks/useProgress';
 import Loading from 'src/components/common/Loading';
 import Upload, { RcFile } from 'antd/lib/upload';
-import { faChevronCircleDown, faChevronCircleUp, faCompress, faUpload } from '@fortawesome/free-solid-svg-icons';
+import {
+  faAlignCenter,
+  faChevronCircleDown,
+  faChevronCircleUp,
+  faCompress,
+  faUpload,
+} from '@fortawesome/free-solid-svg-icons';
 import SingleImgSizeController from 'src/components/tool/single/SingleImgSizeController';
 import { useGlobalState } from 'src/hooks';
 import { FramePrice, ResizeCmd } from 'src/interfaces/ToolInterface';
@@ -18,7 +24,7 @@ import { frameSize, HEADER_HEIGHT } from 'src/constants';
 import { FrameSizeName } from '../divided/DividedToolStyle';
 import { replacePx } from 'src/utils/replacePx';
 import { cmToPx } from 'src/utils/cmToPx';
-import { FullscreenOutlined } from '@ant-design/icons';
+import { CaretDownFilled, DownOutlined, FullscreenOutlined } from '@ant-design/icons';
 import {
   SingleToolContainer,
   SingleToolFactory,
@@ -359,6 +365,16 @@ const SingleTool = () => {
       <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
       <ToolHeader singlePrice={singlePrice.toLocaleString()} singleCanvasName={singleCanvasName} />
       <SingleToolFactory>
+        <Button type="text">
+          <FontAwesomeIcon icon={faAlignCenter} />
+          <small>수직</small>
+        </Button>
+
+        <Button type="text">
+          <FontAwesomeIcon icon={faAlignCenter} />
+          <small>수평</small>
+        </Button>
+
         <Button type="text" onClick={handleRatioForFrame}>
           <FullscreenOutlined />
           <small>액자에 끼우기</small>
