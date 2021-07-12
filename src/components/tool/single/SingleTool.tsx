@@ -289,6 +289,10 @@ const SingleTool = () => {
     [getProgressGage],
   );
 
+  const handleDragImage = useCallback(() => {
+    setIsDragDrop(true);
+  }, []);
+
   const handleSingleImgUpload = useCallback(
     async (file: RcFile | any) => {
       if (file instanceof File === false) {
@@ -521,12 +525,7 @@ const SingleTool = () => {
       <PreviewCanvasWrapper isPreview={isPreview || false}>
         <canvas ref={previewCanvasRef} />
       </PreviewCanvasWrapper>
-      <SingleCanvasField
-        isPreview={isPreview || false}
-        onDragOver={() => {
-          setIsDragDrop(true);
-        }}
-      >
+      <SingleCanvasField isPreview={isPreview || false} onDragOver={handleDragImage}>
         <SingleWrapper
           nearingCenterX={nearingCenterX}
           nearingCenterY={nearingCenterY}
