@@ -185,44 +185,6 @@ export const YouSelectedFrame = styled.div<{
   z-index: 2;
 `;
 
-export const DropZone = styled.div`
-  border: 1px solid ${({ theme }) => theme.color.gray200};
-  width: 300px;
-  height: 300px;
-  margin: 0 auto;
-  cursor: pointer;
-`;
-
-export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: #fff;
-  border: 1px solid ${({ theme }) => theme.color.gray200};
-  justify-content: center;
-  height: 100%;
-  p {
-    margin-top: 6px;
-  }
-  &:hover {
-    opacity: 0.4;
-  }
-  ${({ isDragActive }) =>
-    isDragActive
-      ? css`
-          opacity: 0.4;
-        `
-      : css`
-          opacity: 1;
-        `}
-  *  > svg {
-    font-size: 50px;
-    path {
-      color: ${({ theme }) => theme.color.primary};
-    }
-  }
-`;
-
 export const ImageWrapper = styled.div<{
   bgColor?: string;
   isNearingX?: boolean;

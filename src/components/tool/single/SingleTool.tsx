@@ -42,6 +42,7 @@ import {
 import ToolColorPalette from '../divided/DividedToolColorPalette';
 import { theme } from 'src/style/theme';
 import { ColorResult } from 'react-color';
+import ImageDropZone from 'src/components/common/ImageDropZone';
 
 const SingleTool = () => {
   const singleWrapperRef = useRef<HTMLDivElement>(null);
@@ -255,8 +256,44 @@ const SingleTool = () => {
     [controllerNode, getPosition],
   );
 
+  const imageDropUpload = useCallback(
+    async (acceptedFiles) => {
+      if (!acceptedFiles[0].type.includes('image')) {
+        return alert('이미지 파일이 아닌건 지원하지 않습니다.');
+      }
+
+      if (!imgSizeChecker(acceptedFiles[0])) return;
+
+      setImgUploadLoading(true);
+      try {
+        const file = acceptedFiles[0];
+        const fd = new FormData();
+        fd.append('image', file);
+
+        await axios
+          .post('/canvas/img', fd, {
+            onUploadProgress: getProgressGage,
+          })
+          .then((res) => {
+            setSingleimgUploadUrl(res.data || '');
+          });
+      } catch (err) {
+        alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
+        console.error(err);
+      } finally {
+        setImgUploadLoading(false);
+      }
+    },
+    [getProgressGage],
+  );
+
   const handleSingleImgUpload = useCallback(
-    async (file: RcFile) => {
+    async (file: RcFile | any) => {
+      if (file instanceof File === false) {
+        // 드롭 로직
+        imageDropUpload(file);
+        return;
+      }
       if (!file.type.includes('image')) {
         return alert('이미지 파일이 아닌건 지원하지 않습니다.');
       }
@@ -282,7 +319,7 @@ const SingleTool = () => {
         setImgUploadLoading(false);
       }
     },
-    [getProgressGage],
+    [getProgressGage, imageDropUpload],
   );
 
   const handleMoveSingleImage = useCallback((e) => {
@@ -506,6 +543,9 @@ const SingleTool = () => {
             <span></span>
             <span></span>
           </SingleSelectedFrame>
+          {!singleImgUploadUrl ? (
+            <ImageDropZone width={'100%'} height={`calc(100vh - 80px)`} onDrop={handleSingleImgUpload} />
+          ) : null}
 
           {/* 첨부한 이미지 렌더링 */}
           {singleImgUploadUrl && (
