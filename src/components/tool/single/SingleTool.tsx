@@ -24,7 +24,7 @@ import { frameSize, HEADER_HEIGHT } from 'src/constants';
 import { FrameSizeName } from '../divided/DividedToolStyle';
 import { replacePx } from 'src/utils/replacePx';
 import { cmToPx } from 'src/utils/cmToPx';
-import { CaretDownFilled, DownOutlined, FullscreenOutlined } from '@ant-design/icons';
+import { FullscreenOutlined } from '@ant-design/icons';
 import {
   SingleToolContainer,
   SingleToolFactory,
@@ -145,11 +145,11 @@ const SingleTool = () => {
         const cropX = frameLeft - left;
         const cropY = frameTop - top;
 
-        const pixelRatio = window.devicePixelRatio;
-        canvas.width = singleFrameWidth * pixelRatio;
-        canvas.height = singleFrameHeight * pixelRatio;
+        // const pixelRatio = window.devicePixelRatio;
+        canvas.width = singleFrameWidth;
+        canvas.height = singleFrameHeight;
         ctx.clearRect(0, 0, singleFrameWidth, singleFrameHeight);
-        ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        // ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(
           img,
@@ -174,6 +174,18 @@ const SingleTool = () => {
     singleFrameWidth,
     singleImgUploadUrl,
   ]);
+
+  const handleHorizontal = useCallback(() => {
+    if (controllerNode) {
+      controllerNode.style.top = `0`;
+    }
+  }, [controllerNode]);
+
+  const handleVertical = useCallback(() => {
+    if (controllerNode) {
+      controllerNode.style.left = `0`;
+    }
+  }, [controllerNode]);
 
   const handleSelectFrame = useCallback(
     (e) => {
@@ -365,14 +377,14 @@ const SingleTool = () => {
       <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
       <ToolHeader singlePrice={singlePrice.toLocaleString()} singleCanvasName={singleCanvasName} />
       <SingleToolFactory>
-        <Button type="text">
-          <FontAwesomeIcon icon={faAlignCenter} />
-          <small>수직</small>
-        </Button>
-
-        <Button type="text">
+        <Button type="text" onClick={handleHorizontal}>
           <FontAwesomeIcon icon={faAlignCenter} />
           <small>수평</small>
+        </Button>
+
+        <Button type="text" onClick={handleVertical}>
+          <FontAwesomeIcon icon={faAlignCenter} />
+          <small>수직</small>
         </Button>
 
         <Button type="text" onClick={handleRatioForFrame}>
