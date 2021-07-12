@@ -5,6 +5,7 @@ import { FramePrice } from 'src/interfaces/ToolInterface';
 import Logo from '../layouts/Logo';
 import ToolSave from './ToolSave';
 import { ToolHeaderMenu, CanvasInfomationWrapper, BillInfomation, Bill, BillTotal } from './divided/DividedToolStyle';
+import { theme } from 'src/style/theme';
 
 interface Props {
   singlePrice?: string;
@@ -45,7 +46,7 @@ const ToolHeader = ({ singlePrice, singleCanvasName }: Props) => {
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <Logo />
         {singlePrice && singleCanvasName ? (
-          <div style={{ borderLeft: '1px solid #dbdbdb', paddingLeft: '20px', marginLeft: '20px' }}>
+          <div style={{ borderLeft: `1px solid ${theme.color.gray200}`, paddingLeft: '20px', marginLeft: '20px' }}>
             <span style={{ marginRight: '-9px' }}>{singleCanvasName} -</span>
             <Button type="text">{singlePrice}원</Button>
           </div>
@@ -75,7 +76,10 @@ const ToolHeader = ({ singlePrice, singleCanvasName }: Props) => {
               )
             }
           >
-            <Button type="text" style={{ borderLeft: '1px solid #dbdbdb', paddingLeft: '20px', marginLeft: '20px' }}>
+            <Button
+              type="text"
+              style={{ borderLeft: `1px solid ${theme.color.gray200}`, paddingLeft: '20px', marginLeft: '20px' }}
+            >
               예상가격
             </Button>
           </Popover>

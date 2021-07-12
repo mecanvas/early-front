@@ -112,13 +112,13 @@ const AdminOrderDetail = () => {
         labelStyle={{
           width: '150px',
           backgroundColor: '#fafbfc',
-          borderBottom: '1px solid #dbdbdb',
+          borderBottom: `1px solid ${theme.color.gray200}`,
           padding: '4px 8px',
           textAlign: 'center',
         }}
         contentStyle={{
           backgroundColor: '#fff',
-          borderBottom: '1px solid #dbdbdb',
+          borderBottom: `1px solid ${theme.color.gray200}`,
         }}
         bordered
         column={{ xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }}

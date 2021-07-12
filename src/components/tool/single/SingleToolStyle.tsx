@@ -12,7 +12,7 @@ export const SingleToolFactory = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  border-bottom: 1px solid #dbdbdb;
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray200};
   background-color: ${({ theme }) => theme.color.white};
   button {
     padding: 5px 1em;

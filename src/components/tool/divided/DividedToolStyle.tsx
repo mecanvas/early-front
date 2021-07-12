@@ -29,7 +29,7 @@ export const ToolHeaderMenu = styled.div`
   justify-content: space-between;
   padding: 0 2em;
   align-items: center;
-  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray200};
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     border-bottom: none;
     height: 40px;
@@ -186,7 +186,7 @@ export const YouSelectedFrame = styled.div<{
 `;
 
 export const DropZone = styled.div`
-  border: 1px solid #dbdbdb;
+  border: 1px solid ${({ theme }) => theme.color.gray200};
   width: 300px;
   height: 300px;
   margin: 0 auto;
@@ -198,7 +198,7 @@ export const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
   flex-direction: column;
   align-items: center;
   background-color: #fff;
-  border: 1px solid #dbdbdb;
+  border: 1px solid ${({ theme }) => theme.color.gray200};
   justify-content: center;
   height: 100%;
   p {
@@ -517,7 +517,8 @@ export const ColorPaletteWrapper = styled.div`
   }
   .circle-picker {
     & > span > div {
-      border: 1px solid #dbdbdb;
+      border: 1px solid ${({ theme }) => theme.color.gray200};
+
       border-radius: 50%;
     }
   }
@@ -526,7 +527,7 @@ export const ColorPaletteWrapper = styled.div`
 export const ColorPaletteFreeColor = styled.div`
   text-align: center;
   cursor: pointer;
-  border-top: 1px solid #dbdbdb;
+  border-top: 1px solid ${({ theme }) => theme.color.gray200};
 `;
 
 export const FrameWrapper = styled.div`
