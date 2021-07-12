@@ -44,12 +44,12 @@ const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
 
 interface Props {
   onDrop: <T extends File>(acceptedFiles: T[], fileRejections: FileRejection[], event: DropEvent) => void;
-  text: string;
+  text?: string;
   width?: number;
   height?: number;
 }
 
-const ImageDrop = ({ onDrop, text = '이미지를 드롭하거나 첨부하세요!', width, height }: Props) => {
+const ImageDropZone = ({ onDrop, text = '이미지를 드롭하거나 첨부하세요!', width, height }: Props) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
@@ -63,4 +63,4 @@ const ImageDrop = ({ onDrop, text = '이미지를 드롭하거나 첨부하세�
   );
 };
 
-export default ImageDrop;
+export default ImageDropZone;

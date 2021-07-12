@@ -4,15 +4,11 @@ import axios from 'axios';
 import {
   ToolContainer,
   ImageWrapper,
-  DropZone,
-  DropZoneDiv,
   ImgController,
   CroppedWrapper,
   PreviewBg,
   ToolHeaderWrapper,
 } from './DividedToolStyle';
-import { useDropzone } from 'react-dropzone';
-import { PlusOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { theme } from 'src/style/theme';
 import Loading from '../../common/Loading';
@@ -36,6 +32,7 @@ import { useProgress } from 'src/hooks/useProgress';
 import ToolHeader from '../ToolHeader';
 import DividedToolFactory from './DividedToolFactory';
 import { HEADER_HEIGHT } from 'src/constants';
+import ImageDropZone from 'src/components/common/ImageDropZone';
 
 const Tool = () => {
   const [changeVertical, setChangeVertical] = useState(false);
@@ -312,7 +309,6 @@ const Tool = () => {
     },
     [getProgressGage, setImgUploadLoading, setImgUploadUrl],
   );
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: handleImgDropUpload });
 
   const handleDeleteCanvas = useCallback(
     (e) => {
@@ -720,13 +716,7 @@ const Tool = () => {
             </>
           ) : (
             <>
-              <DropZone {...getRootProps()}>
-                <input {...getInputProps()} accept="image/*" />
-                <DropZoneDiv isDragActive={isDragActive}>
-                  <PlusOutlined />
-                  <p>이미지를 드롭하거나 첨부하세요!</p>
-                </DropZoneDiv>
-              </DropZone>
+              <ImageDropZone onDrop={handleImgDropUpload} />
             </>
           )}
         </ImageWrapper>
