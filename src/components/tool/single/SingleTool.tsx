@@ -84,7 +84,7 @@ const SingleTool = () => {
   }, []);
 
   const [isPreview] = useGlobalState<boolean>('isPreview');
-  const [bgColor, setBgColor] = useState(theme.color.gray100);
+  const [bgColor, setBgColor] = useState(theme.color.white);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
