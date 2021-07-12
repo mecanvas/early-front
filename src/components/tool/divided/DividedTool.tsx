@@ -699,7 +699,12 @@ const Tool = () => {
                 <ToolSelectedFrame croppedList={croppedList} {...yourSelectedFrame} onClick={handleFrameRelease} />
               )}
 
-              <ImgController data-layout="inner" isResizeStart={isResizeMode || false} cmd={resizeCmd}>
+              <ImgController
+                isPreview={isPreview || false}
+                data-layout="inner"
+                isResizeStart={isResizeMode || false}
+                cmd={resizeCmd}
+              >
                 <img
                   onMouseUp={handleImgResizeEnd}
                   ref={imgNode}
