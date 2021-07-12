@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import styled from '@emotion/styled';
 import ToolHeader from '../ToolHeader';
 import { Button } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,295 +8,36 @@ import axios from 'axios';
 import { useProgress } from 'src/hooks/useProgress';
 import Loading from 'src/components/common/Loading';
 import Upload, { RcFile } from 'antd/lib/upload';
-import { faChevronCircleDown, faChevronCircleUp, faCompress, faUpload } from '@fortawesome/free-solid-svg-icons';
-import { css } from '@emotion/react';
+import {
+  faAlignCenter,
+  faChevronCircleDown,
+  faChevronCircleUp,
+  faCompress,
+  faUpload,
+} from '@fortawesome/free-solid-svg-icons';
 import SingleImgSizeController from 'src/components/tool/single/SingleImgSizeController';
 import { useGlobalState } from 'src/hooks';
 import { FramePrice, ResizeCmd } from 'src/interfaces/ToolInterface';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
-import { frameSize } from 'src/constants';
+import { frameSize, HEADER_HEIGHT } from 'src/constants';
 import { FrameSizeName } from '../divided/DividedToolStyle';
 import { replacePx } from 'src/utils/replacePx';
 import { cmToPx } from 'src/utils/cmToPx';
 import { FullscreenOutlined } from '@ant-design/icons';
-
-const SingleToolContainer = styled.div`
-  background-color: ${({ theme }) => theme.color.gray100};
-`;
-
-const SingleToolFactory = styled.div`
-  display: flex;
-  justify-content: center;
-  border-bottom: 1px solid #dbdbdb;
-  background-color: ${({ theme }) => theme.color.white};
-`;
-
-const SingleCanvasField = styled.div<{ isPreview: boolean }>`
-  min-height: calc(100vh - 105px);
-  max-height: calc(100vh - 105px);
-  max-width: 1000px;
-  width: 100%;
-  background-color: ${({ theme }) => theme.color.white};
-  margin: 0 auto;
-  ${({ isPreview }) =>
-    isPreview
-      ? css`
-          position: absolute;
-          top: 0;
-          visibility: hidden;
-          & > * {
-            position: absolute;
-            visibility: hidden;
-          }
-        `
-      : css`
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        `}
-`;
-
-const PreviewCanvasWrapper = styled.div<{ isPreview: boolean }>`
-  ${({ isPreview, theme }) =>
-    isPreview
-      ? css`
-          width: 100%;
-          min-height: calc(100vh - 105px);
-          max-height: calc(100vh - 105px);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          canvas {
-            display: block;
-            background-color: ${theme.color.white};
-            box-shadow: ${theme.canvasShadow};
-          }
-        `
-      : css`
-          canvas {
-            display: none;
-          }
-        `}
-`;
-
-const SingleWrapper = styled.div<{
-  clicked: boolean;
-  cmd: ResizeCmd | null;
-  nearingCenterX: boolean;
-  nearingCenterY: boolean;
-}>`
-  width: 100%;
-  min-height: calc(100vh - 105px);
-  max-height: calc(100vh - 105px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  ${({ clicked }) =>
-    clicked
-      ? css`
-          cursor: pointer;
-        `
-      : css`
-          cursor: default;
-        `}
-
-  ${({ nearingCenterX, theme }) =>
-    nearingCenterX &&
-    css`
-      &:before {
-        position: absolute;
-        width: 2px;
-        top: 0;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        height: 100%;
-        content: '';
-        border: 1px dashed ${theme.color.primary};
-        z-index: 33;
-      }
-    `}
-
-  ${({ nearingCenterY, theme }) =>
-    nearingCenterY &&
-    css`
-      &:after {
-        position: absolute;
-        width: 100%;
-        top: (50% - 95px);
-        transform: translateY(-50%);
-        left: 0;
-        height: 2px;
-        content: '';
-        z-index: 33;
-        border: 1px dashed ${theme.color.primary};
-      }
-    `}
-
-  ${({ cmd }) => {
-    if (!cmd) return;
-    if (cmd === 'top-left' || cmd === 'bottom-right') {
-      return css`
-        cursor: nwse-resize;
-      `;
-    }
-    return css`
-      cursor: nesw-resize;
-    `;
-  }}
-`;
-
-const SingleSelectedFrame = styled.div<{ isImgUploadUrl: boolean; width: number; height: number }>`
-  position: absolute;
-  background-color: ${({ theme }) => theme.color.white};
-  ${({ width, height }) =>
-    width &&
-    height &&
-    css`
-      width: ${width}px;
-      height: ${height}px;
-    `}
-  ${({ isImgUploadUrl }) =>
-    isImgUploadUrl ||
-    css`
-      cursor: default !important;
-    `}
-
-/* top */
-    span:nth-of-type(1) {
-    z-index: 15;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 1px;
-    border-top: 4px dashed ${({ theme }) => theme.color.primary};
-  }
-  /* right */
-  span:nth-of-type(2) {
-    z-index: 15;
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 1px;
-    height: 100%;
-    border-right: 4px dashed ${({ theme }) => theme.color.primary};
-  }
-  /* bottom */
-  span:nth-of-type(3) {
-    z-index: 15;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 1px;
-    border-bottom: 4px dashed ${({ theme }) => theme.color.primary};
-  }
-  /* left */
-  span:nth-of-type(4) {
-    z-index: 15;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 1px;
-    height: 100%;
-    border-left: 4px dashed ${({ theme }) => theme.color.primary};
-  }
-`;
-
-const SingleImageWrapper = styled.div<{ clicked: boolean }>`
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: calc(98vh - 105px);
-
-  canvas {
-    max-height: calc(98vh - 105px);
-    cursor: pointer;
-    ${({ clicked }) =>
-      clicked
-        ? css`
-            opacity: 0.5;
-          `
-        : css`
-            opacity: 1;
-          `};
-  }
-`;
-
-const SingleFrameListHeader = styled.div`
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  right: 0;
-  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
-  top: 54px;
-`;
-
-const SingleFrameListGrid = styled.div<{
-  maxHeight: string;
-  height: string;
-  overflow: string;
-  padding: string;
-}>`
-  /* 스크롤 제거 */
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-  &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera*/
-  }
-
-  display: flex;
-  border: 1px solid ${({ theme }) => theme.color.gray300};
-  justify-content: center;
-  align-items: center;
-  padding: ${({ padding }) => padding};
-  max-height: ${({ maxHeight }) => maxHeight};
-  height: ${({ height }) => height};
-  overflow: ${({ overflow }) => overflow};
-  background-color: ${({ theme }) => theme.color.white};
-  transition: all 500ms ease-in-out;
-  div {
-    flex: 1;
-    text-align: center;
-    small {
-      font-size: 9px;
-    }
-  }
-`;
-
-const SingleFrameList = styled.div<{ width: string; height: string }>`
-  position: relative;
-  cursor: pointer;
-  margin: 0 auto;
-  margin-top: 0.4em;
-  width: ${({ width }) => `${replacePx(width) / 4}px`};
-  height: ${({ height }) => `${replacePx(height) / 4}px`};
-  border: 1px solid ${({ theme }) => theme.color.gray300};
-`;
-
-const FrameListGridHideButton = styled.div`
-  background-color: ${({ theme }) => theme.color.white};
-  cursor: pointer;
-  padding: 0.4em 0;
-  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
-  width: 100%;
-  margin-top: 0.2em;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-
-  small {
-    margin-left: 3px;
-    margin-bottom: 1px;
-  }
-  svg {
-    margin-top: 1px;
-    font-size: 16px;
-  }
-`;
+import {
+  SingleToolContainer,
+  SingleToolFactory,
+  SingleFrameListHeader,
+  SingleFrameListGrid,
+  SingleFrameList,
+  FrameListGridHideButton,
+  PreviewCanvasWrapper,
+  SingleCanvasField,
+  SingleWrapper,
+  SingleSelectedFrame,
+  SingleImageWrapper,
+} from './SingleToolStyle';
 
 const SingleTool = () => {
   const singleWrapperRef = useRef<HTMLDivElement>(null);
@@ -405,11 +145,11 @@ const SingleTool = () => {
         const cropX = frameLeft - left;
         const cropY = frameTop - top;
 
-        const pixelRatio = window.devicePixelRatio;
-        canvas.width = singleFrameWidth * pixelRatio;
-        canvas.height = singleFrameHeight * pixelRatio;
+        // const pixelRatio = window.devicePixelRatio;
+        canvas.width = singleFrameWidth;
+        canvas.height = singleFrameHeight;
         ctx.clearRect(0, 0, singleFrameWidth, singleFrameHeight);
-        ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        // ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(
           img,
@@ -434,6 +174,18 @@ const SingleTool = () => {
     singleFrameWidth,
     singleImgUploadUrl,
   ]);
+
+  const handleHorizontal = useCallback(() => {
+    if (controllerNode) {
+      controllerNode.style.top = `0`;
+    }
+  }, [controllerNode]);
+
+  const handleVertical = useCallback(() => {
+    if (controllerNode) {
+      controllerNode.style.left = `0`;
+    }
+  }, [controllerNode]);
 
   const handleSelectFrame = useCallback(
     (e) => {
@@ -462,7 +214,7 @@ const SingleTool = () => {
       const { height } = singleWrapperRef.current.getBoundingClientRect();
 
       const x = cursorX - window.innerWidth / 2;
-      const y = cursorY - height / 2 - 95;
+      const y = cursorY - height / 2 - HEADER_HEIGHT;
 
       if (0.5 >= Math.abs(x)) {
         setNearingCenterX(true);
@@ -625,6 +377,16 @@ const SingleTool = () => {
       <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
       <ToolHeader singlePrice={singlePrice.toLocaleString()} singleCanvasName={singleCanvasName} />
       <SingleToolFactory>
+        <Button type="text" onClick={handleHorizontal}>
+          <FontAwesomeIcon icon={faAlignCenter} />
+          <small>수평</small>
+        </Button>
+
+        <Button type="text" onClick={handleVertical}>
+          <FontAwesomeIcon icon={faAlignCenter} />
+          <small>수직</small>
+        </Button>
+
         <Button type="text" onClick={handleRatioForFrame}>
           <FullscreenOutlined />
           <small>액자에 끼우기</small>

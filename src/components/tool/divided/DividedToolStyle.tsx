@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import { HEADER_HEIGHT } from 'src/constants';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { replacePx } from 'src/utils/replacePx';
 
@@ -23,7 +24,7 @@ export const ToolHeaderWrapper = styled.div`
 
 export const ToolHeaderMenu = styled.div`
   background-color: ${({ theme }) => theme.color.white};
-  height: 54px;
+  height: 45px;
   display: flex;
   justify-content: space-between;
   padding: 0 2em;
@@ -37,10 +38,13 @@ export const ToolHeaderMenu = styled.div`
 
   & > div {
     display: flex;
+    align-items: center;
     button {
+      padding: 0.4em 1em;
+      height: 33px;
       span {
         font-weight: 500;
-        font-size: 15px;
+        font-size: 13px;
       }
     }
     button + button {
@@ -56,9 +60,8 @@ export const ToolHeaderMenu = styled.div`
     button:nth-of-type(2) {
       @media all and (max-width: ${({ theme }) => theme.size.sm}) {
         padding: 0em 0.6em;
-        height: 30px;
         span {
-          font-size: 14px;
+          font-size: 12px;
           line-height: 30px;
         }
       }
@@ -92,6 +95,8 @@ export const FactoryTool = styled.div`
     justify-content: center;
     align-items: center;
     button {
+      padding: 5px 1em;
+      height: 34px;
       small {
         margin-left: 3px;
         font-size: 12px;
@@ -119,6 +124,8 @@ export const FrameTool = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 5px 1em;
+    height: 34px;
     svg {
       font-size: 18px;
       path {
@@ -152,7 +159,7 @@ export const SelectedFrameWrapper = styled.div`
   top: 0;
   left: 0;
   z-index: 1;
-  padding: 95px 10px 50px 10px;
+  padding: ${HEADER_HEIGHT}px 10px 50px 10px;
   canvas {
     position: absolute;
     top: 0;
@@ -231,7 +238,7 @@ export const ImageWrapper = styled.div<{
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 95px 10px 50px 10px;
+  padding: ${HEADER_HEIGHT}px 10px 10px 10px;
   margin: 0 auto;
   text-align: center;
   position: relative;
@@ -239,7 +246,7 @@ export const ImageWrapper = styled.div<{
   max-height: -webkit-fill-available;
   @media all and (max-width: ${({ theme }) => theme.size.md}) {
     flex-direction: row;
-    padding: 81px 10px 50px 10px;
+    padding: ${HEADER_HEIGHT} 10px 10px 10px;
   }
   ${({ isNearingX, isFitX, theme }) =>
     isNearingX &&
@@ -260,7 +267,7 @@ export const ImageWrapper = styled.div<{
       &:after {
         position: absolute;
         width: 100%;
-        top: (50% - 95px);
+        top: (50% - ${HEADER_HEIGHT}px);
         transform: translateY(-50%);
         height: 2px;
         content: '';
@@ -332,7 +339,7 @@ export const ImageWrapper = styled.div<{
 
 export const PreviewBg = styled.div`
   position: absolute;
-  top: 95px;
+  top: ${HEADER_HEIGHT}px;
   min-width: ${({ theme }) => theme.size.md};
   img {
     min-height: 626px;
@@ -524,12 +531,12 @@ export const ColorPaletteFreeColor = styled.div`
 
 export const FrameWrapper = styled.div`
   position: absolute;
-  top: 109px;
+  top: ${HEADER_HEIGHT}px;
   right: 5px;
   z-index: 340;
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     width: 100%;
-    top: 81px;
+    top: ${HEADER_HEIGHT};
   }
   & > div {
     border-radius: 20px;
@@ -562,13 +569,13 @@ export const FrameWrapper = styled.div`
     z-index: 33;
     cursor: pointer;
     position: fixed;
-    top: 110px;
+    top: ${HEADER_HEIGHT + 10}px;
     right: 20px;
     fill: ${({ theme }) => theme.color.secondarydark};
     padding: 3px 6px;
     border-radius: 20px;
     @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-      top: 82px;
+      top: ${HEADER_HEIGHT + 10}px;
       padding: 1.5px 3px;
     }
     &:hover {

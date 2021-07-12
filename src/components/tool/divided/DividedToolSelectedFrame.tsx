@@ -152,7 +152,6 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
         checkNearingParallelForBox();
         setCanvasPosition({ ...canvasPosition, top: positionTop, left: positionLeft });
         setCanvasFrameSizeInfo({ ...canvasFrameSizeInfo, width: frameWidth, height: frameHeight });
-
         if (ctx) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.strokeStyle = '#333';
