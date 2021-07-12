@@ -4,11 +4,12 @@ import styled from '@emotion/styled';
 import React from 'react';
 import { DropEvent, FileRejection, useDropzone } from 'react-dropzone';
 
-const DropZone = styled.div<{ width?: number; height?: number }>`
+const DropZone = styled.div<{ width?: string; height?: string }>`
   border: 1px solid ${({ theme }) => theme.color.gray200};
-  width: ${({ width }) => (width ? `${width}px` : '300px')};
-  height: ${({ height }) => (height ? `${height}px` : '300px')};
+  width: ${({ width }) => (width ? `${width}` : '300px')};
+  height: ${({ height }) => (height ? `${height}` : '300px')};
   margin: 0 auto;
+  opacity: 0.5;
   cursor: pointer;
 `;
 
@@ -24,7 +25,6 @@ const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
     margin-top: 6px;
   }
   &:hover {
-    opacity: 0.4;
   }
   ${({ isDragActive }) =>
     isDragActive
@@ -45,8 +45,8 @@ const DropZoneDiv = styled.div<{ isDragActive: boolean }>`
 interface Props {
   onDrop: <T extends File>(acceptedFiles: T[], fileRejections: FileRejection[], event: DropEvent) => void;
   text?: string;
-  width?: number;
-  height?: number;
+  width?: string;
+  height?: string;
 }
 
 const ImageDropZone = ({ onDrop, text = '이미지를 드롭하거나 첨부하세요!', width, height }: Props) => {
