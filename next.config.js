@@ -5,6 +5,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 const { merge } = require('webpack-merge');
 const webpackConfig = require('./webpack.config');
+const withImages = require('next-images');
 
 const nextConfig = {
   target: 'serverless',
@@ -50,6 +51,7 @@ module.exports = withPlugins(
       },
     ],
     [withBundleAnalyzer],
+    [withImages],
   ],
   nextConfig,
 );

@@ -25,7 +25,6 @@ import {
 } from 'src/interfaces/ToolInterface';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 import ToolSelectedFrame from './DividedToolSelectedFrame';
-import { getS3 } from 'src/utils/getS3';
 import { ImgToDataURL } from 'src/utils/ImgToDataURL';
 import { replacePx } from 'src/utils/replacePx';
 import { useProgress } from 'src/hooks/useProgress';
@@ -33,6 +32,7 @@ import ToolHeader from '../ToolHeader';
 import DividedToolFactory from './DividedToolFactory';
 import { HEADER_HEIGHT } from 'src/constants';
 import ImageDropZone from 'src/components/common/ImageDropZone';
+import BgPreview from 'public/bg1.jpg';
 
 const Tool = () => {
   const [changeVertical, setChangeVertical] = useState(false);
@@ -677,7 +677,7 @@ const Tool = () => {
         >
           {isPreview && (
             <PreviewBg ref={previewBgRef}>
-              <img src={getS3('bg1.jpg')} alt="미리보기배경" />
+              <img src={BgPreview} alt="미리보기배경" />
             </PreviewBg>
           )}
           <CroppedWrapper isPreview={isPreview || false} top={framePreviewMode?.top} left={framePreviewMode?.left}>
