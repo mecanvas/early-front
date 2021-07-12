@@ -126,6 +126,7 @@ const Tool = () => {
   const { getProgressGage, progressPercentage } = useProgress();
 
   const [isNoContent, setIsNoContent] = useGlobalState<boolean>('isNoContent', false);
+  const [isDragDrop, setIsDragDrop] = useState(false);
   const [isSelectFrame, setIsSelectFrame] = useState(false); // 골랐는지 상태 여부
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
   const [canvasPosition] = useGlobalState<CanvasPosition>('canvasPosition');
@@ -305,10 +306,19 @@ const Tool = () => {
         console.error(err);
       } finally {
         setImgUploadLoading(false);
+        setIsDragDrop(false);
       }
     },
     [getProgressGage, setImgUploadLoading, setImgUploadUrl],
   );
+
+  const handleDropCancel = useCallback(() => {
+    setIsDragDrop(false);
+  }, []);
+
+  const handleDropImage = useCallback(() => {
+    setIsDragDrop(true);
+  }, []);
 
   const handleDeleteCanvas = useCallback(
     (e) => {
@@ -643,6 +653,7 @@ const Tool = () => {
         {<Loading progressPercentage={progressPercentage} loading={imgUploadLoading || false} />}
 
         <ImageWrapper
+          onDragOver={handleDropImage}
           isPreview={isPreview || false}
           imgUploadLoading={imgUploadLoading || false}
           id="img-box"
@@ -656,7 +667,7 @@ const Tool = () => {
           isFitX={isFitX || false}
           isFitY={isFitY || false}
           onMouseUp={handleImgResizeEnd}
-          onMouseLeave={handleImgResizeEnd}
+          onMouseLeave={isDragDrop ? handleDropCancel : handleImgResizeEnd}
           cmd={resizeCmd}
         >
           {isPreview && (
@@ -716,8 +727,21 @@ const Tool = () => {
             </>
           ) : (
             <>
-              <ImageDropZone onDrop={handleImgDropUpload} />
+              <ImageDropZone
+                onDrop={handleImgDropUpload}
+                width="90%"
+                height="calc(100vh - 170px)"
+                isDragDrop={isDragDrop}
+              />
             </>
+          )}
+          {isDragDrop && imgUploadUrl && (
+            <ImageDropZone
+              onDrop={handleImgDropUpload}
+              isDragDrop={isDragDrop}
+              width="100%"
+              height="calc(100vh - 105px)"
+            />
           )}
         </ImageWrapper>
       </ToolContainer>

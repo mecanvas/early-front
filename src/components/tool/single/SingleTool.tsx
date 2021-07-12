@@ -289,6 +289,10 @@ const SingleTool = () => {
     [getProgressGage],
   );
 
+  const handleDragCancel = useCallback(() => {
+    setIsDragDrop(false);
+  }, []);
+
   const handleDragImage = useCallback(() => {
     setIsDragDrop(true);
   }, []);
@@ -525,7 +529,7 @@ const SingleTool = () => {
       <PreviewCanvasWrapper isPreview={isPreview || false}>
         <canvas ref={previewCanvasRef} />
       </PreviewCanvasWrapper>
-      <SingleCanvasField isPreview={isPreview || false} onDragOver={handleDragImage}>
+      <SingleCanvasField isPreview={isPreview || false} onDragOver={handleDragImage} onMouseLeave={handleDragCancel}>
         <SingleWrapper
           nearingCenterX={nearingCenterX}
           nearingCenterY={nearingCenterY}
