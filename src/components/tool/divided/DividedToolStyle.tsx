@@ -86,11 +86,15 @@ export const ToolSinglePrice = styled.div`
   }
 
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    padding-left: 10px;
+    margin-left: 10px;
     span {
-      font-size: 13px;
+      font-size: 12px;
     }
     button {
-      font-size: 11px;
+      span {
+        font-size: 12px !important;
+      }
     }
   }
 `;
@@ -135,6 +139,10 @@ export const FrameTool = styled.div`
 
   button {
     display: flex;
+    border-left: 1px solid ${({ theme }) => theme.color.gray200};
+    &:last-child {
+      border-right: 1px solid ${({ theme }) => theme.color.gray200};
+    }
     justify-content: center;
     align-items: center;
     padding: 5px 1em;

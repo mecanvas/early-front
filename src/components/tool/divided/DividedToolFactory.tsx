@@ -1,11 +1,4 @@
-import {
-  faUndo,
-  faImage,
-  faPaintRoller,
-  faRulerHorizontal,
-  faCompress,
-  faSquare,
-} from '@fortawesome/free-solid-svg-icons';
+import { faUndo, faImage, faPaintRoller, faRulerHorizontal, faCompress } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Upload, Popover } from 'antd';
 import { RcFile } from 'antd/lib/upload';
@@ -140,19 +133,15 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
         </div>
         <FrameTool>
           <Button type="text" onClick={handleGetFrameAttribute} value="정방">
-            <FontAwesomeIcon icon={faSquare} />
             <small>정방</small>
           </Button>
           <Button type="text" onClick={handleGetFrameAttribute} value="인물">
-            <FontAwesomeIcon icon={faSquare} />
             <small>인물</small>
           </Button>
           <Button type="text" onClick={handleGetFrameAttribute} value="해경">
-            <FontAwesomeIcon icon={faSquare} />
             <small>해경</small>
           </Button>
           <Button type="text" onClick={handleGetFrameAttribute} value="풍경">
-            <FontAwesomeIcon icon={faSquare} />
             <small>풍경</small>
           </Button>
         </FrameTool>

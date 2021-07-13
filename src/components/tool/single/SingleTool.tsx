@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ToolHeader from '../ToolHeader';
 import { Button, Popover, Spin } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 import axios from 'axios';
 import { useProgress } from 'src/hooks/useProgress';
@@ -494,19 +493,15 @@ const SingleTool = () => {
       <SingleFrameListHeader>
         <div>
           <Button type="text" onClick={handleGetFrameAttribute} value="정방">
-            <FontAwesomeIcon icon={faSquare} />
             <small>정방</small>
           </Button>
           <Button type="text" onClick={handleGetFrameAttribute} value="인물">
-            <FontAwesomeIcon icon={faSquare} />
             <small>인물</small>
           </Button>
           <Button type="text" onClick={handleGetFrameAttribute} value="해경">
-            <FontAwesomeIcon icon={faSquare} />
             <small>해경</small>
           </Button>
           <Button type="text" onClick={handleGetFrameAttribute} value="풍경">
-            <FontAwesomeIcon icon={faSquare} />
             <small>풍경</small>
           </Button>
         </div>
