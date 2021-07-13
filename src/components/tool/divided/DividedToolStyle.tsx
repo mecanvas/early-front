@@ -136,8 +136,9 @@ export const FrameTool = styled.div`
     }
     justify-content: center;
     align-items: center;
-    padding: 5px 1em;
+    padding: 5px 1.5em;
     height: 34px;
+    font-size: 12px;
     svg {
       font-size: 18px;
       path {

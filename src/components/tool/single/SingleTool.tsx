@@ -479,17 +479,17 @@ const SingleTool = () => {
       {/* 액자 리스트 선택 */}
       <SingleFrameListHeader>
         <div>
-          <Button type="text" onClick={handleGetFrameAttribute} value="정방">
-            <small>정방</small>
+          <Button type={frameAttributes === '정방' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="정방">
+            정방
           </Button>
-          <Button type="text" onClick={handleGetFrameAttribute} value="인물">
-            <small>인물</small>
+          <Button type={frameAttributes === '인물' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="인물">
+            인물
           </Button>
-          <Button type="text" onClick={handleGetFrameAttribute} value="해경">
-            <small>해경</small>
+          <Button type={frameAttributes === '해경' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="해경">
+            해경
           </Button>
-          <Button type="text" onClick={handleGetFrameAttribute} value="풍경">
-            <small>풍경</small>
+          <Button type={frameAttributes === '풍경' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="풍경">
+            풍경
           </Button>
         </div>
 

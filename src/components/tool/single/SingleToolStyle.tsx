@@ -246,13 +246,14 @@ export const SingleFrameListHeader = styled.div`
   button {
     padding: 5px 1.5em;
     height: 34px;
+    font-size: 12px;
   }
 
   div:nth-of-type(1) > button {
-    border-left: 1px solid ${({ theme }) => theme.color.gray200};
-
-    &:last-child {
-      border-right: 1px solid ${({ theme }) => theme.color.gray200};
+    border-top: none;
+    border-bottom: none;
+    button ~ button {
+      border-right: none;
     }
   }
 
