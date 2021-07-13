@@ -126,6 +126,7 @@ export const FactoryTool = styled.div`
 
 export const FrameTool = styled.div`
   position: absolute;
+  top: 50px;
   right: 0;
   display: flex;
   button {
