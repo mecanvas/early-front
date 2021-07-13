@@ -24,10 +24,13 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
   const [resizeWidth, setResizeWidth] = useGlobalState<number>('resizeWidth');
   const [resizeHeight, setResizeHeight] = useGlobalState<number>('resizeHeight');
   const [isResizeMode] = useGlobalState<boolean>('isResizeMode');
-  const [frameAttribute, setFrameAttribute] = useGlobalState<'정방' | '해경' | '인물' | '풍경'>('frameAttribute');
+  const [frameAttribute, setFrameAttribute] = useGlobalState<'정방' | '해경' | '인물' | '풍경'>(
+    'frameAttribute',
+    '정방',
+  );
   const [isGridGuideLine, setIsGridGuideLine] = useGlobalState<boolean>('isGridGuideLine');
   const [, setBgColor] = useGlobalState<string>('bgColor');
-  const [, setImgUploadUrl] = useGlobalState<string>('imgUploadUrl');
+  const [imgUploadUrl, setImgUploadUrl] = useGlobalState<string>('imgUploadUrl');
   const [, setImgUploadLoading] = useGlobalState<boolean>('imgUploadLoading');
   const [selectedFrameList, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
   const [framePrice, setFramePrice] = useGlobalState<FramePrice[]>('framePrice');
@@ -127,20 +130,38 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
             </Button>
           </Upload>
         </div>
-        <FrameTool>
-          <Button type={frameAttribute === '정방' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="정방">
-            정방
-          </Button>
-          <Button type={frameAttribute === '인물' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="인물">
-            인물
-          </Button>
-          <Button type={frameAttribute === '해경' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="해경">
-            해경
-          </Button>
-          <Button type={frameAttribute === '풍경' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="풍경">
-            풍경
-          </Button>
-        </FrameTool>
+        {imgUploadUrl && (
+          <FrameTool>
+            <Button
+              type={frameAttribute === '정방' ? 'primary' : 'text'}
+              onClick={handleGetFrameAttribute}
+              value="정방"
+            >
+              정방
+            </Button>
+            <Button
+              type={frameAttribute === '인물' ? 'primary' : 'text'}
+              onClick={handleGetFrameAttribute}
+              value="인물"
+            >
+              인물
+            </Button>
+            <Button
+              type={frameAttribute === '해경' ? 'primary' : 'text'}
+              onClick={handleGetFrameAttribute}
+              value="해경"
+            >
+              해경
+            </Button>
+            <Button
+              type={frameAttribute === '풍경' ? 'primary' : 'text'}
+              onClick={handleGetFrameAttribute}
+              value="풍경"
+            >
+              풍경
+            </Button>
+          </FrameTool>
+        )}
       </FactoryTool>
     </>
   );
