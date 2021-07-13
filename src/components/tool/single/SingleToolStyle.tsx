@@ -14,12 +14,15 @@ export const SingleToolFactory = styled.div`
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.color.gray200};
   background-color: ${({ theme }) => theme.color.white};
+
   button {
-    padding: 5px 1em;
+    display: flex;
+    align-items: center;
+    padding: 3px 1em;
     height: 34px;
   }
-  svg {
-    margin-right: 4px;
+  img {
+    width: 20px;
   }
 
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {

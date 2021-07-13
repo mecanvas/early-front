@@ -111,23 +111,14 @@ export const FactoryTool = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    img {
+      width: 20px;
+    }
     button {
-      padding: 5px 1em;
+      display: flex;
+      align-items: center;
+      padding: 3px 1em;
       height: 34px;
-      small {
-        margin-left: 3px;
-        font-size: 12px;
-        color: ${({ theme }) => theme.color.gray800};
-      }
-      svg {
-        font-size: 16px;
-        @media all and (max-width: ${({ theme }) => theme.size.xs}) {
-          font-size: 13px;
-        }
-        path {
-          fill: ${({ theme }) => theme.color.secondarydark};
-        }
-      }
     }
   }
 `;
@@ -322,7 +313,9 @@ export const ImageWrapper = styled.div<{
 
 export const PreviewBg = styled.div`
   position: absolute;
-  top: ${HEADER_HEIGHT}px;
+  top: calc(50% + ${HEADER_HEIGHT / 2}px);
+  transform: translateY(-50%);
+  /* top: ${HEADER_HEIGHT}px; */
   min-width: ${({ theme }) => theme.size.md};
   img {
     min-height: 626px;
@@ -563,7 +556,7 @@ export const FrameWrapper = styled.div`
     z-index: 33;
     cursor: pointer;
     position: fixed;
-    top: ${HEADER_HEIGHT + 10}px;
+    top: ${HEADER_HEIGHT + 3}px;
     right: 20px;
     fill: ${({ theme }) => theme.color.secondarydark};
     padding: 3px 6px;
@@ -605,7 +598,7 @@ export const FrameSizeList = styled.div<{ width: string; height: string }>`
   width: ${({ width }) => `${replacePx(width) / 5}px`};
   height: ${({ height }) => `${replacePx(height) / 5}px`};
   z-index: 30;
-  background-color: ${({ theme }) => theme.color.secondarybg};
+  border: 1px solid ${({ theme }) => theme.color.gray200};
   cursor: pointer;
   margin: 10px auto 5px auto;
   position: relative;

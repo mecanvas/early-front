@@ -1,5 +1,3 @@
-import { faUndo, faImage, faPaintRoller, faRulerHorizontal, faCompress } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Upload, Popover } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import axios from 'axios';
@@ -13,6 +11,7 @@ import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 import ToolImageResizerModal from './DividedToolImageResizerModal';
 import ToolColorPalette from './DividedToolColorPalette';
 import { FactoryTool, FrameTool } from './DividedToolStyle';
+import { icons } from 'public/icons';
 
 interface Props {
   croppedList: CroppedFrame[];
@@ -100,15 +99,9 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
         <div>
           {isResizeMode && resizeWidth && resizeHeight && <ToolImageResizerModal />}
           <Button type="text" style={{ opacity: selectedFrameList?.length ? 1 : 0.4 }} onClick={handleImgGoBack}>
-            <FontAwesomeIcon icon={faUndo} />
-            <small>실행취소</small>
+            <img src={icons.undo} />
           </Button>
-          <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
-            <Button type="text">
-              <FontAwesomeIcon icon={faImage} />
-              <small>변경</small>
-            </Button>
-          </Upload>
+
           <Popover
             style={{ padding: 0 }}
             trigger="click"
@@ -116,20 +109,23 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
             content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
           >
             <Button type="text">
-              <FontAwesomeIcon icon={faPaintRoller} />
-              <small>배경</small>
+              <img src={icons.bgPaint} />
             </Button>
           </Popover>
 
           <Button type="text" onClick={handleShowGridGuideLine}>
-            <FontAwesomeIcon icon={faRulerHorizontal} />
-            <small>눈금자</small>
+            <img src={icons.grid} />
           </Button>
 
           <Button type="text" onClick={handleImgRatioSetting}>
-            <FontAwesomeIcon icon={faCompress} />
-            <small>비율 맞추기</small>
+            <img src={icons.ratioFrame} style={{ width: '24px' }} />
           </Button>
+
+          <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
+            <Button type="text">
+              <img src={icons.fileUpload} style={{ width: '22px' }} />
+            </Button>
+          </Upload>
         </div>
         <FrameTool>
           <Button type="text" onClick={handleGetFrameAttribute} value="정방">
