@@ -102,6 +102,7 @@ export const ToolSinglePrice = styled.div`
 export const FactoryTool = styled.div`
   display: flex;
   align-items: center;
+  padding: 5px 0;
   border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
   justify-content: center;
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
@@ -127,12 +128,12 @@ export const FrameTool = styled.div`
   position: absolute;
   right: 0;
   display: flex;
-
   button {
     display: flex;
-    border-left: 1px solid ${({ theme }) => theme.color.gray200};
-    &:last-child {
-      border-right: 1px solid ${({ theme }) => theme.color.gray200};
+    border-top: none;
+    border-bottom: none;
+    button ~ button {
+      border-right: none;
     }
     justify-content: center;
     align-items: center;

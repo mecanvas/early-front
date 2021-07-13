@@ -563,7 +563,7 @@ const SingleTool = () => {
             <ImageDropZone
               isDragDrop={isDragDrop}
               width={'100%'}
-              height={`calc(100vh - 80px)`}
+              height={`calc(100vh - 86px)`}
               onDrop={handleSingleImgUpload}
             />
           ) : null}

@@ -14,7 +14,7 @@ export const SingleToolFactory = styled.div`
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.color.gray200};
   background-color: ${({ theme }) => theme.color.white};
-
+  padding: 3px 0;
   button {
     display: flex;
     align-items: center;
@@ -233,11 +233,11 @@ export const SingleImageWrapper = styled.div<{ clicked: boolean }>`
 export const SingleFrameListHeader = styled.div`
   position: absolute;
   display: flex;
+  align-items: center;
   flex-direction: column;
   right: 0;
-  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
   @media all and (min-width: ${({ theme }) => theme.size.sm}) {
-    top: ${HEADER_HEIGHT - 35}px;
+    top: ${HEADER_HEIGHT - 38}px;
   }
 
   button {
@@ -246,11 +246,15 @@ export const SingleFrameListHeader = styled.div`
     font-size: 12px;
   }
 
-  div:nth-of-type(1) > button {
-    border-top: none;
-    border-bottom: none;
-    button ~ button {
-      border-right: none;
+  div:nth-of-type(1) {
+    padding: 2px 0;
+
+    & > button {
+      border-top: none;
+      border-bottom: none;
+      button ~ button {
+        border-right: none;
+      }
     }
   }
 
@@ -278,7 +282,8 @@ export const SingleFrameListGrid = styled.div<{
     display: none; /* Chrome, Safari, Opera*/
   }
   display: flex;
-  border: 1px solid ${({ theme }) => theme.color.gray300};
+  width: 100%;
+  border-radius: 4px;
   justify-content: center;
   align-items: center;
   padding: ${({ padding }) => padding};
@@ -287,6 +292,7 @@ export const SingleFrameListGrid = styled.div<{
   overflow: ${({ overflow }) => overflow};
   background-color: ${({ theme }) => theme.color.white};
   transition: all 500ms ease-in-out;
+
   div {
     flex: 1;
     text-align: center;
@@ -323,7 +329,6 @@ export const FrameListGridHideButton = styled.div`
   padding: 0.4em 0;
   border: 1px solid ${({ theme }) => theme.color.gray100};
   width: 100%;
-  margin-top: 0.2em;
   display: flex;
   justify-content: center;
   align-items: center;
