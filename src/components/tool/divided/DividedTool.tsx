@@ -472,7 +472,7 @@ const Tool = () => {
     const centerY = height / 2;
     setCenterX(centerX);
     setCenterY(centerY);
-    requestAnimationFrame(getImgWrapperSizeForParallel);
+    requestAnimationFrame(() => getImgWrapperSizeForParallel);
   }, [setCenterX, setCenterY]);
 
   // 리사이즈시에도 동일하게 움직일 수 있도록 설정
@@ -486,7 +486,6 @@ const Tool = () => {
 
     if (imgNode.current) {
       const { left: imgLeft, top: imgTop } = imgNode.current.getBoundingClientRect();
-      console.log(croppedList);
       if (!croppedList.length) return;
       setCroppedList((prev) =>
         prev.map((lst) => ({
@@ -495,7 +494,6 @@ const Tool = () => {
           top: `${+lst.dataset.origintop + imgTop + scrollY}px`,
         })),
       );
-
       requestAnimationFrame(() => handleFramePositionRelative);
     }
     if (previewBgRef.current) {
@@ -569,7 +567,7 @@ const Tool = () => {
       window.removeEventListener('resize', handleFramePositionRelative);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [croppedList]);
 
   useEffect(() => {
     if (isSaveCanvas) {
