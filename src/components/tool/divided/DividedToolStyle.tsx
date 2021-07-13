@@ -50,12 +50,7 @@ export const ToolHeaderMenu = styled.div`
     button + button {
       margin-left: 6px;
     }
-    /* 예상가격 */
-    button:nth-of-type(1) {
-      @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-        display: none;
-      }
-    }
+
     /* 미리보기/이미지 버튼 */
     button:nth-of-type(2) {
       @media all and (max-width: ${({ theme }) => theme.size.sm}) {
@@ -78,6 +73,24 @@ export const ToolHeaderMenu = styled.div`
           font-size: 14px;
         }
       }
+    }
+  }
+`;
+
+export const ToolSinglePrice = styled.div`
+  border-left: 1px solid ${({ theme }) => theme.color.gray200};
+  padding-left: 20px;
+  margin-left: 20px;
+  span {
+    margin-right: -9px;
+  }
+
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    span {
+      font-size: 13px;
+    }
+    button {
+      font-size: 11px;
     }
   }
 `;

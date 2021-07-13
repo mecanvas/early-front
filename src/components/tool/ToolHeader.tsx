@@ -4,7 +4,14 @@ import { useGlobalState } from 'src/hooks';
 import { FramePrice } from 'src/interfaces/ToolInterface';
 import Logo from '../layouts/Logo';
 import ToolSave from './ToolSave';
-import { ToolHeaderMenu, CanvasInfomationWrapper, BillInfomation, Bill, BillTotal } from './divided/DividedToolStyle';
+import {
+  ToolHeaderMenu,
+  CanvasInfomationWrapper,
+  BillInfomation,
+  Bill,
+  BillTotal,
+  ToolSinglePrice,
+} from './divided/DividedToolStyle';
 import { theme } from 'src/style/theme';
 
 interface Props {
@@ -46,10 +53,10 @@ const ToolHeader = ({ singlePrice, singleCanvasName }: Props) => {
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <Logo />
         {singlePrice && singleCanvasName ? (
-          <div style={{ borderLeft: `1px solid ${theme.color.gray200}`, paddingLeft: '20px', marginLeft: '20px' }}>
-            <span style={{ marginRight: '-9px' }}>{singleCanvasName} -</span>
+          <ToolSinglePrice>
+            <span>{singleCanvasName} -</span>
             <Button type="text">{singlePrice}원</Button>
-          </div>
+          </ToolSinglePrice>
         ) : (
           <Popover
             style={{ padding: 0 }}
