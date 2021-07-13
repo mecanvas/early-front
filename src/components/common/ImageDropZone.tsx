@@ -15,7 +15,6 @@ const DropZone = styled.div<{ width?: string; height?: string; isDragActive: boo
           opacity: 1;
         `}
   position: absolute;
-
   background-color: ${({ theme }) => theme.color.gray000};
   border-radius: 8px;
   border: 1px solid ${({ theme }) => theme.color.gray200};

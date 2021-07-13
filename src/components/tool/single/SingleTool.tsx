@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ToolHeader from '../ToolHeader';
-import { Button, Popover } from 'antd';
+import { Button, Popover, Spin } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
@@ -84,10 +84,11 @@ const SingleTool = () => {
     setControllerNode(node);
   }, []);
 
-  const [isPreview] = useGlobalState<boolean>('isPreview');
+  const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
   const [bgColor, setBgColor] = useState(theme.color.white);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragDrop, setIsDragDrop] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
   const [isSaveCanvas] = useGlobalState<boolean>('saveModal');
@@ -142,6 +143,7 @@ const SingleTool = () => {
 
     const canvas = previewCanvasRef.current;
     const ctx = canvas.getContext('2d');
+    setPreviewLoading(true);
 
     if (ctx) {
       const img = new Image();
@@ -175,6 +177,7 @@ const SingleTool = () => {
         ctx.globalCompositeOperation = 'destination-over';
         ctx.fillStyle = bgColor;
         ctx.fillRect(0, 0, singleFrameWidth, singleFrameHeight);
+        setPreviewLoading(false);
       };
     }
   }, [
@@ -437,6 +440,13 @@ const SingleTool = () => {
     setWrapperHeight(height);
     createInitFrame();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    return () => {
+      setIsPreview(false);
+      setFramePrice([]);
+      setSelectedFrameList([]);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -526,9 +536,14 @@ const SingleTool = () => {
       </SingleFrameListHeader>
 
       {/* 본격적인 툴  */}
-      <PreviewCanvasWrapper isPreview={isPreview || false}>
+      <PreviewCanvasWrapper isPreview={(isPreview && !previewLoading) || false}>
         <canvas ref={previewCanvasRef} />
+        <Spin
+          style={{ position: 'absolute', top: '50%', left: '50%', transform: 'traslate(-50%, -50%)' }}
+          spinning={isPreview ? previewLoading : true}
+        />
       </PreviewCanvasWrapper>
+
       <SingleCanvasField isPreview={isPreview || false} onDragOver={handleDragImage} onMouseLeave={handleDragCancel}>
         <SingleWrapper
           nearingCenterX={nearingCenterX}
@@ -536,9 +551,10 @@ const SingleTool = () => {
           cmd={resizeCmd ?? null}
           ref={singleWrapperRef}
           clicked={isMovingImage}
+          onDragOver={handleDragImage}
           onMouseMove={isMovingImage ? handleToImageInWrapper : undefined}
           onMouseUp={handleMoveCancelSingleImage}
-          onMouseLeave={handleMoveCancelSingleImage}
+          onMouseLeave={isDragDrop ? handleDragCancel : handleMoveCancelSingleImage}
         >
           {/* 선택한 액자 렌더링  */}
           <SingleSelectedFrame

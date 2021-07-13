@@ -327,8 +327,18 @@ export const CroppedWrapper = styled.div<{ isPreview: boolean; top?: number; lef
 
 export const ImgController = styled.div<{
   isResizeStart: boolean;
+  isPreview: boolean;
   cmd: ResizeCmd | null;
 }>`
+  ${({ isPreview, theme }) =>
+    isPreview
+      ? css`
+          pointer-events: none;
+        `
+      : css`
+          box-shadow: ${theme.canvasShadow};
+        `}
+
   position: relative;
   border: ${({ theme, isResizeStart }) => isResizeStart && `2px solid ${theme.color.cyan}`};
   ${({ isResizeStart }) =>
