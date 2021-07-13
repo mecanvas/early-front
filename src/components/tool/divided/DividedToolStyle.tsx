@@ -50,12 +50,7 @@ export const ToolHeaderMenu = styled.div`
     button + button {
       margin-left: 6px;
     }
-    /* 예상가격 */
-    button:nth-of-type(1) {
-      @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-        display: none;
-      }
-    }
+
     /* 미리보기/이미지 버튼 */
     button:nth-of-type(2) {
       @media all and (max-width: ${({ theme }) => theme.size.sm}) {
@@ -82,6 +77,28 @@ export const ToolHeaderMenu = styled.div`
   }
 `;
 
+export const ToolSinglePrice = styled.div`
+  border-left: 1px solid ${({ theme }) => theme.color.gray200};
+  padding-left: 20px;
+  margin-left: 20px;
+  span {
+    margin-right: -9px;
+  }
+
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    padding-left: 10px;
+    margin-left: 10px;
+    span {
+      font-size: 12px;
+    }
+    button {
+      span {
+        font-size: 12px !important;
+      }
+    }
+  }
+`;
+
 export const FactoryTool = styled.div`
   display: flex;
   align-items: center;
@@ -94,23 +111,14 @@ export const FactoryTool = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    img {
+      width: 20px;
+    }
     button {
-      padding: 5px 1em;
+      display: flex;
+      align-items: center;
+      padding: 3px 1em;
       height: 34px;
-      small {
-        margin-left: 3px;
-        font-size: 12px;
-        color: ${({ theme }) => theme.color.gray800};
-      }
-      svg {
-        font-size: 16px;
-        @media all and (max-width: ${({ theme }) => theme.size.xs}) {
-          font-size: 13px;
-        }
-        path {
-          fill: ${({ theme }) => theme.color.secondarydark};
-        }
-      }
     }
   }
 `;
@@ -122,20 +130,15 @@ export const FrameTool = styled.div`
 
   button {
     display: flex;
+    border-left: 1px solid ${({ theme }) => theme.color.gray200};
+    &:last-child {
+      border-right: 1px solid ${({ theme }) => theme.color.gray200};
+    }
     justify-content: center;
     align-items: center;
-    padding: 5px 1em;
+    padding: 5px 1.5em;
     height: 34px;
-    svg {
-      font-size: 18px;
-      path {
-      }
-    }
-    small {
-      margin-left: 3px;
-      font-size: 12px;
-      color: ${({ theme }) => theme.color.gray800};
-    }
+    font-size: 12px;
   }
 
   @media all and (max-width: ${({ theme }) => theme.size.md}) {
@@ -262,7 +265,7 @@ export const ImageWrapper = styled.div<{
   .cropped-img {
     position: absolute;
     z-index: 3;
-    box-shadow: 0px 19px 38px rgba(0, 0, 0, 0.3), 15px 5px 38px rgba(0, 0, 0, 0.22);
+    filter: ${({ theme }) => theme.canvasShadowFilter};
     &:hover .cropped-img-delete {
       ${({ isPreview }) =>
         isPreview
@@ -301,7 +304,9 @@ export const ImageWrapper = styled.div<{
 
 export const PreviewBg = styled.div`
   position: absolute;
-  top: ${HEADER_HEIGHT}px;
+  top: calc(50% + ${HEADER_HEIGHT / 2}px);
+  transform: translateY(-50%);
+  /* top: ${HEADER_HEIGHT}px; */
   min-width: ${({ theme }) => theme.size.md};
   img {
     min-height: 626px;
@@ -310,7 +315,7 @@ export const PreviewBg = styled.div`
 `;
 
 export const CroppedWrapper = styled.div<{ isPreview: boolean; top?: number; left?: number }>`
-  ${({ isPreview, top, left }) =>
+  ${({ isPreview, top, left, theme }) =>
     isPreview &&
     left &&
     top &&
@@ -320,7 +325,7 @@ export const CroppedWrapper = styled.div<{ isPreview: boolean; top?: number; lef
       left: ${left}px;
       transform: scale(0.3);
       div {
-        box-shadow: 0 19px 38px rgba(0, 0, 0, 0.4), 0 15px 12px rgba(0, 0, 0, 0.32);
+        filter: ${theme.canvasShadowFilter};
       }
     `}
 `;
@@ -336,7 +341,7 @@ export const ImgController = styled.div<{
           pointer-events: none;
         `
       : css`
-          box-shadow: ${theme.canvasShadow};
+          filter: ${theme.canvasShadowFilter};
         `}
 
   position: relative;
@@ -542,7 +547,7 @@ export const FrameWrapper = styled.div`
     z-index: 33;
     cursor: pointer;
     position: fixed;
-    top: ${HEADER_HEIGHT + 10}px;
+    top: ${HEADER_HEIGHT + 3}px;
     right: 20px;
     fill: ${({ theme }) => theme.color.secondarydark};
     padding: 3px 6px;
@@ -584,7 +589,7 @@ export const FrameSizeList = styled.div<{ width: string; height: string }>`
   width: ${({ width }) => `${replacePx(width) / 5}px`};
   height: ${({ height }) => `${replacePx(height) / 5}px`};
   z-index: 30;
-  background-color: ${({ theme }) => theme.color.secondarybg};
+  border: 1px solid ${({ theme }) => theme.color.gray200};
   cursor: pointer;
   margin: 10px auto 5px auto;
   position: relative;

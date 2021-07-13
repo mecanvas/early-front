@@ -2,20 +2,12 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ToolHeader from '../ToolHeader';
 import { Button, Popover, Spin } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 import axios from 'axios';
 import { useProgress } from 'src/hooks/useProgress';
 import Loading from 'src/components/common/Loading';
 import Upload, { RcFile } from 'antd/lib/upload';
-import {
-  faAlignCenter,
-  faChevronCircleDown,
-  faChevronCircleUp,
-  faCompress,
-  faPalette,
-  faUpload,
-} from '@fortawesome/free-solid-svg-icons';
+import { faChevronCircleDown, faChevronCircleUp } from '@fortawesome/free-solid-svg-icons';
 import SingleImgSizeController from 'src/components/tool/single/SingleImgSizeController';
 import { useGlobalState } from 'src/hooks';
 import { FramePrice, ResizeCmd } from 'src/interfaces/ToolInterface';
@@ -25,7 +17,6 @@ import { frameSize, HEADER_HEIGHT } from 'src/constants';
 import { FrameSizeName } from '../divided/DividedToolStyle';
 import { replacePx } from 'src/utils/replacePx';
 import { cmToPx } from 'src/utils/cmToPx';
-import { FullscreenOutlined } from '@ant-design/icons';
 import {
   SingleToolContainer,
   SingleToolFactory,
@@ -43,6 +34,7 @@ import ToolColorPalette from '../divided/DividedToolColorPalette';
 import { theme } from 'src/style/theme';
 import { ColorResult } from 'react-color';
 import ImageDropZone from 'src/components/common/ImageDropZone';
+import { icons } from 'public/icons';
 
 const SingleTool = () => {
   const singleWrapperRef = useRef<HTMLDivElement>(null);
@@ -116,7 +108,13 @@ const SingleTool = () => {
   const [singlePrice, setSinglePrice] = useState(0);
   const [singleCanvasName, setSingleCanvasName] = useState('정방 S-1호');
 
-  const getPosition = useCallback((event: MouseEvent) => {
+  const getPosition = useCallback((event: any) => {
+    if (event.type === 'touchmove') {
+      const touchs = event.changedTouches[0];
+      const x = touchs.clientX;
+      const y = touchs.clientY;
+      return [x, y];
+    }
     const x = event.clientX;
     const y = event.clientY;
     return [x, y];
@@ -335,8 +333,7 @@ const SingleTool = () => {
     [getProgressGage, imageDropUpload],
   );
 
-  const handleMoveSingleImage = useCallback((e) => {
-    e.preventDefault();
+  const handleMoveSingleImage = useCallback(() => {
     setIsMovingImage(true);
   }, []);
 
@@ -454,14 +451,17 @@ const SingleTool = () => {
       <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
       <ToolHeader singlePrice={singlePrice.toLocaleString()} singleCanvasName={singleCanvasName} />
       <SingleToolFactory>
+        <Upload accept="image/*" beforeUpload={handleSingleImgUpload} showUploadList={false}>
+          <Button type="text">
+            <img src={icons.fileUpload} style={{ width: '22px' }} />
+          </Button>
+        </Upload>
         <Button type="text" onClick={handleHorizontal}>
-          <FontAwesomeIcon icon={faAlignCenter} />
-          <small>수평</small>
+          <img src={icons.horizontal} />
         </Button>
 
         <Button type="text" onClick={handleVertical}>
-          <FontAwesomeIcon icon={faAlignCenter} />
-          <small>수직</small>
+          <img src={icons.vertical} />
         </Button>
         <Popover
           style={{ padding: 0 }}
@@ -470,44 +470,31 @@ const SingleTool = () => {
           content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
         >
           <Button type="text">
-            <FontAwesomeIcon icon={faPalette} />
-            <small>배경</small>
+            <img src={icons.bgPaint} />
           </Button>
         </Popover>
         <Button type="text" onClick={handleRatioForFrame}>
-          <FullscreenOutlined />
-          <small>액자에 끼우기</small>
+          <img src={icons.maximumFrame} />
         </Button>
         <Button type="text" onClick={handleImgRatioSetting}>
-          <FontAwesomeIcon icon={faCompress} />
-          <small>비율 맞추기</small>
+          <img src={icons.ratioFrame} style={{ width: '24px' }} />
         </Button>
-        <Upload accept="image/*" beforeUpload={handleSingleImgUpload} showUploadList={false}>
-          <Button type="text">
-            <FontAwesomeIcon icon={faUpload} />
-            <small>가져오기</small>
-          </Button>
-        </Upload>
       </SingleToolFactory>
 
       {/* 액자 리스트 선택 */}
       <SingleFrameListHeader>
         <div>
-          <Button type="text" onClick={handleGetFrameAttribute} value="정방">
-            <FontAwesomeIcon icon={faSquare} />
-            <small>정방</small>
+          <Button type={frameAttributes === '정방' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="정방">
+            정방
           </Button>
-          <Button type="text" onClick={handleGetFrameAttribute} value="인물">
-            <FontAwesomeIcon icon={faSquare} />
-            <small>인물</small>
+          <Button type={frameAttributes === '인물' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="인물">
+            인물
           </Button>
-          <Button type="text" onClick={handleGetFrameAttribute} value="해경">
-            <FontAwesomeIcon icon={faSquare} />
-            <small>해경</small>
+          <Button type={frameAttributes === '해경' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="해경">
+            해경
           </Button>
-          <Button type="text" onClick={handleGetFrameAttribute} value="풍경">
-            <FontAwesomeIcon icon={faSquare} />
-            <small>풍경</small>
+          <Button type={frameAttributes === '풍경' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="풍경">
+            풍경
           </Button>
         </div>
 
@@ -555,6 +542,8 @@ const SingleTool = () => {
           onMouseMove={isMovingImage ? handleToImageInWrapper : undefined}
           onMouseUp={handleMoveCancelSingleImage}
           onMouseLeave={isDragDrop ? handleDragCancel : handleMoveCancelSingleImage}
+          onTouchMove={isMovingImage ? handleToImageInWrapper : undefined}
+          onTouchEnd={handleMoveCancelSingleImage}
         >
           {/* 선택한 액자 렌더링  */}
           <SingleSelectedFrame
@@ -590,6 +579,8 @@ const SingleTool = () => {
                 <canvas
                   data-url={singleImgUploadUrl}
                   ref={ImageCanvasRef}
+                  onTouchStart={handleMoveSingleImage}
+                  onTouchEnd={handleMoveCancelSingleImage}
                   onMouseDown={handleMoveSingleImage}
                   onMouseUp={handleMoveCancelSingleImage}
                 />

@@ -14,13 +14,21 @@ export const SingleToolFactory = styled.div`
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.color.gray200};
   background-color: ${({ theme }) => theme.color.white};
+
   button {
-    padding: 5px 1em;
+    display: flex;
+    align-items: center;
+    padding: 3px 1em;
     height: 34px;
   }
+  img {
+    width: 20px;
+  }
 
-  svg {
-    margin-right: 4px;
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    button {
+      padding: 0 0.8em;
+    }
   }
 `;
 
@@ -62,7 +70,7 @@ export const PreviewCanvasWrapper = styled.div<{ isPreview: boolean }>`
           canvas {
             display: block;
             background-color: ${theme.color.white};
-            box-shadow: ${theme.canvasShadow};
+            filter: ${theme.canvasShadowFilter};
           }
         `
       : css`
@@ -228,11 +236,32 @@ export const SingleFrameListHeader = styled.div`
   flex-direction: column;
   right: 0;
   border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
-  top: ${HEADER_HEIGHT - 35}px;
+  @media all and (min-width: ${({ theme }) => theme.size.sm}) {
+    top: ${HEADER_HEIGHT - 35}px;
+  }
 
   button {
-    padding: 5px 1em;
+    padding: 5px 1.5em;
     height: 34px;
+    font-size: 12px;
+  }
+
+  div:nth-of-type(1) > button {
+    border-top: none;
+    border-bottom: none;
+    button ~ button {
+      border-right: none;
+    }
+  }
+
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    flex-direction: column-reverse;
+    background-color: ${({ theme }) => theme.color.white};
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    text-align: center;
+    bottom: 0px;
   }
 `;
 
@@ -248,7 +277,6 @@ export const SingleFrameListGrid = styled.div<{
   &::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera*/
   }
-
   display: flex;
   border: 1px solid ${({ theme }) => theme.color.gray300};
   justify-content: center;
@@ -262,9 +290,15 @@ export const SingleFrameListGrid = styled.div<{
   div {
     flex: 1;
     text-align: center;
+    padding: 0 0.3em;
     small {
       font-size: 9px;
     }
+  }
+
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    max-height: ${({ maxHeight }) => `${replacePx(maxHeight) - 50}px`};
+    height: ${({ height }) => `${replacePx(height) - 50}px`};
   }
 `;
 
@@ -276,6 +310,11 @@ export const SingleFrameList = styled.div<{ width: string; height: string }>`
   width: ${({ width }) => `${replacePx(width) / 4}px`};
   height: ${({ height }) => `${replacePx(height) / 4}px`};
   border: 1px solid ${({ theme }) => theme.color.gray300};
+
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    width: ${({ width }) => `${replacePx(width) / 6}px`};
+    height: ${({ height }) => `${replacePx(height) / 6}px`};
+  }
 `;
 
 export const FrameListGridHideButton = styled.div`
@@ -297,5 +336,18 @@ export const FrameListGridHideButton = styled.div`
   svg {
     margin-top: 1px;
     font-size: 16px;
+  }
+
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    bottom: 8px;
+    left: 10px;
+    border: none;
+
+    small {
+      display: none;
+    }
   }
 `;
