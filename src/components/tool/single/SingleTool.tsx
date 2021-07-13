@@ -108,7 +108,13 @@ const SingleTool = () => {
   const [singlePrice, setSinglePrice] = useState(0);
   const [singleCanvasName, setSingleCanvasName] = useState('정방 S-1호');
 
-  const getPosition = useCallback((event: MouseEvent) => {
+  const getPosition = useCallback((event: any) => {
+    if (event.type === 'touchmove') {
+      const touchs = event.changedTouches[0];
+      const x = touchs.clientX;
+      const y = touchs.clientY;
+      return [x, y];
+    }
     const x = event.clientX;
     const y = event.clientY;
     return [x, y];
@@ -228,6 +234,7 @@ const SingleTool = () => {
     (e) => {
       if (!controllerNode || !singleWrapperRef.current) return;
       const [cursorX, cursorY] = getPosition(e);
+      console.log(e, cursorX, cursorY);
       const { height } = singleWrapperRef.current.getBoundingClientRect();
 
       const x = cursorX - window.innerWidth / 2;
@@ -327,8 +334,7 @@ const SingleTool = () => {
     [getProgressGage, imageDropUpload],
   );
 
-  const handleMoveSingleImage = useCallback((e) => {
-    e.preventDefault();
+  const handleMoveSingleImage = useCallback(() => {
     setIsMovingImage(true);
   }, []);
 
@@ -537,6 +543,8 @@ const SingleTool = () => {
           onMouseMove={isMovingImage ? handleToImageInWrapper : undefined}
           onMouseUp={handleMoveCancelSingleImage}
           onMouseLeave={isDragDrop ? handleDragCancel : handleMoveCancelSingleImage}
+          onTouchMove={isMovingImage ? handleToImageInWrapper : undefined}
+          onTouchEnd={handleMoveCancelSingleImage}
         >
           {/* 선택한 액자 렌더링  */}
           <SingleSelectedFrame
@@ -572,6 +580,8 @@ const SingleTool = () => {
                 <canvas
                   data-url={singleImgUploadUrl}
                   ref={ImageCanvasRef}
+                  onTouchStart={handleMoveSingleImage}
+                  onTouchEnd={handleMoveCancelSingleImage}
                   onMouseDown={handleMoveSingleImage}
                   onMouseUp={handleMoveCancelSingleImage}
                 />
