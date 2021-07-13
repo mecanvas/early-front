@@ -13,16 +13,19 @@ import {
   ToolSinglePrice,
 } from './divided/DividedToolStyle';
 import { theme } from 'src/style/theme';
+import { useOpacity } from 'src/hooks/useOpacity';
 
 interface Props {
   singlePrice?: string;
   singleCanvasName?: string;
+  imgUrl: string;
 }
 
-const ToolHeader = ({ singlePrice, singleCanvasName }: Props) => {
+const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl }: Props) => {
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [framePrice] = useGlobalState<FramePrice[]>('framePrice');
+  const { OpacityComponent } = useOpacity(imgUrl || '');
 
   // 고른 액자의 이름과 수량
   const yourPriceList = useMemo(() => {
@@ -52,12 +55,7 @@ const ToolHeader = ({ singlePrice, singleCanvasName }: Props) => {
     <ToolHeaderMenu>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <Logo />
-        {singlePrice && singleCanvasName ? (
-          <ToolSinglePrice>
-            <span>{singleCanvasName} -</span>
-            <Button type="text">{singlePrice}원</Button>
-          </ToolSinglePrice>
-        ) : (
+        {!singlePrice && !singleCanvasName && imgUrl ? (
           <Popover
             style={{ padding: 0 }}
             content={
@@ -83,29 +81,43 @@ const ToolHeader = ({ singlePrice, singleCanvasName }: Props) => {
               )
             }
           >
-            <Button
-              type="text"
-              style={{ borderLeft: `1px solid ${theme.color.gray200}`, paddingLeft: '20px', marginLeft: '20px' }}
-            >
-              예상가격
-            </Button>
+            <OpacityComponent>
+              <Button
+                type="text"
+                style={{ borderLeft: `1px solid ${theme.color.gray200}`, paddingLeft: '20px', marginLeft: '20px' }}
+              >
+                예상가격
+              </Button>
+            </OpacityComponent>
           </Popover>
-        )}
+        ) : null}
+        {singlePrice && singleCanvasName && imgUrl ? (
+          <OpacityComponent>
+            <ToolSinglePrice>
+              <span>{singleCanvasName} -</span>
+              <Button type="text">{singlePrice}원</Button>
+            </ToolSinglePrice>
+          </OpacityComponent>
+        ) : null}
       </div>
-      <div>
-        <Button onClick={handleImgPreview} type={!isPreview ? 'default' : 'primary'}>
-          {!isPreview ? '미리보기' : '이미지로'}
-        </Button>
-        <Button type="text" onClick={handleSaveCanvas}>
-          저장
-        </Button>
-        {isSaveCanvas && (
-          <ToolSave
-            totalPrice={framePrice?.reduce((acc, cur) => (acc += cur.price), 0)}
-            yourPriceList={yourPriceList}
-          />
-        )}
-      </div>
+      {imgUrl && (
+        <OpacityComponent>
+          <>
+            <Button onClick={handleImgPreview} type={!isPreview ? 'default' : 'primary'}>
+              {!isPreview ? '미리보기' : '이미지로'}
+            </Button>
+            <Button type="text" onClick={handleSaveCanvas}>
+              저장
+            </Button>
+            {isSaveCanvas && (
+              <ToolSave
+                totalPrice={framePrice?.reduce((acc, cur) => (acc += cur.price), 0)}
+                yourPriceList={yourPriceList}
+              />
+            )}
+          </>
+        </OpacityComponent>
+      )}
     </ToolHeaderMenu>
   );
 };

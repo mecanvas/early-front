@@ -631,7 +631,7 @@ const Tool = () => {
 
         {/* 사진 조절하는 툴바들 */}
         <ToolHeaderWrapper>
-          <ToolHeader />
+          <ToolHeader imgUrl={imgUploadUrl || ''} />
           <DividedToolFactory croppedList={croppedList} setCroppedList={setCroppedList} />
         </ToolHeaderWrapper>
 
