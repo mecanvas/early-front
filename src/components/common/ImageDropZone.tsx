@@ -1,6 +1,6 @@
-import { PlusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import { icons } from 'public/icons';
 import React from 'react';
 import { DropEvent, FileRejection, useDropzone } from 'react-dropzone';
 
@@ -37,11 +37,8 @@ const DropZoneDiv = styled.div`
     margin-top: 6px;
   }
 
-  * > svg {
-    font-size: 50px;
-    path {
-      color: ${({ theme }) => theme.color.primary};
-    }
+  img {
+    width: 60px;
   }
 `;
 
@@ -61,11 +58,11 @@ const ImageDropZone = ({ isDragDrop, onDrop, text = '이미지를 드롭 or 첨�
       <input {...getInputProps()} accept="image/*" />
       {isDragDrop ? (
         <DropZoneDiv>
-          <PlusCircleOutlined />
+          <img src={icons.add} />
         </DropZoneDiv>
       ) : (
         <DropZoneDiv>
-          <PlusOutlined />
+          <img src={icons.add} />
           <h4>{text}</h4>
         </DropZoneDiv>
       )}

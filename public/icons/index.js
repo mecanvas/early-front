@@ -6,6 +6,7 @@ import ratioFrame from './ratio-frame.svg';
 import fileUpload from './file-upload.svg';
 import grid from './grid.svg';
 import undo from './undo.svg';
+import add from './add.svg';
 
 export const icons = {
   horizontal,
@@ -16,4 +17,5 @@ export const icons = {
   fileUpload,
   grid,
   undo,
+  add,
 };
