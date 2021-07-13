@@ -290,6 +290,7 @@ export const SingleFrameListGrid = styled.div<{
   div {
     flex: 1;
     text-align: center;
+    padding: 0 0.3em;
     small {
       font-size: 9px;
     }
@@ -342,7 +343,7 @@ export const FrameListGridHideButton = styled.div`
     height: 20px;
     position: absolute;
     bottom: 8px;
-    left: 30px;
+    left: 10px;
     border: none;
 
     small {
