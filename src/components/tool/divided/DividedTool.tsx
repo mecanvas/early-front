@@ -173,7 +173,7 @@ const Tool = () => {
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview', false);
 
   // 바뀌는 색상
-  const [bgColor] = useGlobalState<string>('bgColor', theme.color.gray100);
+  const [bgColor, setBgColor] = useGlobalState<string>('bgColor', theme.color.gray100);
   // const [frameBorderColor, setFrameBorderColor] = useState('#333');
 
   // 이미지 크기 조절
@@ -594,6 +594,7 @@ const Tool = () => {
       setIsPreview(false);
       setFramePrice([]);
       setSelectedFrameList([]);
+      setBgColor(theme.color.gray100);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

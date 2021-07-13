@@ -442,6 +442,7 @@ const SingleTool = () => {
       setIsPreview(false);
       setFramePrice([]);
       setSelectedFrameList([]);
+      setBgColor(theme.color.gray200);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
