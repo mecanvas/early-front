@@ -275,7 +275,7 @@ export const ImageWrapper = styled.div<{
   .cropped-img {
     position: absolute;
     z-index: 3;
-    box-shadow: 0px 19px 38px rgba(0, 0, 0, 0.3), 15px 5px 38px rgba(0, 0, 0, 0.22);
+    filter: ${({ theme }) => theme.canvasShadowFilter};
     &:hover .cropped-img-delete {
       ${({ isPreview }) =>
         isPreview
@@ -325,7 +325,7 @@ export const PreviewBg = styled.div`
 `;
 
 export const CroppedWrapper = styled.div<{ isPreview: boolean; top?: number; left?: number }>`
-  ${({ isPreview, top, left }) =>
+  ${({ isPreview, top, left, theme }) =>
     isPreview &&
     left &&
     top &&
@@ -335,7 +335,7 @@ export const CroppedWrapper = styled.div<{ isPreview: boolean; top?: number; lef
       left: ${left}px;
       transform: scale(0.3);
       div {
-        box-shadow: 0 19px 38px rgba(0, 0, 0, 0.4), 0 15px 12px rgba(0, 0, 0, 0.32);
+        filter: ${theme.canvasShadowFilter};
       }
     `}
 `;
@@ -351,7 +351,7 @@ export const ImgController = styled.div<{
           pointer-events: none;
         `
       : css`
-          box-shadow: ${theme.canvasShadow};
+          filter: ${theme.canvasShadowFilter};
         `}
 
   position: relative;

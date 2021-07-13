@@ -73,7 +73,7 @@ export const PreviewCanvasWrapper = styled.div<{ isPreview: boolean }>`
           canvas {
             display: block;
             background-color: ${theme.color.white};
-            box-shadow: ${theme.canvasShadow};
+            filter: ${theme.canvasShadowFilter};
           }
         `
       : css`

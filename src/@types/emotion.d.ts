@@ -4,6 +4,7 @@ declare module '@emotion/react' {
   export interface Theme {
     [key: string]: any;
     canvasShadow: string;
+    canvasShadowFilter: string;
     size: {
       xs: string;
       sm: string;
