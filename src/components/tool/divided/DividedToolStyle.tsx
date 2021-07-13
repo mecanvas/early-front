@@ -331,10 +331,13 @@ export const ImgController = styled.div<{
   cmd: ResizeCmd | null;
 }>`
   ${({ isPreview, theme }) =>
-    isPreview ||
-    css`
-      box-shadow: ${theme.canvasShadow};
-    `}
+    isPreview
+      ? css`
+          pointer-events: none;
+        `
+      : css`
+          box-shadow: ${theme.canvasShadow};
+        `}
 
   position: relative;
   border: ${({ theme, isResizeStart }) => isResizeStart && `2px solid ${theme.color.cyan}`};
