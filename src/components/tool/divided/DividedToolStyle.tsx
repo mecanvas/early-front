@@ -139,16 +139,6 @@ export const FrameTool = styled.div`
     padding: 5px 1.5em;
     height: 34px;
     font-size: 12px;
-    svg {
-      font-size: 18px;
-      path {
-      }
-    }
-    small {
-      margin-left: 3px;
-      font-size: 12px;
-      color: ${({ theme }) => theme.color.gray800};
-    }
   }
 
   @media all and (max-width: ${({ theme }) => theme.size.md}) {

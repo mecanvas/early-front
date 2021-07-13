@@ -27,10 +27,7 @@ export const SingleToolFactory = styled.div`
 
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     button {
-      padding: 0 0.4em;
-    }
-    small {
-      font-size: 10px;
+      padding: 0 0.8em;
     }
   }
 `;
