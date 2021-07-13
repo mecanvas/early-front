@@ -234,7 +234,6 @@ const SingleTool = () => {
     (e) => {
       if (!controllerNode || !singleWrapperRef.current) return;
       const [cursorX, cursorY] = getPosition(e);
-      console.log(e, cursorX, cursorY);
       const { height } = singleWrapperRef.current.getBoundingClientRect();
 
       const x = cursorX - window.innerWidth / 2;

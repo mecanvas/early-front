@@ -245,7 +245,7 @@ const SingleImgSizeController = ({ children, controllerRef, imgRef, wrapperRef, 
       if (!isResizeStart) return;
       if (imgRef.current) {
         e.preventDefault();
-        const { clientY, clientX } = e || e.nativeEvent;
+        const { clientY, clientX } = e.type !== 'touchmove' ? e : e.changedTouches[0];
         if (clientY && clientX && resizeCmd) {
           positioningImageResize(resizeCmd, clientX, clientY);
         }
@@ -275,12 +275,15 @@ const SingleImgSizeController = ({ children, controllerRef, imgRef, wrapperRef, 
   useEffect(() => {
     if (!imgRef || !imgRef.current) return;
 
+    imgRef.current.ontouchend = handleImgResizeEnd;
     imgRef.current.onmouseup = handleImgResizeEnd;
   }, [handleImgResizeEnd, imgRef]);
 
   useEffect(() => {
     if (!wrapperRef || !wrapperRef.current || !imgRef.current) return;
 
+    wrapperRef.current.ontouchmove = handleImgResize;
+    wrapperRef.current.ontouchend = handleImgResizeEnd;
     wrapperRef.current.onmousemove = handleImgResize;
     wrapperRef.current.onmouseup = handleImgResizeEnd;
   }, [handleImgResize, handleImgResizeEnd, imgRef, wrapperRef]);
@@ -290,17 +293,17 @@ const SingleImgSizeController = ({ children, controllerRef, imgRef, wrapperRef, 
       {children}
       {isMovingImage ? null : (
         <>
-          <div data-cmd="top-left" onMouseDown={handleImgResizeStart}></div>
-          <div data-cmd="top-center" onMouseDown={handleImgResizeStart}></div>
-          <div data-cmd="top-right" onMouseDown={handleImgResizeStart}></div>
+          <div data-cmd="top-left" onTouchStart={handleImgResizeStart} onMouseDown={handleImgResizeStart}></div>
+          <div data-cmd="top-center" onTouchStart={handleImgResizeStart} onMouseDown={handleImgResizeStart}></div>
+          <div data-cmd="top-right" onTouchStart={handleImgResizeStart} onMouseDown={handleImgResizeStart}></div>
 
-          <div data-cmd="right" onMouseDown={handleImgResizeStart}></div>
+          <div data-cmd="right" onTouchStart={handleImgResizeStart} onMouseDown={handleImgResizeStart}></div>
 
-          <div data-cmd="bottom-left" onMouseDown={handleImgResizeStart}></div>
-          <div data-cmd="bottom-center" onMouseDown={handleImgResizeStart}></div>
-          <div data-cmd="bottom-right" onMouseDown={handleImgResizeStart}></div>
+          <div data-cmd="bottom-left" onTouchStart={handleImgResizeStart} onMouseDown={handleImgResizeStart}></div>
+          <div data-cmd="bottom-center" onTouchStart={handleImgResizeStart} onMouseDown={handleImgResizeStart}></div>
+          <div data-cmd="bottom-right" onTouchStart={handleImgResizeStart} onMouseDown={handleImgResizeStart}></div>
 
-          <div data-cmd="left" onMouseDown={handleImgResizeStart}></div>
+          <div data-cmd="left" onTouchStart={handleImgResizeStart} onMouseDown={handleImgResizeStart}></div>
         </>
       )}
     </ImgController>
