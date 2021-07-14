@@ -235,7 +235,7 @@ const SingleTool = () => {
       if (!controllerNode || !singleWrapperRef.current) return;
       const [cursorX, cursorY] = getPosition(e);
       const { height } = singleWrapperRef.current.getBoundingClientRect();
-
+      console.log(e);
       const x = cursorX - window.innerWidth / 2;
       const y = cursorY - height / 2 - HEADER_HEIGHT;
 
@@ -459,7 +459,7 @@ const SingleTool = () => {
         <SingleToolFactory>
           <Upload accept="image/*" beforeUpload={handleSingleImgUpload} showUploadList={false}>
             <Button type="text">
-              <img src={icons.fileUpload} style={{ width: '22px' }} />
+              <img src={icons.imgUpload} style={{ width: '22px' }} />
             </Button>
           </Upload>
           <Button type="text" onClick={handleHorizontal}>

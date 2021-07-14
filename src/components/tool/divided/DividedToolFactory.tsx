@@ -126,7 +126,7 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
 
           <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
             <Button type="text">
-              <img src={icons.fileUpload} style={{ width: '22px' }} />
+              <img src={icons.imgUpload} style={{ width: '22px' }} />
             </Button>
           </Upload>
         </div>
