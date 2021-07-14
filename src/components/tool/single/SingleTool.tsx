@@ -201,12 +201,20 @@ const SingleTool = () => {
   const handleHorizontal = useCallback(() => {
     if (controllerNode) {
       controllerNode.style.top = `0`;
+      setNearingCenterY(true);
+      setTimeout(() => {
+        setNearingCenterY(false);
+      }, 300);
     }
   }, [controllerNode]);
 
   const handleVertical = useCallback(() => {
     if (controllerNode) {
       controllerNode.style.left = `0`;
+      setNearingCenterX(true);
+      setTimeout(() => {
+        setNearingCenterX(false);
+      }, 300);
     }
   }, [controllerNode]);
 
@@ -235,7 +243,7 @@ const SingleTool = () => {
       if (!controllerNode || !singleWrapperRef.current) return;
       const [cursorX, cursorY] = getPosition(e);
       const { height } = singleWrapperRef.current.getBoundingClientRect();
-
+      console.log(e);
       const x = cursorX - window.innerWidth / 2;
       const y = cursorY - height / 2 - HEADER_HEIGHT;
 
@@ -459,7 +467,7 @@ const SingleTool = () => {
         <SingleToolFactory>
           <Upload accept="image/*" beforeUpload={handleSingleImgUpload} showUploadList={false}>
             <Button type="text">
-              <img src={icons.fileUpload} style={{ width: '22px' }} />
+              <img src={icons.imgUpload} style={{ width: '22px' }} />
             </Button>
           </Upload>
           <Button type="text" onClick={handleHorizontal}>
@@ -531,7 +539,7 @@ const SingleTool = () => {
                   data-name={lst.name}
                   onClick={handleSelectFrame}
                 >
-                  <SingleFrameList {...lst.size}>
+                  <SingleFrameList {...lst.size} clicked={`${frameAttributes} ${lst.name}` === singleCanvasName}>
                     <FrameSizeName>{lst.name}</FrameSizeName>
                   </SingleFrameList>
                   <small>{lst.cm}</small>
