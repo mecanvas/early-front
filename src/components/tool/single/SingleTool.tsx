@@ -201,12 +201,20 @@ const SingleTool = () => {
   const handleHorizontal = useCallback(() => {
     if (controllerNode) {
       controllerNode.style.top = `0`;
+      setNearingCenterY(true);
+      setTimeout(() => {
+        setNearingCenterY(false);
+      }, 300);
     }
   }, [controllerNode]);
 
   const handleVertical = useCallback(() => {
     if (controllerNode) {
       controllerNode.style.left = `0`;
+      setNearingCenterX(true);
+      setTimeout(() => {
+        setNearingCenterX(false);
+      }, 300);
     }
   }, [controllerNode]);
 
