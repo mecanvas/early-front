@@ -102,7 +102,7 @@ export const ToolSinglePrice = styled.div`
 export const FactoryTool = styled.div`
   display: flex;
   align-items: center;
-  padding: 5px 0;
+  padding: 3px 0;
   border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
   justify-content: center;
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
@@ -156,7 +156,12 @@ export const FrameTool = styled.div`
   }
 `;
 
-export const SelectedFrameWrapper = styled.div`
+export const SelectedFrameWrapper = styled.div<{
+  isNearingX: boolean;
+  isNearingY: boolean;
+  isFitX: boolean;
+  isFitY: boolean;
+}>`
   width: 100%;
   height: 100vh;
   min-height: -webkit-fill-available;
@@ -171,6 +176,34 @@ export const SelectedFrameWrapper = styled.div`
     left: 0;
     z-index: 34;
   }
+  ${({ isNearingX, isFitX, theme }) =>
+    isNearingX &&
+    css`
+      &:before {
+        position: absolute;
+        width: 2px;
+        top: 0;
+        height: 100%;
+        content: '';
+        border: 1px ${isFitX ? 'solid' : 'dashed'} ${theme.color.primary};
+        z-index: 33;
+      }
+    `}
+  ${({ isNearingY, isFitY, theme }) =>
+    isNearingY &&
+    css`
+      &:after {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        top: calc(50%);
+        transform: translateY(-50%);
+        height: 2px;
+        content: '';
+        z-index: 33;
+        border: 1px ${isFitY ? 'solid' : 'dashed'} ${theme.color.primary};
+      }
+    `}
 `;
 
 export const YouSelectedFrame = styled.div<{
@@ -192,10 +225,6 @@ export const YouSelectedFrame = styled.div<{
 
 export const ImageWrapper = styled.div<{
   bgColor?: string;
-  isNearingX?: boolean;
-  isNearingY?: boolean;
-  isFitX?: boolean;
-  isFitY?: boolean;
   imgUploadLoading?: boolean;
   cmd?: ResizeCmd | null;
   isPreview?: boolean;
@@ -215,33 +244,7 @@ export const ImageWrapper = styled.div<{
     flex-direction: row;
     padding: ${HEADER_HEIGHT} 10px 10px 10px;
   }
-  ${({ isNearingX, isFitX, theme }) =>
-    isNearingX &&
-    css`
-      &:before {
-        position: absolute;
-        width: 2px;
-        top: 0;
-        height: 100%;
-        content: '';
-        border: 1px ${isFitX ? 'solid' : 'dashed'} ${theme.color.primary};
-        z-index: 33;
-      }
-    `}
-  ${({ isNearingY, isFitY, theme }) =>
-    isNearingY &&
-    css`
-      &:after {
-        position: absolute;
-        width: 100%;
-        top: (50% - ${HEADER_HEIGHT}px);
-        transform: translateY(-50%);
-        height: 2px;
-        content: '';
-        z-index: 33;
-        border: 1px ${isFitY ? 'solid' : 'dashed'} ${theme.color.primary};
-      }
-    `}
+
   ${({ imgUploadLoading }) =>
     imgUploadLoading &&
     css`

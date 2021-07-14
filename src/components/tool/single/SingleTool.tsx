@@ -201,12 +201,20 @@ const SingleTool = () => {
   const handleHorizontal = useCallback(() => {
     if (controllerNode) {
       controllerNode.style.top = `0`;
+      setNearingCenterY(true);
+      setTimeout(() => {
+        setNearingCenterY(false);
+      }, 300);
     }
   }, [controllerNode]);
 
   const handleVertical = useCallback(() => {
     if (controllerNode) {
       controllerNode.style.left = `0`;
+      setNearingCenterX(true);
+      setTimeout(() => {
+        setNearingCenterX(false);
+      }, 300);
     }
   }, [controllerNode]);
 
@@ -235,7 +243,7 @@ const SingleTool = () => {
       if (!controllerNode || !singleWrapperRef.current) return;
       const [cursorX, cursorY] = getPosition(e);
       const { height } = singleWrapperRef.current.getBoundingClientRect();
-
+      console.log(e);
       const x = cursorX - window.innerWidth / 2;
       const y = cursorY - height / 2 - HEADER_HEIGHT;
 
@@ -448,149 +456,173 @@ const SingleTool = () => {
   }, []);
 
   return (
-    <SingleToolContainer>
-      <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
-      <ToolHeader singlePrice={singlePrice.toLocaleString()} singleCanvasName={singleCanvasName} />
-      <SingleToolFactory>
-        <Upload accept="image/*" beforeUpload={handleSingleImgUpload} showUploadList={false}>
-          <Button type="text">
-            <img src={icons.fileUpload} style={{ width: '22px' }} />
-          </Button>
-        </Upload>
-        <Button type="text" onClick={handleHorizontal}>
-          <img src={icons.horizontal} />
-        </Button>
-
-        <Button type="text" onClick={handleVertical}>
-          <img src={icons.vertical} />
-        </Button>
-        <Popover
-          style={{ padding: 0 }}
-          trigger="click"
-          placement="bottom"
-          content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
-        >
-          <Button type="text">
-            <img src={icons.bgPaint} />
-          </Button>
-        </Popover>
-        <Button type="text" onClick={handleRatioForFrame}>
-          <img src={icons.maximumFrame} />
-        </Button>
-        <Button type="text" onClick={handleImgRatioSetting}>
-          <img src={icons.ratioFrame} style={{ width: '24px' }} />
-        </Button>
-      </SingleToolFactory>
-
-      {/* 액자 리스트 선택 */}
-      <SingleFrameListHeader>
-        <div>
-          <Button type={frameAttributes === '정방' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="정방">
-            정방
-          </Button>
-          <Button type={frameAttributes === '인물' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="인물">
-            인물
-          </Button>
-          <Button type={frameAttributes === '해경' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="해경">
-            해경
-          </Button>
-          <Button type={frameAttributes === '풍경' ? 'primary' : 'text'} onClick={handleGetFrameAttribute} value="풍경">
-            풍경
-          </Button>
-        </div>
-
-        <SingleFrameListGrid {...frameListAnimation}>
-          {frameList.map((lst, index) => (
-            <div
-              key={index}
-              data-width={lst.size.width}
-              data-height={lst.size.height}
-              data-price={lst.price}
-              data-name={lst.name}
-              onClick={handleSelectFrame}
-            >
-              <SingleFrameList {...lst.size}>
-                <FrameSizeName>{lst.name}</FrameSizeName>
-              </SingleFrameList>
-              <small>{lst.cm}</small>
-            </div>
-          ))}
-        </SingleFrameListGrid>
-
-        <FrameListGridHideButton onClick={handleHideFrameList}>
-          <FontAwesomeIcon icon={isHideFrameList ? faChevronCircleDown : faChevronCircleUp} />{' '}
-          <small>{isHideFrameList ? '펼치기' : '접기'}</small>
-        </FrameListGridHideButton>
-      </SingleFrameListHeader>
-
-      {/* 본격적인 툴  */}
-      <PreviewCanvasWrapper isPreview={(isPreview && !previewLoading) || false}>
-        <canvas ref={previewCanvasRef} />
-        <Spin
-          style={{ position: 'absolute', top: '50%', left: '50%', transform: 'traslate(-50%, -50%)' }}
-          spinning={isPreview ? previewLoading : true}
+    <>
+      <SingleToolContainer>
+        <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
+        <ToolHeader
+          imgUrl={singleImgUploadUrl}
+          singlePrice={singlePrice.toLocaleString()}
+          singleCanvasName={singleCanvasName}
         />
-      </PreviewCanvasWrapper>
+        <SingleToolFactory>
+          <Upload accept="image/*" beforeUpload={handleSingleImgUpload} showUploadList={false}>
+            <Button type="text">
+              <img src={icons.imgUpload} style={{ width: '22px' }} />
+            </Button>
+          </Upload>
+          <Button type="text" onClick={handleHorizontal}>
+            <img src={icons.horizontal} />
+          </Button>
 
-      <SingleCanvasField isPreview={isPreview || false} onDragOver={handleDragImage} onMouseLeave={handleDragCancel}>
-        <SingleWrapper
-          nearingCenterX={nearingCenterX}
-          nearingCenterY={nearingCenterY}
-          cmd={resizeCmd ?? null}
-          ref={singleWrapperRef}
-          clicked={isMovingImage}
-          onDragOver={handleDragImage}
-          onMouseMove={isMovingImage ? handleToImageInWrapper : undefined}
-          onMouseUp={handleMoveCancelSingleImage}
-          onMouseLeave={isDragDrop ? handleDragCancel : handleMoveCancelSingleImage}
-          onTouchMove={isMovingImage ? handleToImageInWrapper : undefined}
-          onTouchEnd={handleMoveCancelSingleImage}
-        >
-          {/* 선택한 액자 렌더링  */}
-          <SingleSelectedFrame
-            bgColor={bgColor}
-            isImgUploadUrl={singleImgUploadUrl ? true : false}
-            ref={singleSelectedFrameRef}
-            width={singleFrameWidth}
-            height={singleFrameHeight}
+          <Button type="text" onClick={handleVertical}>
+            <img src={icons.vertical} />
+          </Button>
+          <Popover
+            style={{ padding: 0 }}
+            trigger="click"
+            placement="bottom"
+            content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
           >
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-          </SingleSelectedFrame>
-          {!singleImgUploadUrl || isDragDrop ? (
-            <ImageDropZone
-              isDragDrop={isDragDrop}
-              width={'100%'}
-              height={`calc(100vh - 86px)`}
-              onDrop={handleSingleImgUpload}
-            />
-          ) : null}
+            <Button type="text">
+              <img src={icons.bgPaint} />
+            </Button>
+          </Popover>
+          <Button type="text" onClick={handleRatioForFrame}>
+            <img src={icons.maximumFrame} />
+          </Button>
+          <Button type="text" onClick={handleImgRatioSetting}>
+            <img src={icons.ratioFrame} style={{ width: '24px' }} />
+          </Button>
+        </SingleToolFactory>
 
-          {/* 첨부한 이미지 렌더링 */}
-          {singleImgUploadUrl && (
-            <SingleImageWrapper clicked={isMovingImage}>
-              <SingleImgSizeController
-                controllerRef={(node) => controllerRef(node)}
-                isMovingImage={isMovingImage}
-                imgRef={ImageCanvasRef}
-                wrapperRef={singleWrapperRef}
+        {/* 액자 리스트 선택 */}
+        {singleImgUploadUrl && (
+          <SingleFrameListHeader>
+            <div>
+              <Button
+                type={frameAttributes === '정방' ? 'primary' : 'text'}
+                onClick={handleGetFrameAttribute}
+                value="정방"
               >
-                <canvas
-                  data-url={singleImgUploadUrl}
-                  ref={ImageCanvasRef}
-                  onTouchStart={handleMoveSingleImage}
-                  onTouchEnd={handleMoveCancelSingleImage}
-                  onMouseDown={handleMoveSingleImage}
-                  onMouseUp={handleMoveCancelSingleImage}
-                />
-              </SingleImgSizeController>
-            </SingleImageWrapper>
-          )}
-        </SingleWrapper>
-      </SingleCanvasField>
-    </SingleToolContainer>
+                정방
+              </Button>
+              <Button
+                type={frameAttributes === '인물' ? 'primary' : 'text'}
+                onClick={handleGetFrameAttribute}
+                value="인물"
+              >
+                인물
+              </Button>
+              <Button
+                type={frameAttributes === '해경' ? 'primary' : 'text'}
+                onClick={handleGetFrameAttribute}
+                value="해경"
+              >
+                해경
+              </Button>
+              <Button
+                type={frameAttributes === '풍경' ? 'primary' : 'text'}
+                onClick={handleGetFrameAttribute}
+                value="풍경"
+              >
+                풍경
+              </Button>
+            </div>
+
+            <SingleFrameListGrid {...frameListAnimation}>
+              {frameList.map((lst, index) => (
+                <div
+                  key={index}
+                  data-width={lst.size.width}
+                  data-height={lst.size.height}
+                  data-price={lst.price}
+                  data-name={lst.name}
+                  onClick={handleSelectFrame}
+                >
+                  <SingleFrameList {...lst.size} clicked={`${frameAttributes} ${lst.name}` === singleCanvasName}>
+                    <FrameSizeName>{lst.name}</FrameSizeName>
+                  </SingleFrameList>
+                  <small>{lst.cm}</small>
+                </div>
+              ))}
+            </SingleFrameListGrid>
+
+            <FrameListGridHideButton onClick={handleHideFrameList}>
+              <FontAwesomeIcon icon={isHideFrameList ? faChevronCircleDown : faChevronCircleUp} />{' '}
+              <small>{isHideFrameList ? '펼치기' : '접기'}</small>
+            </FrameListGridHideButton>
+          </SingleFrameListHeader>
+        )}
+
+        {/* 본격적인 툴  */}
+        <PreviewCanvasWrapper isPreview={(isPreview && !previewLoading) || false}>
+          <canvas ref={previewCanvasRef} />
+          <Spin
+            style={{ position: 'absolute', top: '50%', left: '50%', transform: 'traslate(-50%, -50%)' }}
+            spinning={isPreview ? previewLoading : true}
+          />
+        </PreviewCanvasWrapper>
+
+        <SingleCanvasField isPreview={isPreview || false} onDragOver={handleDragImage} onMouseLeave={handleDragCancel}>
+          <SingleWrapper
+            nearingCenterX={nearingCenterX}
+            nearingCenterY={nearingCenterY}
+            cmd={resizeCmd ?? null}
+            ref={singleWrapperRef}
+            clicked={isMovingImage}
+            onDragOver={handleDragImage}
+            onMouseMove={isMovingImage ? handleToImageInWrapper : undefined}
+            onMouseUp={handleMoveCancelSingleImage}
+            onMouseLeave={isDragDrop ? handleDragCancel : handleMoveCancelSingleImage}
+            onTouchMove={isMovingImage ? handleToImageInWrapper : undefined}
+            onTouchEnd={handleMoveCancelSingleImage}
+          >
+            {/* 선택한 액자 렌더링  */}
+            <SingleSelectedFrame
+              bgColor={bgColor}
+              isImgUploadUrl={singleImgUploadUrl ? true : false}
+              ref={singleSelectedFrameRef}
+              width={singleFrameWidth}
+              height={singleFrameHeight}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </SingleSelectedFrame>
+            {!singleImgUploadUrl || isDragDrop ? (
+              <ImageDropZone
+                isDragDrop={isDragDrop}
+                width={'100%'}
+                height={`calc(100vh - 86px)`}
+                onDrop={handleSingleImgUpload}
+              />
+            ) : null}
+
+            {/* 첨부한 이미지 렌더링 */}
+            {singleImgUploadUrl && (
+              <SingleImageWrapper clicked={isMovingImage}>
+                <SingleImgSizeController
+                  controllerRef={(node) => controllerRef(node)}
+                  isMovingImage={isMovingImage}
+                  imgRef={ImageCanvasRef}
+                  wrapperRef={singleWrapperRef}
+                >
+                  <canvas
+                    data-url={singleImgUploadUrl}
+                    ref={ImageCanvasRef}
+                    onTouchStart={handleMoveSingleImage}
+                    onTouchEnd={handleMoveCancelSingleImage}
+                    onMouseDown={handleMoveSingleImage}
+                    onMouseUp={handleMoveCancelSingleImage}
+                  />
+                </SingleImgSizeController>
+              </SingleImageWrapper>
+            )}
+          </SingleWrapper>
+        </SingleCanvasField>
+      </SingleToolContainer>
+    </>
   );
 };
 
