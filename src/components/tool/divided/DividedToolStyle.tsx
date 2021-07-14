@@ -307,23 +307,49 @@ export const ImageWrapper = styled.div<{
   }
 `;
 
-export const PreviewBg = styled.div`
+export const PreviewBg = styled.div<{ isPreviewBgRemove: boolean }>`
   position: absolute;
+  button {
+    left: 0;
+    top: -35px;
+    position: absolute;
+    width: 70px;
+    height: 25px;
+    span {
+      font-size: 14px;
+    }
+    div {
+      margin-top: 1.5px;
+    }
+  }
   top: calc(50% + ${HEADER_HEIGHT / 2}px);
   transform: translateY(-50%);
-  /* top: ${HEADER_HEIGHT}px; */
   min-width: ${({ theme }) => theme.size.md};
   img {
     min-height: 626px;
     object-fit: contain;
+    ${({ isPreviewBgRemove }) =>
+      isPreviewBgRemove
+        ? css`
+            visibility: hidden;
+          `
+        : css`
+            visibility: visible;
+          `}
   }
 `;
 
-export const CroppedWrapper = styled.div<{ isPreview: boolean; top?: number; left?: number }>`
-  ${({ isPreview, top, left, theme }) =>
+export const CroppedWrapper = styled.div<{
+  isPreview: boolean;
+  top?: number;
+  left?: number;
+  isPreviewBgRemove: boolean;
+}>`
+  ${({ isPreview, top, left, isPreviewBgRemove, theme }) =>
     isPreview &&
     left &&
     top &&
+    !isPreviewBgRemove &&
     css`
       position: absolute;
       top: ${top}px;
