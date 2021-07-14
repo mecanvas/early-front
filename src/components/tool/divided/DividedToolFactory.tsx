@@ -100,6 +100,11 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
     <>
       <FactoryTool>
         <div>
+          <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
+            <Button type="text">
+              <img src={icons.imgUpload} style={{ width: '22px' }} />
+            </Button>
+          </Upload>
           {isResizeMode && resizeWidth && resizeHeight && <ToolImageResizerModal />}
           <Button type="text" style={{ opacity: selectedFrameList?.length ? 1 : 0.4 }} onClick={handleImgGoBack}>
             <img src={icons.undo} />
@@ -123,12 +128,6 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
           <Button type="text" onClick={handleImgRatioSetting}>
             <img src={icons.ratioFrame} style={{ width: '24px' }} />
           </Button>
-
-          <Upload accept="image/*" beforeUpload={handleImgReUpload} showUploadList={false}>
-            <Button type="text">
-              <img src={icons.imgUpload} style={{ width: '22px' }} />
-            </Button>
-          </Upload>
         </div>
         {imgUploadUrl && (
           <FrameTool>

@@ -14,6 +14,7 @@ import {
 } from './divided/DividedToolStyle';
 import { theme } from 'src/style/theme';
 import { useOpacity } from 'src/hooks/useOpacity';
+import FloatHelper from '../common/HelperButton';
 
 interface Props {
   singlePrice?: string;
@@ -100,24 +101,27 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl }: Props) => {
           </OpacityComponent>
         ) : null}
       </div>
-      {imgUrl && (
-        <OpacityComponent>
-          <>
-            <Button onClick={handleImgPreview} type={!isPreview ? 'default' : 'primary'}>
-              {!isPreview ? '미리보기' : '이미지로'}
-            </Button>
-            <Button type="text" onClick={handleSaveCanvas}>
-              저장
-            </Button>
-            {isSaveCanvas && (
-              <ToolSave
-                totalPrice={framePrice?.reduce((acc, cur) => (acc += cur.price), 0)}
-                yourPriceList={yourPriceList}
-              />
-            )}
-          </>
-        </OpacityComponent>
-      )}
+      <OpacityComponent>
+        <>
+          <FloatHelper />
+          {imgUrl && (
+            <>
+              <Button onClick={handleImgPreview} type={!isPreview ? 'default' : 'primary'}>
+                {!isPreview ? '미리보기' : '이미지로'}
+              </Button>
+              <Button type="text" onClick={handleSaveCanvas}>
+                저장
+              </Button>
+              {isSaveCanvas && (
+                <ToolSave
+                  totalPrice={framePrice?.reduce((acc, cur) => (acc += cur.price), 0)}
+                  yourPriceList={yourPriceList}
+                />
+              )}
+            </>
+          )}
+        </>
+      </OpacityComponent>
     </ToolHeaderMenu>
   );
 };
