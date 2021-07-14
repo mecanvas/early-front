@@ -9,7 +9,7 @@ import {
   PreviewBg,
   ToolHeaderWrapper,
 } from './DividedToolStyle';
-import { Button } from 'antd';
+import { Button, Switch } from 'antd';
 import { theme } from 'src/style/theme';
 import Loading from '../../common/Loading';
 import { cmToPx } from 'src/utils/cmToPx';
@@ -138,6 +138,7 @@ const Tool = () => {
   const imgWrapperRef = useRef<HTMLDivElement>(null);
   const imgNode = useRef<HTMLImageElement>(null);
   const previewBgRef = useRef<HTMLImageElement>(null);
+  const [isPreviewBgRemove, setIsPreviewBgRemove] = useState(false);
 
   const [imgUploadUrl, setImgUploadUrl] = useGlobalState<string>('imgUploadUrl', '');
   const [imgUploadLoading, setImgUploadLoading] = useGlobalState<boolean>('imgUploadLoading', false);
@@ -503,6 +504,10 @@ const Tool = () => {
     }
   }, [getImgWrapperSizeForParallel, setIsNoContent, croppedList, scrollX, scrollY, framePreviewMode]);
 
+  const handlePreviewBgRemove = useCallback(() => {
+    setIsPreviewBgRemove((prev) => !prev);
+  }, []);
+
   // const handleFrameColorChange = useCallback((color: ColorResult) => {
   //   const { hex } = color;
   //   setFrameBorderColor(hex);
@@ -674,11 +679,22 @@ const Tool = () => {
           cmd={resizeCmd}
         >
           {isPreview && (
-            <PreviewBg ref={previewBgRef}>
+            <PreviewBg ref={previewBgRef} isPreviewBgRemove={isPreviewBgRemove}>
+              <Switch
+                checkedChildren="배경"
+                unCheckedChildren="배경"
+                checked={!isPreviewBgRemove}
+                onChange={handlePreviewBgRemove}
+              />
               <img src={BgPreview} alt="미리보기배경" />
             </PreviewBg>
           )}
-          <CroppedWrapper isPreview={isPreview || false} top={framePreviewMode?.top} left={framePreviewMode?.left}>
+          <CroppedWrapper
+            isPreview={isPreview || false}
+            top={framePreviewMode?.top}
+            left={framePreviewMode?.left}
+            isPreviewBgRemove={isPreviewBgRemove}
+          >
             {croppedList?.map(({ dataset, id, imageCropStyle, ...style }) => (
               <div
                 key={id}
