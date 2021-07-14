@@ -308,14 +308,14 @@ export const SingleFrameListGrid = styled.div<{
   }
 `;
 
-export const SingleFrameList = styled.div<{ width: string; height: string }>`
+export const SingleFrameList = styled.div<{ width: string; height: string; clicked: boolean }>`
   position: relative;
   cursor: pointer;
   margin: 0 auto;
   margin-top: 0.4em;
   width: ${({ width }) => `${replacePx(width) / 4}px`};
   height: ${({ height }) => `${replacePx(height) / 4}px`};
-  border: 1px solid ${({ theme }) => theme.color.gray300};
+  border: 1px solid ${({ theme, clicked }) => (clicked ? theme.color.primary : theme.color.gray300)};
 
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     width: ${({ width }) => `${replacePx(width) / 6}px`};
