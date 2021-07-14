@@ -1,6 +1,8 @@
 import styled from '@emotion/styled';
 import { Button } from 'antd';
 import { icons } from 'public/icons';
+import { useCallback, useState } from 'react';
+import ToolTutorial from 'src/components/tool/ToolTutorial';
 
 const HelpButton = styled(Button)`
   height: 34px;
@@ -30,11 +32,20 @@ const HelpButton = styled(Button)`
 `;
 
 const FloatHelper = () => {
+  const [showingModal, setShowingModal] = useState(false);
+
+  const handleOpenTutorial = useCallback(() => {
+    setShowingModal((prev) => !prev);
+  }, []);
+
   return (
-    <HelpButton type="text">
-      <span>도움말</span>
-      <img src={icons.questionMark} />
-    </HelpButton>
+    <>
+      <HelpButton type="text" onClick={handleOpenTutorial}>
+        <span>도움말</span>
+        <img src={icons.questionMark} />
+      </HelpButton>
+      {showingModal && <ToolTutorial onClick={handleOpenTutorial} />}
+    </>
   );
 };
 
