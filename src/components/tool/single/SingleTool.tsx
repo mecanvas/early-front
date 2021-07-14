@@ -35,6 +35,7 @@ import { theme } from 'src/style/theme';
 import { ColorResult } from 'react-color';
 import ImageDropZone from 'src/components/common/ImageDropZone';
 import { icons } from 'public/icons';
+import Badges from 'src/components/common/Badges';
 
 const SingleTool = () => {
   const singleWrapperRef = useRef<HTMLDivElement>(null);
@@ -465,34 +466,49 @@ const SingleTool = () => {
           singleCanvasName={singleCanvasName}
         />
         <SingleToolFactory>
-          <Upload accept="image/*" beforeUpload={handleSingleImgUpload} showUploadList={false}>
-            <Button type="text">
-              <img src={icons.imgUpload} style={{ width: '22px' }} />
+          <Badges count={1}>
+            <Button type="text"></Button>
+          </Badges>
+          <Badges count={2}>
+            <Upload accept="image/*" beforeUpload={handleSingleImgUpload} showUploadList={false}>
+              <Button type="text">
+                <img src={icons.imgUpload} style={{ width: '22px' }} />
+              </Button>
+            </Upload>
+          </Badges>
+          <Badges count={3}>
+            <Button type="text" onClick={handleHorizontal}>
+              <img src={icons.horizontal} />
             </Button>
-          </Upload>
-          <Button type="text" onClick={handleHorizontal}>
-            <img src={icons.horizontal} />
-          </Button>
+          </Badges>
 
-          <Button type="text" onClick={handleVertical}>
-            <img src={icons.vertical} />
-          </Button>
+          <Badges count={4}>
+            <Button type="text" onClick={handleVertical}>
+              <img src={icons.vertical} />
+            </Button>
+          </Badges>
           <Popover
             style={{ padding: 0 }}
             trigger="click"
             placement="bottom"
             content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
           >
-            <Button type="text">
-              <img src={icons.bgPaint} />
-            </Button>
+            <Badges count={5}>
+              <Button type="text">
+                <img src={icons.bgPaint} />
+              </Button>
+            </Badges>
           </Popover>
-          <Button type="text" onClick={handleRatioForFrame}>
-            <img src={icons.maximumFrame} />
-          </Button>
-          <Button type="text" onClick={handleImgRatioSetting}>
-            <img src={icons.ratioFrame} style={{ width: '24px' }} />
-          </Button>
+          <Badges count={6}>
+            <Button type="text" onClick={handleRatioForFrame}>
+              <img src={icons.maximumFrame} />
+            </Button>
+          </Badges>
+          <Badges count={7}>
+            <Button type="text" onClick={handleImgRatioSetting}>
+              <img src={icons.ratioFrame} style={{ width: '24px' }} />
+            </Button>
+          </Badges>
         </SingleToolFactory>
 
         {/* 액자 리스트 선택 */}
