@@ -164,10 +164,10 @@ const Tool = () => {
   // 가운데 근접 컨트롤
   const [, setCenterX] = useGlobalState<number>('centerX', 0);
   const [, setCenterY] = useGlobalState<number>('centerY', 0);
-  const [isNearingX, setIsNearingX] = useGlobalState<boolean>('isNearingX');
-  const [isNearingY, setIsNearingY] = useGlobalState<boolean>('isNearingY');
-  const [isFitX, setIsFitX] = useGlobalState<boolean>('isFitX');
-  const [isFitY, setIsFitY] = useGlobalState<boolean>('isFitY');
+  const [, setIsNearingX] = useGlobalState<boolean>('isNearingX');
+  const [, setIsNearingY] = useGlobalState<boolean>('isNearingY');
+  const [, setIsFitX] = useGlobalState<boolean>('isFitX');
+  const [, setIsFitY] = useGlobalState<boolean>('isFitY');
 
   // 미리보기
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview', false);
@@ -551,11 +551,11 @@ const Tool = () => {
     const imgWrapper = imgWrapperRef.current;
     if (!imgWrapper) return;
     if (isGridGuideLine) {
+      // const { innerWidth: width, innerHeight: height } = window;
       const { width, height } = imgWrapper.getBoundingClientRect();
-
-      setGridWidth(Math.floor(width / 48));
-      setGridHeight(Math.floor(height / 36));
-      setGridGuideLine(new Array(Math.floor((width / 48) * (height / 36))).fill(undefined).map((_, index) => index));
+      setGridWidth(Math.floor(width / 48) % 2 === 0 ? Math.floor(width / 48) : Math.ceil(width / 48));
+      setGridHeight(Math.floor(height / 54) % 2 === 0 ? Math.floor(height / 54) : Math.ceil(height / 54));
+      setGridGuideLine(new Array(Math.floor((width / 48) * (height / 54))).fill(undefined).map((_, index) => index));
     }
   }, [isGridGuideLine]);
 
@@ -580,9 +580,9 @@ const Tool = () => {
   useEffect(() => {
     const imgWrapper = imgWrapperRef.current;
     if (!imgWrapper) return;
-    const { width, height } = imgWrapper.getBoundingClientRect();
+    const { innerWidth: width, innerHeight: height } = window;
     setCenterX(width / 2);
-    setCenterY(height / 2);
+    setCenterY((height - HEADER_HEIGHT) / 2);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -603,15 +603,15 @@ const Tool = () => {
         <div
           style={{
             position: 'fixed',
-            top: `${HEADER_HEIGHT}px`,
+            // top: `${HEADER_HEIGHT}px`,
             overflow: 'hidden',
             right: 0,
             width: '100%',
             height: '100vh',
             display: 'grid',
             zIndex: 1,
-            gridTemplateColumns: `repeat(${gridWidth}, 1fr)`,
-            gridTemplateRows: `repeat(${gridHeight}, 1fr)`,
+            gridTemplateRows: `repeat(${gridWidth}, 1fr)`,
+            gridTemplateColumns: `repeat(${gridHeight}, 1fr)`,
           }}
         >
           {gridGuideLine.map(() => (
@@ -666,10 +666,6 @@ const Tool = () => {
           onMouseMove={handleImgResize}
           ref={imgWrapperRef}
           bgColor={bgColor || theme.color.white}
-          isNearingX={isNearingX || false}
-          isNearingY={isNearingY || false}
-          isFitX={isFitX || false}
-          isFitY={isFitY || false}
           onMouseUp={handleImgResizeEnd}
           onMouseLeave={isDragDrop ? handleDropCancel : handleImgResizeEnd}
           cmd={resizeCmd}
