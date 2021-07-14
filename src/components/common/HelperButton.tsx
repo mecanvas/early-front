@@ -1,8 +1,7 @@
 import styled from '@emotion/styled';
-import { Button } from 'antd';
+import { Button, List, Popover } from 'antd';
 import { icons } from 'public/icons';
-import { useCallback, useState } from 'react';
-import ToolTutorial from 'src/components/tool/ToolTutorial';
+import React, { useCallback, useState } from 'react';
 
 const HelpButton = styled(Button)`
   height: 34px;
@@ -31,6 +30,21 @@ const HelpButton = styled(Button)`
   }
 `;
 
+const HelperList = styled(List)`
+  * {
+    width: 300px;
+    text-align: left;
+  }
+  * > li {
+    padding: 1em 2em 1em 1em !important;
+    cursor: pointer;
+    font-size: 13px;
+    &:hover {
+      background-color: ${({ theme }) => theme.color.gray100};
+    }
+  }
+`;
+
 const FloatHelper = () => {
   const [showingModal, setShowingModal] = useState(false);
 
@@ -38,13 +52,31 @@ const FloatHelper = () => {
     setShowingModal((prev) => !prev);
   }, []);
 
+  const helpList = [
+    '전체적인 사용 설명이 필요해요.',
+    '액자의 크기를 변경하고 싶어요.',
+    '배경 색상을 변경하고 싶어요.',
+    '예상 가격이 궁금해요.',
+    '주문은 어떻게 하죠?',
+  ];
+
   return (
     <>
-      <HelpButton type="text" onClick={handleOpenTutorial}>
-        <span>도움말</span>
-        <img src={icons.questionMark} />
-      </HelpButton>
-      {showingModal && <ToolTutorial onClick={handleOpenTutorial} />}
+      <Popover
+        overlayClassName="antd-popover-no-padding"
+        trigger="click"
+        title={<h6>어떤 도움이 필요하세요?</h6>}
+        placement="bottomLeft"
+        content={
+          <HelperList size="large" dataSource={helpList} renderItem={(item: any) => <List.Item>{item}</List.Item>} />
+        }
+        visible={showingModal}
+      >
+        <HelpButton type="text" onClick={handleOpenTutorial}>
+          <span>도움말</span>
+          <img src={icons.questionMark} />
+        </HelpButton>
+      </Popover>
     </>
   );
 };
