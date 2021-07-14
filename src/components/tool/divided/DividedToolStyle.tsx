@@ -196,7 +196,7 @@ export const SelectedFrameWrapper = styled.div<{
         position: absolute;
         width: 100%;
         left: 0;
-        top: calc(50%);
+        top: calc(50% + 43px);
         transform: translateY(-50%);
         height: 2px;
         content: '';
