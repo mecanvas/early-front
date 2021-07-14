@@ -33,6 +33,7 @@ import DividedToolFactory from './DividedToolFactory';
 import { HEADER_HEIGHT } from 'src/constants';
 import ImageDropZone from 'src/components/common/ImageDropZone';
 import BgPreview from 'public/bg1.jpg';
+import { getOriginRatio } from 'src/utils/getOriginRatio';
 
 const Tool = () => {
   const [changeVertical, setChangeVertical] = useState(false);
@@ -534,15 +535,17 @@ const Tool = () => {
   useEffect(() => {
     if (!imgUploadUrl) return;
     const el = imgNode.current;
-    if (el) {
+    const img = new Image();
+    if (img && el) {
       el.style.width = '';
       el.style.height = '';
-      el.src = imgUploadUrl;
-      el.onload = () => {
-        setOriginWidth(el.naturalWidth < 1000 ? el.naturalWidth : el.width);
-        setOriginHeight(el.naturalHeight < 700 ? el.naturalHeight : el.height);
-        setResizeWidth(el.width);
-        setResizeHeight(el.height);
+      img.src = imgUploadUrl;
+      img.onload = () => {
+        const [w, h] = getOriginRatio(img.naturalWidth, img.naturalHeight, window.innerWidth, window.innerHeight - 170);
+        setOriginWidth(w);
+        setOriginHeight(h);
+        setResizeWidth(w);
+        setResizeHeight(h);
       };
     }
   }, [imgUploadUrl, setOriginHeight, setOriginWidth, setResizeHeight, setResizeWidth]);
