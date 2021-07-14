@@ -37,14 +37,12 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
     bottom: false,
     left: false,
   });
-  const [fixX, setFixX] = useState<number>(0);
-  const [fixY, setFixY] = useState<number>(0);
   const [centerX] = useGlobalState<number>('centerX');
   const [centerY] = useGlobalState<number>('centerY');
-  const [, setIsNearingX] = useGlobalState('isNearingX', false);
-  const [, setIsNearingY] = useGlobalState('isNearingY', false);
-  const [, setIsFitX] = useGlobalState('isFitX', false);
-  const [, setIsFitY] = useGlobalState('isFitY', false);
+  const [isNearingX, setIsNearingX] = useGlobalState('isNearingX', false);
+  const [isNearingY, setIsNearingY] = useGlobalState('isNearingY', false);
+  const [isFitX, setIsFitX] = useGlobalState('isFitX', false);
+  const [isFitY, setIsFitY] = useGlobalState('isFitY', false);
 
   const checkNearingParallelForBox = useCallback(() => {
     if (!canvasFrameSizeInfo || !canvasPosition || !centerX || !centerY) return;
@@ -53,15 +51,14 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
     const { left, top } = canvasPosition;
     const right = left + width;
     const bottom = top + height;
-    const diffY = window.innerWidth >= 768 ? 32 : 14;
 
     const isNearingAxisXByBox = (conditionValue: number) =>
       Math.abs(right - centerX) < conditionValue || Math.abs(left - centerX) < conditionValue;
     const isNearingAxisYByBox = (conditionValue: number) =>
-      Math.abs(top - centerY - diffY) < conditionValue || Math.abs(bottom - centerY - diffY) < conditionValue;
+      Math.abs(top - centerY) < conditionValue || Math.abs(bottom - centerY) < conditionValue;
     if (isNearingAxisXByBox(5.5) || isNearingAxisYByBox(5.5)) {
       if (isNearingAxisXByBox(5.5) && isNearingAxisYByBox(5.5)) {
-        if (isNearingAxisXByBox(1.1) || isNearingAxisYByBox(1.1)) {
+        if (isNearingAxisXByBox(0.5) || isNearingAxisYByBox(0.5)) {
           setIsFitX(true);
           setIsFitY(true);
         }
@@ -70,14 +67,14 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
         return;
       }
       if (isNearingAxisXByBox(5.5)) {
-        if (isNearingAxisXByBox(1.1)) {
+        if (isNearingAxisXByBox(0.5)) {
           setIsFitX(true);
         }
         setIsNearingX(true);
       }
 
       if (isNearingAxisYByBox(5.5)) {
-        if (isNearingAxisYByBox(1.1)) {
+        if (isNearingAxisYByBox(0.5)) {
           setIsFitY(true);
         }
         setIsNearingY(true);
@@ -88,11 +85,10 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
   // 커서가 x, y축 중 하나라도 정 중앙에 위치하게 되면 평행선을 solid로 바꿉니다.
   const checkNearingCenterForMouse = useCallback(
     (cursorX: number, cursorY: number) => {
-      const diffY = window.innerWidth >= 768 ? 32 : 14;
+      // const diffY = 32;
 
       const isNearingAxisX = (conditionValue: number) => Math.abs(cursorX - window.innerWidth / 2) < conditionValue;
-      const isNearingAxisY = (conditionValue: number) =>
-        Math.abs(cursorY - diffY - window.innerHeight / 2) < conditionValue;
+      const isNearingAxisY = (conditionValue: number) => Math.abs(cursorY - window.innerHeight / 2) < conditionValue;
 
       // 초기 시작시 false로 초기화.
       setIsNearingX(false);
@@ -146,12 +142,11 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
         canvas.height = canvasHeight;
         const ctx = canvas.getContext('2d');
         const [x, y] = getPosition(e);
-        const positionLeft = x - frameWidth / 2 - fixX;
-        const positionTop = y - frameHeight / 2 - fixY;
+        let positionLeft = x - frameWidth / 2;
+        let positionTop = y - frameHeight / 2;
         checkNearingCenterForMouse(x, y);
         checkNearingParallelForBox();
-        setCanvasPosition({ ...canvasPosition, top: positionTop, left: positionLeft });
-        setCanvasFrameSizeInfo({ ...canvasFrameSizeInfo, width: frameWidth, height: frameHeight });
+
         if (ctx) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.strokeStyle = '#333';
@@ -175,22 +170,23 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
               // TODO: 로직 추상화 작업
               const isNearingRight = (conditionValue: number) => {
                 if (Math.abs(right - cropRight) < conditionValue) {
-                  setFixX(right - cropRight);
+                  positionLeft = positionLeft - (right - cropRight);
                   return true;
                 }
                 if (Math.abs(right - cropLeft) < conditionValue) {
-                  setFixX(right - cropLeft);
+                  positionLeft = positionLeft - (right - cropLeft);
+
                   return true;
                 }
                 return false;
               };
               const isNearingLeft = (conditionValue: number) => {
                 if (Math.abs(left - cropLeft) < conditionValue) {
-                  setFixX(left - cropLeft);
+                  positionLeft = positionLeft - (left - cropLeft);
                   return true;
                 }
                 if (Math.abs(left - cropRight) < conditionValue) {
-                  setFixX(left - cropRight);
+                  positionLeft = positionLeft - (left - cropRight);
                   return true;
                 }
                 return false;
@@ -198,11 +194,11 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
 
               const isNearingBottom = (conditionValue: number) => {
                 if (Math.abs(bottom - cropBottom) < conditionValue) {
-                  setFixY(bottom - cropBottom);
+                  positionTop = positionTop - (bottom - cropBottom);
                   return true;
                 }
-                if (Math.abs(left - cropTop) < conditionValue) {
-                  setFixY(bottom - cropTop);
+                if (Math.abs(bottom - cropTop) < conditionValue) {
+                  positionTop = positionTop - (bottom - cropTop);
                   return true;
                 }
                 return false;
@@ -210,21 +206,21 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
 
               const isNearingTop = (conditionValue: number) => {
                 if (Math.abs(top - cropTop) < conditionValue) {
-                  setFixY(top - cropTop);
+                  positionTop = positionTop - (top - cropTop);
                   return true;
                 }
                 if (Math.abs(top - cropBottom) < conditionValue) {
-                  setFixY(top - cropBottom);
+                  positionTop = positionTop - (top - cropBottom);
                   return true;
                 }
                 return false;
               };
 
               setIsNearing({
-                top: isNearingTop(1.5),
-                right: isNearingRight(1.5),
-                left: isNearingLeft(1.5),
-                bottom: isNearingBottom(1.5),
+                top: isNearingTop(1),
+                right: isNearingRight(1),
+                left: isNearingLeft(1),
+                bottom: isNearingBottom(1),
               });
             }
           }
@@ -254,6 +250,8 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
             ctx.fillRect(positionLeft, 0, 1, canvas.height);
           }
         }
+        setCanvasPosition({ ...canvasPosition, top: positionTop, left: positionLeft });
+        setCanvasFrameSizeInfo({ ...canvasFrameSizeInfo, width: frameWidth, height: frameHeight });
       }
       requestAnimationFrame(() => handleDrawingFrame);
     },
@@ -270,8 +268,6 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
       croppedList,
       isNearing,
       scrollY,
-      fixX,
-      fixY,
       scrollX,
     ],
   );
@@ -286,7 +282,13 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
   }, [handleDrawingFrame, height, width]);
 
   return (
-    <SelectedFrameWrapper ref={selectFrameWrapper}>
+    <SelectedFrameWrapper
+      isFitX={isFitX || false}
+      isFitY={isFitY || false}
+      isNearingX={isNearingX || false}
+      isNearingY={isNearingY || false}
+      ref={selectFrameWrapper}
+    >
       <canvas ref={selectFrameRef} onClick={onClick}></canvas>
     </SelectedFrameWrapper>
   );
