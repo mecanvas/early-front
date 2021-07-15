@@ -61,7 +61,7 @@ const ToolSave = ({ yourPriceList, totalPrice, type }: Props) => {
   const [orderRouteEmpty, setOrderRouteEmpty] = useState({ isRequired: false, extra: '' });
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [selectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
-  const { canvasToImage, loading, isDone } = useCanvasToServer();
+  const { canvasToImage, loading, isDone } = useCanvasToServer(type);
   const router = useRouter();
 
   const handleVisible = useCallback(() => {
@@ -136,8 +136,8 @@ const ToolSave = ({ yourPriceList, totalPrice, type }: Props) => {
     if (!info.orderRoute)
       return setOrderRouteEmpty({ ...orderRouteEmpty, isRequired: true, extra: '주문 경로를 선택해 주세요!' });
 
-    canvasToImage(type, selectedFrameList, info);
-  }, [selectedFrameList, info, userNameEmpty, phoneEmpty, orderRouteEmpty, canvasToImage, type]);
+    canvasToImage(selectedFrameList, info);
+  }, [selectedFrameList, info, userNameEmpty, phoneEmpty, orderRouteEmpty, canvasToImage]);
 
   useEffect(() => {
     if (isDone) {

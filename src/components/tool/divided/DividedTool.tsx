@@ -298,7 +298,7 @@ const Tool = () => {
           fd.append('image', file);
 
           await axios
-            .post('/canvas/img', fd, {
+            .post('/canvas/divided/img', fd, {
               onUploadProgress: getProgressGage,
             })
             .then((res) => {

@@ -293,7 +293,7 @@ const SingleTool = () => {
         fd.append('image', file);
 
         await axios
-          .post('/canvas/img', fd, {
+          .post('/canvas/single/upload', fd, {
             onUploadProgress: getProgressGage,
           })
           .then((res) => {
@@ -337,7 +337,7 @@ const SingleTool = () => {
         fd.append('image', file);
 
         await axios
-          .post('/canvas/img', fd, {
+          .post('/canvas/single/upload', fd, {
             onUploadProgress: getProgressGage,
           })
           .then((res) => {

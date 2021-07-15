@@ -60,7 +60,7 @@ export const useGlobalState = <T,>(key: string, defaultValue?: T | null) => {
   return [state, setState] as const;
 };
 
-export const useCanvasToServer = () => {
+export const useCanvasToServer = (type: 'single' | 'divided') => {
   const dataURLtoFile = (dataurl: any, filename: any) => {
     if (dataurl) {
       const arr = dataurl.split(',');
@@ -87,7 +87,7 @@ export const useCanvasToServer = () => {
   const [fileList, setFileList] = useState<File[]>([]);
   const [paperSize, setPaperSize] = useState<string[]>([]);
 
-  const canvasToImage = (type: 'single' | 'divided', canvas: HTMLCanvasElement[], info: OrderInfo) => {
+  const canvasToImage = (canvas: HTMLCanvasElement[], info: OrderInfo) => {
     if (!window) return;
     if (!canvas.length) return notification.error({ message: '액자를 만들어주세요.', placement: 'bottomLeft' });
     setUsername(info.username);
@@ -144,7 +144,7 @@ export const useCanvasToServer = () => {
   };
 
   useEffect(() => {
-    if (!isSave || !imgUploadUrl) return;
+    if (!isSave || !imgUploadUrl || !type) return;
     const saveCanvas = async () => {
       const fd = new FormData();
       fd.append('username', username);
@@ -154,14 +154,14 @@ export const useCanvasToServer = () => {
       fileList.forEach((file) => fd.append('image', file));
       fd.append('paperNames', paperSize.join());
       // type
-      await axios.post('/canvas', fd, {
+      await axios.post(`/canvas/${type}/save`, fd, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
     };
     saveCanvas();
-  }, [phone, fileList, isSave, paperSize, username, imgUploadUrl, orderRoute]);
+  }, [phone, fileList, isSave, paperSize, username, imgUploadUrl, orderRoute, type]);
 
   return { canvasToImage, loading, isDone, setIsDone, imgUploadUrl };
 };
