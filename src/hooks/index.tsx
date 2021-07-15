@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import useSWR, { SWRResponse } from 'swr';
 import { notification } from 'antd';
+import { OrderInfo } from 'src/components/tool/ToolSave';
 
 export const useGetCursorPosition = (isSelected: boolean) => {
   const [windowX, setWindowX] = useState(0);
@@ -82,14 +83,16 @@ export const useCanvasToServer = () => {
   const [isSave, setIsSave] = useState(false);
   const [username, setUsername] = useState('');
   const [phone, setPhone] = useState('');
+  const [orderRoute, setOrderRoute] = useState('');
   const [fileList, setFileList] = useState<File[]>([]);
   const [paperSize, setPaperSize] = useState<string[]>([]);
 
-  const canvasToImage = (canvas: HTMLCanvasElement[], name: string, phone: string) => {
+  const canvasToImage = (type: 'single' | 'divided', canvas: HTMLCanvasElement[], info: OrderInfo) => {
     if (!window) return;
     if (!canvas.length) return notification.error({ message: '액자를 만들어주세요.', placement: 'bottomLeft' });
-    setUsername(name);
-    setPhone(phone);
+    setUsername(info.username);
+    setPhone(info.phone);
+    setOrderRoute(info.orderRoute);
     const sendToCanvas = async () => {
       setLoading(true);
       setIsDone(false);
@@ -110,21 +113,9 @@ export const useCanvasToServer = () => {
 
           const dataUrl = (node as HTMLCanvasElement).toDataURL('image/png', 1.0);
 
-          if (dataset.bgColor) {
-            const ctx = node.getContext('2d');
-
-            if (ctx) {
-              const data = ctx.getImageData(0, 0, w, h);
-              const compositeOperation = ctx.globalCompositeOperation;
-              ctx.clearRect(0, 0, w, h);
-              ctx.putImageData(data, 0, 0);
-              ctx.globalCompositeOperation = compositeOperation;
-            }
-          }
-
           const file = dataURLtoFile(
             dataUrl,
-            `${new Date().toLocaleDateString()}_${name}_${dataset.paper}_${index + 1}.png`,
+            `${new Date().toLocaleDateString()}_${info.username}_${dataset.paper}_${index + 1}.png`,
           );
 
           if (file) {
@@ -158,9 +149,11 @@ export const useCanvasToServer = () => {
       const fd = new FormData();
       fd.append('username', username);
       fd.append('phone', phone);
+      fd.append('orderRoute', orderRoute);
       fd.append('originImgUrl', imgUploadUrl);
       fileList.forEach((file) => fd.append('image', file));
       fd.append('paperNames', paperSize.join());
+      // type
       await axios.post('/canvas', fd, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -168,7 +161,7 @@ export const useCanvasToServer = () => {
       });
     };
     saveCanvas();
-  }, [phone, fileList, isSave, paperSize, username, imgUploadUrl]);
+  }, [phone, fileList, isSave, paperSize, username, imgUploadUrl, orderRoute]);
 
   return { canvasToImage, loading, isDone, setIsDone, imgUploadUrl };
 };

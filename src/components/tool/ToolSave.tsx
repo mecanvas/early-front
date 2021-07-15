@@ -41,7 +41,7 @@ const SaveModalOrderColumns = [
   { title: '가격', dataIndex: 'price', key: 'price', render: (price: number) => price.toLocaleString() },
 ];
 
-interface Info {
+export interface OrderInfo {
   [key: string]: any;
   username: string;
   phone: string;
@@ -51,10 +51,11 @@ interface Info {
 interface Props {
   yourPriceList?: [string, any][];
   totalPrice?: number;
+  type: 'single' | 'divided';
 }
 
-const ToolSave = ({ yourPriceList, totalPrice }: Props) => {
-  const [info, setInfo] = useState<Info | null>(null);
+const ToolSave = ({ yourPriceList, totalPrice, type }: Props) => {
+  const [info, setInfo] = useState<OrderInfo | null>(null);
   const [userNameEmpty, setUserNameEmpty] = useState({ isRequired: false, extra: '' });
   const [phoneEmpty, setPhoneEmpty] = useState({ isRequired: false, extra: '' });
   const [orderRouteEmpty, setOrderRouteEmpty] = useState({ isRequired: false, extra: '' });
@@ -89,7 +90,7 @@ const ToolSave = ({ yourPriceList, totalPrice }: Props) => {
       if (info && value) {
         setInfo({ ...info, orderRoute: value });
       } else {
-        const newInfo = { orderRoute: value } as Info;
+        const newInfo = { orderRoute: value } as OrderInfo;
         setInfo(newInfo);
       }
     },
@@ -115,7 +116,7 @@ const ToolSave = ({ yourPriceList, totalPrice }: Props) => {
       if (info) {
         setInfo({ ...info, [name]: value });
       } else {
-        const newInfo = { [name]: value } as Info;
+        const newInfo = { [name]: value } as OrderInfo;
         setInfo(newInfo);
       }
     },
@@ -135,8 +136,8 @@ const ToolSave = ({ yourPriceList, totalPrice }: Props) => {
     if (!info.orderRoute)
       return setOrderRouteEmpty({ ...orderRouteEmpty, isRequired: true, extra: '주문 경로를 선택해 주세요!' });
 
-    canvasToImage(selectedFrameList, info.username, info.phone);
-  }, [selectedFrameList, info, userNameEmpty, phoneEmpty, orderRouteEmpty, canvasToImage]);
+    canvasToImage(type, selectedFrameList, info);
+  }, [selectedFrameList, info, userNameEmpty, phoneEmpty, orderRouteEmpty, canvasToImage, type]);
 
   useEffect(() => {
     if (isDone) {
