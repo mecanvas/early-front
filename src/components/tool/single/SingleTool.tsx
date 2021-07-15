@@ -35,6 +35,7 @@ import { theme } from 'src/style/theme';
 import { ColorResult } from 'react-color';
 import ImageDropZone from 'src/components/common/ImageDropZone';
 import { icons } from 'public/icons';
+import { PreventPageLeave } from 'src/hoc/PreventPageLeave';
 
 const SingleTool = () => {
   const singleWrapperRef = useRef<HTMLDivElement>(null);
@@ -96,7 +97,7 @@ const SingleTool = () => {
   const [nearingCenterY, setNearingCenterY] = useState<boolean>(false);
 
   const { getProgressGage, progressPercentage } = useProgress();
-  const [singleImgUploadUrl, setSingleimgUploadUrl] = useState('');
+  const [singleImgUploadUrl, setSingleimgUploadUrl] = useGlobalState<string>('singleImgUploadUrl', '');
   const [isImgUploadLoading, setImgUploadLoading] = useState(false);
   const [isMovingImage, setIsMovingImage] = useState(false);
 
@@ -143,7 +144,7 @@ const SingleTool = () => {
     const ctx = canvas.getContext('2d');
     setPreviewLoading(true);
 
-    if (ctx) {
+    if (ctx && singleImgUploadUrl) {
       const img = new Image();
       img.src = singleImgUploadUrl;
       img.onload = () => {
@@ -295,7 +296,7 @@ const SingleTool = () => {
         setIsDragDrop(false);
       }
     },
-    [getProgressGage],
+    [getProgressGage, setSingleimgUploadUrl],
   );
 
   const handleDragCancel = useCallback(() => {
@@ -338,7 +339,7 @@ const SingleTool = () => {
         setImgUploadLoading(false);
       }
     },
-    [getProgressGage, imageDropUpload],
+    [getProgressGage, imageDropUpload, setSingleimgUploadUrl],
   );
 
   const handleMoveSingleImage = useCallback(() => {
@@ -357,7 +358,7 @@ const SingleTool = () => {
       if (!imgCanvas || !wrapperWidth || !wrapperHeight) return;
 
       const imgCtx = imgCanvas.getContext('2d');
-      if (imgCtx) {
+      if (imgCtx && singleImgUploadUrl) {
         const img = new Image();
         img.src = url || singleImgUploadUrl;
         img.onload = () => {
@@ -451,6 +452,7 @@ const SingleTool = () => {
       setFramePrice([]);
       setSelectedFrameList([]);
       setBgColor(theme.color.gray200);
+      setSingleimgUploadUrl('');
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -460,7 +462,7 @@ const SingleTool = () => {
       <SingleToolContainer>
         <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
         <ToolHeader
-          imgUrl={singleImgUploadUrl}
+          imgUrl={singleImgUploadUrl || ''}
           singlePrice={singlePrice.toLocaleString()}
           singleCanvasName={singleCanvasName}
         />
@@ -626,4 +628,4 @@ const SingleTool = () => {
   );
 };
 
-export default SingleTool;
+export default PreventPageLeave(SingleTool);

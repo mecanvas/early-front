@@ -34,6 +34,7 @@ import { HEADER_HEIGHT } from 'src/constants';
 import ImageDropZone from 'src/components/common/ImageDropZone';
 import BgPreview from 'public/bg1.jpg';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
+import { PreventPageLeave } from 'src/hoc/PreventPageLeave';
 
 const Tool = () => {
   const [changeVertical, setChangeVertical] = useState(false);
@@ -595,12 +596,12 @@ const Tool = () => {
   }, []);
 
   useEffect(() => {
-    setImgUploadUrl('');
     return () => {
       setIsPreview(false);
       setFramePrice([]);
       setSelectedFrameList([]);
       setBgColor(theme.color.gray100);
+      setImgUploadUrl('');
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -771,4 +772,4 @@ const Tool = () => {
   );
 };
 
-export default Tool;
+export default PreventPageLeave(Tool);
