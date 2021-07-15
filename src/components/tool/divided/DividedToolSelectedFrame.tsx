@@ -52,7 +52,7 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
     const right = left + width;
     const bottom = top + height;
 
-    const diffY = 43;
+    const diffY = 86;
     const isNearingAxisXByBox = (conditionValue: number) =>
       Math.abs(right - centerX) < conditionValue || Math.abs(left - centerX) < conditionValue;
     const isNearingAxisYByBox = (conditionValue: number) =>
