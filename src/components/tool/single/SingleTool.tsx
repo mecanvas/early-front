@@ -131,65 +131,76 @@ const SingleTool = () => {
     setSingleCanvasName(`${myFrame[0].attribute} ${myFrame[0].name}`);
   }, [setFramePrice]);
 
+  const createCanvasForSave = useCallback(
+    (canvasProps?: HTMLCanvasElement) => {
+      if (!controllerNode || !resizeWidth || !resizeHeight || !originWidth || !originHeight) return;
+
+      const left = (window.innerWidth - resizeWidth) / 2 + replacePx(controllerNode.style.left);
+      const top = (window.innerHeight - resizeHeight) / 2 + replacePx(controllerNode.style.top);
+      const frameLeft = (window.innerWidth - singleFrameWidth) / 2;
+      const frameTop = (window.innerHeight - singleFrameHeight) / 2;
+
+      const canvas = canvasProps || document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      setPreviewLoading(true);
+
+      if (ctx && singleImgUploadUrl) {
+        const img = new Image();
+        img.src = singleImgUploadUrl;
+        img.onload = () => {
+          const scaleX = originWidth / resizeWidth;
+          const scaleY = originHeight / resizeHeight;
+          const cropX = frameLeft - left;
+          const cropY = frameTop - top;
+
+          // const pixelRatio = window.devicePixelRatio;
+          canvas.width = singleFrameWidth;
+          canvas.height = singleFrameHeight;
+          ctx.clearRect(0, 0, singleFrameWidth, singleFrameHeight);
+
+          // ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(
+            img,
+            cropX * scaleX,
+            cropY * scaleY,
+            singleFrameWidth * scaleX,
+            singleFrameHeight * scaleY,
+            0,
+            0,
+            singleFrameWidth,
+            singleFrameHeight,
+          );
+
+          // 배경을 칠합니다.
+          ctx.globalCompositeOperation = 'destination-over';
+          ctx.fillStyle = bgColor;
+          ctx.fillRect(0, 0, singleFrameWidth, singleFrameHeight);
+        };
+      }
+      if (!canvasProps) {
+        return canvas;
+      }
+    },
+    [
+      bgColor,
+      controllerNode,
+      originHeight,
+      originWidth,
+      resizeHeight,
+      resizeWidth,
+      singleFrameHeight,
+      singleFrameWidth,
+      singleImgUploadUrl,
+    ],
+  );
+
   const createPreviewCanvas = useCallback(() => {
     if (!controllerNode || !resizeWidth || !resizeHeight || !previewCanvasRef.current || !originWidth || !originHeight)
       return;
-
-    const left = (window.innerWidth - resizeWidth) / 2 + replacePx(controllerNode.style.left);
-    const top = (window.innerHeight - resizeHeight) / 2 + replacePx(controllerNode.style.top);
-    const frameLeft = (window.innerWidth - singleFrameWidth) / 2;
-    const frameTop = (window.innerHeight - singleFrameHeight) / 2;
-
-    const canvas = previewCanvasRef.current;
-    const ctx = canvas.getContext('2d');
-    setPreviewLoading(true);
-
-    if (ctx && singleImgUploadUrl) {
-      const img = new Image();
-      img.src = singleImgUploadUrl;
-      img.onload = () => {
-        const scaleX = originWidth / resizeWidth;
-        const scaleY = originHeight / resizeHeight;
-        const cropX = frameLeft - left;
-        const cropY = frameTop - top;
-
-        // const pixelRatio = window.devicePixelRatio;
-        canvas.width = singleFrameWidth;
-        canvas.height = singleFrameHeight;
-        ctx.clearRect(0, 0, singleFrameWidth, singleFrameHeight);
-
-        // ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-        ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(
-          img,
-          cropX * scaleX,
-          cropY * scaleY,
-          singleFrameWidth * scaleX,
-          singleFrameHeight * scaleY,
-          0,
-          0,
-          singleFrameWidth,
-          singleFrameHeight,
-        );
-
-        // 배경을 칠합니다.
-        ctx.globalCompositeOperation = 'destination-over';
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, singleFrameWidth, singleFrameHeight);
-        setPreviewLoading(false);
-      };
-    }
-  }, [
-    bgColor,
-    controllerNode,
-    originHeight,
-    originWidth,
-    resizeHeight,
-    resizeWidth,
-    singleFrameHeight,
-    singleFrameWidth,
-    singleImgUploadUrl,
-  ]);
+    createCanvasForSave(previewCanvasRef.current);
+    setPreviewLoading(false);
+  }, [controllerNode, createCanvasForSave, originHeight, originWidth, resizeHeight, resizeWidth]);
 
   const handleColorChange = useCallback(
     (color: ColorResult) => {
@@ -416,7 +427,7 @@ const SingleTool = () => {
 
   useEffect(() => {
     if (isSaveCanvas) {
-      const imgCanvas = ImageCanvasRef.current;
+      const imgCanvas = createCanvasForSave();
       setSelectedFrameList(imgCanvas ? [imgCanvas] : []);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -462,6 +473,7 @@ const SingleTool = () => {
       <SingleToolContainer>
         <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
         <ToolHeader
+          type="single"
           imgUrl={singleImgUploadUrl || ''}
           singlePrice={singlePrice.toLocaleString()}
           singleCanvasName={singleCanvasName}
