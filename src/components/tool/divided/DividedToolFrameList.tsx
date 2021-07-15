@@ -9,11 +9,12 @@ import { FrameWrapper, FrameSizeList, FrameSizeName } from './DividedToolStyle';
 
 interface Props extends FrameAttributes {
   frameSize: FrameSize[];
+  clickedValue: string;
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
   onChangeVertical: () => void;
 }
 
-const ToolFrame = ({ frameSize, attribute, onClick, onChangeVertical }: Props) => {
+const ToolFrame = ({ frameSize, attribute, clickedValue, onClick, onChangeVertical }: Props) => {
   const frameList = useMemo(() => {
     return frameSize.filter((lst) => lst.attribute === attribute);
   }, [attribute, frameSize]);
@@ -63,7 +64,13 @@ const ToolFrame = ({ frameSize, attribute, onClick, onChangeVertical }: Props) =
       <animated.div style={frameRendering}>
         {frameList.map((frame, index) => (
           <div key={index}>
-            <FrameSizeList data-value={frame.name} data-attribute={frame.attribute} {...frame.size} onClick={onClick}>
+            <FrameSizeList
+              clicked={frame.name === clickedValue}
+              data-value={frame.name}
+              data-attribute={frame.attribute}
+              {...frame.size}
+              onClick={onClick}
+            >
               <FrameSizeName>{frame.name}</FrameSizeName>
             </FrameSizeList>
             <small>{frame.cm}</small>

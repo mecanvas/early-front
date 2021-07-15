@@ -131,6 +131,7 @@ const Tool = () => {
   const [isDragDrop, setIsDragDrop] = useState(false);
   const [isSelectFrame, setIsSelectFrame] = useState(false); // 골랐는지 상태 여부
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
+  const [clickedValue, setClickedValue] = useState('');
   const [canvasPosition] = useGlobalState<CanvasPosition>('canvasPosition');
   const [canvasFrameSizeInfo] = useGlobalState<CanvasFrameSizeInfo>('canvasFrameSizeInfo');
   const [framePreviewMode, setFramePreviewMode] = useState<CanvasPosition | null>(null);
@@ -445,6 +446,9 @@ const Tool = () => {
     (e: React.MouseEvent<HTMLDivElement>) => {
       const { value } = e.currentTarget.dataset;
       const el = imgNode.current;
+      if (value) {
+        setClickedValue(value);
+      }
 
       if (el) {
         const { width, height } = el.getBoundingClientRect();
@@ -631,6 +635,7 @@ const Tool = () => {
       <ToolContainer>
         {imgUploadUrl && (
           <ToolFrameList
+            clickedValue={clickedValue}
             frameSize={frameSize}
             attribute={frameAttribute || '정방'}
             onClick={handleFrameSelect}

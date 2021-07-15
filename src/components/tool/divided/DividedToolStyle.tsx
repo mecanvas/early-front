@@ -616,11 +616,11 @@ export const FrameWrapper = styled.div`
   }
 `;
 
-export const FrameSizeList = styled.div<{ width: string; height: string }>`
+export const FrameSizeList = styled.div<{ width: string; height: string; clicked: boolean }>`
   width: ${({ width }) => `${replacePx(width) / 5}px`};
   height: ${({ height }) => `${replacePx(height) / 5}px`};
   z-index: 30;
-  border: 1px solid ${({ theme }) => theme.color.gray200};
+  border: 1px solid ${({ theme, clicked }) => (clicked ? theme.color.primary : theme.color.gray200)};
   cursor: pointer;
   margin: 10px auto 5px auto;
   position: relative;
