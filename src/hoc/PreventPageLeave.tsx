@@ -72,8 +72,10 @@ const PreventModalButton = styled.div`
 
 const usePreventPageLeave = () => {
   const { push, asPath, beforePopState } = useRouter();
-  const [openModal, setOpenModal] = useState(false);
   const [, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
+  const [imgUploadUrl] = useGlobalState<string>('imgUploadUrl');
+  const [singleImgUploadUrl] = useGlobalState<string>('singleImgUploadUrl');
+
   const [modalOpen, modalApi] = useSpring(() => {
     return {
       from: { transform: 'scale(0.5)', translateY: `15px` },
@@ -81,6 +83,8 @@ const usePreventPageLeave = () => {
       config: { duration: 200 },
     };
   });
+
+  const [openModal, setOpenModal] = useState(false);
 
   const handleSaveCanvas = useCallback(() => {
     setOpenModal(false);
@@ -104,6 +108,9 @@ const usePreventPageLeave = () => {
 
   useEffect(() => {
     if (process.browser) {
+      if (!singleImgUploadUrl && !imgUploadUrl) {
+        return;
+      }
       beforePopState(handlePreventLeave);
       window.onbeforeunload = (e) => {
         e.preventDefault();
@@ -116,7 +123,7 @@ const usePreventPageLeave = () => {
       beforePopState(() => true);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [singleImgUploadUrl, imgUploadUrl]);
 
   useEffect(() => {
     if (openModal) {
