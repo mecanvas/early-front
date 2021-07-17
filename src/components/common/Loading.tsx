@@ -46,16 +46,33 @@ const LoaderInnerAnimation = keyframes`
   }
 `;
 
+const LoaderBg = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #fff;
+  opacity: 0.7;
+  width: 100%;
+  min-height: 100vh;
+`;
+
 const LoaderContainer = styled.div`
   position: absolute;
   z-index: 30;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  max-width: 250px;
   margin: 0 auto;
   width: 100%;
+  min-height: 100vh;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  h5,
+  p {
+    z-index: 10;
+    font-weight: 600;
+  }
 `;
 
 const Loader = styled.div`
@@ -79,7 +96,7 @@ const Loader = styled.div`
 interface Props {
   loading: boolean;
   text?: string;
-  progressPercentage?: number;
+  progressPercentage?: number | null;
 }
 
 const Loading = ({ loading, text, progressPercentage }: Props) => {
@@ -96,10 +113,11 @@ const Loading = ({ loading, text, progressPercentage }: Props) => {
 
   return (
     <LoaderContainer>
+      <LoaderBg />
       <Loader>
         <span></span>
       </Loader>
-      <animated.p style={textAni}>{text ? text : '잠시만 기다려 주세요. '}</animated.p>
+      <animated.p style={textAni}>{text ? text : '잠시만 기다려 주세요!'}</animated.p>
       {progressPercentage && <h5>{progressPercentage}%</h5>}
     </LoaderContainer>
   );

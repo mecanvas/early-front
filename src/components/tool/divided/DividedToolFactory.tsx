@@ -53,7 +53,7 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
         const fd = new FormData();
         fd.append('image', file);
         await axios
-          .post('/canvas/img', fd, {
+          .post('/canvas/divided/upload', fd, {
             onUploadProgress: getProgressGage,
           })
           .then((res) => setImgUploadUrl(res.data || ''));

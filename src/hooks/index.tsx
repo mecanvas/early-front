@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import useSWR, { SWRResponse } from 'swr';
 import { notification } from 'antd';
+import { OrderInfo } from 'src/components/tool/ToolSave';
 
 export const useGetCursorPosition = (isSelected: boolean) => {
   const [windowX, setWindowX] = useState(0);
@@ -59,7 +60,7 @@ export const useGlobalState = <T,>(key: string, defaultValue?: T | null) => {
   return [state, setState] as const;
 };
 
-export const useCanvasToServer = () => {
+export const useCanvasToServer = (type: 'single' | 'divided') => {
   const dataURLtoFile = (dataurl: any, filename: any) => {
     if (dataurl) {
       const arr = dataurl.split(',');
@@ -79,17 +80,20 @@ export const useCanvasToServer = () => {
   const [loading, setLoading] = useState(false);
   const [isDone, setIsDone] = useGlobalState('isDone', false);
   const [imgUploadUrl] = useGlobalState<string>('imgUploadUrl');
+  const [singleImgUploadUrl] = useGlobalState<string>('singleImgUploadUrl');
   const [isSave, setIsSave] = useState(false);
   const [username, setUsername] = useState('');
   const [phone, setPhone] = useState('');
+  const [orderRoute, setOrderRoute] = useState('');
   const [fileList, setFileList] = useState<File[]>([]);
   const [paperSize, setPaperSize] = useState<string[]>([]);
 
-  const canvasToImage = (canvas: HTMLCanvasElement[], name: string, phone: string) => {
+  const canvasToImage = (canvas: HTMLCanvasElement[], info: OrderInfo) => {
     if (!window) return;
     if (!canvas.length) return notification.error({ message: '액자를 만들어주세요.', placement: 'bottomLeft' });
-    setUsername(name);
-    setPhone(phone);
+    setUsername(info.username);
+    setPhone(info.phone);
+    setOrderRoute(info.orderRoute);
     const sendToCanvas = async () => {
       setLoading(true);
       setIsDone(false);
@@ -98,6 +102,7 @@ export const useCanvasToServer = () => {
           const { dataset } = node;
           const w = node.width;
           const h = node.height;
+
           // canvas 배경변경 https://github.com/mikechambers/ExamplesByMesh/blob/master/HTML5/canvas/exportWithBackgroundColor/scripts/main.js 참고
           if (dataset.bgColor) {
             const ctx = node.getContext('2d');
@@ -110,21 +115,9 @@ export const useCanvasToServer = () => {
 
           const dataUrl = (node as HTMLCanvasElement).toDataURL('image/png', 1.0);
 
-          if (dataset.bgColor) {
-            const ctx = node.getContext('2d');
-
-            if (ctx) {
-              const data = ctx.getImageData(0, 0, w, h);
-              const compositeOperation = ctx.globalCompositeOperation;
-              ctx.clearRect(0, 0, w, h);
-              ctx.putImageData(data, 0, 0);
-              ctx.globalCompositeOperation = compositeOperation;
-            }
-          }
-
           const file = dataURLtoFile(
             dataUrl,
-            `${new Date().toLocaleDateString()}_${name}_${dataset.paper}_${index + 1}.png`,
+            `${new Date().toLocaleDateString()}_${info.username}_${dataset.paper}_${index + 1}.png`,
           );
 
           if (file) {
@@ -153,22 +146,31 @@ export const useCanvasToServer = () => {
   };
 
   useEffect(() => {
-    if (!isSave || !imgUploadUrl) return;
-    const saveCanvas = async () => {
+    if (!isSave || !type) return;
+    const saveCanvas = async (canvasType: 'single' | 'divided') => {
       const fd = new FormData();
       fd.append('username', username);
       fd.append('phone', phone);
-      fd.append('originImgUrl', imgUploadUrl);
+      fd.append('orderRoute', orderRoute);
+      fd.append('type', '1');
       fileList.forEach((file) => fd.append('image', file));
       fd.append('paperNames', paperSize.join());
-      await axios.post('/canvas', fd, {
+      if (canvasType === 'single') {
+        if (!singleImgUploadUrl) return;
+        fd.append('originImgUrl', singleImgUploadUrl);
+      } else {
+        if (!imgUploadUrl) return;
+        fd.append('originImgUrl', imgUploadUrl);
+      }
+
+      await axios.post(`/canvas/${type}/save`, fd, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
     };
-    saveCanvas();
-  }, [phone, fileList, isSave, paperSize, username, imgUploadUrl]);
+    saveCanvas(type);
+  }, [phone, fileList, isSave, paperSize, username, imgUploadUrl, orderRoute, type, singleImgUploadUrl]);
 
   return { canvasToImage, loading, isDone, setIsDone, imgUploadUrl };
 };

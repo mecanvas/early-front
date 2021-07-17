@@ -20,9 +20,10 @@ interface Props {
   singlePrice?: string;
   singleCanvasName?: string;
   imgUrl: string;
+  type: 'single' | 'divided';
 }
 
-const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl }: Props) => {
+const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl, type }: Props) => {
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [framePrice] = useGlobalState<FramePrice[]>('framePrice');
@@ -101,27 +102,26 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl }: Props) => {
           </OpacityComponent>
         ) : null}
       </div>
-      <OpacityComponent>
-        <>
-          <FloatHelper />
-          {imgUrl && (
-            <>
-              <Button onClick={handleImgPreview} type={!isPreview ? 'default' : 'primary'}>
-                {!isPreview ? '미리보기' : '이미지로'}
-              </Button>
-              <Button type="text" onClick={handleSaveCanvas}>
-                저장
-              </Button>
-              {isSaveCanvas && (
-                <ToolSave
-                  totalPrice={framePrice?.reduce((acc, cur) => (acc += cur.price), 0)}
-                  yourPriceList={yourPriceList}
-                />
-              )}
-            </>
-          )}
-        </>
-      </OpacityComponent>
+      {imgUrl && (
+        <OpacityComponent>
+          <>
+            <FloatHelper />
+            <Button onClick={handleImgPreview} type={!isPreview ? 'default' : 'primary'}>
+              {!isPreview ? '미리보기' : '이미지로'}
+            </Button>
+            <Button type="text" onClick={handleSaveCanvas}>
+              저장
+            </Button>
+            {isSaveCanvas && (
+              <ToolSave
+                type={type}
+                totalPrice={framePrice?.reduce((acc, cur) => (acc += cur.price), 0)}
+                yourPriceList={yourPriceList}
+              />
+            )}
+          </>
+        </OpacityComponent>
+      )}
     </ToolHeaderMenu>
   );
 };

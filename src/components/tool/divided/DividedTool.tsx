@@ -9,7 +9,7 @@ import {
   PreviewBg,
   ToolHeaderWrapper,
 } from './DividedToolStyle';
-import { Button } from 'antd';
+import { Button, Switch } from 'antd';
 import { theme } from 'src/style/theme';
 import Loading from '../../common/Loading';
 import { cmToPx } from 'src/utils/cmToPx';
@@ -34,6 +34,8 @@ import { HEADER_HEIGHT } from 'src/constants';
 import ImageDropZone from 'src/components/common/ImageDropZone';
 import BgPreview from 'public/bg1.jpg';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
+import { PreventPageLeave } from 'src/hoc/PreventPageLeave';
+import { isMobile } from 'react-device-detect';
 
 const Tool = () => {
   const [changeVertical, setChangeVertical] = useState(false);
@@ -130,6 +132,7 @@ const Tool = () => {
   const [isDragDrop, setIsDragDrop] = useState(false);
   const [isSelectFrame, setIsSelectFrame] = useState(false); // 골랐는지 상태 여부
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
+  const [clickedValue, setClickedValue] = useState('');
   const [canvasPosition] = useGlobalState<CanvasPosition>('canvasPosition');
   const [canvasFrameSizeInfo] = useGlobalState<CanvasFrameSizeInfo>('canvasFrameSizeInfo');
   const [framePreviewMode, setFramePreviewMode] = useState<CanvasPosition | null>(null);
@@ -138,6 +141,7 @@ const Tool = () => {
   const imgWrapperRef = useRef<HTMLDivElement>(null);
   const imgNode = useRef<HTMLImageElement>(null);
   const previewBgRef = useRef<HTMLImageElement>(null);
+  const [isPreviewBgRemove, setIsPreviewBgRemove] = useState(false);
 
   const [imgUploadUrl, setImgUploadUrl] = useGlobalState<string>('imgUploadUrl', '');
   const [imgUploadLoading, setImgUploadLoading] = useGlobalState<boolean>('imgUploadLoading', false);
@@ -174,7 +178,7 @@ const Tool = () => {
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview', false);
 
   // 바뀌는 색상
-  const [bgColor, setBgColor] = useGlobalState<string>('bgColor', theme.color.gray100);
+  const [bgColor, setBgColor] = useGlobalState<string>('bgColor', theme.color.white);
   // const [frameBorderColor, setFrameBorderColor] = useState('#333');
 
   // 이미지 크기 조절
@@ -295,7 +299,7 @@ const Tool = () => {
           fd.append('image', file);
 
           await axios
-            .post('/canvas/img', fd, {
+            .post('/canvas/divided/upload', fd, {
               onUploadProgress: getProgressGage,
             })
             .then((res) => {
@@ -443,6 +447,9 @@ const Tool = () => {
     (e: React.MouseEvent<HTMLDivElement>) => {
       const { value } = e.currentTarget.dataset;
       const el = imgNode.current;
+      if (value) {
+        setClickedValue(value);
+      }
 
       if (el) {
         const { width, height } = el.getBoundingClientRect();
@@ -502,6 +509,10 @@ const Tool = () => {
       setFramePreviewMode({ ...framePreviewMode, top: 140, left: left + 75 });
     }
   }, [getImgWrapperSizeForParallel, setIsNoContent, croppedList, scrollX, scrollY, framePreviewMode]);
+
+  const handlePreviewBgRemove = useCallback(() => {
+    setIsPreviewBgRemove((prev) => !prev);
+  }, []);
 
   // const handleFrameColorChange = useCallback((color: ColorResult) => {
   //   const { hex } = color;
@@ -590,12 +601,21 @@ const Tool = () => {
   }, []);
 
   useEffect(() => {
-    setImgUploadUrl('');
+    if (window.innerWidth <= replacePx(theme.size.md)) {
+      setIsNoContent(true);
+    } else {
+      setIsNoContent(false);
+    }
+    if (isMobile) {
+      setIsNoContent(true);
+    }
     return () => {
       setIsPreview(false);
       setFramePrice([]);
       setSelectedFrameList([]);
       setBgColor(theme.color.gray100);
+      setImgUploadUrl('');
+      setIsSaveCanvas(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -625,6 +645,7 @@ const Tool = () => {
       <ToolContainer>
         {imgUploadUrl && (
           <ToolFrameList
+            clickedValue={clickedValue}
             frameSize={frameSize}
             attribute={frameAttribute || '정방'}
             onClick={handleFrameSelect}
@@ -634,7 +655,7 @@ const Tool = () => {
 
         {/* 사진 조절하는 툴바들 */}
         <ToolHeaderWrapper>
-          <ToolHeader imgUrl={imgUploadUrl || ''} />
+          <ToolHeader type="divided" imgUrl={imgUploadUrl || ''} />
           <DividedToolFactory croppedList={croppedList} setCroppedList={setCroppedList} />
         </ToolHeaderWrapper>
 
@@ -642,7 +663,7 @@ const Tool = () => {
           <div
             style={{
               position: 'fixed',
-              marginTop: `${HEADER_HEIGHT}px`,
+              marginTop: '45px',
               width: '100%',
               height: '100vh',
               top: 0,
@@ -652,7 +673,7 @@ const Tool = () => {
             }}
           >
             <Button style={{ position: 'relative', top: '30%', left: '50%', transform: 'translateX(-50%)' }}>
-              최소한의 크기로 키워주세요.
+              {isMobile ? 'PC에서만 작업이 가능합니다.' : '최소한의 크기로 키워주세요.'}
             </Button>
           </div>
         )}
@@ -674,11 +695,22 @@ const Tool = () => {
           cmd={resizeCmd}
         >
           {isPreview && (
-            <PreviewBg ref={previewBgRef}>
+            <PreviewBg ref={previewBgRef} isPreviewBgRemove={isPreviewBgRemove}>
+              <Switch
+                checkedChildren="배경"
+                unCheckedChildren="배경"
+                checked={!isPreviewBgRemove}
+                onChange={handlePreviewBgRemove}
+              />
               <img src={BgPreview} alt="미리보기배경" />
             </PreviewBg>
           )}
-          <CroppedWrapper isPreview={isPreview || false} top={framePreviewMode?.top} left={framePreviewMode?.left}>
+          <CroppedWrapper
+            isPreview={isPreview || false}
+            top={framePreviewMode?.top}
+            left={framePreviewMode?.left}
+            isPreviewBgRemove={isPreviewBgRemove}
+          >
             {croppedList?.map(({ dataset, id, imageCropStyle, ...style }) => (
               <div
                 key={id}
@@ -755,4 +787,4 @@ const Tool = () => {
   );
 };
 
-export default Tool;
+export default PreventPageLeave(Tool);
