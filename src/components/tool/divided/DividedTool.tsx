@@ -608,8 +608,6 @@ const Tool = () => {
     }
     if (isMobile) {
       setIsNoContent(true);
-    } else {
-      setIsNoContent(false);
     }
     return () => {
       setIsPreview(false);
@@ -665,7 +663,7 @@ const Tool = () => {
           <div
             style={{
               position: 'fixed',
-              marginTop: `${HEADER_HEIGHT}px`,
+              marginTop: '45px',
               width: '100%',
               height: '100vh',
               top: 0,
