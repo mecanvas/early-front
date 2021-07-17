@@ -1,4 +1,5 @@
 const withPlugins = require('next-compose-plugins');
+const withCss = require('@zeit/next-css');
 const withLess = require('@zeit/next-less');
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
@@ -50,6 +51,7 @@ module.exports = withPlugins(
         },
       },
     ],
+    [withCss],
     [withBundleAnalyzer],
     [withImages],
   ],
