@@ -177,13 +177,13 @@ const ToolSave = ({ yourPriceList, totalPrice, type }: Props) => {
               placeholder="주문 경로를 선택해 주세요."
               isRequired={orderRouteEmpty.isRequired}
             >
-              <Select.Option value="coupang" label="쿠팡">
+              <Select.Option value="1" label="쿠팡">
                 쿠팡
               </Select.Option>
-              <Select.Option value="naver" label="네이버">
+              <Select.Option value="2" label="네이버">
                 네이버
               </Select.Option>
-              <Select.Option value="ideaus" label="아이디어스">
+              <Select.Option value="3" label="아이디어스">
                 아이디어스
               </Select.Option>
             </AntdSelect>
