@@ -407,7 +407,7 @@ const Tool = () => {
           backgroundPositionY: `${-canvasTop + top}px`,
           width: `${100}%`,
           height: `${100}%`,
-          boxShadow: `0 0 7px #333 inset, 0 0 6px #ededed`,
+          boxShadow: theme.canvasShadow,
         },
       };
 
