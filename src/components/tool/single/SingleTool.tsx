@@ -84,7 +84,7 @@ const SingleTool = () => {
   const [previewLoading, setPreviewLoading] = useState(false);
 
   const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
-  const [isSaveCanvas] = useGlobalState<boolean>('saveModal');
+  const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [, setFramePrice] = useGlobalState<FramePrice[]>('framePrice');
   const [resizeWidth, setResizeWidth] = useGlobalState<number>('resizeWidth');
   const [resizeHeight, setResizeHeight] = useGlobalState<number>('resizeHeight');
@@ -195,6 +195,7 @@ const SingleTool = () => {
       singleFrameHeight,
       singleFrameWidth,
       singleImgUploadUrl,
+      singleCanvasName,
     ],
   );
 
@@ -467,6 +468,7 @@ const SingleTool = () => {
       setSelectedFrameList([]);
       setBgColor(theme.color.gray200);
       setSingleimgUploadUrl('');
+      setIsSaveCanvas(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

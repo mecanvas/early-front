@@ -606,6 +606,7 @@ const Tool = () => {
       setSelectedFrameList([]);
       setBgColor(theme.color.gray100);
       setImgUploadUrl('');
+      setIsSaveCanvas(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
