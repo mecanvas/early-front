@@ -298,7 +298,7 @@ const Tool = () => {
           fd.append('image', file);
 
           await axios
-            .post('/canvas/img', fd, {
+            .post('/canvas/divided/upload', fd, {
               onUploadProgress: getProgressGage,
             })
             .then((res) => {
@@ -606,6 +606,7 @@ const Tool = () => {
       setSelectedFrameList([]);
       setBgColor(theme.color.gray100);
       setImgUploadUrl('');
+      setIsSaveCanvas(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

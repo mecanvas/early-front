@@ -84,7 +84,7 @@ const SingleTool = () => {
   const [previewLoading, setPreviewLoading] = useState(false);
 
   const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
-  const [isSaveCanvas] = useGlobalState<boolean>('saveModal');
+  const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [, setFramePrice] = useGlobalState<FramePrice[]>('framePrice');
   const [resizeWidth, setResizeWidth] = useGlobalState<number>('resizeWidth');
   const [resizeHeight, setResizeHeight] = useGlobalState<number>('resizeHeight');
@@ -147,6 +147,7 @@ const SingleTool = () => {
       if (ctx && singleImgUploadUrl) {
         const img = new Image();
         img.src = singleImgUploadUrl;
+        img.crossOrigin = 'Anonymous';
         img.onload = () => {
           const scaleX = originWidth / resizeWidth;
           const scaleY = originHeight / resizeHeight;
@@ -156,6 +157,8 @@ const SingleTool = () => {
           // const pixelRatio = window.devicePixelRatio;
           canvas.width = singleFrameWidth;
           canvas.height = singleFrameHeight;
+          canvas.setAttribute('data-paper', singleCanvasName);
+
           ctx.clearRect(0, 0, singleFrameWidth, singleFrameHeight);
 
           // ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
@@ -192,6 +195,7 @@ const SingleTool = () => {
       singleFrameHeight,
       singleFrameWidth,
       singleImgUploadUrl,
+      singleCanvasName,
     ],
   );
 
@@ -293,7 +297,7 @@ const SingleTool = () => {
         fd.append('image', file);
 
         await axios
-          .post('/canvas/img', fd, {
+          .post('/canvas/single/upload', fd, {
             onUploadProgress: getProgressGage,
           })
           .then((res) => {
@@ -337,7 +341,7 @@ const SingleTool = () => {
         fd.append('image', file);
 
         await axios
-          .post('/canvas/img', fd, {
+          .post('/canvas/single/upload', fd, {
             onUploadProgress: getProgressGage,
           })
           .then((res) => {
@@ -464,6 +468,7 @@ const SingleTool = () => {
       setSelectedFrameList([]);
       setBgColor(theme.color.gray200);
       setSingleimgUploadUrl('');
+      setIsSaveCanvas(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

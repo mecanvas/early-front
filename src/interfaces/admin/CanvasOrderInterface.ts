@@ -2,7 +2,7 @@ export interface CanvasOrderList {
   id: number;
   orderNo: number;
   username: string;
-  email: string;
+  phone: number;
   originImgUrl: string;
   paperNames: string[];
   createdAt: string;

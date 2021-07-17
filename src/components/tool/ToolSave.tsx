@@ -61,7 +61,7 @@ const ToolSave = ({ yourPriceList, totalPrice, type }: Props) => {
   const [orderRouteEmpty, setOrderRouteEmpty] = useState({ isRequired: false, extra: '' });
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [selectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
-  const { canvasToImage, loading, isDone } = useCanvasToServer();
+  const { canvasToImage, loading, isDone } = useCanvasToServer(type);
   const router = useRouter();
 
   const handleVisible = useCallback(() => {
@@ -136,8 +136,8 @@ const ToolSave = ({ yourPriceList, totalPrice, type }: Props) => {
     if (!info.orderRoute)
       return setOrderRouteEmpty({ ...orderRouteEmpty, isRequired: true, extra: '주문 경로를 선택해 주세요!' });
 
-    canvasToImage(type, selectedFrameList, info);
-  }, [selectedFrameList, info, userNameEmpty, phoneEmpty, orderRouteEmpty, canvasToImage, type]);
+    canvasToImage(selectedFrameList, info);
+  }, [selectedFrameList, info, userNameEmpty, phoneEmpty, orderRouteEmpty, canvasToImage]);
 
   useEffect(() => {
     if (isDone) {
@@ -177,13 +177,13 @@ const ToolSave = ({ yourPriceList, totalPrice, type }: Props) => {
               placeholder="주문 경로를 선택해 주세요."
               isRequired={orderRouteEmpty.isRequired}
             >
-              <Select.Option value="coupang" label="쿠팡">
+              <Select.Option value="1" label="쿠팡">
                 쿠팡
               </Select.Option>
-              <Select.Option value="naver" label="네이버">
+              <Select.Option value="2" label="네이버">
                 네이버
               </Select.Option>
-              <Select.Option value="ideaus" label="아이디어스">
+              <Select.Option value="3" label="아이디어스">
                 아이디어스
               </Select.Option>
             </AntdSelect>
