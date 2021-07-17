@@ -7,15 +7,15 @@ export const MAX_HEIGHT = 1000;
 export const IMG_LIMIT_MINIMUM_SIZE = process.env.NODE_ENV === 'production' ? 500_000 : 0;
 export const API_URL =
   process.env.NODE_ENV === 'production'
-    ? 'https://mecanvas.herokuapp.com'
+    ? 'https://api.early21.com'
     : `http://localhost:${process.env.NEXT_PUBLIC_PORT}`;
 
-export const URL = process.env.NODE_ENV === 'production' ? 'https://early.com' : 'http://localhost:3000';
+export const URL = process.env.NODE_ENV === 'production' ? 'https://early21.com' : 'http://localhost:3000';
 
 // 해당하는 routes들은 false를 반환합니다. -> footer를 제외하고 불러옵니다.
 export const exceptionRoutes = ['/tool/divided', '/tool/single', '/404'];
 
-export const S3_URL = 'https://mecanvas-assets.s3.ap-northeast-2.amazonaws.com/assets';
+export const S3_URL = 'https://early21-assets.s3.ap-northeast-2.amazonaws.com/assets';
 
 export const HEADER_HEIGHT = 86;
 

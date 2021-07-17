@@ -7,13 +7,14 @@ falsyExempleServerlessNext:
     memory:
       defaultLambda: 1024
     roleArn: arn:aws:iam::662876637186:role/early21-role
-    bucketName: 'early21.com'
+    bucketName: 'early21'
+    bucketRegion: 'ap-northeast-2'
     runtime:
       defaultLambda: 'nodejs14.x'
       apiLambda: 'nodejs14.x'
       imageLambda: 'nodejs14.x'
     cloudfront:
-      distributionId: 'E243M535D9659W'
+      distributionId: 'EC6MSO46G51N1'
     name:
       defaultLambda: 'early21-lambda'
       apiLambda: 'early21-api-lambda'
