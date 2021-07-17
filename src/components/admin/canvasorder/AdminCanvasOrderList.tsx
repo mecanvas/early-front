@@ -33,9 +33,9 @@ const canvasOrderColumns = [
     key: 'username',
   },
   {
-    title: '이메일',
-    dataIndex: 'email',
-    key: 'email',
+    title: '연락처',
+    dataIndex: 'phone',
+    key: 'phone',
   },
   {
     title: '주문 호 x 장',
@@ -74,21 +74,46 @@ const canvasOrderColumns = [
 
 const AdminOrderList = () => {
   const { pathname } = useRouter();
-  const [defaultTab, handleTabKey, setDefaultTab] = useMoveTab('canvasorder');
+  const [defaultTab, handleTabKey, setDefaultTab] = useMoveTab('order/divided');
   const [columns, setColumns] = useState<ColumnsType<any>>([]);
   const { queryStringify } = useGetQueryString();
   const { data } = useSWR(`/${defaultTab}/?${queryStringify() || `page=1&per_page=10`}` || null, adminGetFetcher);
 
   useEffect(() => {
-    if (pathname === '/admin/canvasorder') {
-      setDefaultTab('canvasorder');
+    if (pathname === '/admin/order/divided') {
+      setDefaultTab('order/divided');
+      setColumns(() => canvasOrderColumns);
+    }
+    if (pathname === '/admin/order/single') {
+      setDefaultTab('order/single');
       setColumns(() => canvasOrderColumns);
     }
   }, [pathname, setDefaultTab]);
 
   return (
     <Tabs defaultActiveKey={defaultTab} onTabClick={handleTabKey} activeKey={defaultTab}>
-      <TabPane key="canvasorder" tab="주문 목록">
+      <TabPane key="order/divided" tab="분할 주문">
+        <AppTable
+          loading={!data}
+          total={data?.total}
+          dataSource={data?.results.map((res: CanvasOrderList) => ({
+            ...res,
+            paperNames: res.paperNames.reduce((acc: { [key: string]: number }, cur) => {
+              if (acc[cur]) {
+                acc[cur] += 1;
+              }
+              acc[cur] = 1;
+              return acc;
+            }, {}),
+            createdAt: dateFormat(res.createdAt),
+            key: res.id,
+          }))}
+          isRecord
+          columns={columns}
+        />
+      </TabPane>
+
+      <TabPane key="order/single" tab="단일 주문">
         <AppTable
           loading={!data}
           total={data?.total}

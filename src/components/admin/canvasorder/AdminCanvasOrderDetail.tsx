@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Descriptions, Tag, Button } from 'antd';
 import useSWR from 'swr';
 import { adminGetFetcher } from 'src/fetcher';
@@ -15,10 +15,19 @@ import { ImgToDataURL } from 'src/utils/ImgToDataURL';
 const AdminOrderDetail = () => {
   const router = useRouter();
   const {
+    pathname,
     query: { canvasOrderId },
   } = router;
 
-  const { data } = useSWR<CanvasOrderDetail>(canvasOrderId ? `/canvasorder/${canvasOrderId}` : null, adminGetFetcher);
+  const path = useMemo(() => {
+    return pathname
+      .split('/')
+      .filter((lst) => lst)
+      .slice(1, -1)
+      .join('/');
+  }, [pathname]);
+
+  const { data } = useSWR<CanvasOrderDetail>(canvasOrderId ? `/${path}/${canvasOrderId}` : null, adminGetFetcher);
 
   const [loading, setLoading] = useState(false);
   const handleImgDownload = useCallback(
@@ -125,7 +134,7 @@ const AdminOrderDetail = () => {
       >
         <Descriptions.Item label="주문 번호">{data.orderNo}</Descriptions.Item>
         <Descriptions.Item label="이름">{data.username}</Descriptions.Item>
-        <Descriptions.Item label="이메일">{data.email}</Descriptions.Item>
+        <Descriptions.Item label="연락처">{data.phone}</Descriptions.Item>
         <Descriptions.Item label="원본 사진">
           <Img src={data.originImgUrl} alt="고객님의 원본 사진" />
         </Descriptions.Item>

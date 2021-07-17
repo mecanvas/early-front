@@ -147,6 +147,7 @@ const SingleTool = () => {
       if (ctx && singleImgUploadUrl) {
         const img = new Image();
         img.src = singleImgUploadUrl;
+        img.crossOrigin = 'Anonymous';
         img.onload = () => {
           const scaleX = originWidth / resizeWidth;
           const scaleY = originHeight / resizeHeight;
@@ -156,6 +157,8 @@ const SingleTool = () => {
           // const pixelRatio = window.devicePixelRatio;
           canvas.width = singleFrameWidth;
           canvas.height = singleFrameHeight;
+          canvas.setAttribute('data-paper', singleCanvasName);
+
           ctx.clearRect(0, 0, singleFrameWidth, singleFrameHeight);
 
           // ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);

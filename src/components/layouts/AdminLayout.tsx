@@ -83,19 +83,13 @@ const AdminLayout = ({ children }: Props) => {
           </Link>
         </AdminLogo>
         <AdminMenu>
-          <Menu
-            mode="horizontal"
-            theme="light"
-            defaultSelectedKeys={['/']}
-            selectedKeys={[
-              router.pathname.split('/').length < 4
-                ? router.pathname
-                : router.pathname.split('/').slice(0, 3).join('/'),
-            ]}
-          >
-            <SubMenu key="/admin/canvasorder" title="캔버스 주문" onTitleClick={handleTitleClick}>
-              <Menu.Item key="/admin/canvasorder">
-                <Link href="/admin/canvasorder">주문 목록</Link>
+          <Menu mode="horizontal" theme="light" defaultSelectedKeys={['/']} selectedKeys={[router.pathname]}>
+            <SubMenu key="/admin/order/divided" title="주문 목록" onTitleClick={handleTitleClick}>
+              <Menu.Item key="/admin/order/divided">
+                <Link href="/admin/order/divided">분할 주문</Link>
+              </Menu.Item>
+              <Menu.Item key="/admin/order/single">
+                <Link href="/admin/order/single">단일 주문</Link>
               </Menu.Item>
             </SubMenu>
           </Menu>
