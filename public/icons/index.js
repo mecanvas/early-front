@@ -7,6 +7,7 @@ import imgUpload from './img-upload.svg';
 import grid from './grid.svg';
 import undo from './undo.svg';
 import add from './add.svg';
+import share from './share.svg';
 
 export const icons = {
   horizontal,
@@ -18,4 +19,5 @@ export const icons = {
   grid,
   undo,
   add,
+  share,
 };
