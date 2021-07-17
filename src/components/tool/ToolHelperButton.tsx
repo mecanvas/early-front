@@ -45,11 +45,11 @@ const HelperList = styled(List)`
   }
 `;
 
-const FloatHelper = () => {
-  const [showingModal, setShowingModal] = useState(false);
+const HelperButton = () => {
+  const [showingHelper, setShowingHelper] = useState(false);
 
-  const handleOpenTutorial = useCallback(() => {
-    setShowingModal((prev) => !prev);
+  const handleVisible = useCallback((visible) => {
+    setShowingHelper(visible);
   }, []);
 
   const helpList = [
@@ -65,14 +65,15 @@ const FloatHelper = () => {
       <Popover
         overlayClassName="antd-popover-no-padding"
         trigger="click"
+        onVisibleChange={handleVisible}
         title={<h6>어떤 도움이 필요하세요?</h6>}
         placement="bottomLeft"
         content={
           <HelperList size="large" dataSource={helpList} renderItem={(item: any) => <List.Item>{item}</List.Item>} />
         }
-        visible={showingModal}
+        visible={showingHelper}
       >
-        <HelpButton type="text" onClick={handleOpenTutorial}>
+        <HelpButton type="text" onClick={handleVisible}>
           <span>도움말</span>
           <img src={icons.questionMark} />
         </HelpButton>
@@ -81,4 +82,4 @@ const FloatHelper = () => {
   );
 };
 
-export default FloatHelper;
+export default HelperButton;

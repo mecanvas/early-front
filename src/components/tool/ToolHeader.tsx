@@ -14,7 +14,7 @@ import {
 } from './divided/DividedToolStyle';
 import { theme } from 'src/style/theme';
 import { useOpacity } from 'src/hooks/useOpacity';
-import FloatHelper from '../common/HelperButton';
+import FloatHelper from './ToolHelperButton';
 
 interface Props {
   singlePrice?: string;
