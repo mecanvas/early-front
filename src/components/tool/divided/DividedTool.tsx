@@ -473,14 +473,9 @@ const Tool = () => {
   );
 
   const getImgWrapperSizeForParallel = useCallback(() => {
-    const imgWrapper = imgWrapperRef.current;
-    if (!imgWrapper) return;
-    const { width, height } = imgWrapper.getBoundingClientRect();
-    const centerX = width / 2;
-    const centerY = height / 2;
-    setCenterX(centerX);
-    setCenterY(centerY);
-    requestAnimationFrame(() => getImgWrapperSizeForParallel);
+    const { innerWidth: width, innerHeight: height } = window;
+    setCenterX(width / 2);
+    setCenterY((height - HEADER_HEIGHT) / 2);
   }, [setCenterX, setCenterY]);
 
   // 리사이즈시에도 동일하게 움직일 수 있도록 설정
@@ -562,8 +557,6 @@ const Tool = () => {
   }, [imgUploadUrl, setOriginHeight, setOriginWidth, setResizeHeight, setResizeWidth]);
 
   useEffect(() => {
-    const imgWrapper = imgWrapperRef.current;
-    if (!imgWrapper) return;
     if (isGridGuideLine) {
       setGridWidth(
         Math.floor(window.innerWidth / 36) % 2 === 0
@@ -602,8 +595,6 @@ const Tool = () => {
 
   // 정가운데값 구하기
   useEffect(() => {
-    const imgWrapper = imgWrapperRef.current;
-    if (!imgWrapper) return;
     const { innerWidth: width, innerHeight: height } = window;
     setCenterX(width / 2);
     setCenterY((height - HEADER_HEIGHT) / 2);
