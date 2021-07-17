@@ -35,6 +35,7 @@ import ImageDropZone from 'src/components/common/ImageDropZone';
 import BgPreview from 'public/bg1.jpg';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { PreventPageLeave } from 'src/hoc/PreventPageLeave';
+import { isMobile } from 'react-device-detect';
 
 const Tool = () => {
   const [changeVertical, setChangeVertical] = useState(false);
@@ -600,6 +601,16 @@ const Tool = () => {
   }, []);
 
   useEffect(() => {
+    if (window.innerWidth <= replacePx(theme.size.md)) {
+      setIsNoContent(true);
+    } else {
+      setIsNoContent(false);
+    }
+    if (isMobile) {
+      setIsNoContent(true);
+    } else {
+      setIsNoContent(false);
+    }
     return () => {
       setIsPreview(false);
       setFramePrice([]);
@@ -664,7 +675,7 @@ const Tool = () => {
             }}
           >
             <Button style={{ position: 'relative', top: '30%', left: '50%', transform: 'translateX(-50%)' }}>
-              최소한의 크기로 키워주세요.
+              {isMobile ? 'PC에서만 작업이 가능합니다.' : '최소한의 크기로 키워주세요.'}
             </Button>
           </div>
         )}
