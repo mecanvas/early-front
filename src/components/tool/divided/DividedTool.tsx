@@ -473,14 +473,9 @@ const Tool = () => {
   );
 
   const getImgWrapperSizeForParallel = useCallback(() => {
-    const imgWrapper = imgWrapperRef.current;
-    if (!imgWrapper) return;
-    const { width, height } = imgWrapper.getBoundingClientRect();
-    const centerX = width / 2;
-    const centerY = height / 2;
-    setCenterX(centerX);
-    setCenterY(centerY);
-    requestAnimationFrame(() => getImgWrapperSizeForParallel);
+    const { innerWidth: width, innerHeight: height } = window;
+    setCenterX(width / 2);
+    setCenterY((height - HEADER_HEIGHT) / 2);
   }, [setCenterX, setCenterY]);
 
   // 리사이즈시에도 동일하게 움직일 수 있도록 설정
@@ -562,14 +557,22 @@ const Tool = () => {
   }, [imgUploadUrl, setOriginHeight, setOriginWidth, setResizeHeight, setResizeWidth]);
 
   useEffect(() => {
-    const imgWrapper = imgWrapperRef.current;
-    if (!imgWrapper) return;
     if (isGridGuideLine) {
-      // const { innerWidth: width, innerHeight: height } = window;
-      const { width, height } = imgWrapper.getBoundingClientRect();
-      setGridWidth(Math.floor(width / 48) % 2 === 0 ? Math.floor(width / 48) : Math.ceil(width / 48));
-      setGridHeight(Math.floor(height / 54) % 2 === 0 ? Math.floor(height / 54) : Math.ceil(height / 54));
-      setGridGuideLine(new Array(Math.floor((width / 48) * (height / 54))).fill(undefined).map((_, index) => index));
+      setGridWidth(
+        Math.floor(window.innerWidth / 36) % 2 === 0
+          ? Math.floor(window.innerWidth / 36)
+          : Math.ceil(window.innerWidth / 36),
+      );
+      setGridHeight(
+        Math.floor((window.innerHeight - HEADER_HEIGHT) / 36) % 2 === 0
+          ? Math.floor((window.innerHeight - HEADER_HEIGHT) / 36)
+          : Math.ceil((window.innerHeight - HEADER_HEIGHT) / 36),
+      );
+      setGridGuideLine(
+        new Array(Math.floor((window.innerWidth / 36) * ((window.innerHeight - HEADER_HEIGHT) / 36)))
+          .fill(undefined)
+          .map((_, index) => index),
+      );
     }
   }, [isGridGuideLine]);
 
@@ -592,8 +595,6 @@ const Tool = () => {
 
   // 정가운데값 구하기
   useEffect(() => {
-    const imgWrapper = imgWrapperRef.current;
-    if (!imgWrapper) return;
     const { innerWidth: width, innerHeight: height } = window;
     setCenterX(width / 2);
     setCenterY((height - HEADER_HEIGHT) / 2);
@@ -626,19 +627,22 @@ const Tool = () => {
         <div
           style={{
             position: 'fixed',
-            // top: `${HEADER_HEIGHT}px`,
+            top: `calc(50% + ${HEADER_HEIGHT}px)`,
+            transform: 'translateY(-50%)',
             overflow: 'hidden',
             right: 0,
             width: '100%',
             height: '100vh',
             display: 'grid',
+            justifyContent: 'center',
+            alignItems: 'center',
             zIndex: 1,
-            gridTemplateRows: `repeat(${gridWidth}, 1fr)`,
-            gridTemplateColumns: `repeat(${gridHeight}, 1fr)`,
+            gridTemplateRows: `repeat(${gridHeight}, ${(window.innerHeight - HEADER_HEIGHT) / gridHeight}px)`,
+            gridTemplateColumns: `repeat(${gridWidth}, ${window.innerWidth / gridWidth}px)`,
           }}
         >
           {gridGuideLine.map(() => (
-            <div style={{ border: `1px dashed ${theme.color.gray200}` }}></div>
+            <div style={{ border: `1px dashed ${theme.color.gray200}`, height: '100%' }}></div>
           ))}
         </div>
       )}
