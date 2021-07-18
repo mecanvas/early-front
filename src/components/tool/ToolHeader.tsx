@@ -20,6 +20,7 @@ const ToolHomeIcon = styled.div`
   cursor: pointer;
   img {
     &:nth-of-type(1) {
+      transform: rotateY(180deg);
       -webkit-transform: rotateY(180deg);
       -moz-transform: rotateY(180deg);
       -o-transform: rotateY(180deg);
