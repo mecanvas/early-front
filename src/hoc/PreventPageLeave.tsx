@@ -112,7 +112,7 @@ const usePreventPageLeave = () => {
         return;
       }
       beforePopState(handlePreventLeave);
-      window.onbeforeunload = (e) => {
+      window.onbeforeunload = (e: any) => {
         e.preventDefault();
         e.returnValue = '';
         return false;

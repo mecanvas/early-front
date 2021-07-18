@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "NODE_ENV=production next build",
-    "start": "next start",
+    "start": "next start -p $PORT",
+    "deploy": "npx serverless",
     "prettier": "prettier --write --config ./.prettierrc './src/**/*.{ts,tsx,css,json}'",
     "lint:fix": "eslint --fix './src/**/*.{ts,tsx,css}'"
   },
@@ -20,6 +21,7 @@
     "@fortawesome/react-fontawesome": "0.1.14",
     "@next/bundle-analyzer": "10.2.3",
     "@types/react-color": "3.0.4",
+    "@zeit/next-css": "1.0.1",
     "@zeit/next-less": "1.0.1",
     "antd": "4.16.0",
     "axios": "0.21.1",
