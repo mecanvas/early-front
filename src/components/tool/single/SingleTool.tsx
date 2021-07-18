@@ -289,11 +289,12 @@ const SingleTool = () => {
         setIsCalc(false);
       }
 
-      controllerNode.style.position = 'relative';
-      controllerNode.style.left = `${x - xDiff}px`;
-      controllerNode.style.top = `${y - yDiff}px`;
-
-      checkNearingCenter(x - xDiff, y - yDiff);
+      if (!isCalc) {
+        controllerNode.style.position = 'relative';
+        controllerNode.style.left = `${x - xDiff}px`;
+        controllerNode.style.top = `${y - yDiff}px`;
+        checkNearingCenter(x - xDiff, y - yDiff);
+      }
     },
 
     [checkNearingCenter, controllerNode, getPosition, isCalc, xDiff, yDiff],
