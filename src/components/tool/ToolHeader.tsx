@@ -2,7 +2,6 @@ import { Popover, Button } from 'antd';
 import React, { useCallback, useMemo } from 'react';
 import { useGlobalState } from 'src/hooks';
 import { FramePrice } from 'src/interfaces/ToolInterface';
-import Logo from '../layouts/Logo';
 import ToolSave from './ToolSave';
 import {
   ToolHeaderMenu,
@@ -14,6 +13,25 @@ import {
 } from './divided/DividedToolStyle';
 import { theme } from 'src/style/theme';
 import { useOpacity } from 'src/hooks/useOpacity';
+import { icons } from 'public/icons';
+import styled from '@emotion/styled';
+
+const ToolHomeIcon = styled.div`
+  cursor: pointer;
+  img {
+    &:nth-of-type(1) {
+      -webkit-transform: rotateY(180deg);
+      -moz-transform: rotateY(180deg);
+      -o-transform: rotateY(180deg);
+      -ms-transform: rotateY(180deg);
+      unicode-bidi: bidi-override;
+      direction: rtl;
+      width: 20px;
+      margin-right: 4px;
+    }
+    width: 25px;
+  }
+`;
 
 interface Props {
   singlePrice?: string;
@@ -44,6 +62,10 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl, type }: Props) => {
     );
   }, [framePrice]);
 
+  const handleMoveHome = useCallback(() => {
+    history.back();
+  }, []);
+
   const handleSaveCanvas = useCallback(() => {
     setIsSaveCanvas(true);
   }, [setIsSaveCanvas]);
@@ -55,7 +77,10 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl, type }: Props) => {
   return (
     <ToolHeaderMenu>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Logo />
+        <ToolHomeIcon onClick={handleMoveHome}>
+          <img src={icons.arrow} />
+          <img src={icons.home} />
+        </ToolHomeIcon>
         {!singlePrice && !singleCanvasName && imgUrl ? (
           <Popover
             style={{ padding: 0 }}
