@@ -28,8 +28,14 @@ const ToolHomeIcon = styled.div`
       direction: rtl;
       width: 20px;
       margin-right: 4px;
+      @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+        width: 15px;
+      }
     }
     width: 25px;
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      width: 20px;
+    }
   }
 `;
 
