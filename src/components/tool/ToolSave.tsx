@@ -133,10 +133,10 @@ const ToolSave = ({ yourPriceList, totalPrice, type }: Props) => {
     }
     if (!info.username) return setUserNameEmpty({ ...userNameEmpty, isRequired: true, extra: '이름을 입력해 주세요!' });
     if (!info.phone) return setPhoneEmpty({ ...phoneEmpty, isRequired: true, extra: '핸드폰 번호를 입력해 주세요!' });
-    if (!info.orderRoute)
-      return setOrderRouteEmpty({ ...orderRouteEmpty, isRequired: true, extra: '주문 경로를 선택해 주세요!' });
+    // if (!info.orderRoute)
+    //   return setOrderRouteEmpty({ ...orderRouteEmpty, isRequired: true, extra: '주문 경로를 선택해 주세요!' });
 
-    canvasToImage(selectedFrameList, info);
+    canvasToImage(selectedFrameList, { ...info, orderRoute: '1' });
   }, [selectedFrameList, info, userNameEmpty, phoneEmpty, orderRouteEmpty, canvasToImage]);
 
   useEffect(() => {

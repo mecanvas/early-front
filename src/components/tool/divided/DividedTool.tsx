@@ -338,7 +338,16 @@ const Tool = () => {
   // 이미지 저장을 위한 캔버스 생성 (스프라이트 기법으로 이미지 저장은 안되기 때문에 품질이 깨지더라도 이 방법 사용합니다.)
   const createCanvasForSave = useCallback(
     (id: number) => {
-      if (!canvasFrameSizeInfo || !imgNode.current || !selectedFrameInfo || !canvasPosition || !bgColor) return;
+      if (
+        !canvasFrameSizeInfo ||
+        !imgNode.current ||
+        !selectedFrameInfo ||
+        !canvasPosition ||
+        !bgColor ||
+        !resizeWidth ||
+        !resizeHeight
+      )
+        return;
 
       const { name } = selectedFrameInfo;
       const { width: frameWidth, height: frameHeight } = canvasFrameSizeInfo;
@@ -352,27 +361,30 @@ const Tool = () => {
       const cropX = canvasLeft - left;
       const cropY = canvasTop - top;
 
-      const scaleX = image.naturalWidth / image.width;
-      const scaleY = image.naturalHeight / image.height;
+      const scaleX = image.naturalWidth / resizeWidth;
+      const scaleY = image.naturalHeight / resizeHeight;
       const oCtx = oCanvas.getContext('2d');
-      const pixelRatio = window.devicePixelRatio;
+      // const pixelRatio = window.devicePixelRatio;
 
-      oCanvas.width = frameWidth * pixelRatio;
-      oCanvas.height = frameHeight * pixelRatio;
+      const canvasFrameWidth = frameWidth * scaleX;
+      const canvasFrameHeight = frameHeight * scaleY;
 
-      oCtx?.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      oCanvas.width = canvasFrameWidth;
+      oCanvas.height = canvasFrameHeight;
+
+      // oCtx?.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
       (oCtx as CanvasRenderingContext2D).imageSmoothingQuality = 'high';
 
       oCtx?.drawImage(
         image,
         cropX * scaleX,
         cropY * scaleY,
-        frameWidth * scaleX,
-        frameHeight * scaleY,
+        canvasFrameWidth,
+        canvasFrameHeight,
         0,
         0,
-        frameWidth,
-        frameHeight,
+        canvasFrameWidth,
+        canvasFrameHeight,
       );
 
       if (selectedFrameList) {
@@ -381,7 +393,16 @@ const Tool = () => {
         setSelectedFrameList([oCanvas]);
       }
     },
-    [bgColor, canvasFrameSizeInfo, canvasPosition, selectedFrameInfo, selectedFrameList, setSelectedFrameList],
+    [
+      bgColor,
+      canvasFrameSizeInfo,
+      canvasPosition,
+      resizeHeight,
+      resizeWidth,
+      selectedFrameInfo,
+      selectedFrameList,
+      setSelectedFrameList,
+    ],
   );
 
   const createImageCanvas = useCallback(
