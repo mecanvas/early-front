@@ -45,10 +45,9 @@ interface Props {
   singlePrice?: string;
   singleCanvasName?: string;
   imgUrl: string;
-  type: 'single' | 'divided';
 }
 
-const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl, type }: Props) => {
+const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl }: Props) => {
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [framePrice] = useGlobalState<FramePrice[]>('framePrice');
@@ -146,7 +145,6 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl, type }: Props) => {
             </Button>
             {isSaveCanvas && (
               <ToolSave
-                type={type}
                 totalPrice={framePrice?.reduce((acc, cur) => (acc += cur.price), 0)}
                 yourPriceList={yourPriceList}
               />

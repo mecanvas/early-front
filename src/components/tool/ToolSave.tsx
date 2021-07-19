@@ -51,17 +51,16 @@ export interface OrderInfo {
 interface Props {
   yourPriceList?: [string, any][];
   totalPrice?: number;
-  type: 'single' | 'divided';
 }
 
-const ToolSave = ({ yourPriceList, totalPrice, type }: Props) => {
+const ToolSave = ({ yourPriceList, totalPrice }: Props) => {
   const [info, setInfo] = useState<OrderInfo | null>(null);
   const [userNameEmpty, setUserNameEmpty] = useState({ isRequired: false, extra: '' });
   const [phoneEmpty, setPhoneEmpty] = useState({ isRequired: false, extra: '' });
   const [orderRouteEmpty, setOrderRouteEmpty] = useState({ isRequired: false, extra: '' });
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [selectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
-  const { canvasToImage, loading, isDone } = useCanvasToServer(type);
+  const { canvasToImage, loading, isDone } = useCanvasToServer();
   const router = useRouter();
 
   const handleVisible = useCallback(() => {

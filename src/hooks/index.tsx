@@ -60,7 +60,7 @@ export const useGlobalState = <T,>(key: string, defaultValue?: T | null) => {
   return [state, setState] as const;
 };
 
-export const useCanvasToServer = (type: 'single' | 'divided') => {
+export const useCanvasToServer = () => {
   const dataURLtoFile = (dataurl: any, filename: any) => {
     if (dataurl) {
       const arr = dataurl.split(',');
@@ -81,6 +81,7 @@ export const useCanvasToServer = (type: 'single' | 'divided') => {
   const [isDone, setIsDone] = useGlobalState('isDone', false);
   const [imgUploadUrl] = useGlobalState<string>('imgUploadUrl');
   const [singleImgUploadUrl] = useGlobalState<string>('singleImgUploadUrl');
+  const [toolType] = useGlobalState<'single' | 'divided'>('toolType');
   const [isSave, setIsSave] = useState(false);
   const [username, setUsername] = useState('');
   const [phone, setPhone] = useState('');
@@ -146,7 +147,7 @@ export const useCanvasToServer = (type: 'single' | 'divided') => {
   };
 
   useEffect(() => {
-    if (!isSave || !type) return;
+    if (!isSave || !toolType) return;
     const saveCanvas = async (canvasType: 'single' | 'divided') => {
       const fd = new FormData();
       fd.append('username', username);
@@ -163,14 +164,14 @@ export const useCanvasToServer = (type: 'single' | 'divided') => {
         fd.append('originImgUrl', imgUploadUrl);
       }
 
-      await axios.post(`/canvas/${type}/save`, fd, {
+      await axios.post(`/canvas/${canvasType}/save`, fd, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
     };
-    saveCanvas(type);
-  }, [phone, fileList, isSave, paperSize, username, imgUploadUrl, orderRoute, type, singleImgUploadUrl]);
+    saveCanvas(toolType);
+  }, [phone, fileList, isSave, paperSize, username, imgUploadUrl, orderRoute, singleImgUploadUrl, toolType]);
 
   return { canvasToImage, loading, isDone, setIsDone, imgUploadUrl };
 };

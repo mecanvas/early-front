@@ -35,7 +35,6 @@ import { theme } from 'src/style/theme';
 import { ColorResult } from 'react-color';
 import ImageDropZone from 'src/components/common/ImageDropZone';
 import { icons } from 'public/icons';
-import Badges from 'src/components/common/Badges';
 import { PreventPageLeave } from 'src/hoc/PreventPageLeave';
 
 const SingleTool = () => {
@@ -84,6 +83,7 @@ const SingleTool = () => {
   const [isDragDrop, setIsDragDrop] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
 
+  const [, setToolType] = useGlobalState<'single' | 'divided'>('toolType', 'single');
   const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [, setFramePrice] = useGlobalState<FramePrice[]>('framePrice');
@@ -479,6 +479,7 @@ const SingleTool = () => {
   }, [createPreviewCanvas, isPreview]);
 
   useEffect(() => {
+    setToolType('single');
     const sCanvasWrapper = singleWrapperRef.current;
     if (!sCanvasWrapper) return;
 
@@ -504,7 +505,6 @@ const SingleTool = () => {
       <SingleToolContainer>
         <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
         <ToolHeader
-          type="single"
           imgUrl={singleImgUploadUrl || ''}
           singlePrice={singlePrice.toLocaleString()}
           singleCanvasName={singleCanvasName}

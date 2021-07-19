@@ -50,10 +50,10 @@ const CloseButton = styled(Button)`
 
 interface Props {
   onClick: () => void;
-  type: TutorialType;
+  tutorialType: TutorialType;
 }
 
-const ToolTutorial = ({ onClick, type }: Props) => {
+const ToolTutorial = ({ onClick, tutorialType }: Props) => {
   const { OpacityComponent } = useOpacity('type');
   return (
     <TutorialContainer>
@@ -64,11 +64,11 @@ const ToolTutorial = ({ onClick, type }: Props) => {
             X
           </CloseButton>
 
-          {type === 'frame' && <TutorialFrame />}
-          {type === 'preview' && <TutorialPreview />}
-          {type === 'edit' && <TutorialEdit />}
-          {type === 'price' && <TutorialPrice />}
-          {type === 'order' && <TutorialOrder />}
+          {tutorialType === 'frame' && <TutorialFrame />}
+          {tutorialType === 'preview' && <TutorialPreview />}
+          {tutorialType === 'edit' && <TutorialEdit />}
+          {tutorialType === 'price' && <TutorialPrice />}
+          {tutorialType === 'order' && <TutorialOrder />}
         </TutorialModal>
       </OpacityComponent>
     </TutorialContainer>

@@ -129,6 +129,7 @@ const Tool = () => {
   const { getProgressGage, progressPercentage } = useProgress();
 
   const [isNoContent, setIsNoContent] = useGlobalState<boolean>('isNoContent', false);
+  const [, setToolType] = useGlobalState<'single' | 'divided'>('toolType', 'divided');
   const [isDragDrop, setIsDragDrop] = useState(false);
   const [isSelectFrame, setIsSelectFrame] = useState(false); // 골랐는지 상태 여부
   const [selectedFrameInfo, setSelectedFrameInfo] = useState<FrameSize | null>(null); // 고른 액자의 정보 (스타일 + 이름)
@@ -623,6 +624,7 @@ const Tool = () => {
   }, []);
 
   useEffect(() => {
+    setToolType('divided');
     if (window.innerWidth <= replacePx(theme.size.md)) {
       setIsNoContent(true);
     } else {
@@ -680,7 +682,7 @@ const Tool = () => {
 
         {/* 사진 조절하는 툴바들 */}
         <ToolHeaderWrapper>
-          <ToolHeader type="divided" imgUrl={imgUploadUrl || ''} />
+          <ToolHeader imgUrl={imgUploadUrl || ''} />
           <DividedToolFactory croppedList={croppedList} setCroppedList={setCroppedList} />
         </ToolHeaderWrapper>
 

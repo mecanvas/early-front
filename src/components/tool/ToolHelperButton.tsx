@@ -84,7 +84,7 @@ const HelperButton = () => {
   }, []);
   return (
     <>
-      {isOpenTutorial && <ToolTutorial type={openType} onClick={handleOpenTutorialModal} />}
+      {isOpenTutorial && <ToolTutorial tutorialType={openType} onClick={handleOpenTutorialModal} />}
       <Popover
         overlayClassName="antd-popover-no-padding"
         trigger="click"
