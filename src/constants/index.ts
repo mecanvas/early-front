@@ -17,7 +17,10 @@ export const exceptionRoutes = ['/tool/divided', '/tool/single', '/404'];
 
 export const S3_URL = 'https://early21-assets.s3.ap-northeast-2.amazonaws.com/assets';
 
+// Tool의 헤더
 export const HEADER_HEIGHT = 86;
+
+export const CONTENT_HEIGHT = 'calc(100vh - 168px)';
 
 export const frameSize = (changeVertical?: boolean): FrameSize[] => [
   {
