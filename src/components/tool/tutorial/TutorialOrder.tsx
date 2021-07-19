@@ -17,7 +17,7 @@ const TutorialOrder = () => {
           }
         />
         <BadgeNumberDesc
-          count={2}
+          count={3}
           desc={
             <div>
               주문하신 <b>호수와 개수, 가격이</b> 맞는지 확인해 주세요.
@@ -25,13 +25,14 @@ const TutorialOrder = () => {
           }
         />
         <BadgeNumberDesc
-          count={2}
+          count={4}
           desc={
             <div>
-              <b>확인</b>을 누르면 주문이 완료됩니다.
+              <b>확인</b>을 누르면 저장이 완료됩니다.
             </div>
           }
         />
+        <BadgeNumberDesc count={5} desc={<div>주문 사이트로 돌아가 안내에 따라 진행해 주세요.</div>} />
       </Descriptions>
     </TutorialContainer>
   );
