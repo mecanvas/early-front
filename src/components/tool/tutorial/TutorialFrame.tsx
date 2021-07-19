@@ -8,7 +8,7 @@ const TutorialFrame = () => {
 
   return (
     <TutorialContainer>
-      <TutorialTitle title="액자를 선택해 변경하세요." imgUrl="tutorial/select.png" />
+      <TutorialTitle title="액자를 선택해 변경하세요." imgUrl={`tutorial/${toolType}/select.png`} />
       <Descriptions>
         <BadgeNumberDesc
           count={1}

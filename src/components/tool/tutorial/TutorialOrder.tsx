@@ -8,7 +8,7 @@ const TutorialOrder = () => {
 
   return (
     <TutorialContainer>
-      <TutorialTitle title="오른쪽 상단의 저장 버튼을 클릭하세요." imgUrl={['tutorial/order2.png']} />
+      <TutorialTitle title="오른쪽 상단의 저장 버튼을 클릭하세요." imgUrl={`tutorial/${toolType}/order2.png`} />
       <Descriptions>
         <BadgeNumberDesc count={1} desc={'저장 버튼 클릭 시 다음과 같은 화면이 나타납니다.'} />
         <BadgeNumberDesc

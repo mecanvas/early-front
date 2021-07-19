@@ -8,7 +8,7 @@ const TutorialPreview = () => {
 
   return (
     <TutorialContainer>
-      <TutorialTitle title="우측 상단의 미리보기 버튼을 클릭하세요." imgUrl="tutorial/preview.png" />
+      <TutorialTitle title="우측 상단의 미리보기 버튼을 클릭하세요." imgUrl={`tutorial/${toolType}/preview.png`} />
       <Descriptions>
         <BadgeNumberDesc
           count={1}

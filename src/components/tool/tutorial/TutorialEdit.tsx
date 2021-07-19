@@ -8,7 +8,7 @@ const TutorialEdit = () => {
 
   return (
     <TutorialContainer>
-      <TutorialTitle title="에디터에서는 다음과 같은 도구들을 제공합니다." imgUrl="tutorial/header.png" />
+      <TutorialTitle title="에디터에서는 다음과 같은 도구들을 제공합니다." imgUrl={`tutorial/${toolType}/header.png`} />
 
       <Descriptions>
         <BadgeNumberDesc
