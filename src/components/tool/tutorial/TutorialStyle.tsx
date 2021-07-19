@@ -32,10 +32,24 @@ export const Descriptions = styled.div`
   width: 100%;
 `;
 
-export const BadgeNumber = ({ count }: { count: number }) => {
+export const BadgesItemList = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 0.5em 0;
+  padding: 0 2em;
+  p {
+    margin: 0;
+    margin-left: 0.6em;
+  }
+`;
+
+export const BadgeNumberDesc = ({ count, desc }: { count: number; desc: string }) => {
   return (
-    <BadgesItem>
-      <span>{count}</span>
-    </BadgesItem>
+    <BadgesItemList>
+      <BadgesItem>
+        <span>{count}</span>
+      </BadgesItem>
+      <p>{desc}</p>
+    </BadgesItemList>
   );
 };

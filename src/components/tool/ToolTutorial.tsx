@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { TutorialType } from 'src/interfaces/ToolInterface';
 import TutorialEdit from './tutorial/TutorialEdit';
 import { Button } from 'antd';
+import TutorialFrame from './tutorial/TutorialFrame';
 
 const TutorialContainer = styled.div`
   position: fixed;
@@ -58,7 +59,7 @@ const ToolTutorial = ({ onClick, type }: Props) => {
           X
         </CloseButton>
 
-        {type === 'frame' && <div>프레임</div>}
+        {type === 'frame' && <TutorialFrame />}
         {type === 'edit' && <TutorialEdit />}
       </TutorialModal>
     </TutorialContainer>
