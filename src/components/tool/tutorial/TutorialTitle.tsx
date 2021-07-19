@@ -8,6 +8,11 @@ const Img = styeld.img`
   max-height: 250px;
 `;
 
+const Video = styeld.video`
+  max-width: 75%;
+  max-height: 250px;
+`;
+
 const TutorialTitle = ({
   title,
   imgUrl,
@@ -26,7 +31,7 @@ const TutorialTitle = ({
         ) : (
           <Img src={getS3(imgUrl as string)} />
         ))}
-      {videoUrl && <video src={getS3(videoUrl)} autoPlay loop />}
+      {videoUrl && <Video muted src={getS3(videoUrl)} autoPlay loop />}
       <Divider />
     </>
   );

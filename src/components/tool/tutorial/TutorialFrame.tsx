@@ -1,5 +1,6 @@
 import React from 'react';
 import { useGlobalState } from 'src/hooks';
+import { useCarousel } from 'src/hooks/useCarousel';
 import { BadgeNumberDesc, TutorialDescriptions, TutorialContainer } from './TutorialStyle';
 import TutorialTitle from './TutorialTitle';
 
@@ -54,17 +55,42 @@ const SingleDescription = () => {
 
 const TutorialFrame = () => {
   const [toolType] = useGlobalState<'single' | 'divided'>('toolType');
-
+  const { AntdCarousel } = useCarousel();
   return (
-    <TutorialContainer>
+    <>
       {toolType === 'single' ? (
-        <TutorialTitle title="액자를 선택해 변경하세요." imgUrl={`tutorial/single/select.png`} />
-      ) : (
-        <TutorialTitle title="액자 선택 후 원하는 위치에 클릭하세요." videoUrl={`tutorial/divided/divided.mp4`} />
-      )}
+        <TutorialContainer>
+          <TutorialTitle title="액자를 선택해 변경하세요." imgUrl={`tutorial/single/select.png`} />
 
-      {toolType === 'single' ? <SingleDescription /> : <DividedDescription />}
-    </TutorialContainer>
+          <SingleDescription />
+        </TutorialContainer>
+      ) : (
+        <AntdCarousel startIndex={0} lastIndex={1}>
+          <div>
+            <TutorialContainer>
+              <TutorialTitle title="액자 선택 후 원하는 위치에 클릭하세요." videoUrl={`tutorial/divided/divided.mp4`} />
+              <DividedDescription />
+            </TutorialContainer>
+          </div>
+          <div>
+            <TutorialContainer>
+              <TutorialTitle title="액자는 가로/세로 변환할 수 있습니다." videoUrl={`tutorial/divided/vertical.mp4`} />
+              <TutorialDescriptions>
+                <BadgeNumberDesc count={1} desc={<div>맨 하단의 변환 아이콘을 클릭하세요.</div>} />
+                <BadgeNumberDesc
+                  count={2}
+                  desc={
+                    <div>
+                      액자를 재선택하세요. <b>가로/세로로</b> 변환됩니다.
+                    </div>
+                  }
+                />
+              </TutorialDescriptions>
+            </TutorialContainer>
+          </div>
+        </AntdCarousel>
+      )}
+    </>
   );
 };
 
