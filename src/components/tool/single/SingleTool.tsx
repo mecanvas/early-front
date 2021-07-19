@@ -153,17 +153,22 @@ const SingleTool = () => {
         img.src = singleImgUploadUrl;
         img.crossOrigin = 'Anonymous';
         img.onload = () => {
-          const scaleX = originWidth / resizeWidth;
-          const scaleY = originHeight / resizeHeight;
+          const scaleX = img.naturalWidth / resizeWidth;
+          const scaleY = img.naturalHeight / resizeHeight;
           const cropX = frameLeft - left;
           const cropY = frameTop - top;
 
+          const originFrameWidth = singleFrameWidth * scaleX;
+          const originFrameHeight = singleFrameHeight * scaleY;
+          const canvasFrameWidth = canvasProps ? singleFrameWidth : originFrameWidth;
+          const canvasFrameHeight = canvasProps ? singleFrameHeight : originFrameHeight;
+
           // const pixelRatio = window.devicePixelRatio;
-          canvas.width = singleFrameWidth;
-          canvas.height = singleFrameHeight;
+          canvas.width = canvasFrameWidth;
+          canvas.height = canvasFrameHeight;
           canvas.setAttribute('data-paper', singleCanvasName);
 
-          ctx.clearRect(0, 0, singleFrameWidth, singleFrameHeight);
+          ctx.clearRect(0, 0, canvasFrameWidth, canvasFrameHeight);
 
           // ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
           ctx.imageSmoothingQuality = 'high';
@@ -171,18 +176,18 @@ const SingleTool = () => {
             img,
             cropX * scaleX,
             cropY * scaleY,
-            singleFrameWidth * scaleX,
-            singleFrameHeight * scaleY,
+            originFrameWidth,
+            originFrameHeight,
             0,
             0,
-            singleFrameWidth,
-            singleFrameHeight,
+            canvasFrameWidth,
+            canvasFrameHeight,
           );
 
           // 배경을 칠합니다.
           ctx.globalCompositeOperation = 'destination-over';
           ctx.fillStyle = bgColor;
-          ctx.fillRect(0, 0, singleFrameWidth, singleFrameHeight);
+          ctx.fillRect(0, 0, canvasFrameWidth, canvasFrameHeight);
         };
       }
       if (!canvasProps) {

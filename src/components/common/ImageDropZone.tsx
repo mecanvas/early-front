@@ -13,7 +13,9 @@ const DropZone = styled.div<{ width?: string; height?: string; isDragActive: boo
         `
       : css`
           opacity: 1;
+          z-index: 16;
         `}
+  max-width: 1000px;
   position: absolute;
   background-color: ${({ theme }) => theme.color.gray000};
   border-radius: 8px;
@@ -33,8 +35,10 @@ const DropZoneDiv = styled.div`
   border: 1px solid ${({ theme }) => theme.color.gray200};
   justify-content: center;
   height: 100%;
-  h4 {
+  p {
     margin-top: 6px;
+    font-size: 17px;
+    font-weight: bold;
   }
 
   img {
@@ -50,7 +54,7 @@ interface Props {
   isDragDrop?: boolean;
 }
 
-const ImageDropZone = ({ isDragDrop, onDrop, text = '이미지를 드롭 or 첨부하세요!', width, height }: Props) => {
+const ImageDropZone = ({ isDragDrop, onDrop, text = '이미지를 첨부하세요', width, height }: Props) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
@@ -63,7 +67,7 @@ const ImageDropZone = ({ isDragDrop, onDrop, text = '이미지를 드롭 or 첨�
       ) : (
         <DropZoneDiv>
           <img src={icons.add} />
-          <h4>{text}</h4>
+          <p>{text}</p>
         </DropZoneDiv>
       )}
     </DropZone>
