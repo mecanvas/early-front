@@ -637,6 +637,7 @@ const SingleTool = () => {
               <span></span>
               <span></span>
             </SingleSelectedFrame>
+
             {!singleImgUploadUrl || isDragDrop ? (
               <ImageDropZone
                 isDragDrop={isDragDrop}

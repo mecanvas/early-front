@@ -59,7 +59,6 @@ const ToolTutorial = ({ onClick, type }: Props) => {
         </CloseButton>
 
         {type === 'frame' && <div>프레임</div>}
-        {type === 'bg' && <div>bg</div>}
         {type === 'edit' && <TutorialEdit />}
       </TutorialModal>
     </TutorialContainer>
