@@ -32,13 +32,17 @@ const TutorialModal = styled.div`
 
 interface Props {
   onClick: () => void;
+  type: 'frame' | 'bg';
 }
 
-const ToolTutorial = ({ onClick }: Props) => {
+const ToolTutorial = ({ onClick, type }: Props) => {
   return (
     <TutorialContainer>
       <TutorialModalBackground onClick={onClick} />
-      <TutorialModal></TutorialModal>
+      <TutorialModal>
+        {type === 'frame' && <div>프레임</div>}
+        {type === 'bg' && <div>bg</div>}
+      </TutorialModal>
     </TutorialContainer>
   );
 };

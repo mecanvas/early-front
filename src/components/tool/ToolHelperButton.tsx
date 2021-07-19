@@ -1,8 +1,9 @@
 import styled from '@emotion/styled';
 import { Button, List, Popover } from 'antd';
+import { useRouter } from 'next/router';
 import { icons } from 'public/icons';
-import React, { useCallback, useMemo, useState } from 'react';
-import { MY_URL } from 'src/constants';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import ToolTutorial from './ToolTutorial';
 
 const HelpButton = styled(Button)`
   height: 34px;
@@ -48,24 +49,41 @@ const HelperList = styled(List)`
 
 const HelperButton = () => {
   const [showingHelper, setShowingHelper] = useState(false);
-
+  const { asPath } = useRouter();
+  const [isOpenTutorial, setIsOpenTutorial] = useState(false);
+  const [openType, setOpenType] = useState<'frame' | 'bg'>('');
   const handleVisible = useCallback((visible) => {
     setShowingHelper(visible);
   }, []);
 
   const helpArray = useMemo(() => {
-    const helpList = {
-      '/': '전체적인 사용 설명이 필요해요.',
-      '/frame': '액자의 크기를 변경하고 싶어요.',
-      '/bg': '배경 색상을 변경하고 싶어요.',
-      '/price': '예상 가격이 궁금해요.',
-      '/order': '주문은 어떻게 하죠?',
+    const singleHelpList = {
+      all: '전체적인 사용 설명이 필요해요.',
+      frame: '액자의 크기를 변경하고 싶어요.',
+      bg: '배경 색상을 변경하고 싶어요.',
+      price: '예상 가격이 궁금해요.',
+      order: '주문은 어떻게 하죠?',
     };
-    return Object.entries(helpList);
-  }, []);
 
+    if (asPath.includes('single')) {
+      return Object.entries(singleHelpList);
+    }
+    return Object.entries(singleHelpList);
+  }, [asPath]);
+
+  const handleOpenTutorialModal = useCallback((e?: any) => {
+    if (e) {
+      const { key } = e.currentTarget.dataset;
+      setOpenType(key);
+    }
+
+    setIsOpenTutorial((prev) => !prev);
+    setShowingHelper(false);
+  }, []);
+  console.log(openType);
   return (
     <>
+      {isOpenTutorial && <ToolTutorial type={openType} onClick={handleOpenTutorialModal} />}
       <Popover
         overlayClassName="antd-popover-no-padding"
         trigger="click"
@@ -77,9 +95,9 @@ const HelperButton = () => {
             size="large"
             dataSource={helpArray}
             renderItem={([key, value]: any) => (
-              <a target="blank" href={`${MY_URL}/helper${key}`} rel="noreferrer">
-                <List.Item>{value}</List.Item>
-              </a>
+              <List.Item onClick={handleOpenTutorialModal} data-key={key}>
+                {value}
+              </List.Item>
             )}
           />
         }
