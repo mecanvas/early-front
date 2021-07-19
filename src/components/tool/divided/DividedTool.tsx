@@ -459,6 +459,7 @@ const Tool = () => {
     setIsNearingY(false);
     setIsFitX(false);
     setIsFitY(false);
+    setClickedValue('');
     setIsSelectFrame(() => false);
     setSelectedFrameInfo(() => null);
     setYourSelectedFrame(() => null);
