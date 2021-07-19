@@ -18,7 +18,7 @@ const DividedDescription = () => {
         count={2}
         desc={
           <div>
-            최근 순서의 분할 액자 작업을 <b>취소</b>합니다.
+            분할한 액자를 최근 순서대로 <b>제거</b>합니다.
           </div>
         }
       />
@@ -34,7 +34,7 @@ const DividedDescription = () => {
         count={4}
         desc={
           <div>
-            가이드 눈금을 <b>표시</b>합니다.
+            <b>가이드 눈금</b>을 표시합니다.
           </div>
         }
       />

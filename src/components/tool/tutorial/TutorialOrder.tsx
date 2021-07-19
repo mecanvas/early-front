@@ -1,14 +1,13 @@
 import React from 'react';
-import { useGlobalState } from 'src/hooks';
 import { TutorialContainer, BadgeNumberDesc, TutorialDescriptions } from './TutorialStyle';
 import TutorialTitle from './TutorialTitle';
 
 const TutorialOrder = () => {
-  const [toolType] = useGlobalState<'single' | 'divided'>('toolType');
+  // const [toolType] = useGlobalState<'single' | 'divided'>('toolType');
 
   return (
     <TutorialContainer>
-      <TutorialTitle title="오른쪽 상단의 저장 버튼을 클릭하세요." imgUrl={`tutorial/${toolType}/order2.png`} />
+      <TutorialTitle title="오른쪽 상단의 저장 버튼을 클릭하세요." imgUrl={`tutorial/single/order2.png`} />
       <TutorialDescriptions>
         <BadgeNumberDesc count={1} desc={'저장 버튼 클릭 시 다음과 같은 화면이 나타납니다.'} />
         <BadgeNumberDesc

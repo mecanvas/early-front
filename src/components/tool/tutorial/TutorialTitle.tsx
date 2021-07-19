@@ -5,7 +5,7 @@ import styeld from '@emotion/styled';
 
 const Img = styeld.img`
   max-width: 75%;
-  max-height: 200px;
+  max-height: 250px;
 `;
 
 const TutorialTitle = ({
