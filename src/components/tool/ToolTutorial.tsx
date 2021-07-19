@@ -44,6 +44,7 @@ const CloseButton = styled(Button)`
   position: absolute;
   top: 5px;
   right: 5px;
+  z-index: 9999;
   span {
     font-size: 24px;
   }
