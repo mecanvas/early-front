@@ -15,7 +15,14 @@ const TutorialPreview = () => {
             </div>
           }
         />
-        <BadgeNumberDesc count={2} desc={<div>제작한 시안이 나타납니다. 시안은 앞면만 제공합니다.</div>} />
+        <BadgeNumberDesc
+          count={2}
+          desc={
+            <div>
+              제작한 시안이 나타납니다. 시안은 <b>앞면</b>만 제공합니다.
+            </div>
+          }
+        />
         <BadgeNumberDesc
           count={3}
           desc={

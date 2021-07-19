@@ -60,8 +60,8 @@ const HelperButton = () => {
   const helpArray = useMemo(() => {
     const singleHelpList = {
       all: '전체적인 사용 설명이 필요해요.',
-      frame: '다른 액자로 변경하고 싶어요.',
       edit: '에디터 도구에 대해 알고 싶어요.',
+      frame: '다른 액자로 변경하고 싶어요.',
       preview: '제가 만든 시안을 확인하고 싶어요.',
       price: '예상 가격이 궁금해요.',
       order: '주문은 어떻게 하죠?',
