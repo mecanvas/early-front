@@ -52,7 +52,7 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl, type }: Props) => {
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [framePrice] = useGlobalState<FramePrice[]>('framePrice');
   const { OpacityComponent } = useOpacity(imgUrl || '');
-
+  const [, setIsOpenModal] = useGlobalState<boolean>('openModal');
   // 고른 액자의 이름과 수량
   const yourPriceList = useMemo(() => {
     if (!framePrice?.length) return;
@@ -70,8 +70,8 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl, type }: Props) => {
   }, [framePrice]);
 
   const handleMoveHome = useCallback(() => {
-    history.back();
-  }, []);
+    setIsOpenModal(true);
+  }, [setIsOpenModal]);
 
   const handleSaveCanvas = useCallback(() => {
     setIsSaveCanvas(true);
