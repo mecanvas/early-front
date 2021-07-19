@@ -1,77 +1,16 @@
-import styled from '@emotion/styled';
-import { Button, Carousel } from 'antd';
-import { CarouselRef } from 'antd/lib/carousel';
-import { icons } from 'public/icons';
-import React, { useCallback, useRef, useState } from 'react';
+import React from 'react';
 import { useGlobalState } from 'src/hooks';
+import { useCarousel } from 'src/hooks/useCarousel';
 import { BadgeNumberDesc, TutorialDescriptions, TutorialContainer } from './TutorialStyle';
 import TutorialTitle from './TutorialTitle';
 
-const TutorialCarousel = styled(Carousel)`
-  .slide-dots {
-    button {
-      margin-top: 12px;
-      border: 1px solid ${({ theme }) => theme.color.primary} !important;
-    }
-  }
-  li.slick-active {
-    button {
-      background-color: ${({ theme }) => theme.color.primary} !important;
-    }
-  }
-`;
-
-const PrevButton = styled(Button)`
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  left: 0px;
-  img {
-    transform: rotateY(180deg);
-    -webkit-transform: rotateY(180deg);
-    -moz-transform: rotateY(180deg);
-    -o-transform: rotateY(180deg);
-    -ms-transform: rotateY(180deg);
-    unicode-bidi: bidi-override;
-    direction: rtl;
-    width: 20px;
-  }
-`;
-
-const NextButton = styled(Button)`
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  right: 0px;
-  img {
-    width: 20px;
-  }
-`;
-
 const TutorialImg = () => {
   const [toolType] = useGlobalState<'single' | 'divided'>('toolType');
-  const carouselRef = useRef<CarouselRef>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const handleCheckSlideIndex = useCallback((_, current) => {
-    setCurrentIndex(current);
-  }, []);
-
-  const handleSlickGoToPrev = useCallback(() => {
-    if (carouselRef.current) {
-      carouselRef.current.prev();
-    }
-  }, [carouselRef]);
-
-  const handleSlickGoToNext = useCallback(() => {
-    if (carouselRef.current) {
-      carouselRef.current.next();
-    }
-  }, [carouselRef]);
+  const { AntdCarousel } = useCarousel();
 
   return (
     <>
-      <TutorialCarousel ref={carouselRef} dots={{ className: 'slide-dots' }} beforeChange={handleCheckSlideIndex}>
+      <AntdCarousel startIndex={0} lastIndex={1}>
         <div>
           <TutorialContainer>
             <TutorialTitle title="첨부한 이미지를 클릭하세요." imgUrl={`tutorial/${toolType}/imgcontrol.png`} />
@@ -106,17 +45,7 @@ const TutorialImg = () => {
             </TutorialDescriptions>
           </TutorialContainer>
         </div>
-      </TutorialCarousel>
-      {currentIndex === 0 || (
-        <PrevButton type="text" onClick={handleSlickGoToPrev}>
-          <img src={icons.arrow} />
-        </PrevButton>
-      )}
-      {currentIndex === 1 || (
-        <NextButton type="text" onClick={handleSlickGoToNext}>
-          <img src={icons.arrow} />
-        </NextButton>
-      )}
+      </AntdCarousel>
     </>
   );
 };
