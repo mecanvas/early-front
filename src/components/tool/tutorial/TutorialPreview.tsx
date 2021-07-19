@@ -5,7 +5,7 @@ import TutorialTitle from './TutorialTitle';
 const TutorialPreview = () => {
   return (
     <TutorialContainer>
-      <TutorialTitle title="미리보기 버튼을 클릭하세요." imgUrl="tutorial/preview.png" />
+      <TutorialTitle title="우측 상단의 미리보기 버튼을 클릭하세요." imgUrl="tutorial/preview.png" />
       <Descriptions>
         <BadgeNumberDesc
           count={1}
@@ -15,11 +15,12 @@ const TutorialPreview = () => {
             </div>
           }
         />
+        <BadgeNumberDesc count={2} desc={<div>제작한 시안이 나타납니다. 시안은 앞면만 제공합니다.</div>} />
         <BadgeNumberDesc
-          count={2}
+          count={3}
           desc={
             <div>
-              해제하려면 같은 곳의 <b>이미지로</b> 버튼을 클릭하세요.
+              되돌아가려면 같은 곳의 <b>이미지로</b> 버튼을 클릭하세요.
             </div>
           }
         />

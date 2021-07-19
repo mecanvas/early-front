@@ -7,11 +7,15 @@ const Img = styeld.img`
   max-width: 80%;
 `;
 
-const TutorialTitle = ({ title, imgUrl }: { title: string; imgUrl: string }) => {
+const TutorialTitle = ({ title, imgUrl }: { title: string; imgUrl: string | string[] }) => {
   return (
     <>
       <h4>{title}</h4>
-      <Img src={getS3(imgUrl)} />
+      {typeof imgUrl !== 'string' ? (
+        (imgUrl as string[]).map((lst) => <Img src={getS3(lst)} />)
+      ) : (
+        <Img src={getS3(imgUrl as string)} />
+      )}
       <Divider />
     </>
   );
