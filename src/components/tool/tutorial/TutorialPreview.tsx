@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGlobalState } from 'src/hooks';
-import { TutorialContainer, BadgeNumberDesc, Descriptions } from './TutorialStyle';
+import { TutorialContainer, BadgeNumberDesc, TutorialDescriptions } from './TutorialStyle';
 import TutorialTitle from './TutorialTitle';
 
 const TutorialPreview = () => {
@@ -9,7 +9,7 @@ const TutorialPreview = () => {
   return (
     <TutorialContainer>
       <TutorialTitle title="우측 상단의 미리보기 버튼을 클릭하세요." imgUrl={`tutorial/${toolType}/preview.png`} />
-      <Descriptions>
+      <TutorialDescriptions>
         <BadgeNumberDesc
           count={1}
           desc={
@@ -34,7 +34,7 @@ const TutorialPreview = () => {
             </div>
           }
         />
-      </Descriptions>
+      </TutorialDescriptions>
     </TutorialContainer>
   );
 };

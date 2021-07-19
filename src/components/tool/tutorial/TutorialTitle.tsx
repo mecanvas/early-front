@@ -7,15 +7,25 @@ const Img = styeld.img`
   max-width: 80%;
 `;
 
-const TutorialTitle = ({ title, imgUrl }: { title: string; imgUrl: string | string[] }) => {
+const TutorialTitle = ({
+  title,
+  imgUrl,
+  videoUrl,
+}: {
+  title: string;
+  imgUrl?: string | string[];
+  videoUrl?: string;
+}) => {
   return (
     <>
       <h4>{title}</h4>
-      {typeof imgUrl !== 'string' ? (
-        (imgUrl as string[]).map((lst) => <Img src={getS3(lst)} />)
-      ) : (
-        <Img src={getS3(imgUrl as string)} />
-      )}
+      {imgUrl &&
+        (typeof imgUrl !== 'string' ? (
+          (imgUrl as string[]).map((lst) => <Img src={getS3(lst)} />)
+        ) : (
+          <Img src={getS3(imgUrl as string)} />
+        ))}
+      {videoUrl && <video src={getS3(videoUrl)} autoPlay loop />}
       <Divider />
     </>
   );

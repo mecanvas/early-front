@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGlobalState } from 'src/hooks';
-import { TutorialContainer, BadgeNumberDesc, Descriptions } from './TutorialStyle';
+import { TutorialContainer, BadgeNumberDesc, TutorialDescriptions } from './TutorialStyle';
 import TutorialTitle from './TutorialTitle';
 
 const TutorialOrder = () => {
@@ -9,7 +9,7 @@ const TutorialOrder = () => {
   return (
     <TutorialContainer>
       <TutorialTitle title="오른쪽 상단의 저장 버튼을 클릭하세요." imgUrl={`tutorial/${toolType}/order2.png`} />
-      <Descriptions>
+      <TutorialDescriptions>
         <BadgeNumberDesc count={1} desc={'저장 버튼 클릭 시 다음과 같은 화면이 나타납니다.'} />
         <BadgeNumberDesc
           count={2}
@@ -36,7 +36,7 @@ const TutorialOrder = () => {
           }
         />
         <BadgeNumberDesc count={5} desc={<div>주문 사이트로 돌아가 안내에 따라 진행해 주세요.</div>} />
-      </Descriptions>
+      </TutorialDescriptions>
     </TutorialContainer>
   );
 };

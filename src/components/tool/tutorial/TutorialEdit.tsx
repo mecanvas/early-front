@@ -1,11 +1,11 @@
 import React from 'react';
 import { useGlobalState } from 'src/hooks';
-import { TutorialContainer, Descriptions, BadgeNumberDesc } from './TutorialStyle';
+import { TutorialContainer, TutorialDescriptions, BadgeNumberDesc } from './TutorialStyle';
 import TutorialTitle from './TutorialTitle';
 
 const DividedDescription = () => {
   return (
-    <Descriptions>
+    <TutorialDescriptions>
       <BadgeNumberDesc
         count={1}
         desc={
@@ -46,13 +46,13 @@ const DividedDescription = () => {
           </div>
         }
       />
-    </Descriptions>
+    </TutorialDescriptions>
   );
 };
 
 const SingleDescription = () => {
   return (
-    <Descriptions>
+    <TutorialDescriptions>
       <BadgeNumberDesc
         count={1}
         desc={
@@ -101,7 +101,7 @@ const SingleDescription = () => {
           </div>
         }
       />
-    </Descriptions>
+    </TutorialDescriptions>
   );
 };
 

@@ -11,7 +11,7 @@ export const TutorialContainer = styled.div`
   }
 `;
 
-export const Descriptions = styled.div`
+export const TutorialDescriptions = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
