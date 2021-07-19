@@ -4,6 +4,7 @@ import { TutorialType } from 'src/interfaces/ToolInterface';
 import TutorialEdit from './tutorial/TutorialEdit';
 import { Button } from 'antd';
 import TutorialFrame from './tutorial/TutorialFrame';
+import TutorialPreview from './tutorial/TutorialPreview';
 
 const TutorialContainer = styled.div`
   position: fixed;
@@ -60,6 +61,7 @@ const ToolTutorial = ({ onClick, type }: Props) => {
         </CloseButton>
 
         {type === 'frame' && <TutorialFrame />}
+        {type === 'preview' && <TutorialPreview />}
         {type === 'edit' && <TutorialEdit />}
       </TutorialModal>
     </TutorialContainer>

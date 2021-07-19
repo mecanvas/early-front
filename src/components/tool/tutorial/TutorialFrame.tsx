@@ -5,9 +5,18 @@ import TutorialTitle from './TutorialTitle';
 const TutorialFrame = () => {
   return (
     <TutorialContainer>
-      <TutorialTitle title="원하는 액자를 골라 변경할 수 있습니다." imgUrl="tutorial/select.png" />
+      <TutorialTitle title="액자를 선택해 변경하세요." imgUrl="tutorial/select.png" />
       <Descriptions>
-        <BadgeNumberDesc count={1} desc="이미지 첨부(변경)를 합니다. 화면상에 드롭도 가능합니다." />
+        <BadgeNumberDesc
+          count={1}
+          desc={
+            <div>
+              <b>정방/인물/해경/풍경</b> 테마 중 원하는 타입을 선택하세요
+            </div>
+          }
+        />
+        <BadgeNumberDesc count={2} desc="원하는 액자를 선택하면 사이즈가 자동 적용됩니다." />
+        <BadgeNumberDesc count={3} desc="'접기'를 눌러 보이지 않게 할 수 있습니다." />
       </Descriptions>
     </TutorialContainer>
   );

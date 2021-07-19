@@ -43,7 +43,7 @@ export const BadgesItemList = styled.div`
   }
 `;
 
-export const BadgeNumberDesc = ({ count, desc }: { count: number; desc: string }) => {
+export const BadgeNumberDesc = ({ count, desc }: { count: number; desc: string | React.ReactNode }) => {
   return (
     <BadgesItemList>
       <BadgesItem>

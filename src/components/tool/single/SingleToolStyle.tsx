@@ -235,7 +235,7 @@ export const SingleFrameListHeader = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
-  right: 0;
+  right: 2px;
   @media all and (min-width: ${({ theme }) => theme.size.sm}) {
     top: ${HEADER_HEIGHT - 38}px;
   }
@@ -283,7 +283,6 @@ export const SingleFrameListGrid = styled.div<{
   }
   display: flex;
   width: 100%;
-  border-radius: 4px;
   justify-content: center;
   align-items: center;
   padding: ${({ padding }) => padding};
