@@ -67,10 +67,20 @@ const HelperButton = () => {
       order: '주문은 어떻게 하죠?',
     };
 
+    const dividedHelpList = {
+      all: '전체적인 사용 설명이 필요해요.',
+      frame: '어떻게 분할하는지 알려주세요.',
+      edit: '에디터 도구에 대해 알고 싶어요.',
+      image: '사진의 크기를 변경하고 싶어요.',
+      preview: '제가 만든 시안을 확인하고 싶어요.',
+      price: '예상 가격이 궁금해요.',
+      order: '주문은 어떻게 하죠?',
+    };
+
     if (asPath.includes('single')) {
       return Object.entries(singleHelpList);
     }
-    return Object.entries(singleHelpList);
+    return Object.entries(dividedHelpList);
   }, [asPath]);
 
   const handleOpenTutorialModal = useCallback((e?: any) => {

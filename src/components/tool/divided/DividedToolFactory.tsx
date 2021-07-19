@@ -109,7 +109,6 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
           <Button type="text" style={{ opacity: selectedFrameList?.length ? 1 : 0.4 }} onClick={handleImgGoBack}>
             <img src={icons.undo} />
           </Button>
-
           <Popover
             style={{ padding: 0 }}
             trigger="click"

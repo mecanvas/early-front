@@ -8,7 +8,7 @@ export type ResizeCmd =
   | 'right'
   | 'left';
 
-export type TutorialType = 'all' | 'frame' | 'preview' | 'order' | 'price' | 'edit';
+export type TutorialType = 'all' | 'frame' | 'preview' | 'order' | 'price' | 'edit' | 'image';
 
 export interface FrameAttributes {
   // 미대오빠 캔버스 참고
