@@ -2,7 +2,8 @@ import styled from '@emotion/styled';
 import { Button, List, Popover } from 'antd';
 import { useRouter } from 'next/router';
 import { icons } from 'public/icons';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { TutorialType } from 'src/interfaces/ToolInterface';
 import ToolTutorial from './ToolTutorial';
 
 const HelpButton = styled(Button)`
@@ -51,7 +52,7 @@ const HelperButton = () => {
   const [showingHelper, setShowingHelper] = useState(false);
   const { asPath } = useRouter();
   const [isOpenTutorial, setIsOpenTutorial] = useState(false);
-  const [openType, setOpenType] = useState<'frame' | 'bg'>('');
+  const [openType, setOpenType] = useState<TutorialType>('all');
   const handleVisible = useCallback((visible) => {
     setShowingHelper(visible);
   }, []);
@@ -60,6 +61,7 @@ const HelperButton = () => {
     const singleHelpList = {
       all: '전체적인 사용 설명이 필요해요.',
       frame: '액자의 크기를 변경하고 싶어요.',
+      edit: '에디터 도구에 대해 알고 싶어요.',
       bg: '배경 색상을 변경하고 싶어요.',
       price: '예상 가격이 궁금해요.',
       order: '주문은 어떻게 하죠?',

@@ -8,6 +8,8 @@ export type ResizeCmd =
   | 'right'
   | 'left';
 
+export type TutorialType = 'all' | 'frame' | 'bg' | 'order' | 'price' | 'edit';
+
 export interface FrameAttributes {
   // 미대오빠 캔버스 참고
   attribute: '정방' | '해경' | '인물' | '풍경';

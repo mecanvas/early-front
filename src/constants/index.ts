@@ -15,7 +15,7 @@ export const MY_URL = process.env.NODE_ENV === 'production' ? 'https://early21.c
 // 해당하는 routes들은 false를 반환합니다. -> footer를 제외하고 불러옵니다.
 export const exceptionRoutes = ['/tool/divided', '/tool/single', '/404'];
 
-export const S3_URL = 'https://early21-assets.s3.ap-northeast-2.amazonaws.com/assets';
+export const S3_URL = 'https://early21-assets.s3.ap-northeast-2.amazonaws.com';
 
 // Tool의 헤더
 export const HEADER_HEIGHT = 86;

@@ -1,5 +1,8 @@
 import React from 'react';
 import styled from '@emotion/styled';
+import { TutorialType } from 'src/interfaces/ToolInterface';
+import TutorialEdit from './tutorial/TutorialEdit';
+import { Button } from 'antd';
 
 const TutorialContainer = styled.div`
   position: fixed;
@@ -23,16 +26,27 @@ const TutorialModalBackground = styled.div`
 `;
 
 const TutorialModal = styled.div`
-  width: 546px;
-  height: 280px;
+  width: 508px;
+  height: 508px;
   background-color: ${({ theme }) => theme.color.white};
   box-shadow: 0 4px 12px 0 rgb(0 0 0 / 16%);
+  border-radius: 20px;
   z-index: 101;
+  position: relative;
+`;
+
+const CloseButton = styled(Button)`
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  span {
+    font-size: 24px;
+  }
 `;
 
 interface Props {
   onClick: () => void;
-  type: 'frame' | 'bg';
+  type: TutorialType;
 }
 
 const ToolTutorial = ({ onClick, type }: Props) => {
@@ -40,8 +54,13 @@ const ToolTutorial = ({ onClick, type }: Props) => {
     <TutorialContainer>
       <TutorialModalBackground onClick={onClick} />
       <TutorialModal>
+        <CloseButton type="text" onClick={onClick}>
+          X
+        </CloseButton>
+
         {type === 'frame' && <div>프레임</div>}
         {type === 'bg' && <div>bg</div>}
+        {type === 'edit' && <TutorialEdit />}
       </TutorialModal>
     </TutorialContainer>
   );
