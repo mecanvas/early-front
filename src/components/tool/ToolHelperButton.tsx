@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
 import { Button, List, Popover } from 'antd';
 import { icons } from 'public/icons';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { MY_URL } from 'src/constants';
 
 const HelpButton = styled(Button)`
   height: 34px;
@@ -52,13 +53,16 @@ const HelperButton = () => {
     setShowingHelper(visible);
   }, []);
 
-  const helpList = [
-    '전체적인 사용 설명이 필요해요.',
-    '액자의 크기를 변경하고 싶어요.',
-    '배경 색상을 변경하고 싶어요.',
-    '예상 가격이 궁금해요.',
-    '주문은 어떻게 하죠?',
-  ];
+  const helpArray = useMemo(() => {
+    const helpList = {
+      '/': '전체적인 사용 설명이 필요해요.',
+      '/frame': '액자의 크기를 변경하고 싶어요.',
+      '/bg': '배경 색상을 변경하고 싶어요.',
+      '/price': '예상 가격이 궁금해요.',
+      '/order': '주문은 어떻게 하죠?',
+    };
+    return Object.entries(helpList);
+  }, []);
 
   return (
     <>
@@ -69,7 +73,15 @@ const HelperButton = () => {
         title={<h6>어떤 도움이 필요하세요?</h6>}
         placement="bottomLeft"
         content={
-          <HelperList size="large" dataSource={helpList} renderItem={(item: any) => <List.Item>{item}</List.Item>} />
+          <HelperList
+            size="large"
+            dataSource={helpArray}
+            renderItem={([key, value]: any) => (
+              <a target="blank" href={`${MY_URL}/helper${key}`} rel="noreferrer">
+                <List.Item>{value}</List.Item>
+              </a>
+            )}
+          />
         }
         visible={showingHelper}
       >
