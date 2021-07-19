@@ -1,8 +1,11 @@
 import React from 'react';
+import { useGlobalState } from 'src/hooks';
 import { TutorialContainer, BadgeNumberDesc, Descriptions } from './TutorialStyle';
 import TutorialTitle from './TutorialTitle';
 
 const TutorialOrder = () => {
+  const [toolType] = useGlobalState<'single' | 'divided'>('toolType');
+
   return (
     <TutorialContainer>
       <TutorialTitle title="오른쪽 상단의 저장 버튼을 클릭하세요." imgUrl={['tutorial/order2.png']} />

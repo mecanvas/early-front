@@ -1,8 +1,11 @@
 import React from 'react';
+import { useGlobalState } from 'src/hooks';
 import { BadgeNumberDesc, Descriptions, TutorialContainer } from './TutorialStyle';
 import TutorialTitle from './TutorialTitle';
 
 const TutorialFrame = () => {
+  const [toolType] = useGlobalState<'single' | 'divided'>('toolType');
+
   return (
     <TutorialContainer>
       <TutorialTitle title="액자를 선택해 변경하세요." imgUrl="tutorial/select.png" />

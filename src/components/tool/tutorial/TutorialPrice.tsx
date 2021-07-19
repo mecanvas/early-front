@@ -1,8 +1,11 @@
 import React from 'react';
+import { useGlobalState } from 'src/hooks';
 import { TutorialContainer, BadgeNumberDesc, Descriptions } from './TutorialStyle';
 import TutorialTitle from './TutorialTitle';
 
 const TutorialPrice = () => {
+  const [toolType] = useGlobalState<'single' | 'divided'>('toolType');
+
   return (
     <TutorialContainer>
       <TutorialTitle title="왼쪽 상단을 확인하세요." imgUrl="tutorial/price.png" />

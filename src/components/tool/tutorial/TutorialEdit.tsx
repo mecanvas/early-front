@@ -1,8 +1,11 @@
 import React from 'react';
+import { useGlobalState } from 'src/hooks';
 import { TutorialContainer, Descriptions, BadgeNumberDesc } from './TutorialStyle';
 import TutorialTitle from './TutorialTitle';
 
 const TutorialEdit = () => {
+  const [toolType] = useGlobalState<'single' | 'divided'>('toolType');
+
   return (
     <TutorialContainer>
       <TutorialTitle title="에디터에서는 다음과 같은 도구들을 제공합니다." imgUrl="tutorial/header.png" />
