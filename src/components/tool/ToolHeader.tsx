@@ -90,6 +90,7 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl }: Props) => {
         </ToolHomeIcon>
         {!singlePrice && !singleCanvasName && imgUrl ? (
           <Popover
+            trigger="hover"
             style={{ padding: 0 }}
             content={
               yourPriceList?.length ? (
@@ -114,14 +115,16 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl }: Props) => {
               )
             }
           >
-            <OpacityComponent>
-              <Button
-                type="text"
-                style={{ borderLeft: `1px solid ${theme.color.gray200}`, paddingLeft: '20px', marginLeft: '20px' }}
-              >
-                예상가격
-              </Button>
-            </OpacityComponent>
+            <div>
+              <OpacityComponent>
+                <Button
+                  type="text"
+                  style={{ borderLeft: `1px solid ${theme.color.gray200}`, paddingLeft: '20px', marginLeft: '20px' }}
+                >
+                  가격확인
+                </Button>
+              </OpacityComponent>
+            </div>
           </Popover>
         ) : null}
         {singlePrice && singleCanvasName && imgUrl ? (

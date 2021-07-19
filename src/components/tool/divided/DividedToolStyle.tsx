@@ -668,14 +668,11 @@ export const Bill = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 0.3em;
+  font-size: 14px;
   div {
     display: flex;
     justify-content: space-between;
     color: ${({ theme }) => theme.color.gray700};
-  }
-  /* 액자 이름 */
-  & > div > div:nth-of-type(1) {
-    font-weight: bold;
   }
 `;
 
@@ -685,5 +682,5 @@ export const BillTotal = styled.div`
   border-top: 1px solid ${({ theme }) => theme.color.gray300};
   text-align: right;
   font-weight: bold;
-  font-size: 18px;
+  font-size: 14px;
 `;
