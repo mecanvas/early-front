@@ -8,6 +8,7 @@ import TutorialPreview from './tutorial/TutorialPreview';
 import TutorialPrice from './tutorial/TutorialPrice';
 import TutorialOrder from './tutorial/TutorialOrder';
 import { useOpacity } from 'src/hooks/useOpacity';
+import TutorialImg from './tutorial/TutorialImg';
 
 const TutorialContainer = styled.div`
   position: fixed;
@@ -66,6 +67,7 @@ const ToolTutorial = ({ onClick, tutorialType }: Props) => {
 
           {tutorialType === 'frame' && <TutorialFrame />}
           {tutorialType === 'preview' && <TutorialPreview />}
+          {tutorialType === 'image' && <TutorialImg />}
           {tutorialType === 'edit' && <TutorialEdit />}
           {tutorialType === 'price' && <TutorialPrice />}
           {tutorialType === 'order' && <TutorialOrder />}

@@ -4,7 +4,8 @@ import { getS3 } from 'src/utils/getS3';
 import styeld from '@emotion/styled';
 
 const Img = styeld.img`
-  max-width: 80%;
+  max-width: 75%;
+  max-height: 200px;
 `;
 
 const TutorialTitle = ({
