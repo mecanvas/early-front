@@ -175,16 +175,11 @@ const ToolSave = ({ yourPriceList, totalPrice, type }: Props) => {
             <AntdSelect
               onChange={handleSelectOrderRoute}
               placeholder="주문 경로를 선택해 주세요."
+              defaultValue={'1'}
               isRequired={orderRouteEmpty.isRequired}
             >
-              <Select.Option value="1" label="쿠팡">
-                쿠팡
-              </Select.Option>
-              <Select.Option value="2" label="네이버">
+              <Select.Option value="1" label="네이버">
                 네이버
-              </Select.Option>
-              <Select.Option value="3" label="아이디어스">
-                아이디어스
               </Select.Option>
             </AntdSelect>
           </Form.Item>

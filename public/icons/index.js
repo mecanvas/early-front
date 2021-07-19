@@ -8,8 +8,12 @@ import grid from './grid.svg';
 import undo from './undo.svg';
 import add from './add.svg';
 import questionMark from './question-mark.svg';
+import home from './home.svg';
+import arrow from './arrow.svg';
 
 export const icons = {
+  home,
+  arrow,
   horizontal,
   vertical,
   bgPaint,

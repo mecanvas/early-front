@@ -271,6 +271,15 @@ export const ImageWrapper = styled.div<{
     position: absolute;
     z-index: 3;
     filter: ${({ theme }) => theme.canvasShadowFilter};
+
+    ${({ isPreview }) =>
+      isPreview &&
+      css`
+        img {
+          box-shadow: none !important;
+        }
+      `}
+
     &:hover .cropped-img-delete {
       ${({ isPreview }) =>
         isPreview

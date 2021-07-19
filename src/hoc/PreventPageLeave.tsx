@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React, { ComponentType, useCallback, useEffect, useState } from 'react';
+import React, { ComponentType, useCallback, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { animated, useSpring } from 'react-spring';
 import { Button } from 'antd';
@@ -84,27 +84,27 @@ const usePreventPageLeave = () => {
     };
   });
 
-  const [openModal, setOpenModal] = useState(false);
+  const [openModal, setOpenModal] = useGlobalState<boolean>('openModal', false);
 
   const handleSaveCanvas = useCallback(() => {
     setOpenModal(false);
     setIsSaveCanvas(true);
-  }, [setIsSaveCanvas]);
+  }, [setIsSaveCanvas, setOpenModal]);
 
   const handleLeavePage = useCallback(() => {
     setOpenModal(false);
     push('/');
-  }, [push]);
+  }, [push, setOpenModal]);
 
   const handleCloseModal = useCallback(() => {
     setOpenModal(false);
-  }, []);
+  }, [setOpenModal]);
 
   const handlePreventLeave = useCallback(() => {
     setOpenModal(true);
     push(asPath);
     return false;
-  }, [asPath, push]);
+  }, [asPath, push, setOpenModal]);
 
   useEffect(() => {
     if (process.browser) {
@@ -112,7 +112,7 @@ const usePreventPageLeave = () => {
         return;
       }
       beforePopState(handlePreventLeave);
-      window.onbeforeunload = (e) => {
+      window.onbeforeunload = (e: any) => {
         e.preventDefault();
         e.returnValue = '';
         return false;

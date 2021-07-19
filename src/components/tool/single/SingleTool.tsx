@@ -101,6 +101,9 @@ const SingleTool = () => {
   const [singleImgUploadUrl, setSingleimgUploadUrl] = useGlobalState<string>('singleImgUploadUrl', '');
   const [isImgUploadLoading, setImgUploadLoading] = useState(false);
   const [isMovingImage, setIsMovingImage] = useState(false);
+  const [xDiff, setXDiff] = useState(0);
+  const [yDiff, setYDiff] = useState(0);
+  const [isCalc, setIsCalc] = useState(false);
 
   const [singleFrameWidth, setSingleFrameWidth] = useState(0);
   const [singleFrameHeight, setSingleFrameHeight] = useState(0);
@@ -255,32 +258,47 @@ const SingleTool = () => {
     }
   }, []);
 
-  const handleToImageInWrapper = useCallback(
-    (e) => {
-      if (!controllerNode || !singleWrapperRef.current) return;
-      const [cursorX, cursorY] = getPosition(e);
-      const { height } = singleWrapperRef.current.getBoundingClientRect();
-      console.log(e);
-      const x = cursorX - window.innerWidth / 2;
-      const y = cursorY - height / 2 - HEADER_HEIGHT;
-
-      if (0.5 >= Math.abs(x)) {
+  const checkNearingCenter = useCallback(
+    (x: number, y: number) => {
+      if (!controllerNode) return;
+      if (1 >= Math.abs(x)) {
+        controllerNode.style.left = `${0}px`;
         setNearingCenterX(true);
       } else {
         setNearingCenterX(false);
       }
 
-      if (0.5 >= Math.abs(y)) {
+      if (1 >= Math.abs(y)) {
+        controllerNode.style.top = `${0}px`;
         setNearingCenterY(true);
       } else {
         setNearingCenterY(false);
       }
-
-      controllerNode.style.position = 'relative';
-      controllerNode.style.left = `${x}px`;
-      controllerNode.style.top = `${y}px`;
     },
-    [controllerNode, getPosition],
+    [controllerNode],
+  );
+
+  const handleToImageInWrapper = useCallback(
+    (e) => {
+      if (!controllerNode) return;
+      const [cursorX, cursorY] = getPosition(e);
+      const x = cursorX - window.innerWidth / 2;
+      const y = cursorY - window.innerHeight / 2 - HEADER_HEIGHT;
+      if (isCalc) {
+        setXDiff(x - replacePx(controllerNode.style.left));
+        setYDiff(y - replacePx(controllerNode.style.top));
+        setIsCalc(false);
+      }
+
+      if (!isCalc) {
+        controllerNode.style.position = 'relative';
+        controllerNode.style.left = `${x - xDiff}px`;
+        controllerNode.style.top = `${y - yDiff}px`;
+        checkNearingCenter(x - xDiff, y - yDiff);
+      }
+    },
+
+    [checkNearingCenter, controllerNode, getPosition, isCalc, xDiff, yDiff],
   );
 
   const imageDropUpload = useCallback(
@@ -360,12 +378,14 @@ const SingleTool = () => {
 
   const handleMoveSingleImage = useCallback(() => {
     setIsMovingImage(true);
+    setIsCalc(true);
   }, []);
 
   const handleMoveCancelSingleImage = useCallback(() => {
     setIsMovingImage(false);
     setNearingCenterX(false);
     setNearingCenterY(false);
+    setIsCalc(false);
   }, []);
 
   const drawingImage = useCallback(
