@@ -723,11 +723,11 @@ const Tool = () => {
           cmd={resizeCmd}
         >
           {isPreview && (
-            <PreviewBg ref={previewBgRef} isPreviewBgRemove={isPreviewBgRemove}>
+            <PreviewBg ref={previewBgRef} isPreviewBgRemove={!isPreviewBgRemove}>
               <Switch
                 checkedChildren="배경"
                 unCheckedChildren="배경"
-                checked={!isPreviewBgRemove}
+                checked={isPreviewBgRemove}
                 onChange={handlePreviewBgRemove}
               />
               <img src={BgPreview} alt="미리보기배경" />
@@ -737,7 +737,7 @@ const Tool = () => {
             isPreview={isPreview || false}
             top={framePreviewMode?.top}
             left={framePreviewMode?.left}
-            isPreviewBgRemove={isPreviewBgRemove}
+            isPreviewBgRemove={!isPreviewBgRemove}
           >
             {croppedList?.map(({ dataset, id, imageCropStyle, ...style }) => (
               <div
