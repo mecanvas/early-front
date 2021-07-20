@@ -2,7 +2,7 @@ name: Next js Deploy To Cloudfront
 on:
   push:
     branches:
-      - deploy
+      - main
 
 jobs:
   build-and-deploy:
