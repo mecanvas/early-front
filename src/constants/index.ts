@@ -13,7 +13,7 @@ export const API_URL =
 export const MY_URL = process.env.NODE_ENV === 'production' ? 'https://early21.com' : 'http://localhost:3000';
 
 // 해당하는 routes들은 false를 반환합니다. -> footer를 제외하고 불러옵니다.
-export const exceptionRoutes = ['/tool/divided', '/tool/single', '/404'];
+export const exceptionRoutes = ['/tool/divided', '/tool/single', '/404', '/success'];
 
 export const S3_URL = 'https://early21-assets.s3.ap-northeast-2.amazonaws.com';
 
