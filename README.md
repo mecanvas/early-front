@@ -1,1 +1,5 @@
-# 개발용 브랜치입니다.
+```
+NEXT_PUBLIC_PORT=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+```
