@@ -60,27 +60,29 @@ export const useGlobalState = <T,>(key: string, defaultValue?: T | null) => {
   return [state, setState] as const;
 };
 
-export const useCanvasToServer = (type: 'single' | 'divided') => {
-  const dataURLtoFile = (dataurl: any, filename: any) => {
-    if (dataurl) {
-      const arr = dataurl.split(',');
-      const mime = arr[0].match(/:(.*?);/)[1];
-      const bstr = window.atob(arr[1]);
-      let n = bstr.length;
-      const u8arr = new Uint8Array(n);
+const dataURLtoFile = (dataurl: any, filename: any) => {
+  if (dataurl) {
+    const arr = dataurl.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = window.atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
 
-      while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-      }
-      return new File([u8arr], filename, {
-        type: mime,
-      });
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
     }
-  };
+    return new File([u8arr], filename, {
+      type: mime,
+    });
+  }
+};
+
+export const useCanvasToServer = () => {
   const [loading, setLoading] = useState(false);
   const [isDone, setIsDone] = useGlobalState('isDone', false);
   const [imgUploadUrl] = useGlobalState<string>('imgUploadUrl');
   const [singleImgUploadUrl] = useGlobalState<string>('singleImgUploadUrl');
+  const [toolType] = useGlobalState<'single' | 'divided'>('toolType');
   const [isSave, setIsSave] = useState(false);
   const [username, setUsername] = useState('');
   const [phone, setPhone] = useState('');
@@ -132,13 +134,9 @@ export const useCanvasToServer = (type: 'single' | 'divided') => {
           }
         });
         setIsSave(true);
-        setIsDone(true);
       } catch (err) {
         alert('저장에 실패했습니다. 다시 시도해주세요.');
         setIsSave(false);
-        setIsDone(false);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -146,7 +144,7 @@ export const useCanvasToServer = (type: 'single' | 'divided') => {
   };
 
   useEffect(() => {
-    if (!isSave || !type) return;
+    if (!isSave || !toolType) return;
     const saveCanvas = async (canvasType: 'single' | 'divided') => {
       const fd = new FormData();
       fd.append('username', username);
@@ -163,14 +161,25 @@ export const useCanvasToServer = (type: 'single' | 'divided') => {
         fd.append('originImgUrl', imgUploadUrl);
       }
 
-      await axios.post(`/canvas/${type}/save`, fd, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      await axios
+        .post(`/canvas/${canvasType}/save`, fd, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+        .then(() => {
+          setIsDone(true);
+        })
+        .catch(() => {
+          setIsDone(false);
+          alert('다시 시도해 주세요.');
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     };
-    saveCanvas(type);
-  }, [phone, fileList, isSave, paperSize, username, imgUploadUrl, orderRoute, type, singleImgUploadUrl]);
+    saveCanvas(toolType);
+  }, [phone, fileList, isSave, paperSize, username, imgUploadUrl, orderRoute, singleImgUploadUrl, toolType, setIsDone]);
 
   return { canvasToImage, loading, isDone, setIsDone, imgUploadUrl };
 };

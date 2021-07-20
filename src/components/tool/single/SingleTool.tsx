@@ -83,6 +83,7 @@ const SingleTool = () => {
   const [isDragDrop, setIsDragDrop] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
 
+  const [, setToolType] = useGlobalState<'single' | 'divided'>('toolType', 'single');
   const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [, setFramePrice] = useGlobalState<FramePrice[]>('framePrice');
@@ -100,6 +101,9 @@ const SingleTool = () => {
   const [singleImgUploadUrl, setSingleimgUploadUrl] = useGlobalState<string>('singleImgUploadUrl', '');
   const [isImgUploadLoading, setImgUploadLoading] = useState(false);
   const [isMovingImage, setIsMovingImage] = useState(false);
+  const [xDiff, setXDiff] = useState(0);
+  const [yDiff, setYDiff] = useState(0);
+  const [isCalc, setIsCalc] = useState(false);
 
   const [singleFrameWidth, setSingleFrameWidth] = useState(0);
   const [singleFrameHeight, setSingleFrameHeight] = useState(0);
@@ -149,17 +153,22 @@ const SingleTool = () => {
         img.src = singleImgUploadUrl;
         img.crossOrigin = 'Anonymous';
         img.onload = () => {
-          const scaleX = originWidth / resizeWidth;
-          const scaleY = originHeight / resizeHeight;
+          const scaleX = img.naturalWidth / resizeWidth;
+          const scaleY = img.naturalHeight / resizeHeight;
           const cropX = frameLeft - left;
           const cropY = frameTop - top;
 
+          const originFrameWidth = singleFrameWidth * scaleX;
+          const originFrameHeight = singleFrameHeight * scaleY;
+          const canvasFrameWidth = canvasProps ? singleFrameWidth : originFrameWidth;
+          const canvasFrameHeight = canvasProps ? singleFrameHeight : originFrameHeight;
+
           // const pixelRatio = window.devicePixelRatio;
-          canvas.width = singleFrameWidth;
-          canvas.height = singleFrameHeight;
+          canvas.width = canvasFrameWidth;
+          canvas.height = canvasFrameHeight;
           canvas.setAttribute('data-paper', singleCanvasName);
 
-          ctx.clearRect(0, 0, singleFrameWidth, singleFrameHeight);
+          ctx.clearRect(0, 0, canvasFrameWidth, canvasFrameHeight);
 
           // ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
           ctx.imageSmoothingQuality = 'high';
@@ -167,18 +176,18 @@ const SingleTool = () => {
             img,
             cropX * scaleX,
             cropY * scaleY,
-            singleFrameWidth * scaleX,
-            singleFrameHeight * scaleY,
+            originFrameWidth,
+            originFrameHeight,
             0,
             0,
-            singleFrameWidth,
-            singleFrameHeight,
+            canvasFrameWidth,
+            canvasFrameHeight,
           );
 
           // 배경을 칠합니다.
           ctx.globalCompositeOperation = 'destination-over';
           ctx.fillStyle = bgColor;
-          ctx.fillRect(0, 0, singleFrameWidth, singleFrameHeight);
+          ctx.fillRect(0, 0, canvasFrameWidth, canvasFrameHeight);
         };
       }
       if (!canvasProps) {
@@ -254,32 +263,47 @@ const SingleTool = () => {
     }
   }, []);
 
-  const handleToImageInWrapper = useCallback(
-    (e) => {
-      if (!controllerNode || !singleWrapperRef.current) return;
-      const [cursorX, cursorY] = getPosition(e);
-      const { height } = singleWrapperRef.current.getBoundingClientRect();
-      console.log(e);
-      const x = cursorX - window.innerWidth / 2;
-      const y = cursorY - height / 2 - HEADER_HEIGHT;
-
-      if (0.5 >= Math.abs(x)) {
+  const checkNearingCenter = useCallback(
+    (x: number, y: number) => {
+      if (!controllerNode) return;
+      if (1 >= Math.abs(x)) {
+        controllerNode.style.left = `${0}px`;
         setNearingCenterX(true);
       } else {
         setNearingCenterX(false);
       }
 
-      if (0.5 >= Math.abs(y)) {
+      if (1 >= Math.abs(y)) {
+        controllerNode.style.top = `${0}px`;
         setNearingCenterY(true);
       } else {
         setNearingCenterY(false);
       }
-
-      controllerNode.style.position = 'relative';
-      controllerNode.style.left = `${x}px`;
-      controllerNode.style.top = `${y}px`;
     },
-    [controllerNode, getPosition],
+    [controllerNode],
+  );
+
+  const handleToImageInWrapper = useCallback(
+    (e) => {
+      if (!controllerNode) return;
+      const [cursorX, cursorY] = getPosition(e);
+      const x = cursorX - window.innerWidth / 2;
+      const y = cursorY - window.innerHeight / 2 - HEADER_HEIGHT;
+      if (isCalc) {
+        setXDiff(x - replacePx(controllerNode.style.left));
+        setYDiff(y - replacePx(controllerNode.style.top));
+        setIsCalc(false);
+      }
+
+      if (!isCalc) {
+        controllerNode.style.position = 'relative';
+        controllerNode.style.left = `${x - xDiff}px`;
+        controllerNode.style.top = `${y - yDiff}px`;
+        checkNearingCenter(x - xDiff, y - yDiff);
+      }
+    },
+
+    [checkNearingCenter, controllerNode, getPosition, isCalc, xDiff, yDiff],
   );
 
   const imageDropUpload = useCallback(
@@ -359,12 +383,14 @@ const SingleTool = () => {
 
   const handleMoveSingleImage = useCallback(() => {
     setIsMovingImage(true);
+    setIsCalc(true);
   }, []);
 
   const handleMoveCancelSingleImage = useCallback(() => {
     setIsMovingImage(false);
     setNearingCenterX(false);
     setNearingCenterY(false);
+    setIsCalc(false);
   }, []);
 
   const drawingImage = useCallback(
@@ -453,6 +479,7 @@ const SingleTool = () => {
   }, [createPreviewCanvas, isPreview]);
 
   useEffect(() => {
+    setToolType('single');
     const sCanvasWrapper = singleWrapperRef.current;
     if (!sCanvasWrapper) return;
 
@@ -478,12 +505,12 @@ const SingleTool = () => {
       <SingleToolContainer>
         <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
         <ToolHeader
-          type="single"
           imgUrl={singleImgUploadUrl || ''}
           singlePrice={singlePrice.toLocaleString()}
           singleCanvasName={singleCanvasName}
         />
         <SingleToolFactory>
+          <Button type="text"></Button>
           <Upload accept="image/*" beforeUpload={handleSingleImgUpload} showUploadList={false}>
             <Button type="text">
               <img src={icons.imgUpload} style={{ width: '22px' }} />
@@ -506,6 +533,7 @@ const SingleTool = () => {
               <img src={icons.bgPaint} />
             </Button>
           </Popover>
+
           <Button type="text" onClick={handleRatioForFrame}>
             <img src={icons.maximumFrame} />
           </Button>
@@ -609,6 +637,7 @@ const SingleTool = () => {
               <span></span>
               <span></span>
             </SingleSelectedFrame>
+
             {!singleImgUploadUrl || isDragDrop ? (
               <ImageDropZone
                 isDragDrop={isDragDrop}

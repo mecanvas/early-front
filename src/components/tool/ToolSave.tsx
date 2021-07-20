@@ -51,17 +51,16 @@ export interface OrderInfo {
 interface Props {
   yourPriceList?: [string, any][];
   totalPrice?: number;
-  type: 'single' | 'divided';
 }
 
-const ToolSave = ({ yourPriceList, totalPrice, type }: Props) => {
+const ToolSave = ({ yourPriceList, totalPrice }: Props) => {
   const [info, setInfo] = useState<OrderInfo | null>(null);
   const [userNameEmpty, setUserNameEmpty] = useState({ isRequired: false, extra: '' });
   const [phoneEmpty, setPhoneEmpty] = useState({ isRequired: false, extra: '' });
   const [orderRouteEmpty, setOrderRouteEmpty] = useState({ isRequired: false, extra: '' });
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [selectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
-  const { canvasToImage, loading, isDone } = useCanvasToServer(type);
+  const { canvasToImage, loading, isDone } = useCanvasToServer();
   const router = useRouter();
 
   const handleVisible = useCallback(() => {
@@ -133,10 +132,10 @@ const ToolSave = ({ yourPriceList, totalPrice, type }: Props) => {
     }
     if (!info.username) return setUserNameEmpty({ ...userNameEmpty, isRequired: true, extra: '이름을 입력해 주세요!' });
     if (!info.phone) return setPhoneEmpty({ ...phoneEmpty, isRequired: true, extra: '핸드폰 번호를 입력해 주세요!' });
-    if (!info.orderRoute)
-      return setOrderRouteEmpty({ ...orderRouteEmpty, isRequired: true, extra: '주문 경로를 선택해 주세요!' });
+    // if (!info.orderRoute)
+    //   return setOrderRouteEmpty({ ...orderRouteEmpty, isRequired: true, extra: '주문 경로를 선택해 주세요!' });
 
-    canvasToImage(selectedFrameList, info);
+    canvasToImage(selectedFrameList, { ...info, orderRoute: '1' });
   }, [selectedFrameList, info, userNameEmpty, phoneEmpty, orderRouteEmpty, canvasToImage]);
 
   useEffect(() => {
@@ -175,16 +174,11 @@ const ToolSave = ({ yourPriceList, totalPrice, type }: Props) => {
             <AntdSelect
               onChange={handleSelectOrderRoute}
               placeholder="주문 경로를 선택해 주세요."
+              defaultValue={'1'}
               isRequired={orderRouteEmpty.isRequired}
             >
-              <Select.Option value="1" label="쿠팡">
-                쿠팡
-              </Select.Option>
-              <Select.Option value="2" label="네이버">
+              <Select.Option value="1" label="네이버">
                 네이버
-              </Select.Option>
-              <Select.Option value="3" label="아이디어스">
-                아이디어스
               </Select.Option>
             </AntdSelect>
           </Form.Item>

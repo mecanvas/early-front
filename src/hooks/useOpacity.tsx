@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { animated, useSpring } from 'react-spring';
 
-export const useOpacity = (imgUrl: string) => {
+export const useOpacity = (trigger: any) => {
   const [opacityAnimation, api] = useSpring(() => ({
     from: { opacity: 0, translateY: `15px` },
     to: { opacity: 1, translateY: `0px` },
@@ -9,7 +9,7 @@ export const useOpacity = (imgUrl: string) => {
   }));
 
   useEffect(() => {
-    if (imgUrl) {
+    if (trigger) {
       api.update({
         from: { opacity: 0, translateY: `15px` },
         to: { opacity: 1, translateY: `0px` },
@@ -17,7 +17,7 @@ export const useOpacity = (imgUrl: string) => {
       });
       api.start();
     }
-  }, [imgUrl, api]);
+  }, [trigger, api]);
 
   const OpacityComponent = ({ children }: { children: React.ReactChild }) => {
     return <animated.div style={opacityAnimation}>{children}</animated.div>;

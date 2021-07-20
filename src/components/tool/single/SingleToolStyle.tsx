@@ -113,7 +113,7 @@ export const SingleWrapper = styled.div<{
         transform: translateX(-50%);
         height: 100%;
         content: '';
-        border: 1px dashed ${theme.color.primary};
+        border: 1px solid ${theme.color.primary};
         z-index: 33;
       }
     `}
@@ -130,7 +130,7 @@ export const SingleWrapper = styled.div<{
         height: 2px;
         content: '';
         z-index: 33;
-        border: 1px dashed ${theme.color.primary};
+        border: 1px solid ${theme.color.primary};
       }
     `}
 
@@ -175,7 +175,7 @@ export const SingleSelectedFrame = styled.div<{
     top: 0;
     width: 100%;
     height: 1px;
-    border-top: 4px dashed ${({ theme }) => theme.color.primary};
+    border-top: 2px dashed ${({ theme }) => theme.color.primary};
   }
   /* right */
   span:nth-of-type(2) {
@@ -185,7 +185,7 @@ export const SingleSelectedFrame = styled.div<{
     right: 0;
     width: 1px;
     height: 100%;
-    border-right: 4px dashed ${({ theme }) => theme.color.primary};
+    border-right: 2px dashed ${({ theme }) => theme.color.primary};
   }
   /* bottom */
   span:nth-of-type(3) {
@@ -194,7 +194,7 @@ export const SingleSelectedFrame = styled.div<{
     bottom: 0;
     width: 100%;
     height: 1px;
-    border-bottom: 4px dashed ${({ theme }) => theme.color.primary};
+    border-bottom: 2px dashed ${({ theme }) => theme.color.primary};
   }
   /* left */
   span:nth-of-type(4) {
@@ -204,7 +204,7 @@ export const SingleSelectedFrame = styled.div<{
     top: 0;
     width: 1px;
     height: 100%;
-    border-left: 4px dashed ${({ theme }) => theme.color.primary};
+    border-left: 2px dashed ${({ theme }) => theme.color.primary};
   }
 `;
 
@@ -235,7 +235,7 @@ export const SingleFrameListHeader = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
-  right: 0;
+  right: 2px;
   @media all and (min-width: ${({ theme }) => theme.size.sm}) {
     top: ${HEADER_HEIGHT - 38}px;
   }
@@ -283,7 +283,6 @@ export const SingleFrameListGrid = styled.div<{
   }
   display: flex;
   width: 100%;
-  border-radius: 4px;
   justify-content: center;
   align-items: center;
   padding: ${({ padding }) => padding};

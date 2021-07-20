@@ -3,8 +3,8 @@ import React from 'react';
 import Img from 'src/components/common/Img';
 
 const TYPE = new Map();
-TYPE.set(1, '쿠팡');
-TYPE.set(2, '네이버');
+TYPE.set(1, '네이버');
+TYPE.set(2, '쿠팡');
 TYPE.set(3, '아이디어스');
 
 export const canvasDividedOrderColumns = [

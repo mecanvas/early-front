@@ -2,7 +2,6 @@ import { Popover, Button } from 'antd';
 import React, { useCallback, useMemo } from 'react';
 import { useGlobalState } from 'src/hooks';
 import { FramePrice } from 'src/interfaces/ToolInterface';
-import Logo from '../layouts/Logo';
 import ToolSave from './ToolSave';
 import {
   ToolHeaderMenu,
@@ -14,20 +13,49 @@ import {
 } from './divided/DividedToolStyle';
 import { theme } from 'src/style/theme';
 import { useOpacity } from 'src/hooks/useOpacity';
+import ToolHelperButton from './ToolHelperButton';
+import { icons } from 'public/icons';
+import styled from '@emotion/styled';
+import router from 'next/router';
+
+const ToolHomeIcon = styled.div`
+  cursor: pointer;
+  img {
+    &:nth-of-type(1) {
+      transform: rotateY(180deg);
+      -webkit-transform: rotateY(180deg);
+      -moz-transform: rotateY(180deg);
+      -o-transform: rotateY(180deg);
+      -ms-transform: rotateY(180deg);
+      unicode-bidi: bidi-override;
+      direction: rtl;
+      width: 20px;
+      margin-right: 4px;
+      @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+        width: 15px;
+      }
+    }
+    width: 25px;
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      width: 20px;
+    }
+  }
+`;
 
 interface Props {
   singlePrice?: string;
   singleCanvasName?: string;
   imgUrl: string;
-  type: 'single' | 'divided';
 }
 
-const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl, type }: Props) => {
+const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl }: Props) => {
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
+  const [singleImgUploadUrl] = useGlobalState<boolean>('singleImgUploadUrl');
+  const [imgUploadUrl] = useGlobalState<boolean>('imgUploadUrl');
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [framePrice] = useGlobalState<FramePrice[]>('framePrice');
   const { OpacityComponent } = useOpacity(imgUrl || '');
-
+  const [, setIsOpenModal] = useGlobalState<boolean>('openModal');
   // 고른 액자의 이름과 수량
   const yourPriceList = useMemo(() => {
     if (!framePrice?.length) return;
@@ -44,6 +72,14 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl, type }: Props) => {
     );
   }, [framePrice]);
 
+  const handleMoveHome = useCallback(() => {
+    if (imgUploadUrl || singleImgUploadUrl) {
+      setIsOpenModal(true);
+    } else {
+      router.push('/');
+    }
+  }, [imgUploadUrl, setIsOpenModal, singleImgUploadUrl]);
+
   const handleSaveCanvas = useCallback(() => {
     setIsSaveCanvas(true);
   }, [setIsSaveCanvas]);
@@ -55,9 +91,13 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl, type }: Props) => {
   return (
     <ToolHeaderMenu>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Logo />
+        <ToolHomeIcon onClick={handleMoveHome}>
+          <img src={icons.arrow} />
+          <img src={icons.home} />
+        </ToolHomeIcon>
         {!singlePrice && !singleCanvasName && imgUrl ? (
           <Popover
+            trigger="hover"
             style={{ padding: 0 }}
             content={
               yourPriceList?.length ? (
@@ -82,14 +122,16 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl, type }: Props) => {
               )
             }
           >
-            <OpacityComponent>
-              <Button
-                type="text"
-                style={{ borderLeft: `1px solid ${theme.color.gray200}`, paddingLeft: '20px', marginLeft: '20px' }}
-              >
-                예상가격
-              </Button>
-            </OpacityComponent>
+            <div>
+              <OpacityComponent>
+                <Button
+                  type="text"
+                  style={{ borderLeft: `1px solid ${theme.color.gray200}`, paddingLeft: '20px', marginLeft: '20px' }}
+                >
+                  가격확인
+                </Button>
+              </OpacityComponent>
+            </div>
           </Popover>
         ) : null}
         {singlePrice && singleCanvasName && imgUrl ? (
@@ -104,6 +146,7 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl, type }: Props) => {
       {imgUrl && (
         <OpacityComponent>
           <>
+            <ToolHelperButton />
             <Button onClick={handleImgPreview} type={!isPreview ? 'default' : 'primary'}>
               {!isPreview ? '미리보기' : '이미지로'}
             </Button>
@@ -112,7 +155,6 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl, type }: Props) => {
             </Button>
             {isSaveCanvas && (
               <ToolSave
-                type={type}
                 totalPrice={framePrice?.reduce((acc, cur) => (acc += cur.price), 0)}
                 yourPriceList={yourPriceList}
               />
