@@ -229,7 +229,7 @@ export const ImageWrapper = styled.div<{
   cmd?: ResizeCmd | null;
   isPreview?: boolean;
 }>`
-  background-color: ${({ bgColor }) => bgColor};
+  background-color: ${({ bgColor, isPreview, theme }) => (isPreview ? theme.color.white : bgColor)};
   width: 100%;
   display: flex;
   justify-content: center;
@@ -316,7 +316,7 @@ export const ImageWrapper = styled.div<{
   }
 `;
 
-export const PreviewBg = styled.div<{ isPreviewBgRemove: boolean }>`
+export const PreviewBg = styled.div<{ isPreviewBgRemove?: boolean }>`
   position: absolute;
   button {
     left: 0;
@@ -352,7 +352,7 @@ export const CroppedWrapper = styled.div<{
   isPreview: boolean;
   top?: number;
   left?: number;
-  isPreviewBgRemove: boolean;
+  isPreviewBgRemove?: boolean;
 }>`
   ${({ isPreview, top, left, isPreviewBgRemove, theme }) =>
     isPreview &&
@@ -363,7 +363,7 @@ export const CroppedWrapper = styled.div<{
       position: absolute;
       top: ${top}px;
       left: ${left}px;
-      transform: scale(0.3);
+      /* transform: scale(0.3); */
       div {
         filter: ${theme.canvasShadowFilter};
       }
@@ -668,14 +668,11 @@ export const Bill = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 0.3em;
+  font-size: 14px;
   div {
     display: flex;
     justify-content: space-between;
     color: ${({ theme }) => theme.color.gray700};
-  }
-  /* 액자 이름 */
-  & > div > div:nth-of-type(1) {
-    font-weight: bold;
   }
 `;
 
@@ -685,5 +682,5 @@ export const BillTotal = styled.div`
   border-top: 1px solid ${({ theme }) => theme.color.gray300};
   text-align: right;
   font-weight: bold;
-  font-size: 18px;
+  font-size: 14px;
 `;

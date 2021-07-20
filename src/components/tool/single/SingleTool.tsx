@@ -83,6 +83,7 @@ const SingleTool = () => {
   const [isDragDrop, setIsDragDrop] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
 
+  const [, setToolType] = useGlobalState<'single' | 'divided'>('toolType', 'single');
   const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [, setFramePrice] = useGlobalState<FramePrice[]>('framePrice');
@@ -478,6 +479,7 @@ const SingleTool = () => {
   }, [createPreviewCanvas, isPreview]);
 
   useEffect(() => {
+    setToolType('single');
     const sCanvasWrapper = singleWrapperRef.current;
     if (!sCanvasWrapper) return;
 
@@ -503,12 +505,12 @@ const SingleTool = () => {
       <SingleToolContainer>
         <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
         <ToolHeader
-          type="single"
           imgUrl={singleImgUploadUrl || ''}
           singlePrice={singlePrice.toLocaleString()}
           singleCanvasName={singleCanvasName}
         />
         <SingleToolFactory>
+          <Button type="text"></Button>
           <Upload accept="image/*" beforeUpload={handleSingleImgUpload} showUploadList={false}>
             <Button type="text">
               <img src={icons.imgUpload} style={{ width: '22px' }} />
@@ -531,6 +533,7 @@ const SingleTool = () => {
               <img src={icons.bgPaint} />
             </Button>
           </Popover>
+
           <Button type="text" onClick={handleRatioForFrame}>
             <img src={icons.maximumFrame} />
           </Button>
@@ -634,6 +637,7 @@ const SingleTool = () => {
               <span></span>
               <span></span>
             </SingleSelectedFrame>
+
             {!singleImgUploadUrl || isDragDrop ? (
               <ImageDropZone
                 isDragDrop={isDragDrop}
