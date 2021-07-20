@@ -13,7 +13,7 @@ import {
 } from './divided/DividedToolStyle';
 import { theme } from 'src/style/theme';
 import { useOpacity } from 'src/hooks/useOpacity';
-import FloatHelper from './ToolHelperButton';
+import ToolHelperButton from './ToolHelperButton';
 import { icons } from 'public/icons';
 import styled from '@emotion/styled';
 
@@ -139,7 +139,7 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl }: Props) => {
       {imgUrl && (
         <OpacityComponent>
           <>
-            <FloatHelper />
+            <ToolHelperButton />
             <Button onClick={handleImgPreview} type={!isPreview ? 'default' : 'primary'}>
               {!isPreview ? '미리보기' : '이미지로'}
             </Button>
