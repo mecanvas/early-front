@@ -1,6 +1,6 @@
 // https://github.com/emotion-js/emotion/tree/main/packages/babel-plugin
 {
-  "presets": ["next/babel"],
+  "presets": ["next/babel", "@babel/preset-env"],
   "plugins": [
     [
       "@emotion",

@@ -11,6 +11,7 @@ import questionMark from './question-mark.svg';
 import home from './home.svg';
 import arrow from './arrow.svg';
 import man from './man.svg';
+import curi from './curi.svg';
 
 export const icons = {
   home,
@@ -26,4 +27,5 @@ export const icons = {
   add,
   questionMark,
   man,
+  curi,
 };
