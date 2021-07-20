@@ -23,6 +23,7 @@ const PrevButton = styled(Button)`
   top: 50%;
   transform: translateY(-50%);
   left: 0px;
+  background-color: transparent !important;
   img {
     transform: rotateY(180deg);
     -webkit-transform: rotateY(180deg);
@@ -38,6 +39,7 @@ const PrevButton = styled(Button)`
 const NextButton = styled(Button)`
   position: absolute;
   top: 50%;
+  background-color: transparent !important;
   transform: translateY(-50%);
   right: 0px;
   img {

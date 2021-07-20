@@ -50,6 +50,14 @@ const DividedDesription = () => {
                 </div>
               }
             />
+            <BadgeNumberDesc
+              count={5}
+              desc={
+                <div>
+                  쾌적한 작업을 위해 <b>전체 화면</b>으로 진행해 주세요.
+                </div>
+              }
+            />
           </TutorialDescriptions>
         </TutorialContainer>
       </div>
@@ -185,6 +193,14 @@ const SingleDescription = () => {
               desc={
                 <div>
                   얼리 21은 <b>크롬</b>에 최적화 되어있습니다.
+                </div>
+              }
+            />
+            <BadgeNumberDesc
+              count={5}
+              desc={
+                <div>
+                  쾌적한 작업을 위해 <b>전체 화면</b>으로 진행해 주세요.
                 </div>
               }
             />
