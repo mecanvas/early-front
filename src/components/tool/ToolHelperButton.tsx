@@ -65,7 +65,7 @@ const HelperButton = () => {
       preview: '제가 만든 시안을 확인하고 싶어요.',
       price: '가격이 궁금해요.',
       order: '주문은 어떻게 하죠?',
-      size: '액자의 실제 크기가 궁금해요.',
+      // size: '액자의 실제 크기가 궁금해요.',
     };
 
     const dividedHelpList = {
@@ -76,7 +76,7 @@ const HelperButton = () => {
       preview: '제가 만든 시안을 확인하고 싶어요.',
       price: '가격이 궁금해요.',
       order: '주문은 어떻게 하죠?',
-      size: '액자의 실제 크기가 궁금해요.',
+      // size: '액자의 실제 크기가 궁금해요.',
     };
 
     if (asPath.includes('single')) {
