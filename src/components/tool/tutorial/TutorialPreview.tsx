@@ -1,14 +1,13 @@
 import React from 'react';
-import { useGlobalState } from 'src/hooks';
 import { TutorialContainer, BadgeNumberDesc, TutorialDescriptions } from './TutorialStyle';
 import TutorialTitle from './TutorialTitle';
 
 const TutorialPreview = () => {
-  const [toolType] = useGlobalState<'single' | 'divided'>('toolType');
+  // const [toolType] = useGlobalState<'single' | 'divided'>('toolType');
 
   return (
     <TutorialContainer>
-      <TutorialTitle title="우측 상단의 미리보기 버튼을 클릭하세요." imgUrl={`tutorial/${toolType}/preview.png`} />
+      <TutorialTitle title="우측 상단의 미리보기 버튼을 클릭하세요." imgUrl={`tutorial/single/preview.png`} />
       <TutorialDescriptions>
         <BadgeNumberDesc
           count={1}

@@ -1,15 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useGetScollPosition, useGlobalState } from 'src/hooks';
 import axios from 'axios';
-import {
-  ToolContainer,
-  ImageWrapper,
-  ImgController,
-  CroppedWrapper,
-  PreviewBg,
-  ToolHeaderWrapper,
-} from './DividedToolStyle';
-import { Button, Switch } from 'antd';
+import { ToolContainer, ImageWrapper, ImgController, CroppedWrapper, ToolHeaderWrapper } from './DividedToolStyle';
+import { Button } from 'antd';
 import { theme } from 'src/style/theme';
 import Loading from '../../common/Loading';
 import { cmToPx } from 'src/utils/cmToPx';
@@ -32,7 +25,6 @@ import ToolHeader from '../ToolHeader';
 import DividedToolFactory from './DividedToolFactory';
 import { HEADER_HEIGHT } from 'src/constants';
 import ImageDropZone from 'src/components/common/ImageDropZone';
-import BgPreview from 'public/bg1.jpg';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { PreventPageLeave } from 'src/hoc/PreventPageLeave';
 import { isMobile } from 'react-device-detect';
@@ -136,13 +128,13 @@ const Tool = () => {
   const [clickedValue, setClickedValue] = useState('');
   const [canvasPosition] = useGlobalState<CanvasPosition>('canvasPosition');
   const [canvasFrameSizeInfo] = useGlobalState<CanvasFrameSizeInfo>('canvasFrameSizeInfo');
-  const [framePreviewMode, setFramePreviewMode] = useState<CanvasPosition | null>(null);
   const [scrollX, scrollY] = useGetScollPosition();
 
   const imgWrapperRef = useRef<HTMLDivElement>(null);
   const imgNode = useRef<HTMLImageElement>(null);
   const previewBgRef = useRef<HTMLImageElement>(null);
-  const [isPreviewBgRemove, setIsPreviewBgRemove] = useState(false);
+  const [framePreviewMode, setFramePreviewMode] = useState<CanvasPosition | null>(null);
+  // const [isPreviewBgRemove, setIsPreviewBgRemove] = useState(false);
 
   const [imgUploadUrl, setImgUploadUrl] = useGlobalState<string>('imgUploadUrl', '');
   const [imgUploadLoading, setImgUploadLoading] = useGlobalState<boolean>('imgUploadLoading', false);
@@ -528,9 +520,9 @@ const Tool = () => {
     }
   }, [getImgWrapperSizeForParallel, setIsNoContent, croppedList, scrollX, scrollY, framePreviewMode]);
 
-  const handlePreviewBgRemove = useCallback(() => {
-    setIsPreviewBgRemove((prev) => !prev);
-  }, []);
+  // const handlePreviewBgRemove = useCallback(() => {
+  //   setIsPreviewBgRemove((prev) => !prev);
+  // }, []);
 
   // const handleFrameColorChange = useCallback((color: ColorResult) => {
   //   const { hex } = color;
@@ -722,8 +714,11 @@ const Tool = () => {
           onMouseLeave={isDragDrop ? handleDropCancel : handleImgResizeEnd}
           cmd={resizeCmd}
         >
-          {isPreview && (
-            <PreviewBg ref={previewBgRef} isPreviewBgRemove={!isPreviewBgRemove}>
+          {/* {isPreview && (
+            <PreviewBg
+              ref={previewBgRef}
+              isPreviewBgRemove={!isPreviewBgRemove}
+            >
               <Switch
                 checkedChildren="배경"
                 unCheckedChildren="배경"
@@ -732,12 +727,12 @@ const Tool = () => {
               />
               <img src={BgPreview} alt="미리보기배경" />
             </PreviewBg>
-          )}
+          )} */}
           <CroppedWrapper
             isPreview={isPreview || false}
             top={framePreviewMode?.top}
             left={framePreviewMode?.left}
-            isPreviewBgRemove={!isPreviewBgRemove}
+            // isPreviewBgRemove={!isPreviewBgRemove}
           >
             {croppedList?.map(({ dataset, id, imageCropStyle, ...style }) => (
               <div
