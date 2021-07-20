@@ -16,6 +16,7 @@ import { useOpacity } from 'src/hooks/useOpacity';
 import ToolHelperButton from './ToolHelperButton';
 import { icons } from 'public/icons';
 import styled from '@emotion/styled';
+import router from 'next/router';
 
 const ToolHomeIcon = styled.div`
   cursor: pointer;
@@ -49,6 +50,8 @@ interface Props {
 
 const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl }: Props) => {
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
+  const [singleImgUploadUrl] = useGlobalState<boolean>('singleImgUploadUrl');
+  const [imgUploadUrl] = useGlobalState<boolean>('imgUploadUrl');
   const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
   const [framePrice] = useGlobalState<FramePrice[]>('framePrice');
   const { OpacityComponent } = useOpacity(imgUrl || '');
@@ -70,8 +73,12 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl }: Props) => {
   }, [framePrice]);
 
   const handleMoveHome = useCallback(() => {
-    setIsOpenModal(true);
-  }, [setIsOpenModal]);
+    if (imgUploadUrl || singleImgUploadUrl) {
+      setIsOpenModal(true);
+    } else {
+      router.push('/');
+    }
+  }, [imgUploadUrl, setIsOpenModal, singleImgUploadUrl]);
 
   const handleSaveCanvas = useCallback(() => {
     setIsSaveCanvas(true);

@@ -10,6 +10,7 @@ import add from './add.svg';
 import questionMark from './question-mark.svg';
 import home from './home.svg';
 import arrow from './arrow.svg';
+import man from './man.svg';
 
 export const icons = {
   home,
@@ -24,4 +25,5 @@ export const icons = {
   undo,
   add,
   questionMark,
+  man,
 };
