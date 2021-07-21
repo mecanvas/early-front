@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useGetScollPosition, useGlobalState } from 'src/hooks';
 import { CanvasFrameSizeInfo, CanvasPosition, CroppedFrame } from 'src/interfaces/ToolInterface';
 import { theme } from 'src/style/theme';
@@ -26,17 +26,7 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
     width: 0,
     height: 0,
   });
-  const [isNearing, setIsNearing] = useState<{
-    top: boolean;
-    right: boolean;
-    bottom: boolean;
-    left: boolean;
-  }>({
-    top: false,
-    right: false,
-    bottom: false,
-    left: false,
-  });
+
   const [centerX] = useGlobalState<number>('centerX');
   const [centerY] = useGlobalState<number>('centerY');
   const [isNearingX, setIsNearingX] = useGlobalState('isNearingX', false);
@@ -154,6 +144,32 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
           ctx.strokeStyle = '#333';
           ctx.strokeRect(positionLeft, positionTop, frameWidth, frameHeight);
           ctx.stroke();
+          const drawingLine = (nearing: { top: boolean; right: boolean; bottom: boolean; left: boolean }) => {
+            const { top, right, left, bottom } = nearing;
+            // top
+            if (top) {
+              ctx.fillStyle = `${theme.color.primary}`;
+              ctx.fillRect(0, positionTop, canvas.width, 1);
+            }
+
+            //  right
+            if (right) {
+              ctx.fillStyle = `${theme.color.primary}`;
+              ctx.fillRect(positionLeft + frameWidth, 0, 1, canvas.height);
+            }
+
+            //  bottom
+            if (bottom) {
+              ctx.fillStyle = `${theme.color.primary}`;
+              ctx.fillRect(0, positionTop + frameHeight, canvas.width, 1);
+            }
+
+            //  left
+            if (left) {
+              ctx.fillStyle = `${theme.color.primary}`;
+              ctx.fillRect(positionLeft, 0, 1, canvas.height);
+            }
+          };
 
           if (croppedList && croppedList.length) {
             for (const list of croppedList) {
@@ -218,38 +234,14 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
                 return false;
               };
 
-              setIsNearing({
+              const nearing = {
                 top: isNearingTop(1),
                 right: isNearingRight(1),
                 left: isNearingLeft(1),
                 bottom: isNearingBottom(1),
-              });
+              };
+              drawingLine(nearing);
             }
-          }
-
-          const { top, right, left, bottom } = isNearing;
-          // top
-          if (top) {
-            ctx.fillStyle = `${theme.color.primary}`;
-            ctx.fillRect(0, positionTop, canvas.width, 1);
-          }
-
-          //  right
-          if (right) {
-            ctx.fillStyle = `${theme.color.primary}`;
-            ctx.fillRect(positionLeft + frameWidth, 0, 1, canvas.height);
-          }
-
-          //  bottom
-          if (bottom) {
-            ctx.fillStyle = `${theme.color.primary}`;
-            ctx.fillRect(0, positionTop + frameHeight, canvas.width, 1);
-          }
-
-          //  left
-          if (left) {
-            ctx.fillStyle = `${theme.color.primary}`;
-            ctx.fillRect(positionLeft, 0, 1, canvas.height);
           }
         }
         setCanvasPosition({ ...canvasPosition, top: positionTop, left: positionLeft });
@@ -268,7 +260,6 @@ const ToolSelectedFrame = memo(({ width, height, onClick, croppedList }: Props) 
       setCanvasFrameSizeInfo,
       canvasFrameSizeInfo,
       croppedList,
-      isNearing,
       scrollY,
       scrollX,
     ],
