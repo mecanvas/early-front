@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2.3.1
@@ -31,20 +33,10 @@ jobs:
       #   run: npx serverless --component=serverless-next config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       # - run: yarn deploy
 
-      - name: Send custom JSON data to Slack workflow
-        id: slack
-        uses: slackapi/slack-github-action@v1.14.0
+      - name: Slack Notification
+        uses: act10ns/slack@v1
         with:
-          payload: '{
-            "blocks": [
-            {
-            "type": "section",
-            "text": {
-            "type": "mrkdwn",
-            "text": "배포완료! \n\n<https://early21.com|페이지 확인>"
-            }
-            }
-            ]
-            }'
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
+          channel: '#deploy-front'
+        if: always()
