@@ -31,11 +31,20 @@ jobs:
       #   run: npx serverless --component=serverless-next config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       # - run: yarn deploy
 
-      - name: Post to a Slack channel
+      - name: Send custom JSON data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.14.0
         with:
-          channel-id: '#deploy-front'
-          slack-message: 'posting from a github action!'
+          payload: '{
+            "blocks": [
+            {
+            "type": "section",
+            "text": {
+            "type": "mrkdwn",
+            "text": "배포완료! \n\n<https://early21.com|페이지 확인>"
+            }
+            }
+            ]
+            }'
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
