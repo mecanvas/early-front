@@ -77,11 +77,11 @@ const SingleTool = () => {
     setControllerNode(node);
   }, []);
 
+  const [isResizeMode] = useGlobalState('isResizeMode', false);
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
   const [bgColor, setBgColor] = useState(theme.color.white);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragDrop, setIsDragDrop] = useState(false);
-  const [previewLoading, setPreviewLoading] = useState(false);
 
   const [, setToolType] = useGlobalState<'single' | 'divided'>('toolType', 'single');
   const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
@@ -146,7 +146,6 @@ const SingleTool = () => {
 
       const canvas = canvasProps || document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      setPreviewLoading(true);
 
       if (ctx && singleImgUploadUrl) {
         const img = new Image();
@@ -212,7 +211,6 @@ const SingleTool = () => {
     if (!controllerNode || !resizeWidth || !resizeHeight || !previewCanvasRef.current || !originWidth || !originHeight)
       return;
     createCanvasForSave(previewCanvasRef.current);
-    setPreviewLoading(false);
   }, [controllerNode, createCanvasForSave, originHeight, originWidth, resizeHeight, resizeWidth]);
 
   const handleColorChange = useCallback(
@@ -294,7 +292,6 @@ const SingleTool = () => {
         setYDiff(y - replacePx(controllerNode.style.top));
         setIsCalc(false);
       }
-
       if (!isCalc) {
         controllerNode.style.position = 'relative';
         controllerNode.style.left = `${x - xDiff}px`;
@@ -391,7 +388,8 @@ const SingleTool = () => {
     setNearingCenterX(false);
     setNearingCenterY(false);
     setIsCalc(false);
-  }, []);
+    createPreviewCanvas();
+  }, [createPreviewCanvas]);
 
   const drawingImage = useCallback(
     (resizeWidth?: number, resizeHeight?: number, url?: string) => {
@@ -473,10 +471,16 @@ const SingleTool = () => {
   }, [singleImgUploadUrl, wrapperWidth, wrapperHeight, drawingImage, controllerNode]);
 
   useEffect(() => {
-    if (isPreview) {
+    createPreviewCanvas();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [singleImgUploadUrl]);
+
+  useEffect(() => {
+    if (isResizeMode) {
       createPreviewCanvas();
     }
-  }, [createPreviewCanvas, isPreview]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isResizeMode]);
 
   useEffect(() => {
     setToolType('single');
@@ -487,7 +491,6 @@ const SingleTool = () => {
     setWrapperWidth(width);
     setWrapperHeight(height);
     createInitFrame();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
 
     return () => {
       setIsPreview(false);
@@ -602,12 +605,8 @@ const SingleTool = () => {
         )}
 
         {/* 본격적인 툴  */}
-        <PreviewCanvasWrapper isPreview={(isPreview && !previewLoading) || false}>
+        <PreviewCanvasWrapper isPreview={isPreview || false}>
           <canvas ref={previewCanvasRef} />
-          <Spin
-            style={{ position: 'absolute', top: '50%', left: '50%', transform: 'traslate(-50%, -50%)' }}
-            spinning={isPreview ? previewLoading : true}
-          />
         </PreviewCanvasWrapper>
 
         <SingleCanvasField isPreview={isPreview || false} onDragOver={handleDragImage} onMouseLeave={handleDragCancel}>
@@ -619,10 +618,10 @@ const SingleTool = () => {
             clicked={isMovingImage}
             onDragOver={handleDragImage}
             onMouseMove={isMovingImage ? handleToImageInWrapper : undefined}
-            onMouseUp={handleMoveCancelSingleImage}
+            onMouseUp={isMovingImage ? handleMoveCancelSingleImage : undefined}
             onMouseLeave={isDragDrop ? handleDragCancel : handleMoveCancelSingleImage}
             onTouchMove={isMovingImage ? handleToImageInWrapper : undefined}
-            onTouchEnd={handleMoveCancelSingleImage}
+            onTouchEnd={isMovingImage ? handleMoveCancelSingleImage : undefined}
           >
             {/* 선택한 액자 렌더링  */}
             <SingleSelectedFrame
@@ -660,9 +659,9 @@ const SingleTool = () => {
                     data-url={singleImgUploadUrl}
                     ref={ImageCanvasRef}
                     onTouchStart={handleMoveSingleImage}
-                    onTouchEnd={handleMoveCancelSingleImage}
+                    onTouchEnd={isMovingImage ? handleMoveCancelSingleImage : undefined}
                     onMouseDown={handleMoveSingleImage}
-                    onMouseUp={handleMoveCancelSingleImage}
+                    onMouseUp={isMovingImage ? handleMoveCancelSingleImage : undefined}
                   />
                 </SingleImgSizeController>
               </SingleImageWrapper>

@@ -161,7 +161,7 @@ interface Props {
 }
 
 const SingleImgSizeController = ({ children, controllerRef, imgRef, wrapperRef, isMovingImage }: Props) => {
-  // const [isResizeMode, setIsResizeMode] = useState(false);
+  const [, setIsResizeMode] = useGlobalState('isResizeMode', false);
   const [isResizeStart, setIsResizeStart] = useState(false);
   const [resizeCmd, setResizeCmd] = useGlobalState<ResizeCmd | null>('resizeCmd', null);
 
@@ -263,14 +263,16 @@ const SingleImgSizeController = ({ children, controllerRef, imgRef, wrapperRef, 
       const { cmd } = e.currentTarget.dataset;
       setIsResizeStart(true);
       setResizeCmd(cmd);
+      setIsResizeMode(true);
     },
-    [setResizeCmd],
+    [setIsResizeMode, setResizeCmd],
   );
 
   const handleImgResizeEnd = useCallback(() => {
     setIsResizeStart(false);
     setResizeCmd(null);
-  }, [setResizeCmd]);
+    setIsResizeMode(false);
+  }, [setIsResizeMode, setResizeCmd]);
 
   useEffect(() => {
     if (!imgRef || !imgRef.current) return;

@@ -58,24 +58,29 @@ export const SingleCanvasField = styled.div<{ isPreview: boolean }>`
 `;
 
 export const PreviewCanvasWrapper = styled.div<{ isPreview: boolean }>`
-  ${({ isPreview, theme }) =>
+  width: 100%;
+  min-height: calc(100vh - ${HEADER_HEIGHT}px);
+  max-height: calc(100vh - ${HEADER_HEIGHT}px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+
+  canvas {
+    display: block;
+    background-color: ${({ theme }) => theme.color.white};
+    filter: ${({ theme }) => theme.canvasShadowFilter};
+  }
+  ${({ isPreview }) =>
     isPreview
       ? css`
-          width: 100%;
-          min-height: calc(100vh - ${HEADER_HEIGHT}px);
-          max-height: calc(100vh - ${HEADER_HEIGHT}px);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          canvas {
-            display: block;
-            background-color: ${theme.color.white};
-            filter: ${theme.canvasShadowFilter};
-          }
+          z-index: 1;
         `
       : css`
+          z-index: -1;
+          position: absolute;
           canvas {
-            display: none;
+            /* display: none; */
           }
         `}
 `;
