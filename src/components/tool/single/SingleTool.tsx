@@ -472,6 +472,7 @@ const SingleTool = () => {
 
   useEffect(() => {
     createPreviewCanvas();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [singleImgUploadUrl]);
 
   useEffect(() => {
