@@ -186,7 +186,7 @@ export const SelectedFrameWrapper = styled.div<{
         height: 100%;
         content: '';
         border: 1px ${isFitX ? 'solid' : 'dashed'} ${theme.color.primary};
-        z-index: 33;
+        z-index: 35;
       }
     `}
   ${({ isNearingY, isFitY, theme }) =>
@@ -200,7 +200,7 @@ export const SelectedFrameWrapper = styled.div<{
         transform: translateY(-50%);
         height: 2px;
         content: '';
-        z-index: 33;
+        z-index: 35;
         border: 1px ${isFitY ? 'solid' : 'dashed'} ${theme.color.primary};
       }
     `}
@@ -269,7 +269,7 @@ export const ImageWrapper = styled.div<{
   }
   .cropped-img {
     position: absolute;
-    z-index: 3;
+    z-index: 1;
     filter: ${({ theme }) => theme.canvasShadowFilter};
 
     ${({ isPreview }) =>
