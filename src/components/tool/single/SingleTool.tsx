@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ToolHeader from '../ToolHeader';
-import { Button, Popover, Spin } from 'antd';
+import { Button, Popover } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 import axios from 'axios';
