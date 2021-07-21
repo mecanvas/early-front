@@ -81,7 +81,6 @@ const SingleTool = () => {
   const [bgColor, setBgColor] = useState(theme.color.white);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragDrop, setIsDragDrop] = useState(false);
-  const [previewLoading, setPreviewLoading] = useState(false);
 
   const [, setToolType] = useGlobalState<'single' | 'divided'>('toolType', 'single');
   const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
@@ -146,7 +145,6 @@ const SingleTool = () => {
 
       const canvas = canvasProps || document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      setPreviewLoading(true);
 
       if (ctx && singleImgUploadUrl) {
         const img = new Image();
@@ -212,7 +210,6 @@ const SingleTool = () => {
     if (!controllerNode || !resizeWidth || !resizeHeight || !previewCanvasRef.current || !originWidth || !originHeight)
       return;
     createCanvasForSave(previewCanvasRef.current);
-    setPreviewLoading(false);
   }, [controllerNode, createCanvasForSave, originHeight, originWidth, resizeHeight, resizeWidth]);
 
   const handleColorChange = useCallback(
@@ -602,12 +599,8 @@ const SingleTool = () => {
         )}
 
         {/* 본격적인 툴  */}
-        <PreviewCanvasWrapper isPreview={(isPreview && !previewLoading) || false}>
+        <PreviewCanvasWrapper isPreview={isPreview || false}>
           <canvas ref={previewCanvasRef} />
-          <Spin
-            style={{ position: 'absolute', top: '50%', left: '50%', transform: 'traslate(-50%, -50%)' }}
-            spinning={isPreview ? previewLoading : true}
-          />
         </PreviewCanvasWrapper>
 
         <SingleCanvasField isPreview={isPreview || false} onDragOver={handleDragImage} onMouseLeave={handleDragCancel}>
