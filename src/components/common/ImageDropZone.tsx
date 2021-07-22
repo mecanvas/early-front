@@ -38,7 +38,7 @@ const DropZoneDiv = styled.div`
   p {
     margin-top: 6px;
     font-size: 17px;
-    font-weight: bold;
+    font-weight: 500;
   }
 
   img {
