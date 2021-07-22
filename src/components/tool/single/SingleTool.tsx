@@ -79,9 +79,12 @@ const SingleTool = () => {
 
   const [isResizeMode] = useGlobalState('isResizeMode', false);
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
+  const [isPreviewDrawing, setIsPreviewDrawing] = useState(false);
   const [bgColor, setBgColor] = useState(theme.color.white);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragDrop, setIsDragDrop] = useState(false);
+
+  const [isRotate, setIsRotate] = useState(false);
 
   const [, setToolType] = useGlobalState<'single' | 'divided'>('toolType', 'single');
   const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
@@ -113,6 +116,16 @@ const SingleTool = () => {
   const [singlePrice, setSinglePrice] = useState(0);
   const [singleCanvasName, setSingleCanvasName] = useState('정방 S-1호');
 
+  const checkRotate = useCallback(
+    (originAxis: number, rotateAxis: number): number => {
+      if (!isRotate) {
+        return originAxis;
+      }
+      return rotateAxis;
+    },
+    [isRotate],
+  );
+
   const getPosition = useCallback((event: any) => {
     if (event.type === 'touchmove') {
       const touchs = event.changedTouches[0];
@@ -138,12 +151,12 @@ const SingleTool = () => {
   const createCanvasForSave = useCallback(
     (canvasProps?: HTMLCanvasElement) => {
       if (!controllerNode || !resizeWidth || !resizeHeight || !originWidth || !originHeight) return;
-
+      const singleFrameWidthByRotate = checkRotate(singleFrameWidth, singleFrameHeight);
+      const singleFrameHeightByRotate = checkRotate(singleFrameHeight, singleFrameWidth);
       const left = (window.innerWidth - resizeWidth) / 2 + replacePx(controllerNode.style.left);
       const top = (window.innerHeight - resizeHeight) / 2 + replacePx(controllerNode.style.top);
-      const frameLeft = (window.innerWidth - singleFrameWidth) / 2;
-      const frameTop = (window.innerHeight - singleFrameHeight) / 2;
-
+      const frameLeft = (window.innerWidth - singleFrameWidthByRotate) / 2;
+      const frameTop = (window.innerHeight - singleFrameHeightByRotate) / 2;
       const canvas = canvasProps || document.createElement('canvas');
       const ctx = canvas.getContext('2d');
 
@@ -157,10 +170,10 @@ const SingleTool = () => {
           const cropX = frameLeft - left;
           const cropY = frameTop - top;
 
-          const originFrameWidth = singleFrameWidth * scaleX;
-          const originFrameHeight = singleFrameHeight * scaleY;
-          const canvasFrameWidth = canvasProps ? singleFrameWidth : originFrameWidth;
-          const canvasFrameHeight = canvasProps ? singleFrameHeight : originFrameHeight;
+          const originFrameWidth = singleFrameWidthByRotate * scaleX;
+          const originFrameHeight = singleFrameHeightByRotate * scaleY;
+          const canvasFrameWidth = canvasProps ? singleFrameWidthByRotate : originFrameWidth;
+          const canvasFrameHeight = canvasProps ? singleFrameHeightByRotate : originFrameHeight;
 
           // const pixelRatio = window.devicePixelRatio;
           canvas.width = canvasFrameWidth;
@@ -194,32 +207,34 @@ const SingleTool = () => {
       }
     },
     [
-      bgColor,
       controllerNode,
-      originHeight,
-      originWidth,
-      resizeHeight,
       resizeWidth,
-      singleFrameHeight,
+      resizeHeight,
+      originWidth,
+      originHeight,
       singleFrameWidth,
+      singleFrameHeight,
       singleImgUploadUrl,
+      checkRotate,
       singleCanvasName,
+      bgColor,
     ],
   );
 
   const createPreviewCanvas = useCallback(() => {
-    if (!controllerNode || !resizeWidth || !resizeHeight || !previewCanvasRef.current || !originWidth || !originHeight)
-      return;
-    createCanvasForSave(previewCanvasRef.current);
-  }, [controllerNode, createCanvasForSave, originHeight, originWidth, resizeHeight, resizeWidth]);
+    createCanvasForSave(previewCanvasRef.current || undefined);
+  }, [createCanvasForSave]);
 
-  const handleColorChange = useCallback(
-    (color: ColorResult) => {
-      const { hex } = color;
-      setBgColor(hex);
-    },
-    [setBgColor],
-  );
+  const handleColorChange = useCallback((color: ColorResult) => {
+    const { hex } = color;
+    setBgColor(hex);
+    setIsPreviewDrawing(true);
+  }, []);
+
+  const handleFrameRotate = useCallback(() => {
+    setIsRotate((prev) => !prev);
+    setIsPreviewDrawing(true);
+  }, []);
 
   const handleHorizontal = useCallback(() => {
     if (controllerNode) {
@@ -228,6 +243,7 @@ const SingleTool = () => {
       setTimeout(() => {
         setNearingCenterY(false);
       }, 300);
+      setIsPreviewDrawing(true);
     }
   }, [controllerNode]);
 
@@ -238,6 +254,7 @@ const SingleTool = () => {
       setTimeout(() => {
         setNearingCenterX(false);
       }, 300);
+      setIsPreviewDrawing(true);
     }
   }, [controllerNode]);
 
@@ -246,10 +263,13 @@ const SingleTool = () => {
       const { width, height, price, name } = e.currentTarget.dataset;
       const myFrame = frameSize().filter((lst) => lst.name === name);
       setFramePrice(myFrame.map((lst) => ({ id: Date.now(), cm: lst.cm, name: lst.name, price: lst.price })));
-      setSingleFrameWidth(replacePx(width) * 1.5);
-      setSingleFrameHeight(replacePx(height) * 1.5);
+      const calcWidth = replacePx(width) * 1.5;
+      const calcHeight = replacePx(height) * 1.5;
+      setSingleFrameWidth(calcWidth);
+      setSingleFrameHeight(calcHeight);
       setSinglePrice(+price);
       setSingleCanvasName(`${myFrame[0].attribute} ${name}`);
+      setIsPreviewDrawing(true);
     },
     [setFramePrice],
   );
@@ -388,8 +408,8 @@ const SingleTool = () => {
     setNearingCenterX(false);
     setNearingCenterY(false);
     setIsCalc(false);
-    createPreviewCanvas();
-  }, [createPreviewCanvas]);
+    setIsPreviewDrawing(true);
+  }, []);
 
   const drawingImage = useCallback(
     (resizeWidth?: number, resizeHeight?: number, url?: string) => {
@@ -417,6 +437,7 @@ const SingleTool = () => {
           imgCtx.clearRect(0, 0, wrapperWidth, wrapperHeight);
           imgCtx.imageSmoothingQuality = 'high';
           imgCtx.drawImage(img, 0, 0, w, filterOverMaxHeight(h));
+          setIsPreviewDrawing(true);
         };
       }
     },
@@ -454,12 +475,33 @@ const SingleTool = () => {
   }, [controllerNode, drawingImage, originHeight, originWidth, singleFrameHeight, singleFrameWidth]);
 
   useEffect(() => {
-    if (isSaveCanvas) {
-      const imgCanvas = createCanvasForSave();
-      setSelectedFrameList(imgCanvas ? [imgCanvas] : []);
+    if (isPreview) {
+      setFrameListAnimation((prev) => ({
+        ...prev,
+        maxHeight: '0px',
+        height: '0px',
+        overflow: 'hidden',
+        padding: '0em',
+      }));
+      setIsHideFrameList(true);
+    } else {
+      setFrameListAnimation((prev) => ({
+        ...prev,
+        maxHeight: '150px',
+        height: '150px',
+        overflow: 'auto',
+        padding: '0.6em',
+      }));
+      setIsHideFrameList(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSaveCanvas]);
+  }, [isPreview]);
+
+  useEffect(() => {
+    if (isPreviewDrawing) {
+      createPreviewCanvas();
+      setIsPreviewDrawing(false);
+    }
+  }, [createPreviewCanvas, isPreviewDrawing]);
 
   useEffect(() => {
     drawingImage();
@@ -471,9 +513,12 @@ const SingleTool = () => {
   }, [singleImgUploadUrl, wrapperWidth, wrapperHeight, drawingImage, controllerNode]);
 
   useEffect(() => {
-    createPreviewCanvas();
+    if (isSaveCanvas) {
+      const imgCanvas = createCanvasForSave();
+      setSelectedFrameList(imgCanvas ? [imgCanvas] : []);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [singleImgUploadUrl]);
+  }, [isSaveCanvas]);
 
   useEffect(() => {
     if (isResizeMode) {
@@ -519,6 +564,9 @@ const SingleTool = () => {
               <img src={icons.imgUpload} style={{ width: '22px' }} />
             </Button>
           </Upload>
+          <Button type="text" onClick={handleFrameRotate}>
+            <img src={icons.rotate} />
+          </Button>
           <Button type="text" onClick={handleHorizontal}>
             <img src={icons.horizontal} />
           </Button>
@@ -538,7 +586,7 @@ const SingleTool = () => {
           </Popover>
 
           <Button type="text" onClick={handleRatioForFrame}>
-            <img src={icons.maximumFrame} />
+            <img src={icons.auto} />
           </Button>
           <Button type="text" onClick={handleImgRatioSetting}>
             <img src={icons.ratioFrame} style={{ width: '24px' }} />
@@ -589,7 +637,11 @@ const SingleTool = () => {
                   data-name={lst.name}
                   onClick={handleSelectFrame}
                 >
-                  <SingleFrameList {...lst.size} clicked={`${frameAttributes} ${lst.name}` === singleCanvasName}>
+                  <SingleFrameList
+                    {...lst.size}
+                    rotate={isRotate}
+                    clicked={`${frameAttributes} ${lst.name}` === singleCanvasName}
+                  >
                     <FrameSizeName>{lst.name}</FrameSizeName>
                   </SingleFrameList>
                   <small>{lst.cm}</small>
@@ -625,6 +677,7 @@ const SingleTool = () => {
           >
             {/* 선택한 액자 렌더링  */}
             <SingleSelectedFrame
+              rotate={isRotate}
               bgColor={bgColor}
               isImgUploadUrl={singleImgUploadUrl ? true : false}
               ref={singleSelectedFrameRef}

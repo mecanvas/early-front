@@ -65,6 +65,7 @@ export const PreviewCanvasWrapper = styled.div<{ isPreview: boolean }>`
   justify-content: center;
   align-items: center;
   position: absolute;
+  background-color: ${({ theme }) => theme.color.gray100};
 
   canvas {
     display: block;
@@ -74,7 +75,7 @@ export const PreviewCanvasWrapper = styled.div<{ isPreview: boolean }>`
   ${({ isPreview }) =>
     isPreview
       ? css`
-          z-index: 1;
+          z-index: 0;
         `
       : css`
           z-index: -1;
@@ -157,16 +158,20 @@ export const SingleSelectedFrame = styled.div<{
   isImgUploadUrl: boolean;
   width: number;
   height: number;
+  rotate: boolean;
 }>`
   position: absolute;
   background-color: ${({ bgColor }) => bgColor};
-  ${({ width, height }) =>
-    width &&
-    height &&
-    css`
-      width: ${width}px;
-      height: ${height}px;
-    `}
+  ${({ width, height, rotate }) =>
+    width && height && !rotate
+      ? css`
+          width: ${width}px;
+          height: ${height}px;
+        `
+      : css`
+          width: ${height}px;
+          height: ${width}px;
+        `}
   ${({ isImgUploadUrl }) =>
     isImgUploadUrl ||
     css`
@@ -241,6 +246,7 @@ export const SingleFrameListHeader = styled.div`
   align-items: center;
   flex-direction: column;
   right: 2px;
+  z-index: 1;
   @media all and (min-width: ${({ theme }) => theme.size.sm}) {
     top: ${HEADER_HEIGHT - 38}px;
   }
@@ -296,7 +302,7 @@ export const SingleFrameListGrid = styled.div<{
   overflow: ${({ overflow }) => overflow};
   background-color: ${({ theme }) => theme.color.white};
   transition: all 500ms ease-in-out;
-
+  border: 1px solid ${({ theme }) => theme.color.gray100};
   div {
     flex: 1;
     text-align: center;
@@ -312,13 +318,22 @@ export const SingleFrameListGrid = styled.div<{
   }
 `;
 
-export const SingleFrameList = styled.div<{ width: string; height: string; clicked: boolean }>`
+export const SingleFrameList = styled.div<{ rotate: boolean; width: string; height: string; clicked: boolean }>`
   position: relative;
   cursor: pointer;
   margin: 0 auto;
   margin-top: 0.4em;
-  width: ${({ width }) => `${replacePx(width) / 4}px`};
-  height: ${({ height }) => `${replacePx(height) / 4}px`};
+  ${({ rotate, width, height }) =>
+    rotate
+      ? css`
+          width: ${replacePx(height) / 4}px;
+          height: ${replacePx(width) / 4}px;
+        `
+      : css`
+          width: ${replacePx(width) / 4}px;
+          height: ${replacePx(height) / 4}px;
+        `}
+
   border: 1px solid ${({ theme, clicked }) => (clicked ? theme.color.primary : theme.color.gray300)};
 
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
