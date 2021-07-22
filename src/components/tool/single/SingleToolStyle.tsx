@@ -157,16 +157,20 @@ export const SingleSelectedFrame = styled.div<{
   isImgUploadUrl: boolean;
   width: number;
   height: number;
+  rotate: boolean;
 }>`
   position: absolute;
   background-color: ${({ bgColor }) => bgColor};
-  ${({ width, height }) =>
-    width &&
-    height &&
-    css`
-      width: ${width}px;
-      height: ${height}px;
-    `}
+  ${({ width, height, rotate }) =>
+    width && height && !rotate
+      ? css`
+          width: ${width}px;
+          height: ${height}px;
+        `
+      : css`
+          width: ${height}px;
+          height: ${width}px;
+        `}
   ${({ isImgUploadUrl }) =>
     isImgUploadUrl ||
     css`

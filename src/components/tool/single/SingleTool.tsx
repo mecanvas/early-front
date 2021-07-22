@@ -80,6 +80,7 @@ const SingleTool = () => {
   const [isResizeMode] = useGlobalState('isResizeMode', false);
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
   const [bgColor, setBgColor] = useState(theme.color.white);
+  const [isRotate, setIsRotate] = useState(false);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragDrop, setIsDragDrop] = useState(false);
 
@@ -220,6 +221,10 @@ const SingleTool = () => {
     },
     [setBgColor],
   );
+
+  const handleFrameRotate = useCallback(() => {
+    setIsRotate((prev) => !prev);
+  }, []);
 
   const handleHorizontal = useCallback(() => {
     if (controllerNode) {
@@ -519,6 +524,9 @@ const SingleTool = () => {
               <img src={icons.imgUpload} style={{ width: '22px' }} />
             </Button>
           </Upload>
+          <Button type="text" onClick={handleFrameRotate}>
+            <img src={icons.rotate} />
+          </Button>
           <Button type="text" onClick={handleHorizontal}>
             <img src={icons.horizontal} />
           </Button>
@@ -538,7 +546,7 @@ const SingleTool = () => {
           </Popover>
 
           <Button type="text" onClick={handleRatioForFrame}>
-            <img src={icons.maximumFrame} />
+            <img src={icons.auto} />
           </Button>
           <Button type="text" onClick={handleImgRatioSetting}>
             <img src={icons.ratioFrame} style={{ width: '24px' }} />
@@ -625,6 +633,7 @@ const SingleTool = () => {
           >
             {/* 선택한 액자 렌더링  */}
             <SingleSelectedFrame
+              rotate={isRotate}
               bgColor={bgColor}
               isImgUploadUrl={singleImgUploadUrl ? true : false}
               ref={singleSelectedFrameRef}

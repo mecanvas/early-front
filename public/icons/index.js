@@ -12,6 +12,8 @@ import home from './home.svg';
 import arrow from './arrow.svg';
 import man from './man.svg';
 import curi from './curi.svg';
+import rotate from './rotate.svg';
+import auto from './auto.svg';
 
 export const icons = {
   home,
@@ -28,4 +30,6 @@ export const icons = {
   questionMark,
   man,
   curi,
+  rotate,
+  auto,
 };
