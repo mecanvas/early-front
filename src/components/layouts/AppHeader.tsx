@@ -4,10 +4,11 @@ import { Button } from 'antd';
 import { useExceptionRoute } from 'src/hooks/useExceptionRoute';
 import Logo from './Logo';
 import Link from 'next/link';
+import { APP_HEADER_HEIGHT } from 'src/constants';
 
 const HeaderContainer = styled.header`
   width: 100%;
-  height: 60px;
+  height: ${APP_HEADER_HEIGHT}px;
   padding: 0 2em;
   background-color: ${({ theme }) => theme.color.white};
   border-bottom: 1px solid ${({ theme }) => theme.color.gray200};

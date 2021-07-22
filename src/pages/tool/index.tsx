@@ -8,7 +8,7 @@ const SelectedWrapper = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  min-height: calc(100vh - 170px);
+  min-height: calc(98vh);
   background-color: ${({ theme }) => theme.color.white};
 `;
 

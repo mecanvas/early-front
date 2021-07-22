@@ -4,8 +4,9 @@ import { useExceptionRoute } from 'src/hooks/useExceptionRoute';
 
 const FooterContainer = styled.footer`
   width: 100%;
-  padding: 40px;
-  background-color: ${({ theme }) => theme.color.secondarybg};
+  padding: 2em;
+  border-top: 1px solid ${({ theme }) => theme.color.gray100};
+  background-color: ${({ theme }) => theme.color.white};
 `;
 
 const Footer = styled.div`
@@ -22,7 +23,7 @@ const AppFooter = () => {
 
   return (
     <FooterContainer>
-      <Footer>&copy; mecanvas 2021</Footer>
+      <Footer>&copy; EarlyStudio21</Footer>
     </FooterContainer>
   );
 };

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
 import Link from 'next/link';
 import styled from '@emotion/styled';
+import { APP_HEADER_HEIGHT } from 'src/constants';
 
 const { Header, Content } = Layout;
 
@@ -45,7 +46,7 @@ const AdminMenu = styled.div`
 `;
 
 const ContentContainer = styled(Content)`
-  margin-top: 64px;
+  margin-top: ${APP_HEADER_HEIGHT}px;
   & > div {
     min-height: 80vh;
     padding: 24px 130px;
