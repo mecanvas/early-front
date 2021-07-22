@@ -19,8 +19,10 @@ export const S3_URL = 'https://early21-assets.s3.ap-northeast-2.amazonaws.com';
 
 // Tool의 헤더
 export const HEADER_HEIGHT = 86;
-
 export const CONTENT_HEIGHT = 'calc(100vh - 168px)';
+
+// App의 헤더 크기
+export const APP_HEADER_HEIGHT = 60;
 
 export const frameSize = (changeVertical?: boolean): FrameSize[] => [
   {
