@@ -3,13 +3,32 @@ import styled from '@emotion/styled';
 import { Images } from 'public/index';
 import { useOpacity } from 'src/hooks/useOpacity';
 import Link from 'next/link';
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: ${({ theme }) => theme.color.gray000};
+  min-height: calc(98vh);
+  h4 {
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      margin-top: 1em;
+      margin-bottom: 0;
+    }
+  }
+`;
+
 const SelectedWrapper = styled.div`
+  padding-top: 2em;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  min-height: calc(98vh);
-  background-color: ${({ theme }) => theme.color.white};
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    flex-direction: column;
+  }
 `;
 
 const SelectedSingle = styled.div`
@@ -21,6 +40,10 @@ const SelectedSingle = styled.div`
   flex-direction: column;
   margin-right: 3em;
   text-align: center;
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    margin-bottom: 2em;
+    margin-right: 0;
+  }
   div:nth-of-type(1) {
     border-radius: 8px;
     background-color: ${({ theme }) => theme.color.white};
@@ -35,6 +58,7 @@ const SelectedSingle = styled.div`
     }
   }
   p {
+    background-color: ${({ theme }) => theme.color.white};
     font-weight: 500;
     margin: 0;
     padding: 1em 0;
@@ -56,6 +80,10 @@ const SelectedDivided = styled.div`
   flex-direction: column;
   margin-left: 3em;
   text-align: center;
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    margin-bottom: 2em;
+    margin-left: 0;
+  }
   div:nth-of-type(1) {
     background-color: ${({ theme }) => theme.color.white};
     height: 350px;
@@ -70,6 +98,7 @@ const SelectedDivided = styled.div`
     }
   }
   p {
+    background-color: ${({ theme }) => theme.color.white};
     font-weight: 500;
     margin: 0;
     padding: 1em 0;
@@ -85,27 +114,30 @@ const SelectedDivided = styled.div`
 const Index = () => {
   const { OpacityComponent } = useOpacity('trigger');
   return (
-    <OpacityComponent>
-      <SelectedWrapper>
-        <Link href="/tool/single">
-          <SelectedSingle>
-            <div>
-              <img src={Images.henry} />
-            </div>
-            <p>하나의 사진으로 하나의 캔버스</p>
-          </SelectedSingle>
-        </Link>
+    <Container>
+      <h4>제작방식을 선택해 주세요.</h4>
+      <OpacityComponent>
+        <SelectedWrapper>
+          <Link href="/tool/single">
+            <SelectedSingle>
+              <div>
+                <img src={Images.henry} />
+              </div>
+              <p>하나의 사진으로 하나의 캔버스</p>
+            </SelectedSingle>
+          </Link>
 
-        <Link href="/tool/divided">
-          <SelectedDivided>
-            <div>
-              <img src={Images.div} />
-            </div>
-            <p>하나의 사진으로 여러개의 캔버스</p>
-          </SelectedDivided>
-        </Link>
-      </SelectedWrapper>
-    </OpacityComponent>
+          <Link href="/tool/divided">
+            <SelectedDivided>
+              <div>
+                <img src={Images.div} />
+              </div>
+              <p>하나의 사진으로 여러개의 캔버스</p>
+            </SelectedDivided>
+          </Link>
+        </SelectedWrapper>
+      </OpacityComponent>
+    </Container>
   );
 };
 
