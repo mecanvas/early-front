@@ -610,7 +610,11 @@ const SingleTool = () => {
                   data-name={lst.name}
                   onClick={handleSelectFrame}
                 >
-                  <SingleFrameList {...lst.size} clicked={`${frameAttributes} ${lst.name}` === singleCanvasName}>
+                  <SingleFrameList
+                    {...lst.size}
+                    rotate={isRotate}
+                    clicked={`${frameAttributes} ${lst.name}` === singleCanvasName}
+                  >
                     <FrameSizeName>{lst.name}</FrameSizeName>
                   </SingleFrameList>
                   <small>{lst.cm}</small>

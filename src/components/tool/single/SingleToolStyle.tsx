@@ -316,13 +316,22 @@ export const SingleFrameListGrid = styled.div<{
   }
 `;
 
-export const SingleFrameList = styled.div<{ width: string; height: string; clicked: boolean }>`
+export const SingleFrameList = styled.div<{ rotate: boolean; width: string; height: string; clicked: boolean }>`
   position: relative;
   cursor: pointer;
   margin: 0 auto;
   margin-top: 0.4em;
-  width: ${({ width }) => `${replacePx(width) / 4}px`};
-  height: ${({ height }) => `${replacePx(height) / 4}px`};
+  ${({ rotate, width, height }) =>
+    rotate
+      ? css`
+          width: ${replacePx(height) / 4}px;
+          height: ${replacePx(width) / 4}px;
+        `
+      : css`
+          width: ${replacePx(width) / 4}px;
+          height: ${replacePx(height) / 4}px;
+        `}
+
   border: 1px solid ${({ theme, clicked }) => (clicked ? theme.color.primary : theme.color.gray300)};
 
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
