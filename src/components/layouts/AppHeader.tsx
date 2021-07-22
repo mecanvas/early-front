@@ -1,15 +1,16 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
-import { useRouter } from 'next/router';
 import { Button } from 'antd';
 import { useExceptionRoute } from 'src/hooks/useExceptionRoute';
 import Logo from './Logo';
+import Link from 'next/link';
 
 const HeaderContainer = styled.header`
   width: 100%;
-  height: 64px;
-  padding: 0 3em;
+  height: 60px;
+  padding: 0 2em;
   background-color: ${({ theme }) => theme.color.white};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray200};
 `;
 
 const Header = styled.div`
@@ -26,15 +27,6 @@ const Header = styled.div`
 
 const AppHeader = () => {
   const { exceptionRoute } = useExceptionRoute();
-  const router = useRouter();
-
-  const handlePushCustomPage = useCallback(
-    (e) => {
-      const { key } = e.currentTarget.dataset;
-      router.push(`/tool/${key}`);
-    },
-    [router],
-  );
 
   if (exceptionRoute) {
     return null;
@@ -46,12 +38,9 @@ const AppHeader = () => {
         <>
           <Logo />
           <div>
-            <Button type="primary" data-key="single" onClick={handlePushCustomPage}>
-              단일
-            </Button>
-            <Button type="primary" data-key="divided" onClick={handlePushCustomPage}>
-              분할
-            </Button>
+            <Link href="/tool">
+              <Button type="default">시안 제작</Button>
+            </Link>
           </div>
         </>
       </Header>
