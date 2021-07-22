@@ -79,6 +79,7 @@ const SingleTool = () => {
 
   const [isResizeMode] = useGlobalState('isResizeMode', false);
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
+  const [isPreviewDrawing, setIsPreviewDrawing] = useState(false);
   const [bgColor, setBgColor] = useState(theme.color.white);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragDrop, setIsDragDrop] = useState(false);
@@ -224,18 +225,16 @@ const SingleTool = () => {
     createCanvasForSave(previewCanvasRef.current || undefined);
   }, [createCanvasForSave]);
 
-  const handleColorChange = useCallback(
-    (color: ColorResult) => {
-      const { hex } = color;
-      setBgColor(hex);
-    },
-    [setBgColor],
-  );
+  const handleColorChange = useCallback((color: ColorResult) => {
+    const { hex } = color;
+    setBgColor(hex);
+    setIsPreviewDrawing(true);
+  }, []);
 
   const handleFrameRotate = useCallback(() => {
     setIsRotate((prev) => !prev);
-    createPreviewCanvas();
-  }, [createPreviewCanvas]);
+    setIsPreviewDrawing(true);
+  }, []);
 
   const handleHorizontal = useCallback(() => {
     if (controllerNode) {
@@ -244,6 +243,7 @@ const SingleTool = () => {
       setTimeout(() => {
         setNearingCenterY(false);
       }, 300);
+      setIsPreviewDrawing(true);
     }
   }, [controllerNode]);
 
@@ -254,6 +254,7 @@ const SingleTool = () => {
       setTimeout(() => {
         setNearingCenterX(false);
       }, 300);
+      setIsPreviewDrawing(true);
     }
   }, [controllerNode]);
 
@@ -268,6 +269,7 @@ const SingleTool = () => {
       setSingleFrameHeight(calcHeight);
       setSinglePrice(+price);
       setSingleCanvasName(`${myFrame[0].attribute} ${name}`);
+      setIsPreviewDrawing(true);
     },
     [setFramePrice],
   );
@@ -406,8 +408,8 @@ const SingleTool = () => {
     setNearingCenterX(false);
     setNearingCenterY(false);
     setIsCalc(false);
-    createPreviewCanvas();
-  }, [createPreviewCanvas]);
+    setIsPreviewDrawing(true);
+  }, []);
 
   const drawingImage = useCallback(
     (resizeWidth?: number, resizeHeight?: number, url?: string) => {
@@ -435,6 +437,7 @@ const SingleTool = () => {
           imgCtx.clearRect(0, 0, wrapperWidth, wrapperHeight);
           imgCtx.imageSmoothingQuality = 'high';
           imgCtx.drawImage(img, 0, 0, w, filterOverMaxHeight(h));
+          setIsPreviewDrawing(true);
         };
       }
     },
@@ -472,12 +475,11 @@ const SingleTool = () => {
   }, [controllerNode, drawingImage, originHeight, originWidth, singleFrameHeight, singleFrameWidth]);
 
   useEffect(() => {
-    if (isSaveCanvas) {
-      const imgCanvas = createCanvasForSave();
-      setSelectedFrameList(imgCanvas ? [imgCanvas] : []);
+    if (isPreviewDrawing) {
+      createPreviewCanvas();
+      setIsPreviewDrawing(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSaveCanvas]);
+  }, [createPreviewCanvas, isPreviewDrawing]);
 
   useEffect(() => {
     drawingImage();
@@ -489,9 +491,12 @@ const SingleTool = () => {
   }, [singleImgUploadUrl, wrapperWidth, wrapperHeight, drawingImage, controllerNode]);
 
   useEffect(() => {
-    createPreviewCanvas();
+    if (isSaveCanvas) {
+      const imgCanvas = createCanvasForSave();
+      setSelectedFrameList(imgCanvas ? [imgCanvas] : []);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [singleImgUploadUrl]);
+  }, [isSaveCanvas]);
 
   useEffect(() => {
     if (isResizeMode) {
