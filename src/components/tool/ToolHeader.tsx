@@ -76,7 +76,7 @@ const ToolHeader = ({ singlePrice, singleCanvasName, imgUrl }: Props) => {
     if (imgUploadUrl || singleImgUploadUrl) {
       setIsOpenModal(true);
     } else {
-      router.push('/');
+      router.push('/tool');
     }
   }, [imgUploadUrl, setIsOpenModal, singleImgUploadUrl]);
 
