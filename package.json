@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "NODE_ENV=production next build",
     "start": "next start -p $PORT",
-    "deploy": "npx serverless",
+    "deploy": "npx sls s3remove && npx serverless",
     "prettier": "prettier --write --config ./.prettierrc './src/**/*.{ts,tsx,css,json}'",
     "lint:fix": "eslint --fix './src/**/*.{ts,tsx,css}'"
   },
@@ -60,6 +60,7 @@
     "eslint-plugin-react": "7.23.2",
     "eslint-plugin-react-hooks": "4.2.0",
     "prettier": "2.3.0",
+    "serverless-s3-cleaner": "1.0.0",
     "typescript": "4.2.4"
   }
 }
