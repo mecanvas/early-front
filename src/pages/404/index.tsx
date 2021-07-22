@@ -6,7 +6,7 @@ const Error404 = () => {
   const router = useRouter();
   const [count, setCount] = useState(5);
   const handleGoToMainPage = () => {
-    router.push('/');
+    router.push('/tool');
   };
 
   useEffect(() => {

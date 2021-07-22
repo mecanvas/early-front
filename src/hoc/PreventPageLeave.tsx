@@ -93,7 +93,7 @@ const usePreventPageLeave = () => {
 
   const handleLeavePage = useCallback(() => {
     setOpenModal(false);
-    push('/');
+    push('/tool');
   }, [push, setOpenModal]);
 
   const handleCloseModal = useCallback(() => {
