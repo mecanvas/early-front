@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import { Images } from 'public/index';
+import { useOpacity } from 'src/hooks/useOpacity';
+import Link from 'next/link';
 const SelectedWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -38,6 +40,11 @@ const SelectedSingle = styled.div`
     padding: 1em 0;
     border-radius: 8px;
   }
+
+  &:hover {
+    opacity: 0.8;
+    box-shadow: ${({ theme }) => theme.canvasShadow};
+  }
 `;
 
 const SelectedDivided = styled.div`
@@ -68,24 +75,37 @@ const SelectedDivided = styled.div`
     padding: 1em 0;
     border-radius: 8px;
   }
+
+  &:hover {
+    opacity: 0.8;
+    box-shadow: ${({ theme }) => theme.canvasShadow};
+  }
 `;
 
 const Index = () => {
+  const { OpacityComponent } = useOpacity('trigger');
   return (
-    <SelectedWrapper>
-      <SelectedSingle>
-        <div>
-          <img src={Images.henry} />
-        </div>
-        <p>하나의 사진으로 하나의 캔버스</p>
-      </SelectedSingle>
-      <SelectedDivided>
-        <div>
-          <img src={Images.div} />
-        </div>
-        <p>하나의 사진으로 여러개의 캔버스</p>
-      </SelectedDivided>
-    </SelectedWrapper>
+    <OpacityComponent>
+      <SelectedWrapper>
+        <Link href="/tool/single">
+          <SelectedSingle>
+            <div>
+              <img src={Images.henry} />
+            </div>
+            <p>하나의 사진으로 하나의 캔버스</p>
+          </SelectedSingle>
+        </Link>
+
+        <Link href="/tool/divided">
+          <SelectedDivided>
+            <div>
+              <img src={Images.div} />
+            </div>
+            <p>하나의 사진으로 여러개의 캔버스</p>
+          </SelectedDivided>
+        </Link>
+      </SelectedWrapper>
+    </OpacityComponent>
   );
 };
 
