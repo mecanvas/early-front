@@ -80,9 +80,10 @@ const SingleTool = () => {
   const [isResizeMode] = useGlobalState('isResizeMode', false);
   const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
   const [bgColor, setBgColor] = useState(theme.color.white);
-  const [isRotate, setIsRotate] = useState(false);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragDrop, setIsDragDrop] = useState(false);
+
+  const [isRotate, setIsRotate] = useState(false);
 
   const [, setToolType] = useGlobalState<'single' | 'divided'>('toolType', 'single');
   const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
@@ -114,6 +115,16 @@ const SingleTool = () => {
   const [singlePrice, setSinglePrice] = useState(0);
   const [singleCanvasName, setSingleCanvasName] = useState('정방 S-1호');
 
+  const checkRotate = useCallback(
+    (originAxis: number, rotateAxis: number): number => {
+      if (!isRotate) {
+        return originAxis;
+      }
+      return rotateAxis;
+    },
+    [isRotate],
+  );
+
   const getPosition = useCallback((event: any) => {
     if (event.type === 'touchmove') {
       const touchs = event.changedTouches[0];
@@ -139,12 +150,12 @@ const SingleTool = () => {
   const createCanvasForSave = useCallback(
     (canvasProps?: HTMLCanvasElement) => {
       if (!controllerNode || !resizeWidth || !resizeHeight || !originWidth || !originHeight) return;
-
+      const singleFrameWidthByRotate = checkRotate(singleFrameWidth, singleFrameHeight);
+      const singleFrameHeightByRotate = checkRotate(singleFrameHeight, singleFrameWidth);
       const left = (window.innerWidth - resizeWidth) / 2 + replacePx(controllerNode.style.left);
       const top = (window.innerHeight - resizeHeight) / 2 + replacePx(controllerNode.style.top);
-      const frameLeft = (window.innerWidth - singleFrameWidth) / 2;
-      const frameTop = (window.innerHeight - singleFrameHeight) / 2;
-
+      const frameLeft = (window.innerWidth - singleFrameWidthByRotate) / 2;
+      const frameTop = (window.innerHeight - singleFrameHeightByRotate) / 2;
       const canvas = canvasProps || document.createElement('canvas');
       const ctx = canvas.getContext('2d');
 
@@ -158,10 +169,10 @@ const SingleTool = () => {
           const cropX = frameLeft - left;
           const cropY = frameTop - top;
 
-          const originFrameWidth = singleFrameWidth * scaleX;
-          const originFrameHeight = singleFrameHeight * scaleY;
-          const canvasFrameWidth = canvasProps ? singleFrameWidth : originFrameWidth;
-          const canvasFrameHeight = canvasProps ? singleFrameHeight : originFrameHeight;
+          const originFrameWidth = singleFrameWidthByRotate * scaleX;
+          const originFrameHeight = singleFrameHeightByRotate * scaleY;
+          const canvasFrameWidth = canvasProps ? singleFrameWidthByRotate : originFrameWidth;
+          const canvasFrameHeight = canvasProps ? singleFrameHeightByRotate : originFrameHeight;
 
           // const pixelRatio = window.devicePixelRatio;
           canvas.width = canvasFrameWidth;
@@ -195,24 +206,23 @@ const SingleTool = () => {
       }
     },
     [
-      bgColor,
       controllerNode,
-      originHeight,
-      originWidth,
-      resizeHeight,
       resizeWidth,
-      singleFrameHeight,
+      resizeHeight,
+      originWidth,
+      originHeight,
       singleFrameWidth,
+      singleFrameHeight,
       singleImgUploadUrl,
+      checkRotate,
       singleCanvasName,
+      bgColor,
     ],
   );
 
   const createPreviewCanvas = useCallback(() => {
-    if (!controllerNode || !resizeWidth || !resizeHeight || !previewCanvasRef.current || !originWidth || !originHeight)
-      return;
-    createCanvasForSave(previewCanvasRef.current);
-  }, [controllerNode, createCanvasForSave, originHeight, originWidth, resizeHeight, resizeWidth]);
+    createCanvasForSave(previewCanvasRef.current || undefined);
+  }, [createCanvasForSave]);
 
   const handleColorChange = useCallback(
     (color: ColorResult) => {
@@ -224,7 +234,8 @@ const SingleTool = () => {
 
   const handleFrameRotate = useCallback(() => {
     setIsRotate((prev) => !prev);
-  }, []);
+    createPreviewCanvas();
+  }, [createPreviewCanvas]);
 
   const handleHorizontal = useCallback(() => {
     if (controllerNode) {
@@ -251,8 +262,10 @@ const SingleTool = () => {
       const { width, height, price, name } = e.currentTarget.dataset;
       const myFrame = frameSize().filter((lst) => lst.name === name);
       setFramePrice(myFrame.map((lst) => ({ id: Date.now(), cm: lst.cm, name: lst.name, price: lst.price })));
-      setSingleFrameWidth(replacePx(width) * 1.5);
-      setSingleFrameHeight(replacePx(height) * 1.5);
+      const calcWidth = replacePx(width) * 1.5;
+      const calcHeight = replacePx(height) * 1.5;
+      setSingleFrameWidth(calcWidth);
+      setSingleFrameHeight(calcHeight);
       setSinglePrice(+price);
       setSingleCanvasName(`${myFrame[0].attribute} ${name}`);
     },
