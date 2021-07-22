@@ -65,6 +65,7 @@ export const PreviewCanvasWrapper = styled.div<{ isPreview: boolean }>`
   justify-content: center;
   align-items: center;
   position: absolute;
+  background-color: ${({ theme }) => theme.color.gray100};
 
   canvas {
     display: block;
@@ -74,7 +75,7 @@ export const PreviewCanvasWrapper = styled.div<{ isPreview: boolean }>`
   ${({ isPreview }) =>
     isPreview
       ? css`
-          z-index: 1;
+          z-index: 0;
         `
       : css`
           z-index: -1;
@@ -245,6 +246,7 @@ export const SingleFrameListHeader = styled.div`
   align-items: center;
   flex-direction: column;
   right: 2px;
+  z-index: 1;
   @media all and (min-width: ${({ theme }) => theme.size.sm}) {
     top: ${HEADER_HEIGHT - 38}px;
   }
@@ -300,7 +302,7 @@ export const SingleFrameListGrid = styled.div<{
   overflow: ${({ overflow }) => overflow};
   background-color: ${({ theme }) => theme.color.white};
   transition: all 500ms ease-in-out;
-
+  border: 1px solid ${({ theme }) => theme.color.gray100};
   div {
     flex: 1;
     text-align: center;

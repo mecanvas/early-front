@@ -475,6 +475,28 @@ const SingleTool = () => {
   }, [controllerNode, drawingImage, originHeight, originWidth, singleFrameHeight, singleFrameWidth]);
 
   useEffect(() => {
+    if (isPreview) {
+      setFrameListAnimation((prev) => ({
+        ...prev,
+        maxHeight: '0px',
+        height: '0px',
+        overflow: 'hidden',
+        padding: '0em',
+      }));
+      setIsHideFrameList(true);
+    } else {
+      setFrameListAnimation((prev) => ({
+        ...prev,
+        maxHeight: '150px',
+        height: '150px',
+        overflow: 'auto',
+        padding: '0.6em',
+      }));
+      setIsHideFrameList(false);
+    }
+  }, [isPreview]);
+
+  useEffect(() => {
     if (isPreviewDrawing) {
       createPreviewCanvas();
       setIsPreviewDrawing(false);
