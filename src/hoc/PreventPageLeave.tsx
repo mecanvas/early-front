@@ -62,7 +62,7 @@ const PreventModalButton = styled.div`
 
   button {
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 500;
   }
   button ~ button {
     margin-left: 4px;

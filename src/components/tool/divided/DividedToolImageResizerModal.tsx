@@ -12,7 +12,7 @@ export const ImageShowingWidthHeight = styled.small`
   left: 50%;
   transform: translateX(-50%);
   padding: 8px;
-  font-weight: bold;
+  font-weight: 500;
   border: 1px solid ${({ theme }) => theme.color.primary};
   border-radius: 20px;
   background-color: ${({ theme }) => theme.color.secondarybg};
