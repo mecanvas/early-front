@@ -249,6 +249,19 @@ const SingleTool = () => {
             canvasFrameHeight - cmToPx(8),
           );
 
+          // left
+          ctx.drawImage(
+            img,
+            cropX * scaleX,
+            cropY * scaleY,
+            cmToPx(4) * scaleX,
+            originFrameHeight,
+            canvasFrameWidth / 2 - cmToPx(4),
+            -canvasFrameHeight / 2 + cmToPx(4),
+            cmToPx(4),
+            canvasFrameHeight - cmToPx(8),
+          );
+
           ctx.restore();
 
           // 배경을 칠합니다.
