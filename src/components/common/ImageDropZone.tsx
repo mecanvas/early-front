@@ -8,7 +8,7 @@ const DropZone = styled.div<{ width?: string; height?: string; isDragActive: boo
   ${({ isDragActive }) =>
     isDragActive
       ? css`
-          opacity: 0.9;
+          opacity: 0.6;
           z-index: 999;
         `
       : css`
@@ -16,12 +16,11 @@ const DropZone = styled.div<{ width?: string; height?: string; isDragActive: boo
           z-index: 16;
         `}
   max-width: 1000px;
-  position: absolute;
   background-color: ${({ theme }) => theme.color.gray000};
   border-radius: 8px;
   border: 1px solid ${({ theme }) => theme.color.gray200};
-  width: ${({ width }) => (width ? `${width}` : '300px')};
-  height: ${({ height }) => (height ? `${height}` : '300px')};
+  width: ${({ width }) => (width ? `${width}` : '302px')};
+  height: ${({ height }) => (height ? `${height}` : '302px')};
   margin: 0 auto;
   cursor: pointer;
 `;
@@ -31,7 +30,7 @@ const DropZoneDiv = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: ${({ theme }) => theme.color.gray000};
+  background-color: ${({ theme }) => theme.color.white};
   border: 1px solid ${({ theme }) => theme.color.gray200};
   justify-content: center;
   height: 100%;
@@ -48,7 +47,7 @@ const DropZoneDiv = styled.div`
 
 interface Props {
   onDrop: <T extends File>(acceptedFiles: T[], fileRejections: FileRejection[], event: DropEvent) => void;
-  text?: string;
+  text?: string | React.ReactNode;
   width?: string;
   height?: string;
   isDragDrop?: boolean;
