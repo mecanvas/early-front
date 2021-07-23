@@ -15,6 +15,14 @@ const HelpButton = styled(Button)`
     margin-left: 2px;
   }
 
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    padding: 0em 0.6em !important;
+    span {
+      font-size: 12px;
+      line-height: 30px;
+    }
+  }
+
   &:hover {
     img {
       transition: all 100ms;

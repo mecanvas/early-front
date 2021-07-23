@@ -13,7 +13,7 @@ import { useGlobalState } from 'src/hooks';
 import { FramePrice, ResizeCmd } from 'src/interfaces/ToolInterface';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
-import { frameSize, HEADER_HEIGHT } from 'src/constants';
+import { frameSize, HEADER_HEIGHT, HEADER_HEIGHT_MOBILE } from 'src/constants';
 import { FrameSizeName } from '../divided/DividedToolStyle';
 import { replacePx } from 'src/utils/replacePx';
 import { cmToPx } from 'src/utils/cmToPx';
@@ -306,7 +306,7 @@ const SingleTool = () => {
       if (!controllerNode) return;
       const [cursorX, cursorY] = getPosition(e);
       const x = cursorX - window.innerWidth / 2;
-      const y = cursorY - window.innerHeight / 2 - HEADER_HEIGHT;
+      const y = cursorY - window.innerHeight / 2 - window.innerWidth > 768 ? HEADER_HEIGHT : HEADER_HEIGHT_MOBILE;
       if (isCalc) {
         setXDiff(x - replacePx(controllerNode.style.left));
         setYDiff(y - replacePx(controllerNode.style.top));

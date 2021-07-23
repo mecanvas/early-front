@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { HEADER_HEIGHT } from 'src/constants';
+import { HEADER_HEIGHT, HEADER_HEIGHT_MOBILE } from 'src/constants';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { replacePx } from 'src/utils/replacePx';
 
@@ -33,12 +33,15 @@ export const SingleToolFactory = styled.div`
 `;
 
 export const SingleCanvasField = styled.div<{ isPreview: boolean }>`
-  min-height: calc(100vh - ${HEADER_HEIGHT}px);
   max-height: calc(100vh - ${HEADER_HEIGHT}px);
   max-width: 1000px;
   width: 100%;
   background-color: ${({ theme }) => theme.color.gray100};
   margin: 0 auto;
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+    min-height: calc(100vh - ${HEADER_HEIGHT_MOBILE}px);
+    max-height: calc(100vh - ${HEADER_HEIGHT_MOBILE}px);
+  }
   ${({ isPreview }) =>
     isPreview
       ? css`
@@ -66,7 +69,10 @@ export const PreviewCanvasWrapper = styled.div<{ isPreview: boolean }>`
   align-items: center;
   position: absolute;
   background-color: ${({ theme }) => theme.color.gray100};
-
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+    min-height: calc(100vh - ${HEADER_HEIGHT_MOBILE}px);
+    max-height: calc(100vh - ${HEADER_HEIGHT_MOBILE}px);
+  }
   canvas {
     display: block;
     background-color: ${({ theme }) => theme.color.white};
@@ -95,6 +101,10 @@ export const SingleWrapper = styled.div<{
   width: 100%;
   min-height: calc(100vh - ${HEADER_HEIGHT}px);
   max-height: calc(100vh - ${HEADER_HEIGHT}px);
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+    min-height: calc(100vh - ${HEADER_HEIGHT_MOBILE}px);
+    max-height: calc(100vh - ${HEADER_HEIGHT_MOBILE}px);
+  }
   display: flex;
   justify-content: center;
   align-items: center;
@@ -238,6 +248,12 @@ export const SingleImageWrapper = styled.div<{ clicked: boolean }>`
             opacity: 1;
           `};
   }
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+    height: calc(100vh - ${HEADER_HEIGHT_MOBILE}px);
+    canvas {
+      max-height: calc(100vh - ${HEADER_HEIGHT_MOBILE}px);
+    }
+  }
 `;
 
 export const SingleFrameListHeader = styled.div`
@@ -248,7 +264,7 @@ export const SingleFrameListHeader = styled.div`
   right: 2px;
   z-index: 1;
   @media all and (min-width: ${({ theme }) => theme.size.sm}) {
-    top: ${HEADER_HEIGHT - 38}px;
+    top: ${HEADER_HEIGHT_MOBILE - 38}px;
   }
 
   button {

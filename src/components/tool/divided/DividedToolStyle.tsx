@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { HEADER_HEIGHT } from 'src/constants';
+import { HEADER_HEIGHT, HEADER_HEIGHT_MOBILE } from 'src/constants';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { replacePx } from 'src/utils/replacePx';
 
@@ -86,12 +86,17 @@ export const ToolSinglePrice = styled.div`
   }
 
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-    padding-left: 10px;
-    margin-left: 10px;
+    padding-left: 5px;
+    margin-left: 5px;
+    & > span:nth-of-type(1) {
+      display: none;
+    }
     span {
       font-size: 12px;
     }
+
     button {
+      padding: 0 3px !important;
       span {
         font-size: 12px !important;
       }
@@ -170,6 +175,9 @@ export const SelectedFrameWrapper = styled.div<{
   left: 0;
   z-index: 1;
   padding: ${HEADER_HEIGHT}px 10px 50px 10px;
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+    padding: ${HEADER_HEIGHT_MOBILE}px 10px 50px 10px;
+  }
   canvas {
     position: absolute;
     top: 0;
@@ -242,7 +250,7 @@ export const ImageWrapper = styled.div<{
   max-height: -webkit-fill-available;
   @media all and (max-width: ${({ theme }) => theme.size.md}) {
     flex-direction: row;
-    padding: ${HEADER_HEIGHT} 10px 10px 10px;
+    padding: ${HEADER_HEIGHT_MOBILE} 10px 10px 10px;
   }
 
   ${({ imgUploadLoading }) =>
@@ -332,6 +340,9 @@ export const PreviewBg = styled.div<{ isPreviewBgRemove?: boolean }>`
     }
   }
   top: calc(50% + ${HEADER_HEIGHT / 2}px);
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+    top: calc(50% + ${HEADER_HEIGHT_MOBILE / 2}px);
+  }
   transform: translateY(-50%);
   min-width: ${({ theme }) => theme.size.md};
   img {
@@ -552,9 +563,9 @@ export const FrameWrapper = styled.div`
   top: ${HEADER_HEIGHT}px;
   right: 5px;
   z-index: 340;
-  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
     width: 100%;
-    top: ${HEADER_HEIGHT};
+    top: ${HEADER_HEIGHT_MOBILE};
   }
   & > div {
     border-radius: 20px;
