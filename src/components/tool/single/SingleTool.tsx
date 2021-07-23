@@ -166,9 +166,6 @@ const SingleTool = () => {
         const img = new Image();
         img.src = singleImgUploadUrl;
         img.crossOrigin = 'Anonymous';
-        const mirrorImg = new Image();
-        mirrorImg.src = singleImgUploadUrl;
-        mirrorImg.crossOrigin = 'Anonymous';
 
         img.onload = () => {
           const scaleX = img.naturalWidth / resizeWidth;
@@ -202,15 +199,15 @@ const SingleTool = () => {
             canvasFrameHeight - cmToPx(8),
           );
 
-          // 바닥
           ctx.save();
-          //set the origin to the center of the image
+          //회전축을 위해 기준점을 센터로
           ctx.translate(canvasFrameWidth / 2, canvasFrameHeight / 2);
-          //rotate the canvas around the origin
+          //180도 회전
           ctx.rotate((180 * Math.PI) / 180);
-          // filp the image
+          // 이미지 반전
           ctx.scale(-1, 1);
 
+          // top
           ctx.drawImage(
             img,
             cropX * scaleX,
@@ -222,8 +219,21 @@ const SingleTool = () => {
             canvasFrameWidth - cmToPx(8),
             cmToPx(4),
           );
-          //restore the canvas
 
+          // bottom
+          ctx.drawImage(
+            img,
+            cropX * scaleX,
+            (cropY + singleFrameHeightByRotate - cmToPx(4)) * scaleY,
+            originFrameWidth,
+            cmToPx(4) * scaleY,
+            -canvasFrameWidth / 2 + cmToPx(4),
+            -canvasFrameHeight / 2,
+            canvasFrameWidth - cmToPx(8),
+            cmToPx(4),
+          );
+
+          //restore the canvas
           ctx.restore();
 
           // 배경을 칠합니다.
