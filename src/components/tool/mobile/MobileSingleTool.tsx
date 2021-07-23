@@ -1,40 +1,50 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Button, Card, Steps, Tabs } from 'antd';
+import { Button, List, Steps, Tabs } from 'antd';
 import { icons } from 'public/icons';
 import React, { useCallback, useMemo, useState } from 'react';
 import ImageDropZone from 'src/components/common/ImageDropZone';
 import { frameSize } from 'src/constants';
+import { FrameSize } from 'src/interfaces/ToolInterface';
 import { replacePx } from 'src/utils/replacePx';
 const { Step } = Steps;
 
-const Container = styled.div`
-  max-width: ${({ theme }) => theme.size.sm};
-  margin: 0 auto;
-  padding: 0 1em;
-`;
+const Container = styled.div``;
 
 const MobileSingleToolHeader = styled.div`
   cursor: pointer;
   height: 45px;
   display: flex;
   align-items: center;
+  padding: 0 2em;
   border-bottom: 1px solid ${({ theme }) => theme.color.gray200};
-  img {
-    &:nth-of-type(1) {
-      transform: rotateY(180deg);
-      -webkit-transform: rotateY(180deg);
-      -moz-transform: rotateY(180deg);
-      -o-transform: rotateY(180deg);
-      -ms-transform: rotateY(180deg);
-      unicode-bidi: bidi-override;
-      direction: rtl;
-      margin-right: 4px;
-      width: 20px;
+
+  nav {
+    max-width: 1200px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+
+    img {
+      &:nth-of-type(1) {
+        transform: rotateY(180deg);
+        -webkit-transform: rotateY(180deg);
+        -moz-transform: rotateY(180deg);
+        -o-transform: rotateY(180deg);
+        -ms-transform: rotateY(180deg);
+        unicode-bidi: bidi-override;
+        direction: rtl;
+        margin-right: 4px;
+        width: 20px;
+      }
+      width: 25px;
     }
-    width: 25px;
   }
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    padding: 0 1em;
+
     img {
       &:nth-of-type(1) {
         width: 15px;
@@ -45,9 +55,12 @@ const MobileSingleToolHeader = styled.div`
 `;
 
 const MobileSingleToolContainer = styled.div`
-  padding: 1em 0;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2em 1em;
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-    padding: 1em 0;
+    max-width: ${({ theme }) => theme.size.sm};
+    padding: 1em;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -71,17 +84,20 @@ const MobileSteps = styled(Steps)`
 `;
 
 const MobileContent = styled.div`
-  padding: 1em;
+  padding: 2em 1em;
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     width: 100%;
-    padding: 1em;
+    padding: 0.5em 0;
   }
 `;
+
+const MobileGuideText = styled.h5``;
 
 const MobileStepButtonWrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-end;
+  margin-top: 2em;
   div {
     display: flex;
     align-items: center;
@@ -92,8 +108,10 @@ const MobileStepButtonWrapper = styled.div`
   & > button {
     width: 150px;
   }
+
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     justify-content: center;
+    margin-top: 2em;
     & > button {
       width: 120px;
     }
@@ -152,58 +170,57 @@ const TabTitle = styled.span`
 const SecondsContent = styled.div`
   @media all and (min-width: ${({ theme }) => theme.size.sm}) {
     display: grid;
+    gap: 1em;
     grid-template-columns: repeat(2, 1fr);
     justify-content: center;
   }
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     width: 100%;
     display: grid;
-    gap: 1em;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
     justify-content: space-between;
   }
 `;
 
-const FrameList = styled.div<{ width: string; height: string }>`
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto;
-  justify-content: center;
-  text-align: center;
-  & > div {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+const SecondsListItems = styled(List.Item)`
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.color.gray000};
   }
+`;
+
+const SecondsFrameWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ theme }) => theme.color.gray100};
+  border-radius: 8px;
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    margin-top: 1em;
+    padding: 1.5em 0;
+  }
+`;
+
+const SecondsFramePreview = styled.div<{ width: string; height: string }>`
   ${({ width, height, theme }) =>
     width &&
     height &&
     css`
+      background-color: ${theme.color.white};
       width: ${replacePx(width) / 2}px;
       height: ${replacePx(height) / 2}px;
-      border: 1px solid ${theme.color.gray500};
+      border: 1px solid ${theme.color.gray400};
     `}
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-    & > div {
-      div {
-        font-size: 13px;
-      }
-    }
   }
-`;
-const FrameDescription = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 `;
 
 const MobileSingleTool = () => {
   const FIRST_INDEX = 0;
   const LAST_INDEX = 3;
   const [stepCount, setStepCount] = useState(0);
-  const [defaultTab, setDefaultTab] = useState('정사각형');
+  const [defaultTab, setDefaultTab] = useState('추천액자');
 
   const handleTabClick = useCallback((key: string) => {
     setDefaultTab(key);
@@ -232,8 +249,10 @@ const MobileSingleTool = () => {
   return (
     <Container>
       <MobileSingleToolHeader>
-        <img src={icons.arrow} />
-        <img src={icons.home} />
+        <nav>
+          <img src={icons.arrow} />
+          <img src={icons.home} />
+        </nav>
       </MobileSingleToolHeader>
       <MobileSingleToolContainer>
         <MobileSteps size="small" labelPlacement="vertical" responsive current={stepCount}>
@@ -266,44 +285,85 @@ const MobileSingleTool = () => {
         {stepCount === 1 && (
           <MobileContent>
             <Tabs defaultActiveKey={defaultTab} onTabClick={handleTabClick} activeKey={defaultTab}>
-              <Tabs.TabPane key="정사각형" tab={<TabTitle>정사각형</TabTitle>}>
+              <Tabs.TabPane key="추천액자" tab={<TabTitle>추천액자</TabTitle>}>
+                <MobileGuideText>이런 액자는 어떠세요?</MobileGuideText>
                 <SecondsContent>
-                  {frameSize()
-                    .filter((lst) => lst.attribute === '정방')
-                    .map((lst) => (
-                      <Card
-                        title={
-                          <FrameDescription>
-                            <div>{lst.name}</div>
-                            <small>{lst.price.toLocaleString()}원</small>
-                          </FrameDescription>
-                        }
-                      >
-                        <FrameList {...lst.size}>
-                          <small>{lst.cm}</small>
-                        </FrameList>
-                      </Card>
-                    ))}
+                  <List
+                    bordered
+                    dataSource={frameSize().filter((lst) => lst.attribute === '정방')}
+                    renderItem={(item: FrameSize) => (
+                      <SecondsListItems>
+                        <div>
+                          <div>{item.name}</div>
+                          <div>
+                            <small>{item.cm}</small>
+                          </div>
+                        </div>
+                      </SecondsListItems>
+                    )}
+                  />
+                  <SecondsFrameWrapper>
+                    {frameSize()
+                      .filter((lst) => lst.attribute !== '정방')
+                      .slice(0, 1)
+                      .map((lst) => (
+                        <SecondsFramePreview {...lst.size} />
+                      ))}
+                  </SecondsFrameWrapper>
+                </SecondsContent>
+              </Tabs.TabPane>
+              <Tabs.TabPane key="정사각형" tab={<TabTitle>정사각형</TabTitle>}>
+                <MobileGuideText>정사각형 액자입니다. 탁상에 놓기 부담없는 사이즈에요!</MobileGuideText>
+                <SecondsContent>
+                  <List
+                    bordered
+                    dataSource={frameSize().filter((lst) => lst.attribute === '정방')}
+                    renderItem={(item: FrameSize) => (
+                      <SecondsListItems>
+                        <div>
+                          <div>{item.name}</div>
+                          <div>
+                            <small>{item.cm}</small>
+                          </div>
+                        </div>
+                      </SecondsListItems>
+                    )}
+                  />
+                  <SecondsFrameWrapper>
+                    {frameSize()
+                      .filter((lst) => lst.attribute === '정방')
+                      .slice(0, 1)
+                      .map((lst) => (
+                        <SecondsFramePreview {...lst.size} />
+                      ))}
+                  </SecondsFrameWrapper>
                 </SecondsContent>
               </Tabs.TabPane>
               <Tabs.TabPane key="직사각형" tab={<TabTitle>직사각형</TabTitle>}>
+                <MobileGuideText>직사각형 액자입니다. 회전으로 가로와 세로를 바꿀 수 있어요!</MobileGuideText>
                 <SecondsContent>
-                  {frameSize()
-                    .filter((lst) => lst.attribute !== '정방')
-                    .map((lst) => (
-                      <Card
-                        title={
-                          <FrameDescription>
-                            <div>{lst.name}</div>
-                            <small>{lst.price.toLocaleString()}원</small>
-                          </FrameDescription>
-                        }
-                      >
-                        <FrameList {...lst.size}>
-                          <small>{lst.cm}</small>
-                        </FrameList>
-                      </Card>
-                    ))}
+                  <List
+                    bordered
+                    dataSource={frameSize().filter((lst) => lst.attribute !== '정방')}
+                    renderItem={(item: FrameSize) => (
+                      <SecondsListItems>
+                        <div>
+                          <div>{item.name}</div>
+                          <div>
+                            <small>{item.cm}</small>
+                          </div>
+                        </div>
+                      </SecondsListItems>
+                    )}
+                  />
+                  <SecondsFrameWrapper>
+                    {frameSize()
+                      .filter((lst) => lst.attribute !== '정방')
+                      .slice(0, 1)
+                      .map((lst) => (
+                        <SecondsFramePreview {...lst.size} />
+                      ))}
+                  </SecondsFrameWrapper>
                 </SecondsContent>
               </Tabs.TabPane>
             </Tabs>
