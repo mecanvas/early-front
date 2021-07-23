@@ -199,70 +199,98 @@ const SingleTool = () => {
             canvasFrameHeight - cmToPx(8),
           );
 
-          ctx.save();
-          //회전축을 위해 기준점을 센터로
-          ctx.translate(canvasFrameWidth / 2, canvasFrameHeight / 2);
-          //180도 회전
-          ctx.rotate((180 * Math.PI) / 180);
-          // 이미지 반전
-          ctx.scale(-1, 1);
+          if (canvasProps) {
+            ctx.save();
+            //회전축을 위해 기준점을 센터로
+            ctx.translate(canvasFrameWidth / 2, canvasFrameHeight / 2);
+            //180도 회전
+            ctx.rotate((180 * Math.PI) / 180);
+            // 이미지 반전
+            ctx.scale(-1, 1);
 
-          // top
-          ctx.drawImage(
-            img,
-            cropX * scaleX,
-            cropY * scaleY,
-            originFrameWidth,
-            cmToPx(4) * scaleY,
-            -canvasFrameWidth / 2 + cmToPx(4),
-            canvasFrameHeight / 2 - cmToPx(4),
-            canvasFrameWidth - cmToPx(8),
-            cmToPx(4),
-          );
+            // top
+            ctx.drawImage(
+              img,
+              cropX * scaleX,
+              cropY * scaleY,
+              originFrameWidth,
+              cmToPx(4) * scaleY,
+              -canvasFrameWidth / 2 + cmToPx(4),
+              canvasFrameHeight / 2 - cmToPx(4),
+              canvasFrameWidth - cmToPx(8),
+              cmToPx(4),
+            );
 
-          // bottom
-          ctx.drawImage(
-            img,
-            cropX * scaleX,
-            (cropY + singleFrameHeightByRotate - cmToPx(4)) * scaleY,
-            originFrameWidth,
-            cmToPx(4) * scaleY,
-            -canvasFrameWidth / 2 + cmToPx(4),
-            -canvasFrameHeight / 2,
-            canvasFrameWidth - cmToPx(8),
-            cmToPx(4),
-          );
+            // bottom
+            ctx.drawImage(
+              img,
+              cropX * scaleX,
+              (cropY + singleFrameHeightByRotate - cmToPx(4)) * scaleY,
+              originFrameWidth,
+              cmToPx(4) * scaleY,
+              -canvasFrameWidth / 2 + cmToPx(4),
+              -canvasFrameHeight / 2,
+              canvasFrameWidth - cmToPx(8),
+              cmToPx(4),
+            );
 
-          //좌우를 위해 다시 한번 180도 회전 (총 360도)
-          ctx.rotate((180 * Math.PI) / 180);
+            // bottom-left
+            ctx.drawImage(
+              img,
+              cropX * scaleX,
+              (cropY + singleFrameHeightByRotate - cmToPx(4)) * scaleY,
+              cmToPx(4) * scaleX,
+              cmToPx(4) * scaleX,
+              -canvasFrameWidth / 2,
+              -canvasFrameHeight / 2,
+              cmToPx(4),
+              cmToPx(4),
+            );
 
-          // right
-          ctx.drawImage(
-            img,
-            (cropX + singleFrameWidthByRotate - cmToPx(4)) * scaleX,
-            cropY * scaleY,
-            cmToPx(4) * scaleX,
-            originFrameHeight,
-            -canvasFrameWidth / 2,
-            -canvasFrameHeight / 2 + cmToPx(4),
-            cmToPx(4),
-            canvasFrameHeight - cmToPx(8),
-          );
+            // bottom-right
+            ctx.drawImage(
+              img,
+              (cropX + singleFrameWidthByRotate - cmToPx(4)) * scaleX,
+              (cropY + singleFrameHeightByRotate - cmToPx(4)) * scaleY,
+              cmToPx(4) * scaleX,
+              cmToPx(4) * scaleX,
+              canvasFrameWidth / 2 - cmToPx(4),
+              -canvasFrameHeight / 2,
+              cmToPx(4),
+              cmToPx(4),
+            );
 
-          // left
-          ctx.drawImage(
-            img,
-            cropX * scaleX,
-            cropY * scaleY,
-            cmToPx(4) * scaleX,
-            originFrameHeight,
-            canvasFrameWidth / 2 - cmToPx(4),
-            -canvasFrameHeight / 2 + cmToPx(4),
-            cmToPx(4),
-            canvasFrameHeight - cmToPx(8),
-          );
+            //좌우를 위해 다시 한번 180도 회전 (총 360도)
+            ctx.rotate((180 * Math.PI) / 180);
 
-          ctx.restore();
+            // right
+            ctx.drawImage(
+              img,
+              (cropX + singleFrameWidthByRotate - cmToPx(4)) * scaleX,
+              cropY * scaleY,
+              cmToPx(4) * scaleX,
+              originFrameHeight,
+              -canvasFrameWidth / 2,
+              -canvasFrameHeight / 2 + cmToPx(4),
+              cmToPx(4),
+              canvasFrameHeight - cmToPx(8),
+            );
+
+            // left
+            ctx.drawImage(
+              img,
+              cropX * scaleX,
+              cropY * scaleY,
+              cmToPx(4) * scaleX,
+              originFrameHeight,
+              canvasFrameWidth / 2 - cmToPx(4),
+              -canvasFrameHeight / 2 + cmToPx(4),
+              cmToPx(4),
+              canvasFrameHeight - cmToPx(8),
+            );
+
+            ctx.restore();
+          }
 
           // 배경을 칠합니다.
           ctx.globalCompositeOperation = 'destination-over';
