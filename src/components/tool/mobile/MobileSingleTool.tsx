@@ -3,12 +3,14 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, List, Slider, Steps, Tabs } from 'antd';
+import router from 'next/router';
 import { icons } from 'public/icons';
 import React, { useCallback, useMemo, useState } from 'react';
 import ImageDropZone from 'src/components/common/ImageDropZone';
 import { frameSize } from 'src/constants';
 import { FrameSize } from 'src/interfaces/ToolInterface';
 import { replacePx } from 'src/utils/replacePx';
+import ToolSave from '../ToolSave';
 const { Step } = Steps;
 
 const Container = styled.div``;
@@ -330,6 +332,8 @@ const ThirdPreviewCanvas = styled.div`
   }
 `;
 
+const LastContent = styled.div``;
+
 const MobileSingleTool = () => {
   const FIRST_INDEX = 0;
   const LAST_INDEX = 3;
@@ -354,6 +358,10 @@ const MobileSingleTool = () => {
 
   const handlePrevStep = useCallback(() => {
     setStepCount((prev) => prev - 1);
+  }, []);
+
+  const handleFinished = useCallback(() => {
+    router.push('/success');
   }, []);
 
   const handleDropImage = useCallback((acceptedFiles: any) => {
@@ -526,7 +534,13 @@ const MobileSingleTool = () => {
           </MobileContent>
         )}
         {/* step4 */}
-        {stepCount === 3 && <MobileContent>저장하기</MobileContent>}
+        {stepCount === 3 && (
+          <MobileContent>
+            <LastContent>
+              <ToolSave />
+            </LastContent>
+          </MobileContent>
+        )}
 
         <MobileStepButtonWrapper>
           {FIRST_INDEX !== stepCount && (
@@ -538,6 +552,12 @@ const MobileSingleTool = () => {
           {LAST_INDEX !== stepCount && (
             <MobileNextStepButton type="primary" onClick={handleNextStep}>
               {stepTitle.get(stepCount + 1)}
+            </MobileNextStepButton>
+          )}
+
+          {LAST_INDEX === stepCount && (
+            <MobileNextStepButton type="primary" onClick={handleFinished}>
+              저장하기
             </MobileNextStepButton>
           )}
         </MobileStepButtonWrapper>
