@@ -233,7 +233,22 @@ const SingleTool = () => {
             cmToPx(4),
           );
 
-          //restore the canvas
+          //좌우를 위해 다시 한번 180도 회전 (총 360도)
+          ctx.rotate((180 * Math.PI) / 180);
+
+          // right
+          ctx.drawImage(
+            img,
+            (cropX + singleFrameWidthByRotate - cmToPx(4)) * scaleX,
+            cropY * scaleY,
+            cmToPx(4) * scaleX,
+            originFrameHeight,
+            -canvasFrameWidth / 2,
+            -canvasFrameHeight / 2 + cmToPx(4),
+            cmToPx(4),
+            canvasFrameHeight - cmToPx(8),
+          );
+
           ctx.restore();
 
           // 배경을 칠합니다.
