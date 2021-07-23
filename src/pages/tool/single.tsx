@@ -9,7 +9,11 @@ const MobileSingleTool = dynamic(() => import('src/components/tool/mobile/Mobile
 });
 
 const Single = () => {
-  return <>{!isMobile ? <MobileSingleTool /> : <SingleTool />}</>;
+  return (
+    <>
+      <MobileSingleTool />
+    </>
+  );
 };
 
 export default Single;
