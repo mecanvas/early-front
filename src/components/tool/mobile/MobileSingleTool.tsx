@@ -196,13 +196,14 @@ const SecondsFrameWrapper = styled.div`
   align-items: center;
   background-color: ${({ theme }) => theme.color.gray100};
   border-radius: 8px;
+  padding: 3em 0;
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     margin-top: 1em;
-    padding: 1.5em 0;
   }
 `;
 
 const SecondsFramePreview = styled.div<{ width: string; height: string }>`
+  position: relative;
   ${({ width, height, theme }) =>
     width &&
     height &&
@@ -212,6 +213,15 @@ const SecondsFramePreview = styled.div<{ width: string; height: string }>`
       height: ${replacePx(height) / 2}px;
       border: 1px solid ${theme.color.gray400};
     `}
+
+  img {
+    cursor: pointer;
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+  }
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
   }
 `;
@@ -304,10 +314,12 @@ const MobileSingleTool = () => {
                   />
                   <SecondsFrameWrapper>
                     {frameSize()
-                      .filter((lst) => lst.attribute !== '정방')
-                      .slice(0, 1)
+                      .filter((lst) => lst.attribute == '정방')
+                      .slice(1, 2)
                       .map((lst) => (
-                        <SecondsFramePreview {...lst.size} />
+                        <SecondsFramePreview {...lst.size}>
+                          <img src={icons.rotate} />
+                        </SecondsFramePreview>
                       ))}
                   </SecondsFrameWrapper>
                 </SecondsContent>
@@ -334,7 +346,7 @@ const MobileSingleTool = () => {
                       .filter((lst) => lst.attribute === '정방')
                       .slice(0, 1)
                       .map((lst) => (
-                        <SecondsFramePreview {...lst.size} />
+                        <SecondsFramePreview {...lst.size}></SecondsFramePreview>
                       ))}
                   </SecondsFrameWrapper>
                 </SecondsContent>
@@ -361,7 +373,9 @@ const MobileSingleTool = () => {
                       .filter((lst) => lst.attribute !== '정방')
                       .slice(0, 1)
                       .map((lst) => (
-                        <SecondsFramePreview {...lst.size} />
+                        <SecondsFramePreview {...lst.size}>
+                          <img src={icons.rotate} />
+                        </SecondsFramePreview>
                       ))}
                   </SecondsFrameWrapper>
                 </SecondsContent>
@@ -373,6 +387,7 @@ const MobileSingleTool = () => {
         {stepCount === 2 && <MobileContent>시안 확인</MobileContent>}
         {/* step4 */}
         {stepCount === 3 && <MobileContent>저장하기</MobileContent>}
+
         <MobileStepButtonWrapper>
           {FIRST_INDEX !== stepCount && (
             <MobilePrevStepButton type="text" onClick={handlePrevStep}>
