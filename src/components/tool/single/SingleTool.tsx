@@ -151,8 +151,10 @@ const SingleTool = () => {
   const createCanvasForSave = useCallback(
     (canvasProps?: HTMLCanvasElement) => {
       if (!controllerNode || !resizeWidth || !resizeHeight || !originWidth || !originHeight) return;
+
       const singleFrameWidthByRotate = checkRotate(singleFrameWidth, singleFrameHeight);
       const singleFrameHeightByRotate = checkRotate(singleFrameHeight, singleFrameWidth);
+
       const left = (window.innerWidth - resizeWidth) / 2 + replacePx(controllerNode.style.left);
       const top = (window.innerHeight - resizeHeight) / 2 + replacePx(controllerNode.style.top);
       const frameLeft = (window.innerWidth - singleFrameWidthByRotate) / 2;
@@ -164,6 +166,10 @@ const SingleTool = () => {
         const img = new Image();
         img.src = singleImgUploadUrl;
         img.crossOrigin = 'Anonymous';
+        const mirrorImg = new Image();
+        mirrorImg.src = singleImgUploadUrl;
+        mirrorImg.crossOrigin = 'Anonymous';
+
         img.onload = () => {
           const scaleX = img.naturalWidth / resizeWidth;
           const scaleY = img.naturalHeight / resizeHeight;
@@ -172,8 +178,8 @@ const SingleTool = () => {
 
           const originFrameWidth = singleFrameWidthByRotate * scaleX;
           const originFrameHeight = singleFrameHeightByRotate * scaleY;
-          const canvasFrameWidth = canvasProps ? singleFrameWidthByRotate : originFrameWidth;
-          const canvasFrameHeight = canvasProps ? singleFrameHeightByRotate : originFrameHeight;
+          const canvasFrameWidth = (canvasProps ? singleFrameWidthByRotate : originFrameWidth) + cmToPx(8);
+          const canvasFrameHeight = (canvasProps ? singleFrameHeightByRotate : originFrameHeight) + cmToPx(8);
 
           // const pixelRatio = window.devicePixelRatio;
           canvas.width = canvasFrameWidth;
@@ -190,11 +196,35 @@ const SingleTool = () => {
             cropY * scaleY,
             originFrameWidth,
             originFrameHeight,
-            0,
-            0,
-            canvasFrameWidth,
-            canvasFrameHeight,
+            cmToPx(4),
+            cmToPx(4),
+            canvasFrameWidth - cmToPx(8),
+            canvasFrameHeight - cmToPx(8),
           );
+
+          // 바닥
+          ctx.save();
+          //set the origin to the center of the image
+          ctx.translate(canvasFrameWidth / 2, canvasFrameHeight / 2);
+          //rotate the canvas around the origin
+          ctx.rotate((180 * Math.PI) / 180);
+          // filp the image
+          ctx.scale(-1, 1);
+
+          ctx.drawImage(
+            img,
+            cropX * scaleX,
+            cropY * scaleY,
+            originFrameWidth,
+            cmToPx(4) * scaleY,
+            -canvasFrameWidth / 2 + cmToPx(4),
+            canvasFrameHeight / 2 - cmToPx(4),
+            canvasFrameWidth - cmToPx(8),
+            cmToPx(4),
+          );
+          //restore the canvas
+
+          ctx.restore();
 
           // 배경을 칠합니다.
           ctx.globalCompositeOperation = 'destination-over';
@@ -342,7 +372,7 @@ const SingleTool = () => {
             onUploadProgress: getProgressGage,
           })
           .then((res) => {
-            setSingleimgUploadUrl(res.data || '');
+            setSingleimgUploadUrl(`${res.data}?${new Date().getTime()}` || '');
           });
       } catch (err) {
         alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
