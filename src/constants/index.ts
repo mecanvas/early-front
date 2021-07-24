@@ -1,4 +1,5 @@
 import { FrameSize } from 'src/interfaces/ToolInterface';
+import { FrameInfoList } from 'src/store/reducers/frame';
 import { cmToPx } from 'src/utils/cmToPx';
 
 export const MAX_HEIGHT = 1000;
@@ -23,6 +24,144 @@ export const CONTENT_HEIGHT = 'calc(100vh - 168px)';
 
 // App의 헤더 크기
 export const APP_HEADER_HEIGHT = 60;
+
+// 직사각형 2
+export const frameRectangle: FrameInfoList[] = [
+  {
+    id: 1,
+    type: 2,
+    name: 'P-2호',
+    widthCm: 16,
+    heightCm: 25.8,
+    price: 10000,
+    size: {
+      width: cmToPx(16),
+      height: cmToPx(25.8),
+    },
+    recommand: false,
+  },
+  {
+    id: 2,
+    type: 2,
+    name: 'P-4호',
+    widthCm: 21,
+    heightCm: 33.3,
+    price: 18000,
+    size: {
+      width: cmToPx(21),
+      height: cmToPx(33.3),
+    },
+    recommand: false,
+  },
+  {
+    id: 3,
+    type: 2,
+    name: 'F-0호',
+    widthCm: 14,
+    heightCm: 18,
+    price: 11000,
+    size: {
+      width: cmToPx(14),
+      height: cmToPx(18),
+    },
+    recommand: false,
+  },
+  {
+    id: 4,
+    type: 2,
+    name: 'F-2호',
+    widthCm: 18,
+    heightCm: 25.8,
+    price: 16000,
+    size: {
+      width: cmToPx(18),
+      height: cmToPx(25.8),
+    },
+    recommand: false,
+  },
+  {
+    id: 5,
+    type: 2,
+    name: 'F-4호',
+    widthCm: 24,
+    heightCm: 33.3,
+    price: 21000,
+    size: {
+      width: cmToPx(24),
+      height: cmToPx(33.3),
+    },
+    recommand: false,
+  },
+  {
+    id: 6,
+    type: 2,
+    name: 'M-4호',
+    widthCm: 19,
+    heightCm: 33.3,
+    price: 19000,
+    size: {
+      width: cmToPx(19),
+      height: cmToPx(33.3),
+    },
+    recommand: false,
+  },
+];
+
+// 정사각형 = 1
+export const frameSquare: FrameInfoList[] = [
+  {
+    id: 1,
+    type: 1,
+    name: 'S-0호',
+    widthCm: 12,
+    heightCm: 12,
+    price: 8000,
+    size: {
+      width: cmToPx(12),
+      height: cmToPx(12),
+    },
+    recommand: false,
+  },
+  {
+    id: 2,
+    type: 1,
+    name: 'S-1호',
+    widthCm: 16,
+    heightCm: 16,
+    price: 10000,
+    size: {
+      width: cmToPx(16),
+      height: cmToPx(16),
+    },
+    recommand: false,
+  },
+  {
+    id: 3,
+    type: 1,
+    name: 'S-2호',
+    widthCm: 19,
+    heightCm: 19,
+    price: 12000,
+    size: {
+      width: cmToPx(19),
+      height: cmToPx(19),
+    },
+    recommand: false,
+  },
+  {
+    id: 4,
+    type: 1,
+    name: 'S-4호',
+    widthCm: 24,
+    heightCm: 24,
+    price: 15000,
+    size: {
+      width: cmToPx(24),
+      height: cmToPx(24),
+    },
+    recommand: false,
+  },
+];
 
 export const frameSize = (changeVertical?: boolean): FrameSize[] => [
   {

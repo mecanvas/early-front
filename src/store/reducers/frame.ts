@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { frameRectangle, frameSquare } from 'src/constants';
 
-export interface FrameInfo {
+export interface FrameInfoList {
   id: number;
-  type: string;
+  type: 1 | 2; // 1 = 정, 2 = 직
   name: string;
   widthCm: number;
   heightCm: number;
@@ -11,17 +12,20 @@ export interface FrameInfo {
     width: number;
     height: number;
   };
+  recommand: boolean;
 }
 
 interface FrameState {
-  frameInfo: FrameInfo[];
+  frameInfoList: FrameInfoList[];
+  selectedFrame: FrameInfoList[];
 }
 
 const initialState: FrameState = {
-  frameInfo: [
+  frameInfoList: [...frameSquare, ...frameRectangle],
+  selectedFrame: [
     {
       id: 0,
-      type: '',
+      type: 1,
       name: '',
       widthCm: 0,
       heightCm: 0,
@@ -30,6 +34,7 @@ const initialState: FrameState = {
         width: 0,
         height: 0,
       },
+      recommand: false,
     },
   ],
 };
@@ -38,18 +43,18 @@ const frame = createSlice({
   name: 'frame',
   initialState,
   reducers: {
-    getFrameInfo: (state) => {
-      state.frameInfo;
+    getSelectedFrame: (state) => {
+      state.selectedFrame;
     },
-    pushFrameInfo: (state, { payload }) => {
-      state.frameInfo.push(payload);
+    selectedFrame: (state, { payload }: PayloadAction<FrameInfoList>) => {
+      state.selectedFrame.push(payload);
     },
-    deleteFrameInfo: (state, { payload }: PayloadAction<number>) => {
-      state.frameInfo = state.frameInfo.filter((lst) => lst.id !== payload);
+    deleteSelectedFrame: (state, { payload }: PayloadAction<number>) => {
+      state.selectedFrame = state.selectedFrame.filter((lst) => lst.id !== payload);
     },
   },
 });
 
-export const { getFrameInfo, pushFrameInfo, deleteFrameInfo } = frame.actions;
+export const { getSelectedFrame, selectedFrame, deleteSelectedFrame } = frame.actions;
 
 export default frame.reducer;
