@@ -16,21 +16,27 @@ const SecondsContent = styled.div`
   padding: 2em 0;
   width: 100%;
 
-  p {
-    button {
-      font-size: 13px;
-      padding: 3px !important;
-      width: 150px;
+  button {
+    @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+      width: 80px;
+      font-size: 11px;
+      height: 35px;
+    }
+
+    margin-top: 1em;
+    font-size: 13px;
+    padding: 3px !important;
+    width: 120px;
+
+    border: 1px solid ${({ theme }) => theme.color.gray700};
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &:focus {
+      background-color: ${({ theme }) => theme.color.white};
       border: 1px solid ${({ theme }) => theme.color.gray700};
-
-      &:hover {
-        opacity: 0.8;
-      }
-
-      &:focus {
-        background-color: ${({ theme }) => theme.color.white};
-        border: 1px solid ${({ theme }) => theme.color.gray700};
-      }
     }
   }
 `;
@@ -55,16 +61,26 @@ const SecondsImageDropZoneWrapper = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5em;
+
+  h6 {
+    margin-top: 0.4em;
+    small {
+      margin-left: 1em;
+    }
+  }
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     grid-template-columns: repeat(1, 1fr);
   }
 `;
 const ImageWrapper = styled.div`
-  max-height: 500px;
-
+  width: 302px;
+  height: 302px;
   img {
-    width: 100%;
-    height: 500px;
+    width: 302px;
+    height: 302px;
+    object-fit: contain;
+  }
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
   }
 `;
 
@@ -100,28 +116,18 @@ const SecondsStep = () => {
           {selectedFrame.length && selectedFrame.length === 1 ? (
             selectedFrame[0].imgUrl ? (
               <>
-                <div>
-                  <h4>이미지가 맞으신가요?</h4>
-                  <p>
-                    <Button
-                      type="text"
-                      {...getRootProps()}
-                      data-id={selectedFrame[0].id}
-                      data-type={selectedFrame[0].type}
-                    >
-                      재업로드
-                      <input
-                        {...getInputProps()}
-                        accept="image/*"
-                        data-id={selectedFrame[0].id}
-                        data-type={selectedFrame[0].type}
-                      />
-                    </Button>
-                  </p>
-                </div>
                 <ImageWrapper>
                   <img src={selectedFrame[0].imgUrl} />
                 </ImageWrapper>
+                <Button type="text" {...getRootProps()} data-id={selectedFrame[0].id} data-type={selectedFrame[0].type}>
+                  재업로드
+                  <input
+                    {...getInputProps()}
+                    accept="image/*"
+                    data-id={selectedFrame[0].id}
+                    data-type={selectedFrame[0].type}
+                  />
+                </Button>
               </>
             ) : (
               // 액자 다중 선택시
@@ -147,7 +153,34 @@ const SecondsStep = () => {
             <SecondsImageDropZoneWrapper>
               {selectedFrame.map((lst) =>
                 lst.imgUrl ? (
-                  <div>d</div>
+                  <div>
+                    <h6>
+                      {lst.name}
+                      <small>
+                        {lst.widthCm}cm X {lst.heightCm}cm
+                      </small>
+                    </h6>
+
+                    <ImageWrapper>
+                      <img src={lst.imgUrl} />
+                    </ImageWrapper>
+                    <div>
+                      <Button
+                        type="text"
+                        {...getRootProps()}
+                        data-id={selectedFrame[0].id}
+                        data-type={selectedFrame[0].type}
+                      >
+                        재업로드
+                        <input
+                          {...getInputProps()}
+                          accept="image/*"
+                          data-id={selectedFrame[0].id}
+                          data-type={selectedFrame[0].type}
+                        />
+                      </Button>
+                    </div>
+                  </div>
                 ) : (
                   <ImageDropZone
                     dataId={lst.id}

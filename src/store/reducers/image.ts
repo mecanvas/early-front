@@ -30,7 +30,7 @@ const img = createSlice({
         state.imageUploadDone = true;
       })
       .addCase(postImageUpload.rejected, (state, { payload }) => {
-        state.imageUploadLoad = true;
+        state.imageUploadLoad = false;
         state.imageUploadError = payload;
       }),
 });
