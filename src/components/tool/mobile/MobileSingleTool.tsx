@@ -250,11 +250,14 @@ const MobileSingleTool = () => {
   const nextCondition = useMemo(() => {
     const condition = new Map();
     condition.set(0, selectedFrame.length);
-    condition.set(1, true);
+    condition.set(
+      1,
+      selectedFrame.every((lst) => lst.imgUrl),
+    );
     condition.set(2, selectedFrame.length);
     condition.set(3, selectedFrame.length);
     return condition;
-  }, [selectedFrame.length]);
+  }, [selectedFrame]);
 
   const stepTitle = useMemo(() => {
     const title = new Map();
