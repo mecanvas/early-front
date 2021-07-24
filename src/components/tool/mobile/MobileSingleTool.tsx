@@ -243,7 +243,7 @@ const LastContent = styled.div``;
 
 const MobileSingleTool = () => {
   const FIRST_INDEX = 0;
-  const LAST_INDEX = 3;
+  const LAST_INDEX = 4;
   const [stepCount, setStepCount] = useState(0);
   const { selectedFrame } = useAppSelector((state) => state.frame);
 
@@ -264,7 +264,8 @@ const MobileSingleTool = () => {
     title.set(0, '액자');
     title.set(1, '이미지');
     title.set(2, '제작');
-    title.set(3, '저장');
+    title.set(3, '옆면');
+    title.set(4, '저장');
     return title;
   }, []);
 
@@ -295,19 +296,19 @@ const MobileSingleTool = () => {
           <Step title={stepTitle.get(2)} />
           <Step title={stepTitle.get(3)} />
         </MobileSteps>
-        {/* step1 */}
+        {/* step1 액자 선택 */}
         {stepCount === 0 && (
           <MobileContent>
             <FirstStep />
           </MobileContent>
         )}
-        {/* step2 */}
+        {/* step2 이미지 */}
         {stepCount === 1 && (
           <MobileContent>
             <SecondsStep />
           </MobileContent>
         )}
-        {/* step3 */}
+        {/* step3 제작 */}
         {stepCount === 2 && (
           <MobileContent>
             <div>
@@ -345,8 +346,17 @@ const MobileSingleTool = () => {
             </ThirdContent>
           </MobileContent>
         )}
-        {/* step4 */}
+        {/* step4  옆면 */}
         {stepCount === 3 && (
+          <MobileContent>
+            <LastContent>
+              <ToolSave />
+            </LastContent>
+          </MobileContent>
+        )}
+
+        {/* step5 저장 */}
+        {stepCount === 4 && (
           <MobileContent>
             <LastContent>
               <ToolSave />
