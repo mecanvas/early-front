@@ -2,9 +2,11 @@ import { configureStore } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
 import { combineReducers } from '@reduxjs/toolkit';
 import frame from './reducers/frame';
+import image from './reducers/image';
 
 const reducer = combineReducers({
   frame,
+  image,
 });
 
 export const store = configureStore({
