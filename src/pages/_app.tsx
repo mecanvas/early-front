@@ -8,6 +8,8 @@ import { theme } from 'src/style/theme';
 import { API_URL } from 'src/constants';
 import { isIE } from 'react-device-detect';
 import { icons } from 'public/icons';
+import { store } from 'src/store/config';
+import { Provider } from 'react-redux';
 
 const AppContainer = styled.main`
   width: 100%;
@@ -58,13 +60,15 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <>
-      <ThemeProvider theme={theme}>
-        <AppLayout>
-          <AppContainer>
-            <Component {...pageProps} />
-          </AppContainer>
-        </AppLayout>
-      </ThemeProvider>
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <AppLayout>
+            <AppContainer>
+              <Component {...pageProps} />
+            </AppContainer>
+          </AppLayout>
+        </ThemeProvider>
+      </Provider>
     </>
   );
 }
