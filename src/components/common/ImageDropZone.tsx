@@ -51,20 +51,37 @@ interface Props {
   width?: string;
   height?: string;
   isDragDrop?: boolean;
+  dataId?: number;
+  dataType?: number;
 }
 
-const ImageDropZone = ({ isDragDrop, onDrop, text = '이미지를 첨부하세요', width, height }: Props) => {
+const ImageDropZone = ({
+  isDragDrop,
+  onDrop,
+  text = '이미지를 첨부하세요',
+  width,
+  height,
+  dataId,
+  dataType,
+}: Props) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
-    <DropZone width={width} height={height} {...getRootProps()} isDragActive={isDragActive}>
-      <input {...getInputProps()} accept="image/*" />
+    <DropZone
+      data-id={dataId}
+      data-type={dataType}
+      width={width}
+      height={height}
+      {...getRootProps()}
+      isDragActive={isDragActive}
+    >
+      <input data-id={dataId} data-type={dataType} {...getInputProps()} accept="image/*" />
       {isDragDrop ? (
-        <DropZoneDiv>
+        <DropZoneDiv data-id={dataId} data-type={dataType}>
           <img src={icons.add} />
         </DropZoneDiv>
       ) : (
-        <DropZoneDiv>
+        <DropZoneDiv data-id={dataId} data-type={dataType}>
           <img src={icons.add} />
           <p>{text}</p>
         </DropZoneDiv>

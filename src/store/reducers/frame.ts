@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { List } from 'antd/lib/form/Form';
 import { frameRectangle, frameSquare } from 'src/constants';
 
 export interface FrameInfoList {
@@ -15,9 +16,13 @@ export interface FrameInfoList {
   recommand: boolean;
 }
 
+export interface SelectedFrame extends FrameInfoList {
+  imgUrl?: string;
+}
+
 interface FrameState {
   frameInfoList: FrameInfoList[];
-  selectedFrame: FrameInfoList[];
+  selectedFrame: SelectedFrame[];
 }
 
 const initialState: FrameState = {
@@ -64,9 +69,16 @@ const frame = createSlice({
     deleteSelectedFrame: (state, { payload }: PayloadAction<string>) => {
       state.selectedFrame = state.selectedFrame.filter((lst) => lst.name !== payload);
     },
+    putSelectedFrameImage: (state, { payload }: PayloadAction<{ type: number; id: number; imgUrl: string }>) => {
+      state.selectedFrame = state.selectedFrame.map((lst) => ({
+        ...lst,
+        imgUrl: lst.id === payload.id && lst.type === payload.type ? payload.imgUrl : lst.imgUrl,
+      }));
+    },
   },
 });
 
-export const { getSelectedFrame, selectedFrame, rotateSelectedFrameList, deleteSelectedFrame } = frame.actions;
+export const { getSelectedFrame, selectedFrame, rotateSelectedFrameList, deleteSelectedFrame, putSelectedFrameImage } =
+  frame.actions;
 
 export default frame.reducer;

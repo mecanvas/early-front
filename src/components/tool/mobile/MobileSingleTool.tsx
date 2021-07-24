@@ -246,16 +246,15 @@ const MobileSingleTool = () => {
   const LAST_INDEX = 3;
   const [stepCount, setStepCount] = useState(0);
   const { selectedFrame } = useAppSelector((state) => state.frame);
-  const { imageUrl } = useAppSelector((state) => state.image);
 
   const nextCondition = useMemo(() => {
     const condition = new Map();
     condition.set(0, selectedFrame.length);
-    condition.set(1, imageUrl.length === selectedFrame.length);
+    condition.set(1, true);
     condition.set(2, selectedFrame.length);
     condition.set(3, selectedFrame.length);
     return condition;
-  }, [imageUrl.length, selectedFrame.length]);
+  }, [selectedFrame.length]);
 
   const stepTitle = useMemo(() => {
     const title = new Map();
