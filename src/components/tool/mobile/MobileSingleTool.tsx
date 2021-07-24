@@ -270,10 +270,12 @@ const MobileSingleTool = () => {
   }, []);
 
   const handleNextStep = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setStepCount((prev) => prev + 1);
   }, []);
 
   const handlePrevStep = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setStepCount((prev) => prev - 1);
   }, []);
 
@@ -295,6 +297,7 @@ const MobileSingleTool = () => {
           <Step title={stepTitle.get(1)} />
           <Step title={stepTitle.get(2)} />
           <Step title={stepTitle.get(3)} />
+          <Step title={stepTitle.get(4)} />
         </MobileSteps>
         {/* step1 액자 선택 */}
         {stepCount === 0 && (
