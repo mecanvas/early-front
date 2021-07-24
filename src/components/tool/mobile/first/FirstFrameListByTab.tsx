@@ -3,13 +3,14 @@ import { List } from 'antd';
 import { icons } from 'public/icons';
 import React, { useState, useMemo, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from 'src/hooks/useRedux';
-import { FrameInfoList, rotateSelectedFrameList, selectedFrame } from 'src/store/reducers/frame';
+import { FrameInfoList, selectedFrame } from 'src/store/reducers/frame';
 import { FirstContent, FirstListItems, FirstFrameWrapper, FirstFramePreview } from './FirstStyle';
 
 const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
   const selectedFrameList = useAppSelector(({ frame }) => frame.selectedFrame);
   const dispatch = useAppDispatch();
   const [showingIndex, setShowingIndex] = useState(0);
+  const [isRotate, setisRotate] = useState(false);
 
   const showingFrame = useMemo(() => {
     const frame = frameList[showingIndex];
@@ -24,14 +25,9 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
     setShowingIndex(+index);
   }, []);
 
-  const handleRotate = useCallback(
-    (e) => {
-      const { type, id } = e.currentTarget.dataset;
-      if (!type || !id) return;
-      dispatch(rotateSelectedFrameList({ type: +type, id: +id }));
-    },
-    [dispatch],
-  );
+  const handleRotate = useCallback(() => {
+    setisRotate((prev) => !prev);
+  }, []);
 
   const handleSelectFrame = useCallback(
     (e) => {
@@ -70,14 +66,17 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
         )}
       />
       <FirstFrameWrapper>
-        <FirstFramePreview {...showingFrame.size}>
+        <FirstFramePreview {...showingFrame.size} isRotate={isRotate}>
           <img
             src={
               'https://early-canvas.s3.ap-northeast-2.amazonaws.com/single/upload/%E1%84%92%E1%85%A6%E1%86%AB%E1%84%85%E1%85%B5.png'
             }
           />
-          <img src={icons.rotate} onClick={handleRotate} data-type={showingFrame.type} data-id={showingFrame.id} />
+          <img src={icons.rotate} onClick={handleRotate} />
         </FirstFramePreview>
+        <span>
+          <h5>{showingFrame.name}</h5>
+        </span>
       </FirstFrameWrapper>
     </FirstContent>
   );

@@ -61,9 +61,12 @@ const frame = createSlice({
       }
       state.selectedFrame.push(payload);
     },
+    deleteSelectedFrame: (state, { payload }: PayloadAction<string>) => {
+      state.selectedFrame = state.selectedFrame.filter((lst) => lst.name !== payload);
+    },
   },
 });
 
-export const { getSelectedFrame, selectedFrame, rotateSelectedFrameList } = frame.actions;
+export const { getSelectedFrame, selectedFrame, rotateSelectedFrameList, deleteSelectedFrame } = frame.actions;
 
 export default frame.reducer;

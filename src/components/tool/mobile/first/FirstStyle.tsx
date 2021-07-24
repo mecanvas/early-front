@@ -47,6 +47,7 @@ export const FirstListItems = styled(List.Item)<{ selected?: boolean }>`
 `;
 
 export const FirstFrameWrapper = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -61,17 +62,22 @@ export const FirstFrameWrapper = styled.div`
     min-height: 400px;
     max-height: 400px;
   }
+  span {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+  }
 `;
 
-export const FirstFramePreview = styled.div<{ width: number; height: number }>`
+export const FirstFramePreview = styled.div<{ width: number; height: number; isRotate: boolean }>`
   position: relative;
-  ${({ width, height, theme }) =>
+  ${({ width, height, theme, isRotate }) =>
     width &&
     height &&
     css`
       background-color: ${theme.color.white};
-      width: ${width}px;
-      height: ${height}px;
+      width: ${isRotate ? height : width}px;
+      height: ${isRotate ? width : height}px;
       border: 1px solid ${theme.color.gray400};
       img:nth-of-type(1) {
         width: 100%;
