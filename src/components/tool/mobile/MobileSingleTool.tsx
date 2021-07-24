@@ -1,16 +1,12 @@
 import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
-import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, List, Slider, Steps, Tabs } from 'antd';
+import { Button, Slider, Steps } from 'antd';
 import router from 'next/router';
 import { icons } from 'public/icons';
 import React, { useCallback, useMemo, useState } from 'react';
-import ImageDropZone from 'src/components/common/ImageDropZone';
-import { frameSize } from 'src/constants';
-import { FrameSize } from 'src/interfaces/ToolInterface';
-import { replacePx } from 'src/utils/replacePx';
 import ToolSave from '../ToolSave';
+import FirstStep from './FirstStep';
+import SecondsStep from './SecondsStep';
 const { Step } = Steps;
 
 const Container = styled.div``;
@@ -95,8 +91,6 @@ const MobileContent = styled.div`
   }
 `;
 
-const MobileGuideText = styled.h5``;
-
 const MobileStepButtonWrapper = styled.div`
   width: 100%;
   display: flex;
@@ -135,94 +129,6 @@ const MobilePrevStepButton = styled(Button)`
 
   &:hover {
     border: 1px solid ${({ theme }) => theme.color.gray500};
-  }
-  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-  }
-`;
-
-const FirstContent = styled.div`
-  display: flex;
-  text-align: center;
-  flex-direction: column;
-  align-items: center;
-  padding: 2em 0;
-  width: 100%;
-`;
-
-const FirstContentDropZoneText = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  small {
-    line-height: 22px;
-    font-weight: 500;
-    color: ${({ theme }) => theme.color.gray700};
-  }
-  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-    small {
-      font-size: 11px;
-    }
-  }
-`;
-
-const TabTitle = styled.span`
-  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-    font-size: 13px;
-  }
-`;
-
-const SecondsContent = styled.div`
-  display: grid;
-  gap: 1em;
-  grid-template-columns: repeat(2, 1fr);
-  justify-content: center;
-  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    justify-content: space-between;
-  }
-`;
-
-const SecondsListItems = styled(List.Item)`
-  cursor: pointer;
-
-  &:hover {
-    background-color: ${({ theme }) => theme.color.gray000};
-  }
-`;
-
-const SecondsFrameWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: ${({ theme }) => theme.color.gray100};
-  border-radius: 8px;
-  padding: 3em 0;
-  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-    margin-top: 1em;
-  }
-`;
-
-const SecondsFramePreview = styled.div<{ width: string; height: string }>`
-  position: relative;
-  ${({ width, height, theme }) =>
-    width &&
-    height &&
-    css`
-      background-color: ${theme.color.white};
-      width: ${replacePx(width) / 2}px;
-      height: ${replacePx(height) / 2}px;
-      border: 1px solid ${theme.color.gray400};
-    `}
-
-  img {
-    cursor: pointer;
-    position: absolute;
-    bottom: -25px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
   }
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
   }
@@ -338,15 +244,11 @@ const MobileSingleTool = () => {
   const FIRST_INDEX = 0;
   const LAST_INDEX = 3;
   const [stepCount, setStepCount] = useState(0);
-  const [defaultTab, setDefaultTab] = useState('추천액자');
 
-  const handleTabClick = useCallback((key: string) => {
-    setDefaultTab(key);
-  }, []);
   const stepTitle = useMemo(() => {
     const title = new Map();
-    title.set(0, '이미지');
-    title.set(1, '액자');
+    title.set(0, '액자');
+    title.set(1, '이미지');
     title.set(2, '제작');
     title.set(3, '저장');
     return title;
@@ -362,10 +264,6 @@ const MobileSingleTool = () => {
 
   const handleFinished = useCallback(() => {
     router.push('/success');
-  }, []);
-
-  const handleDropImage = useCallback((acceptedFiles: any) => {
-    console.log(acceptedFiles);
   }, []);
 
   return (
@@ -386,113 +284,13 @@ const MobileSingleTool = () => {
         {/* step1 */}
         {stepCount === 0 && (
           <MobileContent>
-            <FirstContent>
-              <div>
-                <h4>이미지를 업로드해 주세요.</h4>
-                <p>해상도가 높을수록 퀄리티 있는 작품을 받아 보실 수 있어요.</p>
-              </div>
-              <ImageDropZone
-                onDrop={handleDropImage}
-                text={
-                  <FirstContentDropZoneText>
-                    <small>jpg, png, webp, svg 등 이미지 확장자</small>
-                    <small> 최소 1MB 이상</small>
-                  </FirstContentDropZoneText>
-                }
-              />
-            </FirstContent>
+            <FirstStep />
           </MobileContent>
         )}
         {/* step2 */}
         {stepCount === 1 && (
           <MobileContent>
-            <Tabs defaultActiveKey={defaultTab} onTabClick={handleTabClick} activeKey={defaultTab}>
-              <Tabs.TabPane key="추천액자" tab={<TabTitle>추천액자</TabTitle>}>
-                <MobileGuideText>이런 액자는 어떠세요?</MobileGuideText>
-                <SecondsContent>
-                  <List
-                    bordered
-                    dataSource={frameSize().filter((lst) => lst.attribute === '정방')}
-                    renderItem={(item: FrameSize) => (
-                      <SecondsListItems>
-                        <div>
-                          <div>{item.name}</div>
-                          <div>
-                            <small>{item.cm}</small>
-                          </div>
-                        </div>
-                      </SecondsListItems>
-                    )}
-                  />
-                  <SecondsFrameWrapper>
-                    {frameSize()
-                      .filter((lst) => lst.attribute == '정방')
-                      .slice(1, 2)
-                      .map((lst) => (
-                        <SecondsFramePreview {...lst.size}>
-                          <img src={icons.rotate} />
-                        </SecondsFramePreview>
-                      ))}
-                  </SecondsFrameWrapper>
-                </SecondsContent>
-              </Tabs.TabPane>
-              <Tabs.TabPane key="정사각형" tab={<TabTitle>정사각형</TabTitle>}>
-                <MobileGuideText>정사각형 액자입니다. 탁상에 놓기 부담없는 사이즈에요!</MobileGuideText>
-                <SecondsContent>
-                  <List
-                    bordered
-                    dataSource={frameSize().filter((lst) => lst.attribute === '정방')}
-                    renderItem={(item: FrameSize) => (
-                      <SecondsListItems>
-                        <div>
-                          <div>{item.name}</div>
-                          <div>
-                            <small>{item.cm}</small>
-                          </div>
-                        </div>
-                      </SecondsListItems>
-                    )}
-                  />
-                  <SecondsFrameWrapper>
-                    {frameSize()
-                      .filter((lst) => lst.attribute === '정방')
-                      .slice(0, 1)
-                      .map((lst) => (
-                        <SecondsFramePreview {...lst.size}></SecondsFramePreview>
-                      ))}
-                  </SecondsFrameWrapper>
-                </SecondsContent>
-              </Tabs.TabPane>
-              <Tabs.TabPane key="직사각형" tab={<TabTitle>직사각형</TabTitle>}>
-                <MobileGuideText>직사각형 액자입니다. 회전으로 가로와 세로를 바꿀 수 있어요!</MobileGuideText>
-                <SecondsContent>
-                  <List
-                    bordered
-                    dataSource={frameSize().filter((lst) => lst.attribute !== '정방')}
-                    renderItem={(item: FrameSize) => (
-                      <SecondsListItems>
-                        <div>
-                          <div>{item.name}</div>
-                          <div>
-                            <small>{item.cm}</small>
-                          </div>
-                        </div>
-                      </SecondsListItems>
-                    )}
-                  />
-                  <SecondsFrameWrapper>
-                    {frameSize()
-                      .filter((lst) => lst.attribute !== '정방')
-                      .slice(0, 1)
-                      .map((lst) => (
-                        <SecondsFramePreview {...lst.size}>
-                          <img src={icons.rotate} />
-                        </SecondsFramePreview>
-                      ))}
-                  </SecondsFrameWrapper>
-                </SecondsContent>
-              </Tabs.TabPane>
-            </Tabs>
+            <SecondsStep />
           </MobileContent>
         )}
         {/* step3 */}
