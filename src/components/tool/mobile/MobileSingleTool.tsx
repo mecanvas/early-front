@@ -4,6 +4,7 @@ import { Button, Slider, Steps } from 'antd';
 import router from 'next/router';
 import { icons } from 'public/icons';
 import React, { useCallback, useMemo, useState } from 'react';
+import { useAppSelector } from 'src/hooks/useRedux';
 import ToolSave from '../ToolSave';
 import FirstStep from './FirstStep';
 import SecondsStep from './SecondsStep';
@@ -244,6 +245,17 @@ const MobileSingleTool = () => {
   const FIRST_INDEX = 0;
   const LAST_INDEX = 3;
   const [stepCount, setStepCount] = useState(0);
+  const { selectedFrame } = useAppSelector((state) => state.frame);
+  const { imageUrl } = useAppSelector((state) => state.image);
+
+  const nextCondition = useMemo(() => {
+    const condition = new Map();
+    condition.set(0, selectedFrame.length);
+    condition.set(1, imageUrl.length === selectedFrame.length);
+    condition.set(2, selectedFrame.length);
+    condition.set(3, selectedFrame.length);
+    return condition;
+  }, [imageUrl.length, selectedFrame.length]);
 
   const stepTitle = useMemo(() => {
     const title = new Map();
@@ -348,7 +360,7 @@ const MobileSingleTool = () => {
           )}
 
           {LAST_INDEX !== stepCount && (
-            <MobileNextStepButton type="primary" onClick={handleNextStep}>
+            <MobileNextStepButton type="primary" onClick={handleNextStep} disabled={!nextCondition.get(stepCount)}>
               {stepTitle.get(stepCount + 1)}
             </MobileNextStepButton>
           )}

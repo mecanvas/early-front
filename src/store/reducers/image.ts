@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { postImageUplaod } from '../api/image';
+import { postImageUpload } from '../api/image';
 
 export interface Img {
   id: number;
@@ -17,7 +17,7 @@ const initialState: ImgState = {
   imageUploadLoad: false,
   imageUploadDone: false,
   imageUploadError: null,
-  imageUrl: [{ id: 0, url: '' }],
+  imageUrl: [],
 };
 
 const img = createSlice({
@@ -31,17 +31,17 @@ const img = createSlice({
   extraReducers: (builder) =>
     builder
       // uploadImage
-      .addCase(postImageUplaod.pending, (state) => {
+      .addCase(postImageUpload.pending, (state) => {
         state.imageUploadLoad = true;
         state.imageUploadDone = false;
         state.imageUploadError = null;
       })
-      .addCase(postImageUplaod.fulfilled, (state, { payload }) => {
+      .addCase(postImageUpload.fulfilled, (state, { payload }) => {
         state.imageUploadLoad = false;
         state.imageUrl.push(payload);
         state.imageUploadDone = true;
       })
-      .addCase(postImageUplaod.rejected, (state, { payload }) => {
+      .addCase(postImageUpload.rejected, (state, { payload }) => {
         state.imageUploadLoad = true;
         state.imageUploadError = payload;
       }),
