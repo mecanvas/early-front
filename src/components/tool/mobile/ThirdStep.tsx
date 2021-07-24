@@ -1,5 +1,49 @@
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import React from 'react';
+import React, { useCallback, useRef, useState } from 'react';
+import { useAppSelector } from 'src/hooks/useRedux';
+
+const ThirdItemList = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 2em 0;
+  & > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1em;
+    text-align: center;
+  }
+  small {
+    margin-top: 6px;
+  }
+`;
+
+const ThirdItem = styled.div<{ type: 1 | 2; selected: boolean }>`
+  cursor: pointer;
+  width: ${({ type }) => (type === 1 ? '80px' : '60px')};
+  height: ${({ type }) => (type === 2 ? '80px' : '80px')};
+  text-align: center;
+  border: 1px solid ${({ theme }) => theme.color.gray400};
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  ${({ selected }) =>
+    selected
+      ? css`
+          transform: scale(1.2);
+        `
+      : css`
+          filter: brightness(60%);
+        `}
+  &:hover {
+    transform: scale(1.1);
+  }
+`;
 
 const ThirdContent = styled.div`
   display: grid;
@@ -106,10 +150,23 @@ const ThirdPreviewCanvas = styled.div`
 `;
 
 const ThirdStep = () => {
+  const { selectedFrame } = useAppSelector(({ frame }) => frame);
+  const imgCanvas = useRef<HTMLCanvasElement>(null);
+  const [selectCanvas, setSelectCanvas] = useState(selectedFrame[0]?.name);
+
+  const createImgCanvas = useCallback(() => {}, []);
+
+  const handleSelected = useCallback((e) => {
+    const { name } = e.currentTarget.dataset;
+    setSelectCanvas(name);
+  }, []);
+
   return (
-    <ThirdContent>
-      <ThirdContentDrawingCanvas>
-        <LikeCanvas>
+    <>
+      <ThirdContent>
+        <ThirdContentDrawingCanvas>
+          <canvas ref={imgCanvas} />
+          {/* <LikeCanvas>
           <img src="https://early-dev.s3.ap-northeast-2.amazonaws.com/brian-lawson-RBy6FEQ2DIk-unsplash-removebg-preview.png" />
         </LikeCanvas>
         <ThirdContentCropper>
@@ -117,19 +174,34 @@ const ThirdStep = () => {
           <span></span>
           <span></span>
           <span></span>
-        </ThirdContentCropper>
-      </ThirdContentDrawingCanvas>
+        </ThirdContentCropper> */}
+        </ThirdContentDrawingCanvas>
 
-      <ThirdPreviewCanvasWrapper>
-        <ThirdPreviewCanvas>
-          <img
-            src={
-              'https://early-dev.s3.ap-northeast-2.amazonaws.com/20210718174824_2021%E1%84%82%E1%85%A7%E1%86%AB+07%E1%84%8B%E1%85%AF%E1%86%AF+18%E1%84%8B%E1%85%B5%E1%86%AF+17_48_gg_%E1%84%8C%E1%85%A5%E1%86%BC%E1%84%87%E1%85%A1%E1%86%BC+S-1%E1%84%92%E1%85%A9.png'
-            }
-          />
-        </ThirdPreviewCanvas>
-      </ThirdPreviewCanvasWrapper>
-    </ThirdContent>
+        <ThirdPreviewCanvasWrapper>
+          <ThirdPreviewCanvas>
+            <img
+              src={
+                'https://early-dev.s3.ap-northeast-2.amazonaws.com/20210718174824_2021%E1%84%82%E1%85%A7%E1%86%AB+07%E1%84%8B%E1%85%AF%E1%86%AF+18%E1%84%8B%E1%85%B5%E1%86%AF+17_48_gg_%E1%84%8C%E1%85%A5%E1%86%BC%E1%84%87%E1%85%A1%E1%86%BC+S-1%E1%84%92%E1%85%A9.png'
+              }
+            />
+          </ThirdPreviewCanvas>
+        </ThirdPreviewCanvasWrapper>
+      </ThirdContent>
+      <ThirdItemList>
+        {selectedFrame.map((lst) => (
+          <div>
+            <ThirdItem
+              type={lst.type}
+              selected={lst.name === selectCanvas}
+              onClick={handleSelected}
+              data-name={lst.name}
+            >
+              <img src={lst.imgUrl} />
+            </ThirdItem>
+          </div>
+        ))}
+      </ThirdItemList>
+    </>
   );
 };
 

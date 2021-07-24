@@ -120,7 +120,7 @@ const SecondsStep = () => {
                   <img src={selectedFrame[0].imgUrl} />
                 </ImageWrapper>
                 <Button type="text" {...getRootProps()} data-id={selectedFrame[0].id} data-type={selectedFrame[0].type}>
-                  재업로드
+                  변경
                   <input
                     {...getInputProps()}
                     accept="image/*"
@@ -171,7 +171,7 @@ const SecondsStep = () => {
                         data-id={selectedFrame[0].id}
                         data-type={selectedFrame[0].type}
                       >
-                        재업로드
+                        변경
                         <input
                           {...getInputProps()}
                           accept="image/*"
