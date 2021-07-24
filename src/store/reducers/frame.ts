@@ -32,6 +32,28 @@ const frame = createSlice({
     getSelectedFrame: (state) => {
       state.selectedFrame;
     },
+    rotateSelectedFrameList: (state, { payload }: PayloadAction<{ type: number; id: number }>) => {
+      state.frameInfoList = state.frameInfoList.map((lst) => ({
+        ...lst,
+        widthCm: lst.id === payload.id && lst.type === payload.type ? lst.heightCm : lst.widthCm,
+        heightCm: lst.id === payload.id && lst.type === payload.type ? lst.widthCm : lst.heightCm,
+        size: {
+          ...lst.size,
+          width: lst.id === payload.id && lst.type === payload.type ? lst.size.height : lst.size.width,
+          height: lst.id === payload.id && lst.type === payload.type ? lst.size.width : lst.size.height,
+        },
+      }));
+      state.selectedFrame = state.selectedFrame.map((lst) => ({
+        ...lst,
+        widthCm: lst.id === payload.id && lst.type === payload.type ? lst.heightCm : lst.widthCm,
+        heightCm: lst.id === payload.id && lst.type === payload.type ? lst.widthCm : lst.heightCm,
+        size: {
+          ...lst.size,
+          width: lst.id === payload.id && lst.type === payload.type ? lst.size.height : lst.size.width,
+          height: lst.id === payload.id && lst.type === payload.type ? lst.size.width : lst.size.height,
+        },
+      }));
+    },
     selectedFrame: (state, { payload }: PayloadAction<FrameInfoList>) => {
       if (state.selectedFrame.find((lst) => lst.name === payload.name)) {
         state.selectedFrame = state.selectedFrame.filter((lst) => lst.name !== payload.name);
@@ -42,6 +64,6 @@ const frame = createSlice({
   },
 });
 
-export const { getSelectedFrame, selectedFrame } = frame.actions;
+export const { getSelectedFrame, selectedFrame, rotateSelectedFrameList } = frame.actions;
 
 export default frame.reducer;

@@ -3,7 +3,7 @@ import { List } from 'antd';
 import { icons } from 'public/icons';
 import React, { useState, useMemo, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from 'src/hooks/useRedux';
-import { FrameInfoList, selectedFrame } from 'src/store/reducers/frame';
+import { FrameInfoList, rotateSelectedFrameList, selectedFrame } from 'src/store/reducers/frame';
 import { FirstContent, FirstListItems, FirstFrameWrapper, FirstFramePreview } from './FirstStyle';
 
 const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
@@ -11,18 +11,27 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
   const dispatch = useAppDispatch();
   const [showingIndex, setShowingIndex] = useState(0);
 
-  const showingSize = useMemo(() => {
+  const showingFrame = useMemo(() => {
     const frame = frameList[showingIndex];
     if (frame) {
-      return frame.size;
+      return frame;
     }
-    return frameList[0].size;
+    return frameList[0];
   }, [frameList, showingIndex]);
 
   const handleShowingFrameByHover = useCallback((e) => {
     const { index } = e.currentTarget.dataset;
     setShowingIndex(+index);
   }, []);
+
+  const handleRotate = useCallback(
+    (e) => {
+      const { type, id } = e.currentTarget.dataset;
+      if (!type || !id) return;
+      dispatch(rotateSelectedFrameList({ type: +type, id: +id }));
+    },
+    [dispatch],
+  );
 
   const handleSelectFrame = useCallback(
     (e) => {
@@ -61,13 +70,13 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
         )}
       />
       <FirstFrameWrapper>
-        <FirstFramePreview {...showingSize}>
+        <FirstFramePreview {...showingFrame.size}>
           <img
             src={
               'https://early-canvas.s3.ap-northeast-2.amazonaws.com/single/upload/%E1%84%92%E1%85%A6%E1%86%AB%E1%84%85%E1%85%B5.png'
             }
           />
-          <img src={icons.rotate} />
+          <img src={icons.rotate} onClick={handleRotate} data-type={showingFrame.type} data-id={showingFrame.id} />
         </FirstFramePreview>
       </FirstFrameWrapper>
     </FirstContent>

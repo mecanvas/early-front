@@ -58,7 +58,7 @@ const FirstStep = () => {
 
       <Tabs.TabPane key="2" tab={<TabTitle>직사각형</TabTitle>}>
         <OpacityComponent>
-          <FirstGuideText>직사각형 액자입니다. 회전으로 가로와 세로를 바꿀 수 있어요!</FirstGuideText>
+          <FirstGuideText>직사각형 액자입니다. 회전으로 가로와 세로를 바꿔 보실 수 있어요!</FirstGuideText>
         </OpacityComponent>
         <FirstFrameListByTab frameList={rectangleList} />
         <Divider />
