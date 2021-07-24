@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAppSelector } from 'src/hooks/useRedux';
 
 const ThirdItemList = styled.div`
@@ -67,12 +67,12 @@ const ThirdContentDrawingCanvas = styled.div`
   /* background-color: ${({ theme }) => theme.color.white}; */
 `;
 
-const ThirdContentCropper = styled.div`
+const ThirdContentCropper = styled.div<{ width: number; height: number }>`
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 285px;
-  height: 285px;
+  width: ${({ width }) => width}px;
+  height: ${({ height }) => height}px;
   transform: translate(-50%, -50%);
   cursor: move;
 
@@ -115,7 +115,6 @@ const ThirdContentCropper = styled.div`
 // TODO: 캔버스로 전환 예정 이미지 자를 수 있게.
 const LikeCanvas = styled.div`
   width: 100%;
-  max-width: 462.5px;
   background-color: #a5b0e6;
   filter: brightness(70%);
 
@@ -139,54 +138,81 @@ const ThirdPreviewCanvasWrapper = styled.div`
 
 const ThirdPreviewCanvas = styled.div`
   width: 100%;
-  max-width: 302px;
   filter: ${({ theme }) => theme.canvasShadowFilter};
-  background-color: #a5b0e6;
-
-  img {
-    width: 100%;
-    height: 100%;
-  }
+  text-align: center;
 `;
 
 const ThirdStep = () => {
   const { selectedFrame } = useAppSelector(({ frame }) => frame);
-  const imgCanvas = useRef<HTMLCanvasElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const [selectCanvas, setSelectCanvas] = useState(selectedFrame[0]?.name);
 
-  const createImgCanvas = useCallback(() => {}, []);
+  const selectedInfo = useMemo(() => {
+    const selectedCanvas = selectedFrame.filter((lst) => lst.name === selectCanvas)[0];
+    return selectedCanvas;
+  }, [selectCanvas, selectedFrame]);
+
+  const imgElements = useMemo(() => {
+    const res = new Map();
+
+    for (const info of selectedFrame) {
+      const img = new Image();
+      img.src = info.imgUrl || '';
+      img.crossOrigin = 'Anonymous';
+      res.set(info.name, img);
+    }
+    return res;
+  }, [selectedFrame]);
+
+  const createImgCanvas = useCallback((img: HTMLImageElement, w: number, h: number) => {
+    if (!previewCanvasRef.current) return;
+
+    const canvas = previewCanvasRef.current;
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) return;
+    // const img = new Image();
+    // img.src = imgUrl;
+    // img.crossOrigin = 'Anonymous';
+    const { naturalWidth, naturalHeight } = img;
+    const scaleX = naturalWidth / w;
+    const scaleY = naturalHeight / h;
+
+    canvas.width = w;
+    canvas.height = h;
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, w, h);
+  }, []);
 
   const handleSelected = useCallback((e) => {
     const { name } = e.currentTarget.dataset;
     setSelectCanvas(name);
   }, []);
 
+  useEffect(() => {
+    const choiceCanvas = selectedFrame.filter((lst) => lst.name === selectCanvas);
+    const {
+      name,
+      size: { width, height },
+    } = choiceCanvas[0];
+
+    const img: HTMLImageElement = imgElements.get(name);
+    if (isLoaded) {
+      createImgCanvas(img, width, height);
+    }
+
+    img.onload = () => {
+      createImgCanvas(img, width, height);
+      setIsLoaded(true);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectCanvas, imgElements, isLoaded]);
+
   return (
     <>
-      <ThirdContent>
-        <ThirdContentDrawingCanvas>
-          <canvas ref={imgCanvas} />
-          {/* <LikeCanvas>
-          <img src="https://early-dev.s3.ap-northeast-2.amazonaws.com/brian-lawson-RBy6FEQ2DIk-unsplash-removebg-preview.png" />
-        </LikeCanvas>
-        <ThirdContentCropper>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </ThirdContentCropper> */}
-        </ThirdContentDrawingCanvas>
-
-        <ThirdPreviewCanvasWrapper>
-          <ThirdPreviewCanvas>
-            <img
-              src={
-                'https://early-dev.s3.ap-northeast-2.amazonaws.com/20210718174824_2021%E1%84%82%E1%85%A7%E1%86%AB+07%E1%84%8B%E1%85%AF%E1%86%AF+18%E1%84%8B%E1%85%B5%E1%86%AF+17_48_gg_%E1%84%8C%E1%85%A5%E1%86%BC%E1%84%87%E1%85%A1%E1%86%BC+S-1%E1%84%92%E1%85%A9.png'
-              }
-            />
-          </ThirdPreviewCanvas>
-        </ThirdPreviewCanvasWrapper>
-      </ThirdContent>
       <ThirdItemList>
         {selectedFrame.map((lst) => (
           <div>
@@ -201,6 +227,25 @@ const ThirdStep = () => {
           </div>
         ))}
       </ThirdItemList>
+      <ThirdContent>
+        <ThirdContentDrawingCanvas>
+          <LikeCanvas>
+            <img src={selectedInfo.imgUrl} />
+          </LikeCanvas>
+          <ThirdContentCropper {...selectedInfo.size}>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </ThirdContentCropper>
+        </ThirdContentDrawingCanvas>
+
+        <ThirdPreviewCanvasWrapper>
+          <ThirdPreviewCanvas>
+            <canvas ref={previewCanvasRef} />
+          </ThirdPreviewCanvas>
+        </ThirdPreviewCanvasWrapper>
+      </ThirdContent>
     </>
   );
 };

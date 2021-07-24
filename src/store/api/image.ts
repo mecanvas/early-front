@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { ImgToDataURL } from 'src/utils/ImgToDataURL';
 import { putSelectedFrameImage } from '../reducers/frame';
 
 export const postImageUpload = createAsyncThunk<any, { type: 1 | 2; fd: any; id: number }>(
@@ -10,7 +11,8 @@ export const postImageUpload = createAsyncThunk<any, { type: 1 | 2; fd: any; id:
       const url = await axios.post<string>(`/canvas/single/upload`, fd).then((res) => {
         return res.data;
       });
-      await dispatch(putSelectedFrameImage({ type, id, imgUrl: url }));
+      const imgUrl = await ImgToDataURL(url);
+      await dispatch(putSelectedFrameImage({ type, id, imgUrl }));
     } catch (err: any) {
       return rejectWithValue(err.response.data);
     }
