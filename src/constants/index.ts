@@ -38,7 +38,7 @@ export const frameRectangle: FrameInfoList[] = [
       width: cmToPx(16),
       height: cmToPx(25.8),
     },
-    recommand: false,
+    recommand: true,
   },
   {
     id: 2,
@@ -77,7 +77,7 @@ export const frameRectangle: FrameInfoList[] = [
       width: cmToPx(18),
       height: cmToPx(25.8),
     },
-    recommand: false,
+    recommand: true,
   },
   {
     id: 5,
@@ -159,7 +159,7 @@ export const frameSquare: FrameInfoList[] = [
       width: cmToPx(24),
       height: cmToPx(24),
     },
-    recommand: false,
+    recommand: true,
   },
 ];
 

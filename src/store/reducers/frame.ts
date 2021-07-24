@@ -22,21 +22,7 @@ interface FrameState {
 
 const initialState: FrameState = {
   frameInfoList: [...frameSquare, ...frameRectangle],
-  selectedFrame: [
-    {
-      id: 0,
-      type: 1,
-      name: '',
-      widthCm: 0,
-      heightCm: 0,
-      price: 0,
-      size: {
-        width: 0,
-        height: 0,
-      },
-      recommand: false,
-    },
-  ],
+  selectedFrame: [],
 };
 
 const frame = createSlice({
@@ -47,14 +33,15 @@ const frame = createSlice({
       state.selectedFrame;
     },
     selectedFrame: (state, { payload }: PayloadAction<FrameInfoList>) => {
+      if (state.selectedFrame.find((lst) => lst.name === payload.name)) {
+        state.selectedFrame = state.selectedFrame.filter((lst) => lst.name !== payload.name);
+        return;
+      }
       state.selectedFrame.push(payload);
-    },
-    deleteSelectedFrame: (state, { payload }: PayloadAction<number>) => {
-      state.selectedFrame = state.selectedFrame.filter((lst) => lst.id !== payload);
     },
   },
 });
 
-export const { getSelectedFrame, selectedFrame, deleteSelectedFrame } = frame.actions;
+export const { getSelectedFrame, selectedFrame } = frame.actions;
 
 export default frame.reducer;
