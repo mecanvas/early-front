@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { List } from 'antd/lib/form/Form';
 import { frameRectangle, frameSquare } from 'src/constants';
 
 export interface FrameInfoList {
