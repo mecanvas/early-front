@@ -246,7 +246,29 @@ const ThirdStep = () => {
     [bgColor, selectedInfo],
   );
 
-  const createImgCanvas = useCallback((canvas: HTMLCanvasElement, img: HTMLImageElement, filter?: boolean) => {
+  const drawingPreview = useCallback(
+    (name: string) => {
+      const img: HTMLImageElement = imgElements.get(name);
+      const canvas = previewCanvasRef.current;
+      if (canvas) {
+        createCropperCanvas(canvas, img, true);
+      }
+    },
+    [createCropperCanvas, imgElements],
+  );
+
+  const drawingCropper = useCallback(
+    (name: string) => {
+      const img: HTMLImageElement = imgElements.get(name);
+      const canvas = cropperRef.current;
+      if (canvas) {
+        createCropperCanvas(canvas, img);
+      }
+    },
+    [createCropperCanvas, imgElements],
+  );
+
+  const createImgCanvas = useCallback((canvas: HTMLCanvasElement, img: HTMLImageElement) => {
     const ctx = canvas.getContext('2d');
 
     if (!ctx) return;
@@ -256,11 +278,11 @@ const ThirdStep = () => {
 
     canvas.width = newW;
     canvas.height = newH;
+    canvas.style.filter = 'brightness(60%)';
+
     setImgWidth(newW);
     setImgHeight(newH);
-    if (filter) {
-      canvas.style.filter = 'brightness(60%)';
-    }
+
     ctx.clearRect(0, 0, newW, newH);
     ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, 0, 0, newW, newH);
@@ -271,38 +293,29 @@ const ThirdStep = () => {
     setSelectCanvas(name);
   }, []);
 
-  const handleActiveCropper = useCallback(() => {}, []);
+  const handleActiveCropper = useCallback(() => {
+    drawingCropper(selectedInfo.name);
+  }, [selectedInfo.name, drawingCropper]);
   const handleCancelMoveCropper = useCallback(() => {}, []);
 
   useEffect(() => {
-    const choiceCanvas = selectedFrame.filter((lst) => lst.name === selectCanvas);
-    const { name } = choiceCanvas[0];
-
+    const { name } = selectedInfo;
     const img: HTMLImageElement = imgElements.get(name);
     const imgCanvas = imgCanvasRef.current;
-    const previewCanvas = previewCanvasRef.current;
-    const cropper = cropperRef.current;
+
     if (isLoaded) {
       if (imgCanvas) {
-        createImgCanvas(imgCanvas, img, true);
-        if (cropper) {
-          createCropperCanvas(cropper, img);
-        }
-        if (previewCanvas) {
-          createCropperCanvas(previewCanvas, img, true);
-        }
+        createImgCanvas(imgCanvas, img);
+        drawingCropper(name);
+        drawingPreview(name);
       }
     }
 
     img.onload = () => {
       if (imgCanvas) {
         createImgCanvas(imgCanvas, img);
-        if (cropper) {
-          createCropperCanvas(cropper, img);
-        }
-        if (previewCanvas) {
-          createCropperCanvas(previewCanvas, img, true);
-        }
+        drawingCropper(name);
+        drawingPreview(name);
       }
       setIsLoaded(true);
     };
