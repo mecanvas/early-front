@@ -1,6 +1,5 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Divider } from 'antd';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAppSelector } from 'src/hooks/useRedux';
 import { theme } from 'src/style/theme';
@@ -72,10 +71,57 @@ const ThirdContentDrawingCanvas = styled.div<{ width: number; height: number }>`
   border: 1px solid ${({ theme }) => theme.color.gray100};
 `;
 
+const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>`
+  position: absolute;
+
+  width: ${({ width }) => width}px;
+  height: ${({ height }) => height}px;
+
+  /* top */
+  span:nth-of-type(1) {
+    z-index: 15;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 1px;
+    border-top: 2px dashed ${({ theme }) => theme.color.primary};
+  }
+  /* right */
+  span:nth-of-type(2) {
+    z-index: 15;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    border-right: 2px dashed ${({ theme }) => theme.color.primary};
+  }
+  /* bottom */
+  span:nth-of-type(3) {
+    z-index: 15;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    border-bottom: 2px dashed ${({ theme }) => theme.color.primary};
+  }
+  /* left */
+  span:nth-of-type(4) {
+    z-index: 15;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1px;
+    height: 100%;
+    border-left: 2px dashed ${({ theme }) => theme.color.primary};
+  }
+`;
+
 const ThirdContentCropper = styled.canvas`
   position: absolute;
+  top: 0;
+  left: 0;
   cursor: move;
-  border: 2px dashed ${({ theme }) => theme.color.primary};
 `;
 
 const ThirdPreviewCanvas = styled.div`
@@ -88,18 +134,21 @@ const ThirdPreviewCanvas = styled.div`
 `;
 
 const ThirdStep = () => {
-  const IMAGE_MAXIMUM_WIDTH = 425;
-  const IMAGE_MAXIMUM_HEIGHT = 425;
+  const IMAGE_MAXIMUM_WIDTH = 304;
+  const IMAGE_MAXIMUM_HEIGHT = 304;
 
   const { selectedFrame } = useAppSelector(({ frame }) => frame);
   const [isLoaded, setIsLoaded] = useState(false);
   const imgCanvasRef = useRef<HTMLCanvasElement>(null);
   const cropperRef = useRef<HTMLCanvasElement>(null);
+  const cropperWrapperRef = useRef<HTMLDivElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const [selectCanvas, setSelectCanvas] = useState(selectedFrame[0]?.name);
 
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
+  const [canvasWidth, setCanvasWidth] = useState(0);
+  const [canvasHeight, setCanvasHeight] = useState(0);
 
   const [bgColor] = useState(theme.color.white);
 
@@ -124,7 +173,8 @@ const ThirdStep = () => {
     (canvas: HTMLCanvasElement, img: HTMLImageElement, preview?: boolean) => {
       const ctx = canvas.getContext('2d');
       const imgCanvas = imgCanvasRef.current;
-      if (!ctx || !imgCanvas) return;
+      const cropperWrapper = cropperWrapperRef.current;
+      if (!ctx || !imgCanvas || !cropperWrapper) return;
 
       const { width: imgW, height: imgH } = imgCanvas.getBoundingClientRect();
 
@@ -135,9 +185,16 @@ const ThirdStep = () => {
 
       if (isSquare) {
         // 정사각형이면 이미지 너비에 따라 정사각형
-        const [ratioW, ratioH] = getOriginRatio(selectedInfo.size.width, selectedInfo.size.height, imgW, imgW);
-        w = ratioW;
-        h = ratioH;
+
+        if (imgW > imgH) {
+          const [ratioW, ratioH] = getOriginRatio(selectedInfo.size.width, selectedInfo.size.height, imgH, imgH);
+          w = ratioW;
+          h = ratioH;
+        } else {
+          const [ratioW, ratioH] = getOriginRatio(selectedInfo.size.width, selectedInfo.size.height, imgW, imgW);
+          w = ratioW;
+          h = ratioH;
+        }
       } else {
         const [ratioW, ratioH] = getOriginRatio(selectedInfo.size.width, selectedInfo.size.height, imgW, imgH);
         w = ratioW;
@@ -155,8 +212,14 @@ const ThirdStep = () => {
       const scaleX = naturalWidth / imgW;
       const scaleY = naturalHeight / imgH;
 
+      setCanvasWidth(w);
+      setCanvasHeight(h);
+
       canvas.width = w;
       canvas.height = h;
+
+      cropperWrapper.style.top = `${cropY}px`;
+      cropperWrapper.style.left = `${cropX}px`;
 
       ctx.clearRect(0, 0, imgW, imgH);
       ctx.imageSmoothingQuality = 'high';
@@ -266,11 +329,17 @@ const ThirdStep = () => {
         <ThirdContentDrawingCanvas width={imgWidth} height={imgHeight}>
           <canvas ref={imgCanvasRef} />
 
-          <ThirdContentCropper ref={cropperRef} onMouseDown={handleActiveCropper} onMouseUp={handleCancelMoveCropper} />
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
+          <ThirdContentCropperWrapper width={canvasWidth} height={canvasHeight} ref={cropperWrapperRef}>
+            <ThirdContentCropper
+              ref={cropperRef}
+              onMouseDown={handleActiveCropper}
+              onMouseUp={handleCancelMoveCropper}
+            />
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </ThirdContentCropperWrapper>
         </ThirdContentDrawingCanvas>
 
         <ThirdPreviewCanvas>
