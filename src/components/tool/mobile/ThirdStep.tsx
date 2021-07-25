@@ -316,13 +316,21 @@ const ThirdStep = () => {
         setIsCalc(false);
       }
       if (!isCalc) {
+        const { width, height } = imgCanvas.getBoundingClientRect();
         const positionX = x - xDiff;
         const positionY = y - yDiff;
-        setCropperX(positionX >= 0 ? positionX : 0);
-        setCropperY(positionY >= 0 ? positionY : 0);
+        const left = (window.innerWidth - width) / 2;
+        const top = (window.innerHeight - height) / 2;
+        const cropperLeft = (window.innerWidth - canvasWidth) / 2;
+        const cropperTop = (window.innerHeight - canvasHeight) / 2;
+        const cropX = cropperLeft - left;
+        const cropY = cropperTop - top;
+
+        setCropperX(positionX >= 0 ? (positionX >= cropX * 2 ? cropX * 2 : positionX) : 0);
+        setCropperY(positionY >= 0 ? (positionY >= cropY * 2 ? cropY * 2 : positionY) : 0);
       }
     },
-    [isCalc, xDiff, yDiff],
+    [isCalc, xDiff, yDiff, canvasWidth, canvasHeight],
   );
 
   const handleActiveCropper = useCallback(() => {
@@ -362,7 +370,7 @@ const ThirdStep = () => {
   useEffect(() => {
     const cropperWrapper = cropperWrapperRef.current;
     if (cropperWrapper) {
-      console.log(cropperX);
+      console.log(cropperX, cropperY);
       const left = replacePx(cropperWrapper.style.left);
       const top = replacePx(cropperWrapper.style.top);
       console.log(left, top);
