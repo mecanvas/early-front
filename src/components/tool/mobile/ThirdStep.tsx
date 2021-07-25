@@ -1,7 +1,9 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { isMobile } from 'react-device-detect';
 import { useAppSelector } from 'src/hooks/useRedux';
+import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { theme } from 'src/style/theme';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getPosition } from 'src/utils/getPosition';
@@ -186,6 +188,9 @@ const ThirdStep = () => {
   const IMAGE_MAXIMUM_WIDTH = 304;
   const IMAGE_MAXIMUM_HEIGHT = 304;
 
+  const [resizeMode, setResizeMode] = useState(false);
+  const [cmd, setCmd] = useState<ResizeCmd | null>(null);
+
   const { selectedFrame } = useAppSelector(({ frame }) => frame);
   const [isLoaded, setIsLoaded] = useState(false);
   const imgCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -335,6 +340,16 @@ const ThirdStep = () => {
     ctx.drawImage(img, 0, 0, newW, newH);
   }, []);
 
+  const handleResizeStart = useCallback((e) => {
+    const { cmd } = e.currentTarget.dataset;
+    setResizeMode(true);
+    setCmd(cmd);
+  }, []);
+  const handleResizeEnd = useCallback(() => {
+    setResizeMode(false);
+    setCmd(null);
+  }, []);
+
   const handleSelected = useCallback((e) => {
     const { name } = e.currentTarget.dataset;
     setSelectCanvas(name);
@@ -441,15 +456,35 @@ const ThirdStep = () => {
           <ThirdContentCropperWrapper width={canvasWidth} height={canvasHeight} ref={cropperWrapperRef}>
             <ThirdContentCropper
               ref={cropperRef}
+              onTouchStart={isMoving && isMobile ? handleMovingCropper : undefined}
+              onTouchEnd={isMobile ? handleActiveCropper : undefined}
+              onTouchMove={isMobile ? handleCancelMoveCropper : undefined}
               onMouseMove={isMoving ? handleMovingCropper : undefined}
               onMouseDown={handleActiveCropper}
               onMouseUp={handleCancelMoveCropper}
+              onMouseLeave={isMoving ? handleCancelMoveCropper : handleResizeEnd}
             />
 
-            <div data-cmd="top-left"></div>
-            <div data-cmd="top-right"></div>
-            <div data-cmd="bottom-left"></div>
-            <div data-cmd="bottom-right"></div>
+            <div
+              data-cmd="top-left"
+              onMouseDown={handleResizeStart}
+              onTouchStart={isMobile ? handleResizeStart : undefined}
+            />
+            <div
+              data-cmd="top-right"
+              onMouseDown={handleResizeStart}
+              onTouchStart={isMobile ? handleResizeStart : undefined}
+            />
+            <div
+              data-cmd="bottom-left"
+              onMouseDown={handleResizeStart}
+              onTouchStart={isMobile ? handleResizeStart : undefined}
+            />
+            <div
+              data-cmd="bottom-right"
+              onMouseDown={handleResizeStart}
+              onTouchStart={isMobile ? handleResizeStart : undefined}
+            />
             <span></span>
             <span></span>
             <span></span>
