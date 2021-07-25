@@ -78,10 +78,60 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
 
   width: ${({ width }) => width}px;
   height: ${({ height }) => height}px;
+  /* top-left */
+  div:nth-of-type(1) {
+    z-index: 12;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    border-top: 2px solid ${({ theme }) => theme.color.primary};
+    border-left: 2px solid ${({ theme }) => theme.color.primary};
+    cursor: nwse-resize;
+  }
+
+  /* top-right */
+  div:nth-of-type(2) {
+    z-index: 12;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    border-top: 2px solid ${({ theme }) => theme.color.primary};
+    border-right: 2px solid ${({ theme }) => theme.color.primary};
+    cursor: nesw-resize;
+  }
+
+  /* bottom-left */
+  div:nth-of-type(3) {
+    z-index: 12;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 12px;
+    height: 12px;
+    border-bottom: 2px solid ${({ theme }) => theme.color.primary};
+    border-left: 2px solid ${({ theme }) => theme.color.primary};
+    cursor: nesw-resize;
+  }
+
+  /* bottom-right */
+  div:nth-of-type(4) {
+    z-index: 12;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    width: 12px;
+    height: 12px;
+    border-bottom: 2px solid ${({ theme }) => theme.color.primary};
+    border-right: 2px solid ${({ theme }) => theme.color.primary};
+    cursor: nwse-resize;
+  }
 
   /* top */
   span:nth-of-type(1) {
-    z-index: 15;
     position: absolute;
     top: 0;
     width: 100%;
@@ -90,7 +140,6 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   }
   /* right */
   span:nth-of-type(2) {
-    z-index: 15;
     position: absolute;
     top: 0;
     right: 0;
@@ -100,7 +149,6 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   }
   /* bottom */
   span:nth-of-type(3) {
-    z-index: 15;
     position: absolute;
     bottom: 0;
     width: 100%;
@@ -109,7 +157,6 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   }
   /* left */
   span:nth-of-type(4) {
-    z-index: 15;
     position: absolute;
     left: 0;
     top: 0;
@@ -212,12 +259,6 @@ const ThirdStep = () => {
 
       const { naturalWidth, naturalHeight } = img;
 
-      // const left = (window.innerWidth - imgW) / 2;
-      // const top = (window.innerHeight - imgH) / 2;
-      // const cropperLeft = (window.innerWidth - w) / 2;
-      // const cropperTop = (window.innerHeight - h) / 2;
-      // const cropX = cropperLeft - left;
-      // const cropY = cropperTop - top;
       const scaleX = naturalWidth / imgW;
       const scaleY = naturalHeight / imgH;
 
@@ -229,7 +270,6 @@ const ThirdStep = () => {
 
       ctx.clearRect(0, 0, imgW, imgH);
       ctx.imageSmoothingQuality = 'high';
-      // ctx.drawImage(img, cropX * scaleX, cropY * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
       ctx.drawImage(img, cropperX * scaleX, cropperY * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
 
       // 프리뷰 드로잉
@@ -370,15 +410,12 @@ const ThirdStep = () => {
   useEffect(() => {
     const cropperWrapper = cropperWrapperRef.current;
     if (cropperWrapper) {
-      console.log(cropperX, cropperY);
-      const left = replacePx(cropperWrapper.style.left);
-      const top = replacePx(cropperWrapper.style.top);
-      console.log(left, top);
       cropperWrapper.style.top = `${cropperY}px`;
       cropperWrapper.style.left = `${cropperX}px`;
       drawingCropper(selectedInfo.name);
       drawingPreview(selectedInfo.name);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cropperX, cropperY]);
 
   return (
@@ -409,6 +446,10 @@ const ThirdStep = () => {
               onMouseUp={handleCancelMoveCropper}
             />
 
+            <div data-cmd="top-left"></div>
+            <div data-cmd="top-right"></div>
+            <div data-cmd="bottom-left"></div>
+            <div data-cmd="bottom-right"></div>
             <span></span>
             <span></span>
             <span></span>
