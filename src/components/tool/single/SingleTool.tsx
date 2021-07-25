@@ -726,4 +726,4 @@ const SingleTool = () => {
   );
 };
 
-export default SingleTool;
+export default PreventPageLeave(SingleTool);
