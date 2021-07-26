@@ -10,7 +10,7 @@ export const postImageUpload = createAsyncThunk<any, { type: 1 | 2; fd: any; id:
       const imgUrl = await axios.post<string>(`/canvas/single/upload`, fd).then((res) => {
         return res.data;
       });
-      await dispatch(putSelectedFrameImage({ type, id, imgUrl }));
+      await dispatch(putSelectedFrameImage({ type, id, imgUrl: `${imgUrl}?${new Date().getTime()}` }));
     } catch (err: any) {
       return rejectWithValue(err.response.data);
     }
