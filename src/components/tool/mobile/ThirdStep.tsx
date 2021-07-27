@@ -231,12 +231,8 @@ const ThirdStep = () => {
   const [xDiff, setXDiff] = useState(0);
   const [yDiff, setYDiff] = useState(0);
   const [isCalc, setIsCalc] = useState(false);
-  const [resizeWidth, setResizeWidth] = useState(0);
-  const [resizeHeight, setResizeHeight] = useState(0);
   const [cropperX, setCropperX] = useState(0);
   const [cropperY, setCropperY] = useState(0);
-  const [cropperRight, setCropperRight] = useState(0);
-  const [cropperBottom, setCropperBottom] = useState(0);
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
   const [canvasWidth, setCanvasWidth] = useState(0);
@@ -260,109 +256,6 @@ const ThirdStep = () => {
     }
     return res;
   }, [selectedFrame]);
-
-  // 크로퍼 리사이즈즈
-  const createResizeCropper = useCallback(
-    (canvas: HTMLCanvasElement, img: HTMLImageElement, w: number, h: number) => {
-      const ctx = canvas.getContext('2d');
-      const imgCanvas = imgCanvasRef.current;
-      const cropperWrapper = cropperWrapperRef.current;
-
-      if (!ctx || !imgCanvas || !cropperWrapper) return;
-      const { width: wrapperWidth, height: wrapperHeight } = cropperWrapper.dataset;
-
-      if (!wrapperWidth || !wrapperHeight) return;
-
-      const { width: imgW, height: imgH } = imgCanvas.getBoundingClientRect();
-
-      const { naturalWidth, naturalHeight } = img;
-
-      const scaleX = naturalWidth / imgW;
-      const scaleY = naturalHeight / imgH;
-
-      let newCropperX = 0;
-      let newCropperY = 0;
-
-      setCanvasWidth(w);
-      setCanvasHeight(h);
-      canvas.width = w;
-      canvas.height = h;
-
-      if (cmd === 'top-left') {
-        const paddingLeft = w + cropperRight;
-        const paddingTop = h + cropperBottom;
-
-        newCropperX = imgW - paddingLeft;
-        newCropperY = imgH - paddingTop;
-
-        cropperWrapper.style.left = `${newCropperX}px`;
-        cropperWrapper.style.top = `${newCropperY}px`;
-      }
-
-      if (cmd === 'top-right') {
-        const paddingRight = w + cropperX;
-        const paddingTop = h + cropperBottom;
-
-        const paddingLeft = w + cropperRight;
-
-        newCropperX = imgW - paddingLeft;
-        newCropperY = imgH - paddingTop;
-
-        cropperWrapper.style.right = `${newCropperX}px`;
-        cropperWrapper.style.top = `${newCropperY}px`;
-      }
-
-      if (cmd === 'bottom-left') {
-        const paddingLeft = w + cropperRight;
-        newCropperX = imgW - paddingLeft;
-        newCropperY = cropperY;
-        cropperWrapper.style.left = `${newCropperX}px`;
-      }
-
-      if (cmd === 'bottom-right') {
-        const paddingRight = w + cropperX;
-
-        const paddingLeft = w + cropperRight;
-
-        newCropperX = imgW - paddingLeft;
-        newCropperY = cropperY;
-        cropperWrapper.style.right = `${imgW - paddingLeft}px`;
-      }
-
-      console.log(newCropperX, newCropperY);
-
-      ctx.clearRect(0, 0, imgW, imgH);
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(img, newCropperX * scaleX, newCropperY * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
-
-      const previewCanvas = previewCanvasRef.current;
-      if (previewCanvas) {
-        const pCtx = previewCanvas.getContext('2d');
-        previewCanvas.width = w;
-        previewCanvas.height = h;
-        if (!pCtx) return;
-        pCtx.clearRect(0, 0, imgW, imgH);
-        pCtx.imageSmoothingQuality = 'high';
-        pCtx.drawImage(img, newCropperX * scaleX, newCropperY * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
-
-        pCtx.globalCompositeOperation = 'destination-over';
-        pCtx.fillStyle = bgColor;
-        pCtx.fillRect(0, 0, imgW, imgH);
-      }
-    },
-    [cropperX, cropperRight, cmd, cropperY, cropperBottom, bgColor],
-  );
-
-  const drawingResizing = useCallback(
-    (newWidth: number, newHeight: number) => {
-      const cropper = cropperRef.current;
-      const img = imgElements.get(selectedInfo.name);
-      if (cropper) {
-        createResizeCropper(cropper, img, newWidth, newHeight);
-      }
-    },
-    [createResizeCropper, imgElements, selectedInfo.name],
-  );
 
   const createCropperCanvas = useCallback(
     (canvas: HTMLCanvasElement, img: HTMLImageElement, preview?: boolean) => {
@@ -484,12 +377,12 @@ const ThirdStep = () => {
     ctx.drawImage(img, 0, 0, newW, newH);
   }, []);
 
-  const handleResizeStart = useCallback((e) => {
-    const { cmd } = e.currentTarget.dataset;
-    setIsResizeMode(true);
-    setCmd(cmd);
-    setIsCalc(true);
-  }, []);
+  // const handleResizeStart = useCallback((e) => {
+  //   const { cmd } = e.currentTarget.dataset;
+  //   setIsResizeMode(true);
+  //   setCmd(cmd);
+  //   setIsCalc(true);
+  // }, []);
 
   const handleResizeEnd = useCallback(() => {
     setIsResizeMode(false);
@@ -510,8 +403,8 @@ const ThirdStep = () => {
             if (newWidth + cropperX > imgWidth || newHeight + cropperY > imgHeight) {
               return;
             }
-            setResizeWidth(newWidth);
-            setResizeHeight(newHeight);
+            // setResizeWidth(newWidth);
+            // setResizeHeight(newHeight);
           }
         }
       }
@@ -559,11 +452,9 @@ const ThirdStep = () => {
 
         setCropperX(positionLeft);
         setCropperY(positionTop);
-        setCropperRight(imgWidth - (positionLeft + canvasWidth));
-        setCropperBottom(imgHeight - (positionTop + canvasHeight));
       }
     },
-    [isCalc, xDiff, yDiff, canvasWidth, canvasHeight, imgWidth, imgHeight],
+    [isCalc, xDiff, yDiff, canvasWidth, canvasHeight],
   );
 
   const handleActiveCropper = useCallback(() => {
@@ -599,12 +490,6 @@ const ThirdStep = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectCanvas, imgElements, isLoaded]);
-
-  useEffect(() => {
-    if (resizeWidth && resizeHeight && isResizeMode) {
-      drawingResizing(resizeWidth, resizeHeight);
-    }
-  }, [drawingResizing, isResizeMode, resizeHeight, resizeWidth]);
 
   useEffect(() => {
     const cropperWrapper = cropperWrapperRef.current;
@@ -668,7 +553,7 @@ const ThirdStep = () => {
               onMouseLeave={isMoving ? handleCancelMoveCropper : undefined}
             />
 
-            <div
+            {/* <div
               data-cmd="top-left"
               onMouseDown={handleResizeStart}
               onTouchStart={isMobile ? handleResizeStart : undefined}
@@ -687,7 +572,7 @@ const ThirdStep = () => {
               data-cmd="bottom-right"
               onMouseDown={handleResizeStart}
               onTouchStart={isMobile ? handleResizeStart : undefined}
-            />
+            /> */}
             <span></span>
             <span></span>
             <span></span>
