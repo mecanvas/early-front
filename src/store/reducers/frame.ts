@@ -17,6 +17,8 @@ export interface FrameInfoList {
 
 export interface SelectedFrame extends FrameInfoList {
   imgUrl?: string;
+  x?: number;
+  y?: number;
 }
 
 interface FrameState {
@@ -72,6 +74,14 @@ const frame = createSlice({
       state.selectedFrame = state.selectedFrame.map((lst) => ({
         ...lst,
         imgUrl: lst.id === payload.id && lst.type === payload.type ? payload.imgUrl : lst.imgUrl,
+      }));
+    },
+    updatePositionByFrame: (state, { payload }: PayloadAction<{ name: string; x: number; y: number }>) => {
+      state.selectedFrame = state.selectedFrame.map((lst) => ({
+        ...lst,
+        name: lst.name === payload.name ? payload.name : lst.name,
+        x: lst.name === payload.name ? payload.x : lst.x,
+        y: lst.name === payload.name ? payload.y : lst.y,
       }));
     },
   },

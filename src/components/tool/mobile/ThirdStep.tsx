@@ -231,8 +231,8 @@ const ThirdStep = () => {
   const [xDiff, setXDiff] = useState(0);
   const [yDiff, setYDiff] = useState(0);
   const [isCalc, setIsCalc] = useState(false);
-  const [cropperX, setCropperX] = useState(0);
-  const [cropperY, setCropperY] = useState(0);
+  // const [cropperX, setCropperX] = useState(0);
+  // const [cropperY, setCropperY] = useState(0);
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
   const [canvasWidth, setCanvasWidth] = useState(0);
@@ -256,6 +256,14 @@ const ThirdStep = () => {
     }
     return res;
   }, [selectedFrame]);
+
+  const canvasElements = useMemo(() => {
+    return new Map();
+  }, []);
+
+  const [cropperList, setCropperList] = useState<{ name: string; x: number; y: number }[]>([
+    { name: selectedInfo.name, x: 0, y: 0 },
+  ]);
 
   const createCropperCanvas = useCallback(
     (canvas: HTMLCanvasElement, img: HTMLImageElement, preview?: boolean) => {
@@ -287,6 +295,7 @@ const ThirdStep = () => {
         w = ratioW;
         h = ratioH;
       }
+      const { x: cropperX, y: cropperY } = cropperList.filter((lst) => lst.name === selectCanvas)[0];
 
       const { naturalWidth, naturalHeight } = img;
 
@@ -320,15 +329,18 @@ const ThirdStep = () => {
           pCtx.globalCompositeOperation = 'destination-over';
           pCtx.fillStyle = bgColor;
           pCtx.fillRect(0, 0, imgW, imgH);
+          canvasElements.set(selectedInfo.name, previewCanvas);
         }
       }
     },
     [
       bgColor,
+      canvasElements,
       canvasHeight,
       canvasWidth,
-      cropperX,
-      cropperY,
+      cropperList,
+      selectCanvas,
+      selectedInfo.name,
       selectedInfo.size.height,
       selectedInfo.size.width,
       selectedInfo.type,
@@ -399,10 +411,10 @@ const ThirdStep = () => {
         if (cursorX && cursorY && cmd) {
           const result = positioningImageResize(cropperWrapperRef, cmd, cursorX, cursorY);
           if (result) {
-            const { newWidth, newHeight } = result;
-            if (newWidth + cropperX > imgWidth || newHeight + cropperY > imgHeight) {
-              return;
-            }
+            // const { newWidth, newHeight } = result;
+            // if (newWidth + cropperX > imgWidth || newHeight + cropperY > imgHeight) {
+            //   return;
+            // }
             // setResizeWidth(newWidth);
             // setResizeHeight(newHeight);
           }
@@ -411,7 +423,7 @@ const ThirdStep = () => {
 
       requestAnimationFrame(() => handleResize);
     },
-    [isResizeMode, cmd, cropperX, imgWidth, cropperY, imgHeight],
+    [isResizeMode, cmd],
   );
 
   const handleSelected = useCallback((e) => {
@@ -450,11 +462,21 @@ const ThirdStep = () => {
         const positionLeft = positionX >= 0 ? (positionX >= cropX * 2 ? cropX * 2 : positionX) : 0;
         const positionTop = positionY >= 0 ? (positionY >= cropY * 2 ? cropY * 2 : positionY) : 0;
 
-        setCropperX(positionLeft);
-        setCropperY(positionTop);
+        setCropperList((prev) => {
+          const res = prev.map((lst) => ({
+            ...lst,
+            name: lst.name === selectCanvas ? selectedInfo.name : lst.name,
+            x: lst.name === selectCanvas ? positionLeft : lst.x,
+            y: lst.name === selectCanvas ? positionTop : lst.y,
+          }));
+          return res;
+        });
+
+        // setCropperX(positionLeft);
+        // setCropperY(positionTop);
       }
     },
-    [isCalc, xDiff, yDiff, canvasWidth, canvasHeight],
+    [isCalc, xDiff, yDiff, canvasWidth, canvasHeight, selectCanvas, selectedInfo.name],
   );
 
   const handleActiveCropper = useCallback(() => {
@@ -489,21 +511,23 @@ const ThirdStep = () => {
       setIsLoaded(true);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectCanvas, imgElements, isLoaded]);
+  }, [selectCanvas, imgElements]);
 
   useEffect(() => {
     const cropperWrapper = cropperWrapperRef.current;
     if (cropperWrapper) {
+      const { x, y } = cropperList.filter((lst) => lst.name === selectCanvas)[0];
+      console.log(cropperList);
       // cropperWrapper.style.right = `${cropperRight}px`;
       // cropperWrapper.style.bottom = `${cropperBottom}px`;
-      cropperWrapper.style.top = `${cropperY}px`;
-      cropperWrapper.style.left = `${cropperX}px`;
+      cropperWrapper.style.top = `${y}px`;
+      cropperWrapper.style.left = `${x}px`;
     }
 
     drawingCropper(selectedInfo.name);
     drawingPreview(selectedInfo.name);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cropperX, cropperY]);
+  }, [cropperList]);
 
   return (
     <Container
