@@ -216,9 +216,7 @@ const MobileSingleTool = () => {
         {/* step4  옆면 */}
         {stepCount === 3 && (
           <MobileContent>
-            <LastContent>
-              <ToolSave />
-            </LastContent>
+            <LastContent></LastContent>
           </MobileContent>
         )}
 

@@ -2,8 +2,9 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { useAppSelector } from 'src/hooks/useRedux';
+import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
+import { setCanvasSaveList } from 'src/store/reducers/canvas';
 import { SelectedFrame } from 'src/store/reducers/frame';
 import { theme } from 'src/style/theme';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
@@ -214,13 +215,15 @@ const ThirdPreviewCanvas = styled.div`
 `;
 
 const ThirdStep = () => {
+  const dispatch = useAppDispatch();
+  const { selectedFrame } = useAppSelector(({ frame }) => frame);
+  const { canvasSaveList } = useAppSelector(({ canvas }) => canvas);
   const IMAGE_MAXIMUM_WIDTH = 304;
   const IMAGE_MAXIMUM_HEIGHT = 304;
 
   const [isResizeMode, setIsResizeMode] = useState(false);
   const [cmd, setCmd] = useState<ResizeCmd | null>(null);
 
-  const { selectedFrame } = useAppSelector(({ frame }) => frame);
   const [isLoaded, setIsLoaded] = useState(false);
   const imgCanvasRef = useRef<HTMLCanvasElement>(null);
   const cropperRef = useRef<HTMLCanvasElement>(null);
@@ -256,16 +259,11 @@ const ThirdStep = () => {
     return res;
   }, [selectedFrame]);
 
-  const canvasElements = useMemo(() => {
-    return new Map();
-  }, []);
-
   const [isInitial, setIsInitial] = useState(false);
 
   const [cropperList, setCropperList] = useState<{ name: string; x: number; y: number }[]>([
     { name: selectedInfo.name, x: 0, y: 0 },
   ]);
-  console.log(canvasElements);
 
   const createInitialCanvas = useCallback(() => {
     selectedFrame.forEach((info: SelectedFrame) => {
@@ -312,13 +310,13 @@ const ThirdStep = () => {
         pCtx.globalCompositeOperation = 'destination-over';
         pCtx.fillStyle = bgColor;
         pCtx.fillRect(0, 0, imgW, imgH);
-        canvasElements.set(info.name, previewCanvas);
+        dispatch(setCanvasSaveList({ name: info.name, canvas: previewCanvas }));
         setCropperList((prev) => {
           return [...prev, { name: info.name, x: 0, y: 0 }];
         });
       };
     });
-  }, [bgColor, canvasElements, selectedFrame]);
+  }, [bgColor, selectedFrame, dispatch]);
 
   const createCropperCanvas = useCallback(
     (canvas: HTMLCanvasElement, img: HTMLImageElement, preview?: boolean) => {
@@ -386,7 +384,7 @@ const ThirdStep = () => {
           pCtx.globalCompositeOperation = 'destination-over';
           pCtx.fillStyle = bgColor;
           pCtx.fillRect(0, 0, imgW, imgH);
-          canvasElements.set(selectFrameName, previewCanvas);
+          dispatch(setCanvasSaveList({ name: selectFrameName, canvas: previewCanvas }));
           setCropperList((prev) => {
             const isExist = prev.find((lst) => lst.name === selectFrameName);
             if (isExist) {
@@ -400,10 +398,10 @@ const ThirdStep = () => {
     },
     [
       bgColor,
-      canvasElements,
       canvasHeight,
       canvasWidth,
       cropperList,
+      dispatch,
       selectFrameName,
       selectedInfo.size.height,
       selectedInfo.size.width,
@@ -588,11 +586,11 @@ const ThirdStep = () => {
 
   // 초기 진입시 캔버스 생성
   useEffect(() => {
-    if (canvasElements.size === selectedFrame.length) {
+    if (canvasSaveList.length === selectedFrame.length) {
       setIsInitial(true);
       return;
     }
-  }, [canvasElements.size, selectedFrame.length]);
+  }, [canvasSaveList.length, selectedFrame.length]);
 
   useEffect(() => {
     if (isInitial) return;
