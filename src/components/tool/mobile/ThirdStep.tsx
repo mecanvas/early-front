@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { isMobile } from 'react-device-detect';
 import { useAppSelector } from 'src/hooks/useRedux';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
+import { SelectedFrame } from 'src/store/reducers/frame';
 import { theme } from 'src/style/theme';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getPosition } from 'src/utils/getPosition';
@@ -225,14 +226,12 @@ const ThirdStep = () => {
   const cropperRef = useRef<HTMLCanvasElement>(null);
   const cropperWrapperRef = useRef<HTMLDivElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-  const [selectCanvas, setSelectCanvas] = useState(selectedFrame[0]?.name);
+  const [selectFrameName, setSelectFrameName] = useState(selectedFrame[0]?.name);
   const [isMoving, setIsMoving] = useState(false);
 
   const [xDiff, setXDiff] = useState(0);
   const [yDiff, setYDiff] = useState(0);
   const [isCalc, setIsCalc] = useState(false);
-  // const [cropperX, setCropperX] = useState(0);
-  // const [cropperY, setCropperY] = useState(0);
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
   const [canvasWidth, setCanvasWidth] = useState(0);
@@ -241,9 +240,9 @@ const ThirdStep = () => {
   const [bgColor] = useState(theme.color.white);
 
   const selectedInfo = useMemo(() => {
-    const selectedCanvas = selectedFrame.filter((lst) => lst.name === selectCanvas)[0];
+    const selectedCanvas = selectedFrame.filter((lst) => lst.name === selectFrameName)[0];
     return selectedCanvas;
-  }, [selectCanvas, selectedFrame]);
+  }, [selectFrameName, selectedFrame]);
 
   const imgElements = useMemo(() => {
     const res = new Map();
@@ -261,9 +260,65 @@ const ThirdStep = () => {
     return new Map();
   }, []);
 
+  const [isInitial, setIsInitial] = useState(false);
+
   const [cropperList, setCropperList] = useState<{ name: string; x: number; y: number }[]>([
     { name: selectedInfo.name, x: 0, y: 0 },
   ]);
+  console.log(canvasElements);
+
+  const createInitialCanvas = useCallback(() => {
+    selectedFrame.forEach((info: SelectedFrame) => {
+      const previewCanvas = document.createElement('canvas');
+      const pCtx = previewCanvas.getContext('2d');
+
+      const img = new Image();
+      img.src = info.imgUrl || '';
+      img.crossOrigin = 'Anonymous';
+      img.onload = () => {
+        if (!pCtx) return;
+        const { naturalWidth, naturalHeight } = img;
+        const [imgW, imgH] = getOriginRatio(naturalWidth, naturalHeight, IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT);
+
+        const isSquare = info.type === 1;
+
+        let w = 0;
+        let h = 0;
+
+        const scaleX = naturalWidth / imgW;
+        const scaleY = naturalHeight / imgH;
+
+        if (isSquare) {
+          // 정사각형이면 이미지 너비에 따라 정사각형
+          if (imgW > imgH) {
+            const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgH, imgH);
+            w = ratioW;
+            h = ratioH;
+          } else {
+            const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgW, imgW);
+            w = ratioW;
+            h = ratioH;
+          }
+        } else {
+          const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgW, imgH);
+          w = ratioW;
+          h = ratioH;
+        }
+        previewCanvas.width = w;
+        previewCanvas.height = h;
+        pCtx.clearRect(0, 0, imgW, imgH);
+        pCtx.imageSmoothingQuality = 'high';
+        pCtx.drawImage(img, 0 * scaleX, 0 * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
+        pCtx.globalCompositeOperation = 'destination-over';
+        pCtx.fillStyle = bgColor;
+        pCtx.fillRect(0, 0, imgW, imgH);
+        canvasElements.set(info.name, previewCanvas);
+        setCropperList((prev) => {
+          return [...prev, { name: info.name, x: 0, y: 0 }];
+        });
+      };
+    });
+  }, [bgColor, canvasElements, selectedFrame]);
 
   const createCropperCanvas = useCallback(
     (canvas: HTMLCanvasElement, img: HTMLImageElement, preview?: boolean) => {
@@ -295,7 +350,6 @@ const ThirdStep = () => {
         w = ratioW;
         h = ratioH;
       }
-      const { x: cropperX, y: cropperY } = cropperList.filter((lst) => lst.name === selectCanvas)[0];
 
       const { naturalWidth, naturalHeight } = img;
 
@@ -304,6 +358,9 @@ const ThirdStep = () => {
 
       setCanvasWidth(canvasWidth ? canvasWidth : w);
       setCanvasHeight(canvasHeight ? canvasHeight : h);
+      const crop = cropperList.filter((lst) => lst.name === selectFrameName)[0];
+      cropperWrapper.style.top = `${crop?.y}px`;
+      cropperWrapper.style.left = `${crop?.x}px`;
 
       canvas.width = canvasWidth || w;
       canvas.height = canvasHeight || h;
@@ -312,7 +369,7 @@ const ThirdStep = () => {
 
       ctx.clearRect(0, 0, imgW, imgH);
       ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(img, cropperX * scaleX, cropperY * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
+      ctx.drawImage(img, crop?.x * scaleX, crop?.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
 
       // 프리뷰 드로잉
       if (preview) {
@@ -324,12 +381,20 @@ const ThirdStep = () => {
           if (!pCtx) return;
           pCtx.clearRect(0, 0, imgW, imgH);
           pCtx.imageSmoothingQuality = 'high';
-          pCtx.drawImage(img, cropperX * scaleX, cropperY * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
+          pCtx.drawImage(img, crop?.x * scaleX, crop?.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
 
           pCtx.globalCompositeOperation = 'destination-over';
           pCtx.fillStyle = bgColor;
           pCtx.fillRect(0, 0, imgW, imgH);
-          canvasElements.set(selectedInfo.name, previewCanvas);
+          canvasElements.set(selectFrameName, previewCanvas);
+          setCropperList((prev) => {
+            const isExist = prev.find((lst) => lst.name === selectFrameName);
+            if (isExist) {
+              return prev;
+            } else {
+              return [...prev, { name: selectFrameName, x: 0, y: 0 }];
+            }
+          });
         }
       }
     },
@@ -339,8 +404,7 @@ const ThirdStep = () => {
       canvasHeight,
       canvasWidth,
       cropperList,
-      selectCanvas,
-      selectedInfo.name,
+      selectFrameName,
       selectedInfo.size.height,
       selectedInfo.size.width,
       selectedInfo.type,
@@ -348,25 +412,23 @@ const ThirdStep = () => {
   );
 
   const drawingPreview = useCallback(
-    (name: string) => {
-      const img: HTMLImageElement = imgElements.get(name);
+    (name: string, img: HTMLImageElement) => {
       const canvas = previewCanvasRef.current;
       if (canvas) {
         createCropperCanvas(canvas, img, true);
       }
     },
-    [createCropperCanvas, imgElements],
+    [createCropperCanvas],
   );
 
   const drawingCropper = useCallback(
-    (name: string) => {
-      const img: HTMLImageElement = imgElements.get(name);
+    (name: string, img: HTMLImageElement) => {
       const canvas = cropperRef.current;
       if (canvas) {
         createCropperCanvas(canvas, img);
       }
     },
-    [createCropperCanvas, imgElements],
+    [createCropperCanvas],
   );
 
   const createImgCanvas = useCallback((canvas: HTMLCanvasElement, img: HTMLImageElement) => {
@@ -426,12 +488,16 @@ const ThirdStep = () => {
     [isResizeMode, cmd],
   );
 
-  const handleSelected = useCallback((e) => {
-    const { name } = e.currentTarget.dataset;
-    setSelectCanvas(name);
-    setCanvasWidth(0);
-    setCanvasHeight(0);
-  }, []);
+  const handleSelected = useCallback(
+    (e) => {
+      const { name } = e.currentTarget.dataset;
+      if (selectFrameName === name) return;
+      setSelectFrameName(name);
+      setCanvasWidth(0);
+      setCanvasHeight(0);
+    },
+    [selectFrameName],
+  );
 
   const handleMovingCropper = useCallback(
     (e) => {
@@ -463,20 +529,22 @@ const ThirdStep = () => {
         const positionTop = positionY >= 0 ? (positionY >= cropY * 2 ? cropY * 2 : positionY) : 0;
 
         setCropperList((prev) => {
-          const res = prev.map((lst) => ({
-            ...lst,
-            name: lst.name === selectCanvas ? selectedInfo.name : lst.name,
-            x: lst.name === selectCanvas ? positionLeft : lst.x,
-            y: lst.name === selectCanvas ? positionTop : lst.y,
-          }));
-          return res;
+          const isExist = prev.find((lst) => lst.name === selectFrameName);
+          if (isExist) {
+            const res = prev.map((lst) => ({
+              ...lst,
+              name: lst.name === selectFrameName ? selectedInfo.name : lst.name,
+              x: lst.name === selectFrameName ? positionLeft : lst.x,
+              y: lst.name === selectFrameName ? positionTop : lst.y,
+            }));
+            return res;
+          } else {
+            return [...prev, { name: selectFrameName, x: positionLeft, y: positionTop }];
+          }
         });
-
-        // setCropperX(positionLeft);
-        // setCropperY(positionTop);
       }
     },
-    [isCalc, xDiff, yDiff, canvasWidth, canvasHeight, selectCanvas, selectedInfo.name],
+    [isCalc, xDiff, yDiff, canvasWidth, canvasHeight, selectFrameName, selectedInfo.name],
   );
 
   const handleActiveCropper = useCallback(() => {
@@ -490,44 +558,50 @@ const ThirdStep = () => {
   }, []);
 
   useEffect(() => {
-    const { name } = selectedInfo;
-    const img: HTMLImageElement = imgElements.get(name);
-    const imgCanvas = imgCanvasRef.current;
+    const img: HTMLImageElement = imgElements.get(selectFrameName);
 
-    if (isLoaded) {
-      if (imgCanvas) {
-        createImgCanvas(imgCanvas, img);
-        drawingCropper(name);
-        drawingPreview(name);
-      }
+    if (!isLoaded) {
+      img.onload = () => {
+        setIsLoaded(true);
+      };
     }
-
-    img.onload = () => {
-      if (imgCanvas) {
-        createImgCanvas(imgCanvas, img);
-        drawingCropper(name);
-        drawingPreview(name);
-      }
-      setIsLoaded(true);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectCanvas, imgElements]);
+  }, [imgElements, isLoaded, selectFrameName]);
 
   useEffect(() => {
-    const cropperWrapper = cropperWrapperRef.current;
-    if (cropperWrapper) {
-      const { x, y } = cropperList.filter((lst) => lst.name === selectCanvas)[0];
-      console.log(cropperList);
-      // cropperWrapper.style.right = `${cropperRight}px`;
-      // cropperWrapper.style.bottom = `${cropperBottom}px`;
-      cropperWrapper.style.top = `${y}px`;
-      cropperWrapper.style.left = `${x}px`;
-    }
+    const img: HTMLImageElement = imgElements.get(selectFrameName);
 
-    drawingCropper(selectedInfo.name);
-    drawingPreview(selectedInfo.name);
+    if (isLoaded) {
+      const imgCanvas = imgCanvasRef.current;
+      if (imgCanvas) {
+        new Promise((resolve) => {
+          createImgCanvas(imgCanvas, img);
+          resolve(true);
+        })
+          .then(() => {
+            drawingCropper(selectFrameName, img);
+            drawingPreview(selectFrameName, img);
+          })
+          .catch((err) => new Error(`캔버스 드로잉에 실패했습니다! ${err}`));
+      }
+    }
+  }, [selectFrameName, imgElements, isLoaded, createImgCanvas, drawingCropper, drawingPreview]);
+
+  // 초기 진입시 캔버스 생성
+  useEffect(() => {
+    if (canvasElements.size === selectedFrame.length) {
+      setIsInitial(true);
+      return;
+    }
+  }, [canvasElements.size, selectedFrame.length]);
+
+  useEffect(() => {
+    if (isInitial) return;
+
+    if (imgElements.size === selectedFrame.length) {
+      createInitialCanvas();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cropperList]);
+  }, [imgElements.size, selectedFrame.length, isInitial]);
 
   return (
     <Container
@@ -541,7 +615,7 @@ const ThirdStep = () => {
           <div>
             <ThirdItem
               type={lst.type}
-              selected={lst.name === selectCanvas}
+              selected={lst.name === selectFrameName}
               onClick={handleSelected}
               data-name={lst.name}
             >
