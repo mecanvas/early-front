@@ -6,7 +6,7 @@ import { isMobile } from 'react-device-detect';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { setCanvasSaveList } from 'src/store/reducers/canvas';
-import { SelectedFrame } from 'src/store/reducers/frame';
+import { SelectedFrame, updatePositionByFrame } from 'src/store/reducers/frame';
 import { theme } from 'src/style/theme';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getPosition } from 'src/utils/getPosition';
@@ -305,24 +305,26 @@ const ThirdStep = () => {
           w = ratioW;
           h = ratioH;
         }
-
+        const crop = { x: selectedInfo.x || 0, y: selectedInfo.y || 0 };
+        console.log(crop);
         previewCanvas.width = w;
         previewCanvas.height = h;
 
         pCtx.clearRect(0, 0, imgW, imgH);
         pCtx.imageSmoothingQuality = 'high';
-        pCtx.drawImage(img, 0 * scaleX, 0 * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
+        pCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
         pCtx.globalCompositeOperation = 'destination-over';
         pCtx.fillStyle = bgColor;
         pCtx.fillRect(0, 0, imgW, imgH);
 
         dispatch(setCanvasSaveList({ name: info.name, canvas: previewCanvas }));
         setCropperList((prev) => {
-          return [...prev, { name: info.name, x: 0, y: 0 }];
+          return [...prev, { name: info.name, x: crop.x, y: crop.y }];
         });
+        setIsInitial(true);
       };
     });
-  }, [bgColor, selectedFrame, dispatch]);
+  }, [selectedFrame, selectedInfo.x, selectedInfo.y, bgColor, dispatch]);
 
   const createCropperCanvas = useCallback(
     (canvas: HTMLCanvasElement, img: HTMLImageElement, preview?: boolean) => {
@@ -362,7 +364,8 @@ const ThirdStep = () => {
 
       setCanvasWidth(canvasWidth ? canvasWidth : w);
       setCanvasHeight(canvasHeight ? canvasHeight : h);
-      const crop = cropperList.filter((lst) => lst.name === selectFrameName)[0];
+      // const crop = cropperList.filter((lst) => lst.name === selectFrameName)[0];
+      const crop = { x: selectedInfo.x || 0, y: selectedInfo.y || 0 };
       cropperWrapper.style.top = `${crop?.y}px`;
       cropperWrapper.style.left = `${crop?.x}px`;
 
@@ -408,12 +411,13 @@ const ThirdStep = () => {
       bgColor,
       canvasHeight,
       canvasWidth,
-      cropperList,
       dispatch,
       selectFrameName,
       selectedInfo.size.height,
       selectedInfo.size.width,
       selectedInfo.type,
+      selectedInfo.x,
+      selectedInfo.y,
     ],
   );
 
@@ -533,7 +537,12 @@ const ThirdStep = () => {
 
         const positionLeft = positionX >= 0 ? (positionX >= cropX * 2 ? cropX * 2 : positionX) : 0;
         const positionTop = positionY >= 0 ? (positionY >= cropY * 2 ? cropY * 2 : positionY) : 0;
+        const cropper = cropperList[0];
 
+        if (cropper) {
+          const { x, y, name } = cropper;
+          dispatch(updatePositionByFrame({ name, x, y }));
+        }
         setCropperList((prev) => {
           const isExist = prev.find((lst) => lst.name === selectFrameName);
           if (isExist) {
@@ -550,7 +559,7 @@ const ThirdStep = () => {
         });
       }
     },
-    [isCalc, xDiff, yDiff, canvasWidth, canvasHeight, selectFrameName, selectedInfo.name],
+    [isCalc, xDiff, yDiff, canvasWidth, canvasHeight, cropperList, dispatch, selectFrameName, selectedInfo.name],
   );
 
   const handleActiveCropper = useCallback(() => {
@@ -602,12 +611,9 @@ const ThirdStep = () => {
 
   useEffect(() => {
     if (isInitial) return;
-
-    if (imgElements.size === selectedFrame.length) {
-      createInitialCanvas();
-    }
+    createInitialCanvas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [imgElements.size, selectedFrame.length, isInitial]);
+  }, [isInitial]);
 
   return (
     <Container

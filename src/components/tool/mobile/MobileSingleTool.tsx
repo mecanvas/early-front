@@ -143,6 +143,7 @@ const MobileSingleTool = () => {
   const LAST_INDEX = 4;
   const [stepCount, setStepCount] = useState(0);
   const { selectedFrame } = useAppSelector((state) => state.frame);
+  const { canvasSaveList } = useAppSelector((state) => state.canvas);
 
   const nextCondition = useMemo(() => {
     const condition = new Map();
@@ -151,10 +152,10 @@ const MobileSingleTool = () => {
       1,
       selectedFrame.every((lst) => lst.imgUrl),
     );
-    condition.set(2, selectedFrame.length);
-    condition.set(3, selectedFrame.length);
+    condition.set(2, true);
+    condition.set(3, canvasSaveList[0] ? canvasSaveList[0].scaleType : false);
     return condition;
-  }, [selectedFrame]);
+  }, [canvasSaveList, selectedFrame]);
 
   const stepTitle = useMemo(() => {
     const title = new Map();

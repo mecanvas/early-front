@@ -87,7 +87,13 @@ const frame = createSlice({
   },
 });
 
-export const { getSelectedFrame, selectedFrame, rotateSelectedFrameList, deleteSelectedFrame, putSelectedFrameImage } =
-  frame.actions;
+export const {
+  getSelectedFrame,
+  selectedFrame,
+  rotateSelectedFrameList,
+  deleteSelectedFrame,
+  putSelectedFrameImage,
+  updatePositionByFrame,
+} = frame.actions;
 
 export default frame.reducer;
