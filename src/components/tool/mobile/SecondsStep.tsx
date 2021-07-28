@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Button } from 'antd';
+import { Alert, Button } from 'antd';
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import ImageDropZone from 'src/components/common/ImageDropZone';
@@ -89,14 +89,35 @@ const SecondsStep = () => {
   const { selectedFrame } = useAppSelector(({ frame }) => frame);
   const dispatch = useAppDispatch();
 
+  const handleButtonUpload = useCallback(
+    (e) => {
+      const { id, type } = e.currentTarget.dataset;
+
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+
+      input.click();
+
+      input.oninput = () => {
+        if (!input.files) return;
+        const file = input.files[0];
+        if (!imgSizeChecker(file)) return Alert({ message: '최소 1MB 이상의 이미지이어야 합니다.' });
+        const fd = new FormData();
+        fd.append('image', file);
+        dispatch(postImageUpload({ fd, type: type === '1' ? 1 : 2, id: +id }));
+      };
+    },
+    [dispatch],
+  );
+
   const handleDropImage = useCallback(
     (acceptedFiles: any, reject, e) => {
       const { id, type } = e.target.dataset;
       if (!acceptedFiles[0].type.includes('image')) {
-        return alert('이미지 파일이 아닌건 지원하지 않습니다.');
+        return Alert({ message: '이미지 파일이 아닌건 지원하지 않습니다.' });
       }
-      if (!imgSizeChecker(acceptedFiles[0])) return;
-
+      if (!imgSizeChecker(acceptedFiles[0])) return Alert({ message: '최소 1MB 이상의 이미지이어야 합니다.' });
       const file = acceptedFiles[0];
       const fd = new FormData();
       fd.append('image', file);
@@ -130,7 +151,6 @@ const SecondsStep = () => {
                 </Button>
               </>
             ) : (
-              // 액자 다중 선택시
               <>
                 <div>
                   <h4>이미지를 업로드해 주세요.</h4>
@@ -150,6 +170,7 @@ const SecondsStep = () => {
               </>
             )
           ) : (
+            // 액자 다중 선택시
             <SecondsImageDropZoneWrapper>
               {selectedFrame.map((lst) =>
                 lst.imgUrl ? (
@@ -165,19 +186,8 @@ const SecondsStep = () => {
                       <img src={lst.imgUrl} />
                     </ImageWrapper>
                     <div>
-                      <Button
-                        type="text"
-                        {...getRootProps()}
-                        data-id={selectedFrame[0].id}
-                        data-type={selectedFrame[0].type}
-                      >
+                      <Button type="text" data-id={lst.id} data-type={lst.type} onClick={handleButtonUpload}>
                         변경
-                        <input
-                          {...getInputProps()}
-                          accept="image/*"
-                          data-id={selectedFrame[0].id}
-                          data-type={selectedFrame[0].type}
-                        />
                       </Button>
                     </div>
                   </div>

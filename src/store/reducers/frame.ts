@@ -73,7 +73,7 @@ const frame = createSlice({
     putSelectedFrameImage: (state, { payload }: PayloadAction<{ type: number; id: number; imgUrl: string }>) => {
       state.selectedFrame = state.selectedFrame.map((lst) => ({
         ...lst,
-        imgUrl: lst.id === payload.id && lst.type === payload.type ? payload.imgUrl : lst.imgUrl,
+        imgUrl: lst.type === payload.type && lst.id === payload.id ? payload.imgUrl : lst.imgUrl,
       }));
     },
     updatePositionByFrame: (state, { payload }: PayloadAction<{ name: string; x: number; y: number }>) => {
