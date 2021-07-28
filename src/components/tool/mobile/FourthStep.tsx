@@ -88,15 +88,15 @@ const FourthStep = () => {
     return [
       {
         id: 1,
-        title: '옆면을 확장해 주세요',
-        subTitle: '선택 시 이미지가 옆면까지 확장됩니다.',
+        title: '기본으로 해주세요.',
+        subTitle: '흰색 옆면이 적용됩니다.',
         exampleImg: Images.sample1,
         isSelected: canvasSaveList[0] ? canvasSaveList[0].scaleType === 1 : false,
       },
       {
         id: 2,
-        title: '기본으로 해주세요.',
-        subTitle: '흰색 옆면이 적용됩니다.',
+        title: '옆면을 확장해 주세요',
+        subTitle: '선택 시 이미지가 옆면까지 확장됩니다.',
         exampleImg: Images.sample1,
         isSelected: canvasSaveList[0] ? canvasSaveList[0].scaleType === 2 : false,
       },

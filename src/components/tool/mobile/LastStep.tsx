@@ -40,6 +40,7 @@ const SliderItem = styled.div`
     object-fit: contain;
     max-width: 100%;
     max-height: 100%;
+    filter: ${({ theme }) => theme.canvasShadowFilter};
   }
 `;
 
@@ -62,9 +63,9 @@ const LastStep = () => {
   const [form] = useForm();
 
   const dispatch = useAppDispatch();
-  const { canvasSaveList } = useAppSelector((state) => state.canvas);
+  const { canvasSaveList, canvasOrder } = useAppSelector((state) => state.canvas);
   const { selectedFrame } = useAppSelector((state) => state.frame);
-  const [orderForm, setOrderForm] = useState<CanvasOrder>({ username: '', phone: '', orderRoute: '1' });
+  const [orderForm, setOrderForm] = useState<CanvasOrder>({ username: '', phone: '', orderRoute: 1 });
   const [canvasUrl, setCanvasUrl] = useState('');
 
   const handleFormChange = useCallback((e) => {
@@ -98,6 +99,7 @@ const LastStep = () => {
 
           {/* </AntdCarousel> */}
         </PreivewCanvas>
+        <Divider />
         <CanvasSaleInfo>
           <div>
             <span>{selectedFrame[0].name}</span>
@@ -106,6 +108,7 @@ const LastStep = () => {
             </span>
           </div>
           <div>{selectedFrame[0].price.toLocaleString()}원</div>
+          <div>{canvasOrder.scaleType === 1 ? `옆면 확장` : '기본 옆면'}</div>
         </CanvasSaleInfo>
 
         <Divider />

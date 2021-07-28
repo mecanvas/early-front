@@ -4,8 +4,9 @@ import { postCanvasForSave } from '../api/canvas';
 export interface CanvasOrder {
   username: string;
   phone: string;
-  orderRoute: '1' | '2' | '3';
-  type?: '1' | '2';
+  orderRoute: 1 | 2 | 3;
+  type?: 1 | 2;
+  scaleType?: 1 | 2; // 1 = 기본 , 2 = 확장
 }
 
 interface CanvasState {
@@ -18,7 +19,7 @@ interface CanvasState {
     name: string;
     saveCanvas: HTMLCanvasElement;
     previewCanvas: HTMLCanvasElement;
-    scaleType?: number;
+    scaleType?: 1 | 2;
   }[];
   canvasOrder: CanvasOrder;
 }
@@ -30,7 +31,7 @@ const initialState: CanvasState = {
 
   type: null,
   canvasSaveList: [],
-  canvasOrder: { username: '', phone: '', orderRoute: '1', type: '1' },
+  canvasOrder: { username: '', phone: '', orderRoute: 1, type: 1, scaleType: 1 },
 };
 
 const canvas = createSlice({
@@ -56,8 +57,9 @@ const canvas = createSlice({
         previewCanvas: payload.previewCanvas,
       });
     },
-    setCanvasSaveScale: (state, { payload }: PayloadAction<{ scaleType: number }>) => {
+    setCanvasSaveScale: (state, { payload }: PayloadAction<{ scaleType: 1 | 2 }>) => {
       state.canvasSaveList = [{ ...state.canvasSaveList[0], scaleType: payload.scaleType }];
+      state.canvasOrder.scaleType = payload.scaleType;
     },
     resetCanvasState: (state) => {
       state.isCanvasSaveDone = false;

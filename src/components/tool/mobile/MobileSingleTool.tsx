@@ -207,11 +207,12 @@ const MobileSingleTool = () => {
     const fd = new FormData();
     fd.append('username', order.username);
     fd.append('phone', order.phone);
-    fd.append('orderRoute', order.orderRoute);
-    fd.append('type', order.type as string); // 1 = 캔버스 2 = 포스터
+    fd.append('orderRoute', order.orderRoute.toString());
+    fd.append('type', order.type?.toString() || '1'); // 1 = 캔버스 2 = 포스터
     fd.append('image', file);
     fd.append('paperNames', frame.name);
     fd.append('originImgUrl', frame.imgUrl);
+    fd.append('scaleType', order.scaleType?.toString() || '1'); // 1 = 기본, 2 = 확장
 
     await dispatch(postCanvasForSave(fd));
   }, [canvasOrder, canvasSaveList, dispatch, selectedFrame]);
