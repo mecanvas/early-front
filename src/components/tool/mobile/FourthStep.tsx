@@ -2,9 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import { Images } from 'public';
 import { css } from '@emotion/react';
-import { CheckCircleFilled, CheckSquareTwoTone } from '@ant-design/icons';
 import { icons } from 'public/icons';
-import image from 'src/store/reducers/image';
 import { useAppDispatch } from 'src/hooks/useRedux';
 import { setCanvasSaveScale } from 'src/store/reducers/canvas';
 
@@ -92,7 +90,7 @@ const FourthStep = () => {
         title: '옆면을 확장해 주세요',
         subTitle: '선택 시 이미지가 옆면까지 확장됩니다.',
         exampleImg: Images.sample1,
-        isSelected: true,
+        isSelected: false,
       },
       {
         id: 2,
@@ -109,7 +107,7 @@ const FourthStep = () => {
     (e) => {
       const { scale } = e.currentTarget.dataset;
       if (!scale) return;
-      setSelectBox(selectBox.map((lst) => ({ ...lst, isSelected: !lst.isSelected })));
+      setSelectBox(selectBox.map((lst) => ({ ...lst, isSelected: lst.id === +scale ? true : false })));
       dispatch(setCanvasSaveScale({ scaleType: +scale }));
     },
     [dispatch, selectBox],
