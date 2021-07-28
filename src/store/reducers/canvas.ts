@@ -1,5 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+export interface CanvasOrder {
+  username: string;
+  phone: string;
+  orderRoute: '1' | '2' | '3';
+  type?: '1' | '2';
+  originImgUrl?: string;
+  paperNames?: string;
+}
+
 interface CanvasState {
   type: 'single' | 'divided' | null;
   canvasSaveList: {
@@ -8,17 +17,22 @@ interface CanvasState {
     previewCanvas: HTMLCanvasElement;
     scaleType?: number;
   }[];
+  canvasOrder: CanvasOrder;
 }
 
 const initialState: CanvasState = {
   type: null,
   canvasSaveList: [],
+  canvasOrder: { username: '', phone: '', orderRoute: '1', type: '1', originImgUrl: '', paperNames: '' },
 };
 
 const canvas = createSlice({
   name: 'canvas',
   initialState,
   reducers: {
+    setCanvasOrder: (state, { payload }: PayloadAction<CanvasOrder>) => {
+      state.canvasOrder = { ...state.canvasOrder, ...payload };
+    },
     setCanvasSaveList: (state, { payload }: PayloadAction<{ name: string; saveCanvas: any; previewCanvas: any }>) => {
       if (state.canvasSaveList.find((lst) => lst.name === payload.name)) {
         state.canvasSaveList = state.canvasSaveList.map((lst) => ({
@@ -41,6 +55,6 @@ const canvas = createSlice({
   },
 });
 
-export const { setCanvasSaveList, setCanvasSaveScale } = canvas.actions;
+export const { setCanvasSaveList, setCanvasSaveScale, setCanvasOrder } = canvas.actions;
 
 export default canvas.reducer;

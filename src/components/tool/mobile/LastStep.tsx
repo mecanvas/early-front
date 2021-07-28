@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { Input, Form, Select, Divider } from 'antd';
-import { useAppSelector } from 'src/hooks/useRedux';
-import { useCarousel } from 'src/hooks/useCarousel';
-import { Images } from 'public';
+import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import Img from 'src/components/common/Img';
-import { cmToPx } from 'src/utils/cmToPx';
+import { useForm } from 'antd/lib/form/Form';
+import { CanvasOrder, setCanvasOrder } from 'src/store/reducers/canvas';
 
 const Container = styled.div`
   margin: 1em 0;
   padding: 1em;
+
+  h5 {
+    margin-bottom: 2em;
+  }
 `;
 
 const SaveForm = styled(Form)`
@@ -22,10 +25,6 @@ const SaveForm = styled(Form)`
 const PreivewCanvas = styled.div`
   position: relative;
   width: 100%;
-
-  canvas {
-    filter: ${({ theme }) => theme.canvasShadowFilter};
-  }
 `;
 
 const SliderItem = styled.div`
@@ -45,19 +44,33 @@ const SliderItem = styled.div`
 `;
 
 const CanvasSaleInfo = styled.div`
+  text-align: center;
+  div {
+    color: ${({ theme }) => theme.color.gray600};
+  }
   span {
     line-height: 20px;
     font-size: 15px;
-    margin-right: 0.3em;
+
+    &:nth-of-type(1) {
+      margin-right: 0.5em;
+    }
   }
 `;
 
 const LastStep = () => {
+  const [form] = useForm();
+
+  const dispatch = useAppDispatch();
   const { canvasSaveList } = useAppSelector((state) => state.canvas);
   const { selectedFrame } = useAppSelector((state) => state.frame);
-
+  const [orderForm, setOrderForm] = useState<CanvasOrder>({ username: '', phone: '', orderRoute: '1' });
   const [canvasUrl, setCanvasUrl] = useState('');
-  const { AntdCarousel } = useCarousel();
+
+  const handleFormChange = useCallback((e) => {
+    const { name, value } = e[0];
+    setOrderForm((prev) => ({ ...prev, [name[0]]: value }));
+  }, []);
 
   useEffect(() => {
     const canvas = canvasSaveList[0].saveCanvas;
@@ -67,28 +80,27 @@ const LastStep = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    dispatch(setCanvasOrder(orderForm));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderForm]);
+
   return (
     <Container>
-      <a download="ekdns.png" href={canvasUrl}>
-        샘플다운
-      </a>
-      <SaveForm>
+      <SaveForm form={form} name="form" onFieldsChange={handleFormChange}>
         <PreivewCanvas>
-          <AntdCarousel startIndex={0} lastIndex={1}>
-            <div>
-              <SliderItem>
-                <Img src={canvasUrl} alt="액자사진" />
-              </SliderItem>
-            </div>
-            <div>
-              <SliderItem>
-                <Img src={Images.div} alt="액자사진" />
-              </SliderItem>
-            </div>
-          </AntdCarousel>
+          {/* <AntdCarousel startIndex={0} lastIndex={1}> */}
+          <div>
+            <SliderItem>
+              <Img src={canvasUrl} alt="액자사진" width={300} height={350} />
+            </SliderItem>
+          </div>
+
+          {/* </AntdCarousel> */}
         </PreivewCanvas>
         <CanvasSaleInfo>
           <div>
+            <span>{selectedFrame[0].name}</span>
             <span>
               {selectedFrame[0].widthCm}cm x {selectedFrame[0].heightCm}cm
             </span>
@@ -98,14 +110,53 @@ const LastStep = () => {
 
         <Divider />
 
-        <Form.Item labelAlign="left" labelCol={{ span: 2 }} wrapperCol={{ span: 18 }} label="이름">
-          <Input />
+        <h5>주문을 위해 정보를 입력해 주세요.</h5>
+        <Form.Item
+          style={{ paddingBottom: '1em' }}
+          initialValue={orderForm.username}
+          name="username"
+          labelAlign="left"
+          labelCol={{ span: 2 }}
+          wrapperCol={{ span: 18 }}
+          label="이름"
+          rules={[
+            {
+              required: true,
+              message: '성함을 입력해 주세요!',
+            },
+          ]}
+        >
+          <Input placeholder="성함을 입력해 주세요." />
         </Form.Item>
-        <Form.Item labelAlign="left" labelCol={{ span: 2 }} wrapperCol={{ span: 18 }} label="연락처">
-          <Input />
+        <Form.Item
+          style={{ paddingBottom: '1em' }}
+          initialValue={orderForm.phone}
+          name="phone"
+          labelAlign="left"
+          labelCol={{ span: 2 }}
+          wrapperCol={{ span: 18 }}
+          label="연락처"
+          rules={[
+            {
+              required: true,
+              pattern: /(^02.{0}|^01.{1})([0-9]{3})([0-9]+)([0-9]{4})/g,
+              message: '-가 없는 올바른 번호를 입력하세요.',
+            },
+          ]}
+        >
+          <Input placeholder="-없이 입력해 주세요." />
         </Form.Item>
-        <Form.Item labelAlign="left" labelCol={{ span: 2 }} wrapperCol={{ span: 18 }} label="주문 경로">
-          <Select placeholder="주문 경로를 선택해 주세요." defaultValue={'1'}>
+        <Form.Item
+          style={{ paddingBottom: '1em' }}
+          initialValue={orderForm.orderRoute}
+          name="orderRoute"
+          labelAlign="left"
+          labelCol={{ span: 2 }}
+          wrapperCol={{ span: 18 }}
+          label="주문 경로"
+          rules={[{ required: true, message: '주문 경로를 선택해 주세요.' }]}
+        >
+          <Select defaultValue={'1'} placeholder="주문하시는 경로를 선택해 주세요.">
             <Select.Option value="1" label="네이버">
               네이버
             </Select.Option>

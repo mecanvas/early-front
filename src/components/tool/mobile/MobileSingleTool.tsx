@@ -152,7 +152,7 @@ const MobileSingleTool = () => {
   const LAST_INDEX = 4;
   const [stepCount, setStepCount] = useState(0);
   const { selectedFrame } = useAppSelector((state) => state.frame);
-  const { canvasSaveList } = useAppSelector((state) => state.canvas);
+  const { canvasSaveList, canvasOrder } = useAppSelector((state) => state.canvas);
 
   const nextCondition = useMemo(() => {
     const condition = new Map();
@@ -254,7 +254,16 @@ const MobileSingleTool = () => {
           )}
 
           {LAST_INDEX === stepCount && (
-            <MobileNextStepButton type="primary" onClick={handleFinished}>
+            <MobileNextStepButton
+              type="primary"
+              onClick={handleFinished}
+              disabled={
+                !canvasOrder.username ||
+                !canvasOrder.phone.match(/(^02.{0}|^01.{1})([0-9]{3})([0-9]+)([0-9]{4})/g) ||
+                !canvasOrder.orderRoute ||
+                false
+              }
+            >
               저장하기
             </MobileNextStepButton>
           )}

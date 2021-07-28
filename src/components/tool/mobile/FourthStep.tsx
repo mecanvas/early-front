@@ -43,7 +43,7 @@ const SelectBox = styled.div<{ selected: boolean }>`
     margin: 0;
   }
   &:hover {
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.19), 0 1px 1px rgba(0, 0, 0, 0.23);
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   }
   border: 1px solid ${({ theme }) => theme.color.gray200};
   text-align: center;
