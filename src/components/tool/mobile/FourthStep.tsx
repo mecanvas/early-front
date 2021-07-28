@@ -23,6 +23,9 @@ const SelectWrapper = styled.div`
 
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     flex-direction: column;
+    div + div {
+      margin-left: 0em;
+    }
   }
 `;
 
@@ -109,7 +112,7 @@ const FourthStep = () => {
       const { scale } = e.currentTarget.dataset;
       if (!scale) return;
       setSelectBox(selectBox.map((lst) => ({ ...lst, isSelected: lst.id === +scale ? true : false })));
-      dispatch(setCanvasSaveScale({ scaleType: +scale }));
+      dispatch(setCanvasSaveScale({ scaleType: +scale as 1 | 2 }));
     },
     [dispatch, selectBox],
   );
