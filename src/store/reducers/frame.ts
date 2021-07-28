@@ -35,8 +35,8 @@ const frame = createSlice({
   name: 'frame',
   initialState,
   reducers: {
-    getSelectedFrame: (state) => {
-      state.selectedFrame;
+    resetFrameState: (state) => {
+      state.selectedFrame = [];
     },
     rotateSelectedFrameList: (state, { payload }: PayloadAction<{ type: number; id: number }>) => {
       state.frameInfoList = state.frameInfoList.map((lst) => ({
@@ -91,7 +91,7 @@ const frame = createSlice({
 });
 
 export const {
-  getSelectedFrame,
+  resetFrameState,
   selectedFrame,
   rotateSelectedFrameList,
   deleteSelectedFrame,

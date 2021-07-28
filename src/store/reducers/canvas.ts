@@ -1,15 +1,18 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { postCanvasForSave } from '../api/canvas';
 
 export interface CanvasOrder {
   username: string;
   phone: string;
   orderRoute: '1' | '2' | '3';
   type?: '1' | '2';
-  originImgUrl?: string;
-  paperNames?: string;
 }
 
 interface CanvasState {
+  isCanvasSaveLoad: boolean;
+  isCanvasSaveDone: boolean;
+  isCanvasSaveError: any | null;
+
   type: 'single' | 'divided' | null;
   canvasSaveList: {
     name: string;
@@ -21,9 +24,13 @@ interface CanvasState {
 }
 
 const initialState: CanvasState = {
+  isCanvasSaveLoad: false,
+  isCanvasSaveDone: false,
+  isCanvasSaveError: null,
+
   type: null,
   canvasSaveList: [],
-  canvasOrder: { username: '', phone: '', orderRoute: '1', type: '1', originImgUrl: '', paperNames: '' },
+  canvasOrder: { username: '', phone: '', orderRoute: '1', type: '1' },
 };
 
 const canvas = createSlice({
@@ -52,9 +59,32 @@ const canvas = createSlice({
     setCanvasSaveScale: (state, { payload }: PayloadAction<{ scaleType: number }>) => {
       state.canvasSaveList = [{ ...state.canvasSaveList[0], scaleType: payload.scaleType }];
     },
+    resetCanvasState: (state) => {
+      state.isCanvasSaveDone = false;
+      state.isCanvasSaveLoad = false;
+      state.isCanvasSaveError = null;
+      state.canvasSaveList = [];
+      state.canvasOrder = initialState.canvasOrder;
+    },
   },
+  extraReducers: (builder) =>
+    builder
+      // uploadImage
+      .addCase(postCanvasForSave.pending, (state) => {
+        state.isCanvasSaveLoad = true;
+        state.isCanvasSaveDone = false;
+        state.isCanvasSaveError = null;
+      })
+      .addCase(postCanvasForSave.fulfilled, (state) => {
+        state.isCanvasSaveLoad = false;
+        state.isCanvasSaveDone = true;
+      })
+      .addCase(postCanvasForSave.rejected, (state, { payload }) => {
+        state.isCanvasSaveLoad = false;
+        state.isCanvasSaveError = payload;
+      }),
 });
 
-export const { setCanvasSaveList, setCanvasSaveScale, setCanvasOrder } = canvas.actions;
+export const { setCanvasSaveList, setCanvasSaveScale, setCanvasOrder, resetCanvasState } = canvas.actions;
 
 export default canvas.reducer;

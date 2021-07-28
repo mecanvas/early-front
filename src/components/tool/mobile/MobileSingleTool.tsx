@@ -2,8 +2,12 @@ import styled from '@emotion/styled';
 import { Button, Steps } from 'antd';
 import router from 'next/router';
 import { icons } from 'public/icons';
-import React, { useCallback, useMemo, useState } from 'react';
-import { useAppSelector } from 'src/hooks/useRedux';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
+import { postCanvasForSave } from 'src/store/api/canvas';
+import { resetCanvasState } from 'src/store/reducers/canvas';
+import { resetFrameState } from 'src/store/reducers/frame';
+import { dataURLtoFile } from 'src/utils/dataUrlToFile';
 import FirstStep from './FirstStep';
 import FourthStep from './FourthStep';
 import LastStep from './LastStep';
@@ -150,9 +154,11 @@ const MobilePrevStepButton = styled(Button)`
 const MobileSingleTool = () => {
   const FIRST_INDEX = 0;
   const LAST_INDEX = 4;
+
+  const dispatch = useAppDispatch();
   const [stepCount, setStepCount] = useState(0);
   const { selectedFrame } = useAppSelector((state) => state.frame);
-  const { canvasSaveList, canvasOrder } = useAppSelector((state) => state.canvas);
+  const { canvasSaveList, canvasOrder, isCanvasSaveDone } = useAppSelector((state) => state.canvas);
 
   const nextCondition = useMemo(() => {
     const condition = new Map();
@@ -176,6 +182,40 @@ const MobileSingleTool = () => {
     return title;
   }, [nextCondition, selectedFrame]);
 
+  const saveCanvas = useCallback(async () => {
+    const frame = selectedFrame[0];
+    const canvas = canvasSaveList[0].saveCanvas;
+    const order = canvasOrder;
+
+    if (!frame.imgUrl) {
+      alert('이미지가 정상적으로 저장되지 않았습니다. 사진을 변경해 주세요.');
+      return;
+    }
+
+    const dataUrl = canvas.toDataURL('image/png', 1.0);
+
+    const file = dataURLtoFile(
+      dataUrl,
+      `${new Date().toLocaleDateString()}_${order.username}_${frame.name}_${frame.widthCm}px_${frame.heightCm}.png`,
+    );
+
+    if (!file) {
+      alert('이미지가 정상적으로 저장되지 않았습니다. 사진을 변경해 주세요.');
+      return;
+    }
+
+    const fd = new FormData();
+    fd.append('username', order.username);
+    fd.append('phone', order.phone);
+    fd.append('orderRoute', order.orderRoute);
+    fd.append('type', order.type as string); // 1 = 캔버스 2 = 포스터
+    fd.append('image', file);
+    fd.append('paperNames', frame.name);
+    fd.append('originImgUrl', frame.imgUrl);
+
+    await dispatch(postCanvasForSave(fd));
+  }, [canvasOrder, canvasSaveList, dispatch, selectedFrame]);
+
   const handleNextStep = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setStepCount((prev) => prev + 1);
@@ -187,7 +227,21 @@ const MobileSingleTool = () => {
   }, []);
 
   const handleFinished = useCallback(() => {
-    router.push('/success');
+    saveCanvas();
+  }, [saveCanvas]);
+
+  useEffect(() => {
+    if (isCanvasSaveDone) {
+      router.push('/success');
+    }
+  }, [isCanvasSaveDone]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetCanvasState());
+      dispatch(resetFrameState());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
