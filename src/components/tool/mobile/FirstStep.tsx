@@ -3,7 +3,6 @@ import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useOpacity } from 'src/hooks/useOpacity';
 import { useAppSelector } from 'src/hooks/useRedux';
 import FirstFrameListByTab from './first/FirstFrameListByTab';
-import FirstSelectedList from './first/FirstSelectedList';
 import { TabTitle, FirstGuideText } from './first/FirstStyle';
 
 const FirstStep = () => {

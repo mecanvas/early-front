@@ -279,6 +279,9 @@ const ThirdStep = () => {
       img.crossOrigin = 'Anonymous';
       img.onload = () => {
         if (!sCtx || !pCtx) return;
+        if (typeof selectedInfo.x !== 'number' || typeof selectedInfo.y !== 'number') {
+          return;
+        }
         const { naturalWidth, naturalHeight } = img;
         const [imgW, imgH] = getOriginRatio(naturalWidth, naturalHeight, IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT);
 
@@ -306,7 +309,7 @@ const ThirdStep = () => {
         const scaleX = naturalWidth / imgW;
         const scaleY = naturalHeight / imgH;
 
-        const crop = { x: selectedInfo.x || 0, y: selectedInfo.y || 0 };
+        const crop = { x: selectedInfo.x, y: selectedInfo.y };
         saveCanvas.width = w * scaleX;
         saveCanvas.height = h * scaleY;
 
@@ -349,6 +352,9 @@ const ThirdStep = () => {
 
   const createCropperCanvas = useCallback(
     (canvas: HTMLCanvasElement, img: HTMLImageElement, preview?: boolean) => {
+      if (typeof selectedInfo.x !== 'number' || typeof selectedInfo.y !== 'number') {
+        return;
+      }
       const ctx = canvas.getContext('2d');
       const imgCanvas = imgCanvasRef.current;
       const cropperWrapper = cropperWrapperRef.current;
@@ -386,9 +392,9 @@ const ThirdStep = () => {
       setCanvasWidth(canvasWidth ? canvasWidth : w);
       setCanvasHeight(canvasHeight ? canvasHeight : h);
       // const crop = cropperList.filter((lst) => lst.name === selectFrameName)[0];
-      const crop = { x: selectedInfo.x || 0, y: selectedInfo.y || 0 };
-      cropperWrapper.style.top = `${crop?.y}px`;
-      cropperWrapper.style.left = `${crop?.x}px`;
+      const crop = { x: selectedInfo.x, y: selectedInfo.y };
+      cropperWrapper.style.top = `${crop.y}px`;
+      cropperWrapper.style.left = `${crop.x}px`;
 
       canvas.width = canvasWidth || w;
       canvas.height = canvasHeight || h;
@@ -397,7 +403,7 @@ const ThirdStep = () => {
 
       ctx.clearRect(0, 0, imgW, imgH);
       ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(img, crop?.x * scaleX, crop?.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
+      ctx.drawImage(img, crop.x * scaleX, crop.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
 
       // 프리뷰 드로잉
       if (preview) {
@@ -411,7 +417,7 @@ const ThirdStep = () => {
           if (!pCtx) return;
           pCtx.clearRect(0, 0, imgW, imgH);
           pCtx.imageSmoothingQuality = 'high';
-          pCtx.drawImage(img, crop?.x * scaleX, crop?.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
+          pCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
 
           pCtx.globalCompositeOperation = 'destination-over';
           pCtx.fillStyle = bgColor;
@@ -557,11 +563,12 @@ const ThirdStep = () => {
 
         const positionLeft = positionX >= 0 ? (positionX >= cropX * 2 ? cropX * 2 : positionX) : 0;
         const positionTop = positionY >= 0 ? (positionY >= cropY * 2 ? cropY * 2 : positionY) : 0;
+
         const cropper = cropperList[0];
 
         if (cropper) {
-          const { x, y, name } = cropper;
-          dispatch(updatePositionByFrame({ name, x, y }));
+          const { name } = cropper;
+          dispatch(updatePositionByFrame({ name, x: positionLeft, y: positionTop }));
         }
         setCropperList((prev) => {
           const isExist = prev.find((lst) => lst.name === selectFrameName);

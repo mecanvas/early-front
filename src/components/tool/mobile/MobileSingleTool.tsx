@@ -175,12 +175,12 @@ const MobileSingleTool = () => {
   const stepTitle = useMemo(() => {
     const title = new Map();
     title.set(0, '액자 선택');
-    title.set(1, `${selectedFrame[0] ? `${selectedFrame[0].name}로 진행` : '액자를 선택해 주세요'}`);
-    title.set(2, `${nextCondition.get(1) ? '시안 제작' : '이미지를 첨부하세요'}`);
+    title.set(1, '이미지 첨부');
+    title.set(2, `시안 제작`);
     title.set(3, '옆면 선택');
     title.set(4, '저장');
     return title;
-  }, [nextCondition, selectedFrame]);
+  }, []);
 
   const saveCanvas = useCallback(async () => {
     const frame = selectedFrame[0];
