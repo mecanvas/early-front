@@ -44,7 +44,7 @@ const FirstStep = () => {
         </OpacityComponent>
         <FirstFrameListByTab frameList={recommandList} />
         <Divider />
-        <FirstSelectedList />
+        {/* <FirstSelectedList /> */}
       </Tabs.TabPane>
 
       <Tabs.TabPane key="1" tab={<TabTitle>정사각형</TabTitle>}>
@@ -53,7 +53,7 @@ const FirstStep = () => {
         </OpacityComponent>
         <FirstFrameListByTab frameList={squareList} />
         <Divider />
-        <FirstSelectedList />
+        {/* <FirstSelectedList /> */}
       </Tabs.TabPane>
 
       <Tabs.TabPane key="2" tab={<TabTitle>직사각형</TabTitle>}>
@@ -62,7 +62,7 @@ const FirstStep = () => {
         </OpacityComponent>
         <FirstFrameListByTab frameList={rectangleList} />
         <Divider />
-        <FirstSelectedList />
+        {/* <FirstSelectedList /> */}
       </Tabs.TabPane>
     </Tabs>
   );

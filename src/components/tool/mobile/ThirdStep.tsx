@@ -638,11 +638,7 @@ const ThirdStep = () => {
           ))}
         </ThirdItemList>
       ) : (
-        <>
-          <Divider />
-          <br />
-          <br />
-        </>
+        <></>
       )}
       <ThirdContent>
         <ThirdContentDrawingCanvas

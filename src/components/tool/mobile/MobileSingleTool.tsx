@@ -4,14 +4,17 @@ import router from 'next/router';
 import { icons } from 'public/icons';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useAppSelector } from 'src/hooks/useRedux';
-import ToolSave from '../ToolSave';
 import FirstStep from './FirstStep';
 import FourthStep from './FourthStep';
+import LastStep from './LastStep';
 import SecondsStep from './SecondsStep';
 import ThirdStep from './ThirdStep';
 const { Step } = Steps;
 
-const Container = styled.div``;
+const Container = styled.div`
+  min-height: 100vh;
+  background-color: ${({ theme }) => theme.color.gray000};
+`;
 
 const MobileSingleToolHeader = styled.div`
   cursor: pointer;
@@ -19,7 +22,8 @@ const MobileSingleToolHeader = styled.div`
   display: flex;
   align-items: center;
   padding: 0 2em;
-  border-bottom: 1px solid ${({ theme }) => theme.color.gray200};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray100};
+  background-color: ${({ theme }) => theme.color.white};
 
   nav {
     max-width: 1200px;
@@ -60,6 +64,7 @@ const MobileSingleToolContainer = styled.div`
   max-width: 1000px;
   margin: 0 auto;
   padding: 2em 1em;
+  background-color: ${({ theme }) => theme.color.white};
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     max-width: ${({ theme }) => theme.size.sm};
     padding: 1em;
@@ -68,6 +73,12 @@ const MobileSingleToolContainer = styled.div`
     justify-content: center;
     align-items: center;
   }
+`;
+
+const MobileStepsWrapper = styled.div`
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2em 1em;
 `;
 
 const MobileSteps = styled(Steps)`
@@ -97,7 +108,7 @@ const MobileStepButtonWrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  margin-top: 2em;
+  padding-bottom: 1em;
   div {
     display: flex;
     align-items: center;
@@ -136,8 +147,6 @@ const MobilePrevStepButton = styled(Button)`
   }
 `;
 
-const LastContent = styled.div``;
-
 const MobileSingleTool = () => {
   const FIRST_INDEX = 0;
   const LAST_INDEX = 4;
@@ -159,13 +168,13 @@ const MobileSingleTool = () => {
 
   const stepTitle = useMemo(() => {
     const title = new Map();
-    title.set(0, '액자');
-    title.set(1, '이미지');
-    title.set(2, '제작');
-    title.set(3, '옆면');
+    title.set(0, '액자 선택');
+    title.set(1, `${selectedFrame[0] ? `${selectedFrame[0].name}로 진행` : '액자를 선택해 주세요'}`);
+    title.set(2, `${nextCondition.get(1) ? '시안 제작' : '이미지를 첨부하세요'}`);
+    title.set(3, '옆면 선택');
     title.set(4, '저장');
     return title;
-  }, []);
+  }, [nextCondition, selectedFrame]);
 
   const handleNextStep = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -189,7 +198,7 @@ const MobileSingleTool = () => {
           <img src={icons.home} />
         </nav>
       </MobileSingleToolHeader>
-      <MobileSingleToolContainer>
+      <MobileStepsWrapper>
         <MobileSteps size="small" labelPlacement="vertical" responsive current={stepCount}>
           <Step title={stepTitle.get(0)} />
           <Step title={stepTitle.get(1)} />
@@ -197,6 +206,8 @@ const MobileSingleTool = () => {
           <Step title={stepTitle.get(3)} />
           <Step title={stepTitle.get(4)} />
         </MobileSteps>
+      </MobileStepsWrapper>
+      <MobileSingleToolContainer>
         {/* step1 액자 선택 */}
         {stepCount === 0 && (
           <MobileContent>
@@ -225,9 +236,7 @@ const MobileSingleTool = () => {
         {/* step5 저장 */}
         {stepCount === 4 && (
           <MobileContent>
-            <LastContent>
-              <ToolSave />
-            </LastContent>
+            <LastStep />
           </MobileContent>
         )}
 
