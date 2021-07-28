@@ -1,6 +1,5 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Divider } from 'antd';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
@@ -268,16 +267,18 @@ const ThirdStep = () => {
     { name: selectedInfo.name, x: 0, y: 0 },
   ]);
 
-  const createInitialCanvas = useCallback(() => {
+  const createSaveCanvas = useCallback(() => {
     selectedFrame.forEach((info: SelectedFrame) => {
+      const saveCanvas = document.createElement('canvas');
       const previewCanvas = document.createElement('canvas');
+      const sCtx = saveCanvas.getContext('2d');
       const pCtx = previewCanvas.getContext('2d');
 
       const img = new Image();
       img.src = info.imgUrl || '';
       img.crossOrigin = 'Anonymous';
       img.onload = () => {
-        if (!pCtx) return;
+        if (!sCtx || !pCtx) return;
         const { naturalWidth, naturalHeight } = img;
         const [imgW, imgH] = getOriginRatio(naturalWidth, naturalHeight, IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT);
 
@@ -285,9 +286,6 @@ const ThirdStep = () => {
 
         let w = 0;
         let h = 0;
-
-        const scaleX = naturalWidth / imgW;
-        const scaleY = naturalHeight / imgH;
 
         if (isSquare) {
           // 정사각형이면 이미지 너비에 따라 정사각형
@@ -305,11 +303,34 @@ const ThirdStep = () => {
           w = ratioW;
           h = ratioH;
         }
+        const scaleX = naturalWidth / imgW;
+        const scaleY = naturalHeight / imgH;
+
         const crop = { x: selectedInfo.x || 0, y: selectedInfo.y || 0 };
-        console.log(crop);
+        saveCanvas.width = w * scaleX;
+        saveCanvas.height = h * scaleY;
+
         previewCanvas.width = w;
         previewCanvas.height = h;
 
+        sCtx.clearRect(0, 0, imgW, imgH);
+        sCtx.imageSmoothingQuality = 'high';
+        sCtx.drawImage(
+          img,
+          crop.x * scaleX,
+          crop.y * scaleY,
+          imgW * scaleX,
+          imgH * scaleY,
+          0,
+          0,
+          imgW * scaleX,
+          imgH * scaleY,
+        );
+        sCtx.globalCompositeOperation = 'destination-over';
+        sCtx.fillStyle = bgColor;
+        sCtx.fillRect(0, 0, imgW * scaleX, imgH * scaleY);
+
+        // 프리뷰
         pCtx.clearRect(0, 0, imgW, imgH);
         pCtx.imageSmoothingQuality = 'high';
         pCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
@@ -317,7 +338,7 @@ const ThirdStep = () => {
         pCtx.fillStyle = bgColor;
         pCtx.fillRect(0, 0, imgW, imgH);
 
-        dispatch(setCanvasSaveList({ name: info.name, canvas: previewCanvas }));
+        dispatch(setCanvasSaveList({ name: info.name, saveCanvas, previewCanvas }));
         setCropperList((prev) => {
           return [...prev, { name: info.name, x: crop.x, y: crop.y }];
         });
@@ -395,7 +416,7 @@ const ThirdStep = () => {
           pCtx.globalCompositeOperation = 'destination-over';
           pCtx.fillStyle = bgColor;
           pCtx.fillRect(0, 0, imgW, imgH);
-          dispatch(setCanvasSaveList({ name: selectFrameName, canvas: previewCanvas }));
+
           setCropperList((prev) => {
             const isExist = prev.find((lst) => lst.name === selectFrameName);
             if (isExist) {
@@ -411,7 +432,6 @@ const ThirdStep = () => {
       bgColor,
       canvasHeight,
       canvasWidth,
-      dispatch,
       selectFrameName,
       selectedInfo.size.height,
       selectedInfo.size.width,
@@ -570,7 +590,8 @@ const ThirdStep = () => {
   const handleCancelMoveCropper = useCallback(() => {
     setIsMoving(false);
     setIsCalc(false);
-  }, []);
+    createSaveCanvas();
+  }, [createSaveCanvas]);
 
   useEffect(() => {
     const img: HTMLImageElement = imgElements.get(selectFrameName);
@@ -603,17 +624,14 @@ const ThirdStep = () => {
 
   // 초기 진입시 캔버스 생성
   useEffect(() => {
+    if (isInitial) return;
     if (canvasSaveList.length === selectedFrame.length) {
       setIsInitial(true);
       return;
     }
-  }, [canvasSaveList.length, selectedFrame.length]);
 
-  useEffect(() => {
-    if (isInitial) return;
-    createInitialCanvas();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInitial]);
+    createSaveCanvas();
+  }, [canvasSaveList.length, createSaveCanvas, isInitial, selectedFrame.length]);
 
   return (
     <Container

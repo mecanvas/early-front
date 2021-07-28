@@ -6,6 +6,7 @@ import ImageDropZone from 'src/components/common/ImageDropZone';
 import Loading from 'src/components/common/Loading';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { postImageUpload } from 'src/store/api/image';
+import { deletePositionByFrame } from 'src/store/reducers/frame';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 
 const SecondsContent = styled.div`
@@ -106,6 +107,7 @@ const SecondsStep = () => {
         const fd = new FormData();
         fd.append('image', file);
         dispatch(postImageUpload({ fd, type: type === '1' ? 1 : 2, id: +id }));
+        dispatch(deletePositionByFrame());
       };
     },
     [dispatch],
@@ -122,6 +124,7 @@ const SecondsStep = () => {
       const fd = new FormData();
       fd.append('image', file);
       dispatch(postImageUpload({ fd, type: type === '1' ? 1 : 2, id: +id }));
+      dispatch(deletePositionByFrame());
     },
     [dispatch],
   );

@@ -1,7 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { Input, Form, Select, Divider } from 'antd';
 import { useAppSelector } from 'src/hooks/useRedux';
+import { useCarousel } from 'src/hooks/useCarousel';
+import { Images } from 'public';
+import Img from 'src/components/common/Img';
+import { cmToPx } from 'src/utils/cmToPx';
 
 const Container = styled.div`
   margin: 1em 0;
@@ -16,27 +20,31 @@ const SaveForm = styled(Form)`
 `;
 
 const PreivewCanvas = styled.div`
-  display: flex;
-  margin-bottom: 3em;
+  position: relative;
   width: 100%;
-  /* border-radius: 8px; */
-  /* border: 1px solid ${({ theme }) => theme.color.gray100}; */
-  /* background-color: ${({ theme }) => theme.color.gray100}; */
 
   canvas {
     filter: ${({ theme }) => theme.canvasShadowFilter};
   }
 `;
 
-const CanvasSaleInfo = styled.div`
-  padding: 0 1em;
-  margin-left: 1em;
-  width: 300px;
-
-  h3 {
-    color: ${({ theme }) => theme.color.primary};
+const SliderItem = styled.div`
+  width: 70%;
+  margin: 0 auto;
+  padding: 0.6em;
+  min-height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.color.white};
+  img {
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
   }
+`;
 
+const CanvasSaleInfo = styled.div`
   span {
     line-height: 20px;
     font-size: 15px;
@@ -47,36 +55,46 @@ const CanvasSaleInfo = styled.div`
 const LastStep = () => {
   const { canvasSaveList } = useAppSelector((state) => state.canvas);
   const { selectedFrame } = useAppSelector((state) => state.frame);
-  const previewRef = useRef<HTMLDivElement>(null);
+
   const [canvasUrl, setCanvasUrl] = useState('');
+  const { AntdCarousel } = useCarousel();
 
   useEffect(() => {
-    const wrapper = previewRef.current;
-    if (wrapper) {
-      const canvas = canvasSaveList[0].canvas;
-      const url = canvas.toDataURL('image/png', 1.0);
-      setCanvasUrl(url);
-    }
+    const canvas = canvasSaveList[0].saveCanvas;
+
+    const url = canvas.toDataURL('image/png', 1.0);
+    setCanvasUrl(url);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <Container>
+      <a download="ekdns.png" href={canvasUrl}>
+        샘플다운
+      </a>
       <SaveForm>
         <PreivewCanvas>
-          <div ref={previewRef}>
-            <img src={canvasUrl} alt="액자사진" />
-          </div>
-          <CanvasSaleInfo>
-            <h3>Infomation</h3>
+          <AntdCarousel startIndex={0} lastIndex={1}>
             <div>
-              <span>
-                {selectedFrame[0].widthCm}cm x {selectedFrame[0].heightCm}cm
-              </span>
+              <SliderItem>
+                <Img src={canvasUrl} alt="액자사진" />
+              </SliderItem>
             </div>
-            <div>{selectedFrame[0].price.toLocaleString()}원</div>
-          </CanvasSaleInfo>
+            <div>
+              <SliderItem>
+                <Img src={Images.div} alt="액자사진" />
+              </SliderItem>
+            </div>
+          </AntdCarousel>
         </PreivewCanvas>
+        <CanvasSaleInfo>
+          <div>
+            <span>
+              {selectedFrame[0].widthCm}cm x {selectedFrame[0].heightCm}cm
+            </span>
+          </div>
+          <div>{selectedFrame[0].price.toLocaleString()}원</div>
+        </CanvasSaleInfo>
 
         <Divider />
 

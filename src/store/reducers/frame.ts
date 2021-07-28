@@ -84,6 +84,9 @@ const frame = createSlice({
         y: lst.name === payload.name ? payload.y : lst.y,
       }));
     },
+    deletePositionByFrame: (state) => {
+      state.selectedFrame = state.selectedFrame.map((lst) => ({ ...lst, x: 0, y: 0 }));
+    },
   },
 });
 
@@ -94,6 +97,7 @@ export const {
   deleteSelectedFrame,
   putSelectedFrameImage,
   updatePositionByFrame,
+  deletePositionByFrame,
 } = frame.actions;
 
 export default frame.reducer;

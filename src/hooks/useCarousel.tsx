@@ -5,9 +5,11 @@ import { icons } from 'public/icons';
 import React, { useCallback, useRef, useState } from 'react';
 
 const CarouselContainer = styled(Carousel)`
+  background-color: ${({ theme }) => theme.color.gray000};
   .slide-dots {
+    position: absolute;
+    bottom: -2em;
     button {
-      margin-top: 12px;
       border: 1px solid ${({ theme }) => theme.color.primary} !important;
     }
   }
