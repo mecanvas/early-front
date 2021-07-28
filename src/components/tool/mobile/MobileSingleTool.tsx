@@ -6,6 +6,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useAppSelector } from 'src/hooks/useRedux';
 import ToolSave from '../ToolSave';
 import FirstStep from './FirstStep';
+import FourthStep from './FourthStep';
 import SecondsStep from './SecondsStep';
 import ThirdStep from './ThirdStep';
 const { Step } = Steps;
@@ -216,7 +217,7 @@ const MobileSingleTool = () => {
         {/* step4  옆면 */}
         {stepCount === 3 && (
           <MobileContent>
-            <LastContent></LastContent>
+            <FourthStep />
           </MobileContent>
         )}
 

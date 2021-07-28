@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import { Divider } from 'antd';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
@@ -13,6 +14,8 @@ import { replacePx } from 'src/utils/replacePx';
 import { positioningImageResize } from 'src/utils/resize';
 
 const Container = styled.section<{ cmd: ResizeCmd | null }>`
+  padding: 1em 0;
+
   ${({ cmd }) => {
     if (!cmd) return;
     if (cmd === 'top-left' || cmd === 'bottom-right') {
@@ -608,20 +611,28 @@ const ThirdStep = () => {
       onMouseUp={handleResizeEnd}
       onMouseLeave={handleResizeEnd}
     >
-      <ThirdItemList>
-        {selectedFrame.map((lst) => (
-          <div>
-            <ThirdItem
-              type={lst.type}
-              selected={lst.name === selectFrameName}
-              onClick={handleSelected}
-              data-name={lst.name}
-            >
-              <img src={lst.imgUrl} />
-            </ThirdItem>
-          </div>
-        ))}
-      </ThirdItemList>
+      {selectedFrame.length > 1 ? (
+        <ThirdItemList>
+          {selectedFrame.map((lst) => (
+            <div>
+              <ThirdItem
+                type={lst.type}
+                selected={lst.name === selectFrameName}
+                onClick={handleSelected}
+                data-name={lst.name}
+              >
+                <img src={lst.imgUrl} />
+              </ThirdItem>
+            </div>
+          ))}
+        </ThirdItemList>
+      ) : (
+        <>
+          <Divider />
+          <br />
+          <br />
+        </>
+      )}
       <ThirdContent>
         <ThirdContentDrawingCanvas
           width={imgWidth}

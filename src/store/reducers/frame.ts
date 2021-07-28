@@ -61,11 +61,11 @@ const frame = createSlice({
       }));
     },
     selectedFrame: (state, { payload }: PayloadAction<FrameInfoList>) => {
-      if (state.selectedFrame.find((lst) => lst.name === payload.name)) {
-        state.selectedFrame = state.selectedFrame.filter((lst) => lst.name !== payload.name);
-        return;
-      }
-      state.selectedFrame.push(payload);
+      // if (state.selectedFrame.find((lst) => lst.name === payload.name)) {
+      //   state.selectedFrame = state.selectedFrame.filter((lst) => lst.name !== payload.name);
+      //   return;
+      // }
+      state.selectedFrame = [payload];
     },
     deleteSelectedFrame: (state, { payload }: PayloadAction<string>) => {
       state.selectedFrame = state.selectedFrame.filter((lst) => lst.name !== payload);
