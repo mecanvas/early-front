@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface CanvasState {
   type: 'single' | 'divided' | null;
-  canvasSaveList: { name: string; canvas: HTMLCanvasElement }[];
+  canvasSaveList: { name: string; canvas: HTMLCanvasElement; scaleType?: number }[];
 }
 
 const initialState: CanvasState = {
@@ -34,9 +34,12 @@ const canvas = createSlice({
       }
       state.canvasSaveList.push({ name: payload.name, canvas: payload.canvas });
     },
+    setCanvasSaveScale: (state, { payload }: PayloadAction<{ scaleType: number }>) => {
+      state.canvasSaveList = [{ ...state.canvasSaveList[0], scaleType: payload.scaleType }];
+    },
   },
 });
 
-export const { setToolType, getToolType, resetToolType, setCanvasSaveList } = canvas.actions;
+export const { setToolType, getToolType, resetToolType, setCanvasSaveList, setCanvasSaveScale } = canvas.actions;
 
 export default canvas.reducer;

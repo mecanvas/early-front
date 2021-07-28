@@ -305,14 +305,17 @@ const ThirdStep = () => {
           w = ratioW;
           h = ratioH;
         }
+
         previewCanvas.width = w;
         previewCanvas.height = h;
+
         pCtx.clearRect(0, 0, imgW, imgH);
         pCtx.imageSmoothingQuality = 'high';
         pCtx.drawImage(img, 0 * scaleX, 0 * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
         pCtx.globalCompositeOperation = 'destination-over';
         pCtx.fillStyle = bgColor;
         pCtx.fillRect(0, 0, imgW, imgH);
+
         dispatch(setCanvasSaveList({ name: info.name, canvas: previewCanvas }));
         setCropperList((prev) => {
           return [...prev, { name: info.name, x: 0, y: 0 }];
@@ -377,8 +380,10 @@ const ThirdStep = () => {
         const previewCanvas = previewCanvasRef.current;
         if (previewCanvas) {
           const pCtx = previewCanvas.getContext('2d');
+
           previewCanvas.width = canvasWidth || w;
           previewCanvas.height = canvasHeight || h;
+
           if (!pCtx) return;
           pCtx.clearRect(0, 0, imgW, imgH);
           pCtx.imageSmoothingQuality = 'high';
