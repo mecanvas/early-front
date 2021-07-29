@@ -8,7 +8,6 @@ import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { setCanvasSaveList } from 'src/store/reducers/canvas';
 import { SelectedFrame, updatePositionByFrame } from 'src/store/reducers/frame';
 import { theme } from 'src/style/theme';
-import { cmToPx } from 'src/utils/cmToPx';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getPosition } from 'src/utils/getPosition';
 import { replacePx } from 'src/utils/replacePx';
@@ -310,100 +309,6 @@ const ThirdStep = () => {
 
         const crop = { x: selectedInfo.x, y: selectedInfo.y };
 
-        // 세이브 캔버스
-        const originFrameWidth = (canvasWidth || w) * scaleX;
-        const originFrameHeight = (canvasHeight || h) * scaleY;
-        const canvasFrameWidth = originFrameWidth + cmToPx(8) * scaleX;
-        const canvasFrameHeight = originFrameHeight + cmToPx(8) * scaleY;
-
-        saveCanvas.width = w * scaleX + cmToPx(8);
-        saveCanvas.height = h * scaleY + cmToPx(8);
-
-        saveCanvas.width = canvasFrameWidth;
-        saveCanvas.height = canvasFrameHeight;
-        sCtx.clearRect(0, 0, canvasFrameWidth, canvasFrameHeight);
-        sCtx.imageSmoothingQuality = 'high';
-        sCtx.drawImage(
-          img,
-          crop.x * scaleX,
-          crop.y * scaleY,
-          originFrameWidth,
-          originFrameHeight,
-          cmToPx(4) * scaleX,
-          cmToPx(4) * scaleY,
-          originFrameWidth,
-          originFrameHeight,
-        );
-
-        sCtx.save();
-        //회전축을 위해 기준점을 센터로
-        sCtx.translate(canvasFrameWidth / 2, canvasFrameHeight / 2);
-        //180도 회전
-        sCtx.rotate((180 * Math.PI) / 180);
-        // 이미지 반전
-        sCtx.scale(-1, 1);
-
-        // top
-        sCtx.drawImage(
-          img,
-          crop.x * scaleX,
-          crop.y * scaleY,
-          originFrameWidth,
-          cmToPx(4) * scaleY,
-          -canvasFrameWidth / 2 + cmToPx(4) * scaleX,
-          canvasFrameHeight / 2 - cmToPx(4) * scaleY,
-          canvasFrameWidth - cmToPx(8) * scaleX,
-          cmToPx(4) * scaleY,
-        );
-
-        // bottom
-        sCtx.drawImage(
-          img,
-          crop.x * scaleX,
-          crop.y * scaleY + (h - cmToPx(4)) * scaleY,
-          originFrameWidth,
-          cmToPx(4) * scaleY,
-          -canvasFrameWidth / 2 + cmToPx(4) * scaleX,
-          -canvasFrameHeight / 2,
-          canvasFrameWidth - cmToPx(8) * scaleX,
-          cmToPx(4) * scaleY,
-        );
-
-        //좌우를 위해 다시 한번 180도 회전 (총 360도)
-        sCtx.rotate((180 * Math.PI) / 180);
-
-        // right
-        sCtx.drawImage(
-          img,
-          crop.x * scaleX + (w - cmToPx(4)) * scaleX,
-          crop.y * scaleY,
-          cmToPx(4) * scaleX,
-          originFrameHeight,
-          -canvasFrameWidth / 2,
-          -canvasFrameHeight / 2 + cmToPx(4) * scaleY,
-          cmToPx(4) * scaleX,
-          originFrameHeight,
-        );
-
-        // left
-        sCtx.drawImage(
-          img,
-          crop.x * scaleX,
-          crop.y * scaleY,
-          cmToPx(4) * scaleX,
-          originFrameHeight,
-          canvasFrameWidth / 2 - cmToPx(4) * scaleX,
-          -canvasFrameHeight / 2 + cmToPx(4) * scaleY,
-          cmToPx(4) * scaleX,
-          originFrameHeight,
-        );
-
-        sCtx.restore();
-
-        sCtx.globalCompositeOperation = 'destination-over';
-        sCtx.fillStyle = bgColor;
-        sCtx.fillRect(0, 0, canvasFrameWidth, canvasFrameHeight);
-
         // 프리뷰
         previewCanvas.width = w;
         previewCanvas.height = h;
@@ -422,7 +327,7 @@ const ThirdStep = () => {
         setIsInitial(true);
       };
     });
-  }, [selectedFrame, selectedInfo.x, selectedInfo.y, canvasWidth, canvasHeight, bgColor, dispatch]);
+  }, [selectedFrame, selectedInfo.x, selectedInfo.y, bgColor, dispatch]);
 
   const createCropperCanvas = useCallback(
     (canvas: HTMLCanvasElement, img: HTMLImageElement, preview?: boolean) => {
