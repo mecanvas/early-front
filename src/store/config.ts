@@ -4,11 +4,13 @@ import { combineReducers } from '@reduxjs/toolkit';
 import frame from './reducers/frame';
 import image from './reducers/image';
 import canvas from './reducers/canvas';
+import progress from './reducers/progress';
 
 const reducer = combineReducers({
   frame,
   image,
   canvas,
+  progress,
 });
 
 export const store = configureStore({

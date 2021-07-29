@@ -3,7 +3,6 @@ import { Alert, Button } from 'antd';
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import ImageDropZone from 'src/components/common/ImageDropZone';
-import Loading from 'src/components/common/Loading';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { postImageUpload } from 'src/store/api/image';
 import { deletePositionByFrame } from 'src/store/reducers/frame';
@@ -86,7 +85,6 @@ const ImageWrapper = styled.div`
 `;
 
 const SecondsStep = () => {
-  const { imageUploadLoad } = useAppSelector(({ image }) => image);
   const { selectedFrame } = useAppSelector(({ frame }) => frame);
   const dispatch = useAppDispatch();
 
@@ -133,7 +131,6 @@ const SecondsStep = () => {
 
   return (
     <>
-      <Loading loading={imageUploadLoad} />
       <SecondsContent>
         {/* 선택한 액자가 하나 뿐이면 */}
         <>

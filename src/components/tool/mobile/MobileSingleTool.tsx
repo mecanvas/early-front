@@ -3,6 +3,7 @@ import { Button, Steps } from 'antd';
 import router from 'next/router';
 import { icons } from 'public/icons';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import Loader from 'src/components/common/Loader';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { postCanvasForSave } from 'src/store/api/canvas';
 import { resetCanvasState } from 'src/store/reducers/canvas';
@@ -21,7 +22,6 @@ const Container = styled.div`
 `;
 
 const MobileSingleToolHeader = styled.div`
-  cursor: pointer;
   height: 45px;
   display: flex;
   align-items: center;
@@ -38,6 +38,7 @@ const MobileSingleToolHeader = styled.div`
     margin: 0 auto;
 
     img {
+      cursor: pointer;
       &:nth-of-type(1) {
         transform: rotateY(180deg);
         -webkit-transform: rotateY(180deg);
@@ -247,6 +248,7 @@ const MobileSingleTool = () => {
 
   return (
     <Container>
+      <Loader />
       <MobileSingleToolHeader>
         <nav>
           <img src={icons.arrow} />
