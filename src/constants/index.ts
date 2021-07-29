@@ -28,8 +28,90 @@ export const CONTENT_HEIGHT = 'calc(100vh - 168px)';
 // App의 헤더 크기
 export const APP_HEADER_HEIGHT = 60;
 
-// 직사각형 2
-export const frameRectangle: FrameInfoList[] = [
+// 직사각형 3 -> 가로가 긴 모형
+export const frameRectangleMoreWidthThanHeight: FrameInfoList[] = [
+  {
+    id: 1,
+    type: 3,
+    name: 'P-2호',
+    widthCm: 25.8,
+    heightCm: 16,
+    price: 10000,
+    size: {
+      width: cmToPx(25.8),
+      height: cmToPx(16),
+    },
+    recommand: true,
+  },
+  {
+    id: 2,
+    type: 3,
+    name: 'P-4호',
+    widthCm: 33.3,
+    heightCm: 21,
+    price: 18000,
+    size: {
+      width: cmToPx(33.3),
+      height: cmToPx(21),
+    },
+    recommand: false,
+  },
+  {
+    id: 3,
+    type: 3,
+    name: 'F-0호',
+    widthCm: 18,
+    heightCm: 14,
+    price: 11000,
+    size: {
+      width: cmToPx(18),
+      height: cmToPx(14),
+    },
+    recommand: false,
+  },
+  {
+    id: 4,
+    type: 3,
+    name: 'F-2호',
+    widthCm: 25.8,
+    heightCm: 18,
+    price: 16000,
+    size: {
+      width: cmToPx(25.8),
+      height: cmToPx(18),
+    },
+    recommand: true,
+  },
+  {
+    id: 5,
+    type: 3,
+    name: 'F-4호',
+    widthCm: 33.3,
+    heightCm: 24,
+    price: 21000,
+    size: {
+      width: cmToPx(33.3),
+      height: cmToPx(24),
+    },
+    recommand: false,
+  },
+  {
+    id: 6,
+    type: 3,
+    name: 'M-4호',
+    widthCm: 33.3,
+    heightCm: 19,
+    price: 19000,
+    size: {
+      width: cmToPx(33.3),
+      height: cmToPx(19),
+    },
+    recommand: false,
+  },
+];
+
+// 직사각형 2 -> 세로가 긴 모형
+export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
   {
     id: 1,
     type: 2,
