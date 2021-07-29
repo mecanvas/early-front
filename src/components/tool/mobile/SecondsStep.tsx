@@ -106,7 +106,7 @@ const SecondsStep = () => {
         if (!imgSizeChecker(file)) return Alert({ message: '최소 1MB 이상의 이미지이어야 합니다.' });
         const fd = new FormData();
         fd.append('image', file);
-        dispatch(postImageUpload({ fd, type: type === '1' ? 1 : 2, id: +id }));
+        dispatch(postImageUpload({ fd, type: +type as 1 | 2 | 3, id: +id }));
         dispatch(deletePositionByFrame());
       };
     },
@@ -123,7 +123,7 @@ const SecondsStep = () => {
       const file = acceptedFiles[0];
       const fd = new FormData();
       fd.append('image', file);
-      dispatch(postImageUpload({ fd, type: type === '1' ? 1 : 2, id: +id }));
+      dispatch(postImageUpload({ fd, type: +type as 1 | 2 | 3, id: +id }));
       dispatch(deletePositionByFrame());
     },
     [dispatch],

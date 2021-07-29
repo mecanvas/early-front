@@ -47,7 +47,7 @@ const ThirdItemList = styled.div`
   }
 `;
 
-const ThirdItem = styled.div<{ type: 1 | 2; selected: boolean }>`
+const ThirdItem = styled.div<{ type: 1 | 2 | 3; selected: boolean }>`
   cursor: pointer;
   width: ${({ type }) => (type === 1 ? '80px' : '60px')};
   height: ${({ type }) => (type === 2 ? '80px' : '80px')};

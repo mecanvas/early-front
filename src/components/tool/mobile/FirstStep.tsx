@@ -9,20 +9,16 @@ const FirstStep = () => {
   const { frameInfoList } = useAppSelector(({ frame }) => frame);
   const [isOpacityOn, setIsOpacityOn] = useState(false);
   const { OpacityComponent } = useOpacity(isOpacityOn);
+  const [defaultTab, setDefaultTab] = useState('0');
 
   const recommandList = useMemo(() => {
     return frameInfoList.filter((lst) => lst.recommand);
   }, [frameInfoList]);
 
-  const squareList = useMemo(() => {
-    return frameInfoList.filter((lst) => lst.type === 1);
-  }, [frameInfoList]);
-
-  const rectangleList = useMemo(() => {
-    return frameInfoList.filter((lst) => lst.type === 2);
-  }, [frameInfoList]);
-
-  const [defaultTab, setDefaultTab] = useState('0');
+  const frameList = useMemo(() => {
+    if (defaultTab === '0') return frameInfoList;
+    return frameInfoList.filter((lst) => lst.type === +defaultTab);
+  }, [defaultTab, frameInfoList]);
 
   const handleTabClick = useCallback((key: string) => {
     setDefaultTab(key);
@@ -46,20 +42,29 @@ const FirstStep = () => {
         {/* <FirstSelectedList /> */}
       </Tabs.TabPane>
 
-      <Tabs.TabPane key="1" tab={<TabTitle>정사각형</TabTitle>}>
+      <Tabs.TabPane key="1" tab={<TabTitle>정방형</TabTitle>}>
         <OpacityComponent>
           <FirstGuideText>정사각형 액자입니다. 탁상에 놓기 부담없는 사이즈에요!</FirstGuideText>
         </OpacityComponent>
-        <FirstFrameListByTab frameList={squareList} />
+        <FirstFrameListByTab frameList={frameList} />
         <Divider />
         {/* <FirstSelectedList /> */}
       </Tabs.TabPane>
 
-      <Tabs.TabPane key="2" tab={<TabTitle>직사각형</TabTitle>}>
+      <Tabs.TabPane key="2" tab={<TabTitle>세로형</TabTitle>}>
         <OpacityComponent>
-          <FirstGuideText>직사각형 액자입니다. 회전으로 가로와 세로를 바꿔 보실 수 있어요!</FirstGuideText>
+          <FirstGuideText>세로가 긴 형태의 직사각형 액자입니다.</FirstGuideText>
         </OpacityComponent>
-        <FirstFrameListByTab frameList={rectangleList} />
+        <FirstFrameListByTab frameList={frameList} />
+        <Divider />
+        {/* <FirstSelectedList /> */}
+      </Tabs.TabPane>
+
+      <Tabs.TabPane key="3" tab={<TabTitle>가로형</TabTitle>}>
+        <OpacityComponent>
+          <FirstGuideText>가로가 긴 형태의 직사각형 액자입니다. </FirstGuideText>
+        </OpacityComponent>
+        <FirstFrameListByTab frameList={frameList} />
         <Divider />
         {/* <FirstSelectedList /> */}
       </Tabs.TabPane>

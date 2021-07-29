@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { putSelectedFrameImage } from '../reducers/frame';
 
-export const postImageUpload = createAsyncThunk<any, { type: 1 | 2; fd: any; id: number }>(
+export const postImageUpload = createAsyncThunk<any, { type: 1 | 2 | 3; fd: any; id: number }>(
   'img/postImageUplaod',
   async (data, { rejectWithValue, dispatch }) => {
     const { fd, type, id } = data;
