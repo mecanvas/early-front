@@ -47,7 +47,7 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
         renderItem={(item: FrameInfoList, index) => (
           <FirstListItems
             onMouseOver={handleShowingFrameByHover}
-            selected={selectedFrameList.some((lst) => lst.name === item.name)}
+            selected={selectedFrameList.some((lst) => lst.type === item.type && lst.name === item.name)}
             data-index={index}
             onClick={handleSelectFrame}
           >
@@ -57,7 +57,7 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
                 <small>{item.widthCm}cm</small> <small>X</small> <small>{item.heightCm}cm</small>
               </div>
             </div>
-            {selectedFrameList.some((lst) => lst.name === item.name) ? (
+            {selectedFrameList.some((lst) => lst.type === item.type && lst.name === item.name) ? (
               <span>
                 <CheckCircleFilled />
               </span>

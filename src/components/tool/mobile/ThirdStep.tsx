@@ -88,7 +88,6 @@ const ThirdContentDrawingCanvas = styled.div<{ width: number; height: number }>`
   position: relative;
   width: ${({ width }) => width}px;
   height: ${({ height }) => height}px;
-  margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -289,7 +288,7 @@ const ThirdStep = () => {
         let h = 0;
 
         if (isSquare) {
-          // 정사각형이면 이미지 너비에 따라 정사각형
+          // 너비가 높이보다 크면 높이에 맞춰 렌더링
           if (imgW > imgH) {
             const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgH, imgH);
             w = ratioW;
@@ -299,11 +298,19 @@ const ThirdStep = () => {
             w = ratioW;
             h = ratioH;
           }
-        } else {
-          const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgW, imgH);
-          w = ratioW;
-          h = ratioH;
         }
+        if (!isSquare) {
+          if (imgW > imgH) {
+            const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgW, imgH);
+            w = ratioW;
+            h = ratioH;
+          } else {
+            const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgW, imgW);
+            w = ratioW;
+            h = ratioH;
+          }
+        }
+
         const scaleX = naturalWidth / imgW;
         const scaleY = naturalHeight / imgH;
 
@@ -339,7 +346,10 @@ const ThirdStep = () => {
       const cropperWrapper = cropperWrapperRef.current;
       if (!ctx || !imgCanvas || !cropperWrapper) return;
 
-      const { width: imgW, height: imgH } = imgCanvas.getBoundingClientRect();
+      const { naturalWidth, naturalHeight } = img;
+
+      // const { width: imgW, height: imgH } = imgCanvas.getBoundingClientRect();
+      const [imgW, imgH] = getOriginRatio(naturalWidth, naturalHeight, IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT);
 
       const isSquare = selectedInfo.type === 1;
 
@@ -347,7 +357,7 @@ const ThirdStep = () => {
       let h = 0;
 
       if (isSquare) {
-        // 정사각형이면 이미지 너비에 따라 정사각형
+        // 너비가 높이보다 크면 높이에 맞춰 렌더링
         if (imgW > imgH) {
           const [ratioW, ratioH] = getOriginRatio(selectedInfo.size.width, selectedInfo.size.height, imgH, imgH);
           w = ratioW;
@@ -357,13 +367,30 @@ const ThirdStep = () => {
           w = ratioW;
           h = ratioH;
         }
-      } else {
-        const [ratioW, ratioH] = getOriginRatio(selectedInfo.size.width, selectedInfo.size.height, imgW, imgH);
-        w = ratioW;
-        h = ratioH;
       }
-
-      const { naturalWidth, naturalHeight } = img;
+      if (!isSquare) {
+        if (imgW > imgH) {
+          const [ratioW, ratioH] = getOriginRatio(
+            selectedInfo.size.width,
+            selectedInfo.size.height,
+            imgH,
+            imgH,
+            IMAGE_MAXIMUM_WIDTH,
+          );
+          w = ratioW;
+          h = ratioH;
+        } else {
+          const [ratioW, ratioH] = getOriginRatio(
+            selectedInfo.size.width,
+            selectedInfo.size.height,
+            imgW,
+            imgW,
+            IMAGE_MAXIMUM_WIDTH,
+          );
+          w = ratioW;
+          h = ratioH;
+        }
+      }
 
       const scaleX = naturalWidth / imgW;
       const scaleY = naturalHeight / imgH;

@@ -40,21 +40,33 @@ const canvas = createSlice({
     setCanvasOrder: (state, { payload }: PayloadAction<CanvasOrder>) => {
       state.canvasOrder = { ...state.canvasOrder, ...payload };
     },
-    setCanvasSaveList: (state, { payload }: PayloadAction<{ name: string; saveCanvas?: any; previewCanvas: any }>) => {
+    setCanvasSaveList: (state, { payload }: PayloadAction<{ name: string; saveCanvas?: any; previewCanvas?: any }>) => {
       if (state.canvasSaveList.find((lst) => lst.name === payload.name)) {
         state.canvasSaveList = state.canvasSaveList.map((lst) => ({
           ...lst,
           name: lst.name === payload.name ? payload.name : lst.name,
           saveCanvas: lst.name === payload.name ? payload.saveCanvas : lst.saveCanvas,
-          previewCanvas: lst.name === payload.name ? payload.previewCanvas : lst.previewCanvas,
+          previewCanvas:
+            lst.name === payload.name
+              ? payload.previewCanvas
+                ? payload.previewCanvas
+                : lst.previewCanvas
+              : lst.previewCanvas,
         }));
-        return;
+      } else {
+        state.canvasSaveList = [
+          {
+            name: payload.name,
+            saveCanvas: payload.saveCanvas,
+            previewCanvas: payload.previewCanvas,
+          },
+        ];
       }
-      state.canvasSaveList.push({
-        name: payload.name,
-        saveCanvas: payload.saveCanvas,
-        previewCanvas: payload.previewCanvas,
-      });
+      // state.canvasSaveList.push({
+      //   name: payload.name,
+      //   saveCanvas: payload.saveCanvas,
+      //   previewCanvas: payload.previewCanvas,
+      // });
     },
     setCanvasSaveScale: (state, { payload }: PayloadAction<{ scaleType: 1 | 2 }>) => {
       state.canvasOrder.scaleType = payload.scaleType;

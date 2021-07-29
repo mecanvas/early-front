@@ -86,7 +86,7 @@ const SelectImage = styled.div`
 `;
 
 const FourthStep = () => {
-  const { canvasOrder, canvasSaveList } = useAppSelector((state) => state.canvas);
+  const { canvasOrder } = useAppSelector((state) => state.canvas);
   const { selectedFrame } = useAppSelector((state) => state.frame);
   const dispatch = useAppDispatch();
   const selectBoxList = useMemo(() => {
@@ -115,12 +115,10 @@ const FourthStep = () => {
       if (!scale) return;
       setSelectBox(selectBox.map((lst) => ({ ...lst, isSelected: lst.id === +scale ? true : false })));
       const saveCanvas = createExpandCanvas(selectedFrame, +scale as 1 | 2);
-      dispatch(
-        setCanvasSaveList({ name: selectedFrame[0].name, saveCanvas, previewCanvas: canvasSaveList[0].previewCanvas }),
-      );
+      dispatch(setCanvasSaveList({ name: selectedFrame[0].name, saveCanvas }));
       dispatch(setCanvasSaveScale({ scaleType: +scale as 1 | 2 }));
     },
-    [canvasSaveList, dispatch, selectBox, selectedFrame],
+    [dispatch, selectBox, selectedFrame],
   );
 
   return (
