@@ -19,7 +19,6 @@ interface CanvasState {
     name: string;
     saveCanvas: HTMLCanvasElement;
     previewCanvas: HTMLCanvasElement;
-    scaleType?: 1 | 2;
   }[];
   canvasOrder: CanvasOrder;
 }
@@ -31,7 +30,7 @@ const initialState: CanvasState = {
 
   type: null,
   canvasSaveList: [],
-  canvasOrder: { username: '', phone: '', orderRoute: 1, type: 1, scaleType: 1 },
+  canvasOrder: { username: '', phone: '', orderRoute: 1 },
 };
 
 const canvas = createSlice({
@@ -41,7 +40,7 @@ const canvas = createSlice({
     setCanvasOrder: (state, { payload }: PayloadAction<CanvasOrder>) => {
       state.canvasOrder = { ...state.canvasOrder, ...payload };
     },
-    setCanvasSaveList: (state, { payload }: PayloadAction<{ name: string; saveCanvas: any; previewCanvas: any }>) => {
+    setCanvasSaveList: (state, { payload }: PayloadAction<{ name: string; saveCanvas?: any; previewCanvas: any }>) => {
       if (state.canvasSaveList.find((lst) => lst.name === payload.name)) {
         state.canvasSaveList = state.canvasSaveList.map((lst) => ({
           ...lst,
@@ -58,7 +57,6 @@ const canvas = createSlice({
       });
     },
     setCanvasSaveScale: (state, { payload }: PayloadAction<{ scaleType: 1 | 2 }>) => {
-      state.canvasSaveList = [{ ...state.canvasSaveList[0], scaleType: payload.scaleType }];
       state.canvasOrder.scaleType = payload.scaleType;
     },
     resetCanvasState: (state) => {

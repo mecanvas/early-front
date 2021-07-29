@@ -168,9 +168,9 @@ const MobileSingleTool = () => {
       selectedFrame.every((lst) => lst.imgUrl),
     );
     condition.set(2, true);
-    condition.set(3, canvasSaveList[0] ? canvasSaveList[0].scaleType : false);
+    condition.set(3, canvasOrder.scaleType ? true : false);
     return condition;
-  }, [canvasSaveList, selectedFrame]);
+  }, [canvasOrder.scaleType, selectedFrame]);
 
   const stepTitle = useMemo(() => {
     const title = new Map();

@@ -74,9 +74,8 @@ const LastStep = () => {
   }, []);
 
   useEffect(() => {
-    const canvas = canvasSaveList[0].saveCanvas;
-
-    const url = canvas.toDataURL('image/png', 1.0);
+    const canvas = canvasSaveList[0].previewCanvas;
+    const url = canvas?.toDataURL('image/png', 1.0);
     setCanvasUrl(url);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -88,9 +87,6 @@ const LastStep = () => {
 
   return (
     <Container>
-      <a href={canvasUrl} download="다운.png">
-        gg
-      </a>
       <SaveForm form={form} name="form" onFieldsChange={handleFormChange}>
         <PreivewCanvas>
           {/* <AntdCarousel startIndex={0} lastIndex={1}> */}
@@ -111,7 +107,7 @@ const LastStep = () => {
             </span>
           </div>
           <div>{selectedFrame[0].price.toLocaleString()}원</div>
-          <div>{canvasOrder.scaleType === 1 ? `옆면 확장` : '기본 옆면'}</div>
+          <div>{canvasOrder.scaleType === 2 ? `옆면 확장` : '기본 옆면'}</div>
         </CanvasSaleInfo>
 
         <Divider />
@@ -162,8 +158,8 @@ const LastStep = () => {
           label="주문 경로"
           rules={[{ required: true, message: '주문 경로를 선택해 주세요.' }]}
         >
-          <Select defaultValue={'1'} placeholder="주문하시는 경로를 선택해 주세요.">
-            <Select.Option value="1" label="네이버">
+          <Select defaultValue={canvasOrder.orderRoute} placeholder="주문하시는 경로를 선택해 주세요.">
+            <Select.Option value={1} label="네이버">
               네이버
             </Select.Option>
           </Select>

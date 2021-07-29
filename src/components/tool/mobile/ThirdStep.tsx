@@ -2,6 +2,7 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import { IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT } from 'src/constants';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { setCanvasSaveList } from 'src/store/reducers/canvas';
@@ -221,8 +222,6 @@ const ThirdStep = () => {
   const dispatch = useAppDispatch();
   const { selectedFrame } = useAppSelector(({ frame }) => frame);
   const { canvasSaveList } = useAppSelector(({ canvas }) => canvas);
-  const IMAGE_MAXIMUM_WIDTH = 304;
-  const IMAGE_MAXIMUM_HEIGHT = 304;
 
   const [isResizeMode, setIsResizeMode] = useState(false);
   const [cmd, setCmd] = useState<ResizeCmd | null>(null);
@@ -311,33 +310,30 @@ const ThirdStep = () => {
 
         const crop = { x: selectedInfo.x, y: selectedInfo.y };
 
-        previewCanvas.width = w;
-        previewCanvas.height = h;
-
-        const originFrameWidth = imgW * scaleX;
-        const originFrameHeight = imgH * scaleY;
-        const canvasFrameWidth = originFrameWidth + cmToPx(8);
-        const canvasFrameHeight = originFrameHeight + cmToPx(8);
+        // 세이브 캔버스
+        const originFrameWidth = (canvasWidth || w) * scaleX;
+        const originFrameHeight = (canvasHeight || h) * scaleY;
+        const canvasFrameWidth = originFrameWidth + cmToPx(8) * scaleX;
+        const canvasFrameHeight = originFrameHeight + cmToPx(8) * scaleY;
 
         saveCanvas.width = w * scaleX + cmToPx(8);
         saveCanvas.height = h * scaleY + cmToPx(8);
 
-        sCtx.clearRect(0, 0, imgW, imgH);
+        saveCanvas.width = canvasFrameWidth;
+        saveCanvas.height = canvasFrameHeight;
+        sCtx.clearRect(0, 0, canvasFrameWidth, canvasFrameHeight);
         sCtx.imageSmoothingQuality = 'high';
         sCtx.drawImage(
           img,
           crop.x * scaleX,
           crop.y * scaleY,
-          imgW * scaleX,
-          imgH * scaleY,
-          cmToPx(4),
-          cmToPx(4),
-          imgW * scaleX - cmToPx(8),
-          imgH * scaleY - cmToPx(8),
+          originFrameWidth,
+          originFrameHeight,
+          cmToPx(4) * scaleX,
+          cmToPx(4) * scaleY,
+          originFrameWidth,
+          originFrameHeight,
         );
-        sCtx.globalCompositeOperation = 'destination-over';
-        sCtx.fillStyle = bgColor;
-        sCtx.fillRect(0, 0, imgW * scaleX, imgH * scaleY);
 
         sCtx.save();
         //회전축을 위해 기준점을 센터로
@@ -354,23 +350,23 @@ const ThirdStep = () => {
           crop.y * scaleY,
           originFrameWidth,
           cmToPx(4) * scaleY,
-          -canvasFrameWidth / 2 + cmToPx(4),
-          canvasFrameHeight / 2 - cmToPx(4),
-          canvasFrameWidth - cmToPx(8),
-          cmToPx(4),
+          -canvasFrameWidth / 2 + cmToPx(4) * scaleX,
+          canvasFrameHeight / 2 - cmToPx(4) * scaleY,
+          canvasFrameWidth - cmToPx(8) * scaleX,
+          cmToPx(4) * scaleY,
         );
 
         // bottom
         sCtx.drawImage(
           img,
           crop.x * scaleX,
-          (crop.y + h - cmToPx(4)) * scaleY,
+          crop.y * scaleY + (h - cmToPx(4)) * scaleY,
           originFrameWidth,
           cmToPx(4) * scaleY,
-          -canvasFrameWidth / 2 + cmToPx(4),
+          -canvasFrameWidth / 2 + cmToPx(4) * scaleX,
           -canvasFrameHeight / 2,
-          canvasFrameWidth - cmToPx(8),
-          cmToPx(4),
+          canvasFrameWidth - cmToPx(8) * scaleX,
+          cmToPx(4) * scaleY,
         );
 
         //좌우를 위해 다시 한번 180도 회전 (총 360도)
@@ -379,14 +375,14 @@ const ThirdStep = () => {
         // right
         sCtx.drawImage(
           img,
-          (crop.x + w - cmToPx(4)) * scaleX,
+          crop.x * scaleX + (w - cmToPx(4)) * scaleX,
           crop.y * scaleY,
           cmToPx(4) * scaleX,
           originFrameHeight,
           -canvasFrameWidth / 2,
-          -canvasFrameHeight / 2 + cmToPx(4),
-          cmToPx(4),
-          canvasFrameHeight - cmToPx(8),
+          -canvasFrameHeight / 2 + cmToPx(4) * scaleY,
+          cmToPx(4) * scaleX,
+          originFrameHeight,
         );
 
         // left
@@ -396,15 +392,22 @@ const ThirdStep = () => {
           crop.y * scaleY,
           cmToPx(4) * scaleX,
           originFrameHeight,
-          canvasFrameWidth / 2 - cmToPx(4),
-          -canvasFrameHeight / 2 + cmToPx(4),
-          cmToPx(4),
-          canvasFrameHeight - cmToPx(8),
+          canvasFrameWidth / 2 - cmToPx(4) * scaleX,
+          -canvasFrameHeight / 2 + cmToPx(4) * scaleY,
+          cmToPx(4) * scaleX,
+          originFrameHeight,
         );
 
         sCtx.restore();
 
+        sCtx.globalCompositeOperation = 'destination-over';
+        sCtx.fillStyle = bgColor;
+        sCtx.fillRect(0, 0, canvasFrameWidth, canvasFrameHeight);
+
         // 프리뷰
+        previewCanvas.width = w;
+        previewCanvas.height = h;
+
         pCtx.clearRect(0, 0, imgW, imgH);
         pCtx.imageSmoothingQuality = 'high';
         pCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
@@ -412,14 +415,14 @@ const ThirdStep = () => {
         pCtx.fillStyle = bgColor;
         pCtx.fillRect(0, 0, imgW, imgH);
 
-        dispatch(setCanvasSaveList({ name: info.name, saveCanvas, previewCanvas }));
+        dispatch(setCanvasSaveList({ name: info.name, previewCanvas }));
         setCropperList((prev) => {
           return [...prev, { name: info.name, x: crop.x, y: crop.y }];
         });
         setIsInitial(true);
       };
     });
-  }, [selectedFrame, selectedInfo.x, selectedInfo.y, bgColor, dispatch]);
+  }, [selectedFrame, selectedInfo.x, selectedInfo.y, canvasWidth, canvasHeight, bgColor, dispatch]);
 
   const createCropperCanvas = useCallback(
     (canvas: HTMLCanvasElement, img: HTMLImageElement, preview?: boolean) => {
@@ -482,116 +485,18 @@ const ThirdStep = () => {
         if (previewCanvas) {
           const pCtx = previewCanvas.getContext('2d');
 
-          const originFrameWidth = (canvasWidth || w) * scaleX;
-          const originFrameHeight = (canvasHeight || h) * scaleY;
-          const canvasFrameWidth = originFrameWidth + cmToPx(8) * scaleX;
-          const canvasFrameHeight = originFrameHeight + cmToPx(8) * scaleY;
-
-          // previewCanvas.width = canvasWidth || w;
-          // previewCanvas.height = canvasHeight || h;
+          previewCanvas.width = canvasWidth || w;
+          previewCanvas.height = canvasHeight || h;
 
           if (!pCtx) return;
 
-          previewCanvas.width = canvasFrameWidth;
-          previewCanvas.height = canvasFrameHeight;
-          pCtx.clearRect(0, 0, canvasFrameWidth, canvasFrameHeight);
+          pCtx.clearRect(0, 0, imgW, imgH);
           pCtx.imageSmoothingQuality = 'high';
-          pCtx.drawImage(
-            img,
-            crop.x * scaleX,
-            crop.y * scaleY,
-            originFrameWidth,
-            originFrameHeight,
-            cmToPx(4) * scaleX,
-            cmToPx(4) * scaleY,
-            originFrameWidth,
-            originFrameHeight,
-          );
-
-          // pCtx.clearRect(0, 0, imgW, imgH);
-          // pCtx.imageSmoothingQuality = 'high';
-          // pCtx.drawImage(
-          //   img,
-          //   crop.x * scaleX,
-          //   crop.y * scaleY,
-          //   imgW * scaleX,
-          //   imgH * scaleY,
-          //   cmToPx(4),
-          //   cmToPx(4),
-          //   imgW  ,
-          //   imgH,
-          // );
-          // pCtx.globalCompositeOperation = 'destination-over';
-          // pCtx.fillStyle = bgColor;
-          // pCtx.fillRect(0, 0, imgW * scaleX, imgH * scaleY);
-
-          pCtx.save();
-          //회전축을 위해 기준점을 센터로
-          pCtx.translate(canvasFrameWidth / 2, canvasFrameHeight / 2);
-          //180도 회전
-          pCtx.rotate((180 * Math.PI) / 180);
-          // 이미지 반전
-          pCtx.scale(-1, 1);
-
-          // top
-          pCtx.drawImage(
-            img,
-            crop.x * scaleX,
-            crop.y * scaleY,
-            originFrameWidth,
-            cmToPx(4) * scaleY,
-            -canvasFrameWidth / 2 + cmToPx(4) * scaleX,
-            canvasFrameHeight / 2 - cmToPx(4) * scaleY,
-            canvasFrameWidth - cmToPx(8) * scaleX,
-            cmToPx(4) * scaleY,
-          );
-
-          // bottom
-          pCtx.drawImage(
-            img,
-            crop.x * scaleX,
-            crop.y * scaleY + (h - cmToPx(4)) * scaleY,
-            originFrameWidth,
-            cmToPx(4) * scaleY,
-            -canvasFrameWidth / 2 + cmToPx(4) * scaleX,
-            -canvasFrameHeight / 2,
-            canvasFrameWidth - cmToPx(8) * scaleX,
-            cmToPx(4) * scaleY,
-          );
-
-          //좌우를 위해 다시 한번 180도 회전 (총 360도)
-          pCtx.rotate((180 * Math.PI) / 180);
-
-          // right
-          pCtx.drawImage(
-            img,
-            crop.x * scaleX + (w - cmToPx(4)) * scaleX,
-            crop.y * scaleY,
-            cmToPx(4) * scaleX,
-            originFrameHeight,
-            -canvasFrameWidth / 2,
-            -canvasFrameHeight / 2 + cmToPx(4) * scaleY,
-            cmToPx(4) * scaleX,
-            originFrameHeight,
-          );
-
-          // left
-          pCtx.drawImage(
-            img,
-            crop.x * scaleX,
-            crop.y * scaleY,
-            cmToPx(4) * scaleX,
-            originFrameHeight,
-            canvasFrameWidth / 2 - cmToPx(4) * scaleX,
-            -canvasFrameHeight / 2 + cmToPx(4) * scaleY,
-            cmToPx(4) * scaleX,
-            originFrameHeight,
-          );
-
-          pCtx.restore();
+          pCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
           pCtx.globalCompositeOperation = 'destination-over';
-          pCtx.fillStyle = '#333';
-          pCtx.fillRect(0, 0, canvasFrameWidth, canvasFrameHeight);
+          pCtx.fillStyle = bgColor;
+          pCtx.fillRect(0, 0, imgW * scaleX, imgH * scaleY);
+
           setCropperList((prev) => {
             const isExist = prev.find((lst) => lst.name === selectFrameName);
             if (isExist) {
@@ -604,6 +509,7 @@ const ThirdStep = () => {
       }
     },
     [
+      bgColor,
       canvasHeight,
       canvasWidth,
       selectFrameName,
@@ -765,7 +671,7 @@ const ThirdStep = () => {
   const handleCancelMoveCropper = useCallback(() => {
     setIsMoving(false);
     setIsCalc(false);
-    // createSaveCanvas();
+    createSaveCanvas();
   }, [createSaveCanvas]);
 
   useEffect(() => {
@@ -805,7 +711,7 @@ const ThirdStep = () => {
       return;
     }
 
-    // createSaveCanvas();
+    createSaveCanvas();
   }, [canvasSaveList.length, createSaveCanvas, isInitial, selectedFrame.length]);
 
   return (

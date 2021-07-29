@@ -4,7 +4,8 @@ import { Images } from 'public';
 import { css } from '@emotion/react';
 import { icons } from 'public/icons';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
-import { setCanvasSaveScale } from 'src/store/reducers/canvas';
+import { setCanvasSaveList, setCanvasSaveScale } from 'src/store/reducers/canvas';
+import { createExpandCanvas } from 'src/utils/createExpandSave';
 
 const Container = styled.div`
   h4 {
@@ -85,7 +86,8 @@ const SelectImage = styled.div`
 `;
 
 const FourthStep = () => {
-  const { canvasSaveList } = useAppSelector((state) => state.canvas);
+  const { canvasOrder, canvasSaveList } = useAppSelector((state) => state.canvas);
+  const { selectedFrame } = useAppSelector((state) => state.frame);
   const dispatch = useAppDispatch();
   const selectBoxList = useMemo(() => {
     return [
@@ -94,17 +96,17 @@ const FourthStep = () => {
         title: '기본으로 해주세요.',
         subTitle: '흰색 옆면이 적용됩니다.',
         exampleImg: Images.sample1,
-        isSelected: canvasSaveList[0] ? canvasSaveList[0].scaleType === 1 : false,
+        isSelected: canvasOrder.scaleType ? canvasOrder.scaleType === 1 : false,
       },
       {
         id: 2,
         title: '옆면을 확장해 주세요',
         subTitle: '선택 시 이미지가 옆면까지 확장됩니다.',
         exampleImg: Images.sample1,
-        isSelected: canvasSaveList[0] ? canvasSaveList[0].scaleType === 2 : false,
+        isSelected: canvasOrder.scaleType ? canvasOrder.scaleType === 2 : false,
       },
     ];
-  }, [canvasSaveList]);
+  }, [canvasOrder]);
   const [selectBox, setSelectBox] = useState(selectBoxList);
 
   const handleCheck = useCallback(
@@ -112,9 +114,13 @@ const FourthStep = () => {
       const { scale } = e.currentTarget.dataset;
       if (!scale) return;
       setSelectBox(selectBox.map((lst) => ({ ...lst, isSelected: lst.id === +scale ? true : false })));
+      const saveCanvas = createExpandCanvas(selectedFrame, +scale as 1 | 2);
+      dispatch(
+        setCanvasSaveList({ name: selectedFrame[0].name, saveCanvas, previewCanvas: canvasSaveList[0].previewCanvas }),
+      );
       dispatch(setCanvasSaveScale({ scaleType: +scale as 1 | 2 }));
     },
-    [dispatch, selectBox],
+    [canvasSaveList, dispatch, selectBox, selectedFrame],
   );
 
   return (
