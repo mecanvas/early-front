@@ -1,17 +1,26 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import { Popover, Button, Spin } from 'antd';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ColorResult } from 'react-color';
 import { isMobile } from 'react-device-detect';
 import { IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT } from 'src/constants';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { setCanvasSaveList } from 'src/store/reducers/canvas';
-import { SelectedFrame, updatePositionByFrame } from 'src/store/reducers/frame';
-import { theme } from 'src/style/theme';
+import { SelectedFrame, setBgColorFrame, updatePositionByFrame } from 'src/store/reducers/frame';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getPosition } from 'src/utils/getPosition';
 import { replacePx } from 'src/utils/replacePx';
 import { positioningImageResize } from 'src/utils/resize';
+import ToolColorPalette from '../divided/DividedToolColorPalette';
+
+const SpinLoader = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+`;
 
 const Container = styled.section<{ cmd: ResizeCmd | null }>`
   padding: 1em 0;
@@ -27,6 +36,15 @@ const Container = styled.section<{ cmd: ResizeCmd | null }>`
       cursor: nesw-resize;
     `;
   }}
+`;
+
+const ThirdBgChanger = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  font-size: 14px;
+  img {
+    width: 18px;
+  }
 `;
 
 const ThirdItemList = styled.div`
@@ -92,6 +110,7 @@ const ThirdContentDrawingCanvas = styled.div<{ width: number; height: number }>`
   justify-content: center;
   align-items: center;
   border: 1px solid ${({ theme }) => theme.color.gray100};
+  margin: 0 auto;
 `;
 
 const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>`
@@ -240,8 +259,6 @@ const ThirdStep = () => {
   const [canvasWidth, setCanvasWidth] = useState(0);
   const [canvasHeight, setCanvasHeight] = useState(0);
 
-  const [bgColor] = useState(theme.color.white);
-
   const selectedInfo = useMemo(() => {
     const selectedCanvas = selectedFrame.filter((lst) => lst.name === selectFrameName)[0];
     return selectedCanvas;
@@ -336,7 +353,7 @@ const ThirdStep = () => {
         pCtx.imageSmoothingQuality = 'high';
         pCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, w * scaleX, h * scaleY, 0, 0, w * scaleX, h * scaleY);
         pCtx.globalCompositeOperation = 'destination-over';
-        pCtx.fillStyle = bgColor;
+        pCtx.fillStyle = selectedInfo.bgColor || '#fff';
         pCtx.fillRect(0, 0, imgW * scaleX, imgH * scaleY);
 
         dispatch(setCanvasSaveList({ name: info.name, previewCanvas }));
@@ -350,9 +367,9 @@ const ThirdStep = () => {
     selectedFrame,
     selectedInfo.x,
     selectedInfo.y,
+    selectedInfo.bgColor,
     selectedInfo.size.width,
     selectedInfo.size.height,
-    bgColor,
     dispatch,
   ]);
 
@@ -446,7 +463,7 @@ const ThirdStep = () => {
           pCtx.imageSmoothingQuality = 'high';
           pCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
           pCtx.globalCompositeOperation = 'destination-over';
-          pCtx.fillStyle = bgColor;
+          pCtx.fillStyle = selectedInfo.bgColor || '#fff';
           pCtx.fillRect(0, 0, imgW * scaleX, imgH * scaleY);
 
           setCropperList((prev) => {
@@ -461,10 +478,10 @@ const ThirdStep = () => {
       }
     },
     [
-      bgColor,
       canvasHeight,
       canvasWidth,
       selectFrameName,
+      selectedInfo.bgColor,
       selectedInfo.size.height,
       selectedInfo.size.width,
       selectedInfo.type,
@@ -626,6 +643,15 @@ const ThirdStep = () => {
     createSaveCanvas();
   }, [createSaveCanvas]);
 
+  const handleColorChange = useCallback(
+    (color: ColorResult) => {
+      const { hex } = color;
+      dispatch(setBgColorFrame({ bgColor: hex }));
+      createSaveCanvas();
+    },
+    [createSaveCanvas, dispatch],
+  );
+
   useEffect(() => {
     const img: HTMLImageElement = imgElements.get(selectFrameName);
 
@@ -672,6 +698,14 @@ const ThirdStep = () => {
     };
   }, []);
 
+  if (!isLoaded) {
+    return (
+      <SpinLoader>
+        <Spin />
+      </SpinLoader>
+    );
+  }
+
   return (
     <Container
       cmd={cmd}
@@ -679,6 +713,20 @@ const ThirdStep = () => {
       onMouseUp={handleResizeEnd}
       onMouseLeave={handleResizeEnd}
     >
+      <ThirdBgChanger>
+        <Popover
+          style={{ padding: 0 }}
+          trigger="click"
+          placement="bottom"
+          content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
+        >
+          <Button type="default">
+            <span>배경 변경</span>
+            {/* <img src={icons.bgPaint} /> */}
+          </Button>
+        </Popover>
+      </ThirdBgChanger>
+
       {selectedFrame.length > 1 ? (
         <ThirdItemList>
           {selectedFrame.map((lst) => (
