@@ -44,7 +44,7 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
       let h = 0;
 
       if (isSquare) {
-        // 정사각형이면 이미지 너비에 따라 정사각형
+        // 너비가 높이보다 크면 높이에 맞춰 렌더링
         if (imgW > imgH) {
           const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgH, imgH);
           w = ratioW;
@@ -54,11 +54,19 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
           w = ratioW;
           h = ratioH;
         }
-      } else {
-        const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgW, imgH);
-        w = ratioW;
-        h = ratioH;
       }
+      if (!isSquare) {
+        if (imgW > imgH) {
+          const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgH, imgH, IMAGE_MAXIMUM_WIDTH);
+          w = ratioW;
+          h = ratioH;
+        } else {
+          const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgW, imgW, IMAGE_MAXIMUM_WIDTH);
+          w = ratioW;
+          h = ratioH;
+        }
+      }
+
       const scaleX = naturalWidth / imgW;
       const scaleY = naturalHeight / imgH;
       const crop = { x: info.x, y: info.y };

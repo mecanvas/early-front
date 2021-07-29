@@ -290,22 +290,34 @@ const ThirdStep = () => {
         if (isSquare) {
           // 너비가 높이보다 크면 높이에 맞춰 렌더링
           if (imgW > imgH) {
-            const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgH, imgH);
+            const [ratioW, ratioH] = getOriginRatio(selectedInfo.size.width, selectedInfo.size.height, imgH, imgH);
             w = ratioW;
             h = ratioH;
           } else {
-            const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgW, imgW);
+            const [ratioW, ratioH] = getOriginRatio(selectedInfo.size.width, selectedInfo.size.height, imgW, imgW);
             w = ratioW;
             h = ratioH;
           }
         }
         if (!isSquare) {
           if (imgW > imgH) {
-            const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgW, imgH);
+            const [ratioW, ratioH] = getOriginRatio(
+              selectedInfo.size.width,
+              selectedInfo.size.height,
+              imgH,
+              imgH,
+              IMAGE_MAXIMUM_WIDTH,
+            );
             w = ratioW;
             h = ratioH;
           } else {
-            const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgW, imgW);
+            const [ratioW, ratioH] = getOriginRatio(
+              selectedInfo.size.width,
+              selectedInfo.size.height,
+              imgW,
+              imgW,
+              IMAGE_MAXIMUM_WIDTH,
+            );
             w = ratioW;
             h = ratioH;
           }
@@ -334,7 +346,15 @@ const ThirdStep = () => {
         setIsInitial(true);
       };
     });
-  }, [selectedFrame, selectedInfo.x, selectedInfo.y, bgColor, dispatch]);
+  }, [
+    selectedFrame,
+    selectedInfo.x,
+    selectedInfo.y,
+    selectedInfo.size.width,
+    selectedInfo.size.height,
+    bgColor,
+    dispatch,
+  ]);
 
   const createCropperCanvas = useCallback(
     (canvas: HTMLCanvasElement, img: HTMLImageElement, preview?: boolean) => {
@@ -635,7 +655,7 @@ const ThirdStep = () => {
     }
   }, [selectFrameName, imgElements, isLoaded, createImgCanvas, drawingCropper, drawingPreview]);
 
-  // 초기 진입시 캔버스 생성
+  // 초기 진입시 캔버스 저장
   useEffect(() => {
     if (isInitial) return;
     if (canvasSaveList.length === selectedFrame.length) {
@@ -645,6 +665,12 @@ const ThirdStep = () => {
 
     createSaveCanvas();
   }, [canvasSaveList.length, createSaveCanvas, isInitial, selectedFrame.length]);
+
+  useEffect(() => {
+    return () => {
+      setIsLoaded(false);
+    };
+  }, []);
 
   return (
     <Container
