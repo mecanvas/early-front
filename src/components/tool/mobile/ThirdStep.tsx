@@ -329,15 +329,15 @@ const ThirdStep = () => {
         const crop = { x: selectedInfo.x, y: selectedInfo.y };
 
         // 프리뷰
-        previewCanvas.width = w;
-        previewCanvas.height = h;
+        previewCanvas.width = w * scaleX;
+        previewCanvas.height = h * scaleY;
 
-        pCtx.clearRect(0, 0, imgW, imgH);
+        pCtx.clearRect(0, 0, w * scaleX, h * scaleY);
         pCtx.imageSmoothingQuality = 'high';
-        pCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
+        pCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, w * scaleX, h * scaleY, 0, 0, w * scaleX, h * scaleY);
         pCtx.globalCompositeOperation = 'destination-over';
         pCtx.fillStyle = bgColor;
-        pCtx.fillRect(0, 0, imgW, imgH);
+        pCtx.fillRect(0, 0, imgW * scaleX, imgH * scaleY);
 
         dispatch(setCanvasSaveList({ name: info.name, previewCanvas }));
         setCropperList((prev) => {
