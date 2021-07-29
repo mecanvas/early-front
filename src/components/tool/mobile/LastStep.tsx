@@ -88,6 +88,9 @@ const LastStep = () => {
 
   return (
     <Container>
+      <a href={canvasUrl} download="다운.png">
+        gg
+      </a>
       <SaveForm form={form} name="form" onFieldsChange={handleFormChange}>
         <PreivewCanvas>
           {/* <AntdCarousel startIndex={0} lastIndex={1}> */}
