@@ -30,6 +30,7 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
   }, []);
 
   const handleLeave = useCallback(() => {
+    if (!selectedFrameList[0]) return;
     const selectedId = selectedFrameList[0].id;
     const selectedType = selectedFrameList[0].type;
     const showingIndex = frameList.findIndex((lst) => lst.type === selectedType && lst.id === selectedId);

@@ -124,12 +124,11 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   div:nth-of-type(1) {
     z-index: 12;
     position: absolute;
-    top: 0;
-    left: 0;
+    top: -4px;
+    left: -4px;
     width: 12px;
     height: 12px;
-    border-top: 2px solid ${({ theme }) => theme.color.primary};
-    border-left: 2px solid ${({ theme }) => theme.color.primary};
+    background: ${({ theme }) => theme.color.primary};
     cursor: nwse-resize;
   }
 
@@ -137,12 +136,11 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   div:nth-of-type(2) {
     z-index: 12;
     position: absolute;
-    top: 0;
-    right: 0;
+    top: -4px;
+    right: -4px;
     width: 12px;
     height: 12px;
-    border-top: 2px solid ${({ theme }) => theme.color.primary};
-    border-right: 2px solid ${({ theme }) => theme.color.primary};
+    background: ${({ theme }) => theme.color.primary};
     cursor: nesw-resize;
   }
 
@@ -150,12 +148,11 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   div:nth-of-type(3) {
     z-index: 12;
     position: absolute;
-    bottom: 0px;
-    left: 0px;
+    bottom: -4px;
+    left: -4px;
     width: 12px;
     height: 12px;
-    border-bottom: 2px solid ${({ theme }) => theme.color.primary};
-    border-left: 2px solid ${({ theme }) => theme.color.primary};
+    background: ${({ theme }) => theme.color.primary};
     cursor: nesw-resize;
   }
 
@@ -163,12 +160,11 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   div:nth-of-type(4) {
     z-index: 12;
     position: absolute;
-    bottom: 0px;
-    right: 0px;
+    bottom: -4px;
+    right: -4px;
     width: 12px;
     height: 12px;
-    border-bottom: 2px solid ${({ theme }) => theme.color.primary};
-    border-right: 2px solid ${({ theme }) => theme.color.primary};
+    background: ${({ theme }) => theme.color.primary};
     cursor: nwse-resize;
   }
 
@@ -258,6 +254,10 @@ const ThirdStep = () => {
   const [imgHeight, setImgHeight] = useState(0);
   const [canvasWidth, setCanvasWidth] = useState(0);
   const [canvasHeight, setCanvasHeight] = useState(0);
+  const [originWidth, setOriginWidth] = useState(0);
+  const [originHeight, setOriginHeight] = useState(0);
+  const [resizeWidth, setResizeWidth] = useState(0);
+  const [resizeHeight, setResizeHeight] = useState(0);
 
   const selectedInfo = useMemo(() => {
     const selectedCanvas = selectedFrame.filter((lst) => lst.name === selectFrameName)[0];
@@ -277,10 +277,6 @@ const ThirdStep = () => {
   }, [selectedFrame]);
 
   const [isInitial, setIsInitial] = useState(false);
-
-  const [cropperList, setCropperList] = useState<{ name: string; x: number; y: number }[]>([
-    { name: selectedInfo.name, x: 0, y: 0 },
-  ]);
 
   const createSaveCanvas = useCallback(() => {
     selectedFrame.forEach((info: SelectedFrame) => {
@@ -304,40 +300,44 @@ const ThirdStep = () => {
         let w = 0;
         let h = 0;
 
-        if (isSquare) {
-          // 너비가 높이보다 크면 높이에 맞춰 렌더링
-          if (imgW > imgH) {
-            const [ratioW, ratioH] = getOriginRatio(selectedInfo.size.width, selectedInfo.size.height, imgH, imgH);
-            w = ratioW;
-            h = ratioH;
-          } else {
-            const [ratioW, ratioH] = getOriginRatio(selectedInfo.size.width, selectedInfo.size.height, imgW, imgW);
-            w = ratioW;
-            h = ratioH;
+        if (!originWidth && !originHeight) {
+          if (isSquare) {
+            // 너비가 높이보다 크면 높이에 맞춰 렌더링
+            if (imgW > imgH) {
+              const [ratioW, ratioH] = getOriginRatio(selectedInfo.size.width, selectedInfo.size.height, imgH, imgH);
+              w = ratioW;
+              h = ratioH;
+            } else {
+              const [ratioW, ratioH] = getOriginRatio(selectedInfo.size.width, selectedInfo.size.height, imgW, imgW);
+              w = ratioW;
+              h = ratioH;
+            }
           }
-        }
-        if (!isSquare) {
-          if (imgW > imgH) {
-            const [ratioW, ratioH] = getOriginRatio(
-              selectedInfo.size.width,
-              selectedInfo.size.height,
-              imgH,
-              imgH,
-              IMAGE_MAXIMUM_WIDTH,
-            );
-            w = ratioW;
-            h = ratioH;
-          } else {
-            const [ratioW, ratioH] = getOriginRatio(
-              selectedInfo.size.width,
-              selectedInfo.size.height,
-              imgW,
-              imgW,
-              IMAGE_MAXIMUM_WIDTH,
-            );
-            w = ratioW;
-            h = ratioH;
+          if (!isSquare) {
+            if (imgW > imgH) {
+              const [ratioW, ratioH] = getOriginRatio(
+                selectedInfo.size.width,
+                selectedInfo.size.height,
+                imgH,
+                imgH,
+                IMAGE_MAXIMUM_WIDTH,
+              );
+              w = ratioW;
+              h = ratioH;
+            } else {
+              const [ratioW, ratioH] = getOriginRatio(
+                selectedInfo.size.width,
+                selectedInfo.size.height,
+                imgW,
+                imgW,
+                IMAGE_MAXIMUM_WIDTH,
+              );
+              w = ratioW;
+              h = ratioH;
+            }
           }
+          setOriginWidth(w);
+          setOriginHeight(h);
         }
 
         const scaleX = naturalWidth / imgW;
@@ -345,21 +345,31 @@ const ThirdStep = () => {
 
         const crop = { x: selectedInfo.x, y: selectedInfo.y };
 
-        // 프리뷰
-        previewCanvas.width = w * scaleX;
-        previewCanvas.height = h * scaleY;
+        const canvasW = originWidth || w;
+        const canvasH = originHeight || h;
 
-        pCtx.clearRect(0, 0, w * scaleX, h * scaleY);
+        // 프리뷰
+        previewCanvas.width = canvasW * scaleX;
+        previewCanvas.height = canvasH * scaleY;
+
+        pCtx.clearRect(0, 0, canvasW * scaleX, canvasH * scaleY);
         pCtx.imageSmoothingQuality = 'high';
-        pCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, w * scaleX, h * scaleY, 0, 0, w * scaleX, h * scaleY);
+        pCtx.drawImage(
+          img,
+          crop.x * scaleX,
+          crop.y * scaleY,
+          canvasW * scaleX,
+          canvasH * scaleY,
+          0,
+          0,
+          canvasW * scaleX,
+          canvasH * scaleY,
+        );
         pCtx.globalCompositeOperation = 'destination-over';
         pCtx.fillStyle = selectedInfo.bgColor || '#fff';
-        pCtx.fillRect(0, 0, imgW * scaleX, imgH * scaleY);
+        pCtx.fillRect(0, 0, canvasW * scaleX, canvasH * scaleY);
 
         dispatch(setCanvasSaveList({ name: info.name, previewCanvas }));
-        setCropperList((prev) => {
-          return [...prev, { name: info.name, x: crop.x, y: crop.y }];
-        });
         setIsInitial(true);
       };
     });
@@ -370,11 +380,49 @@ const ThirdStep = () => {
     selectedInfo.bgColor,
     selectedInfo.size.width,
     selectedInfo.size.height,
+    originWidth,
+    originHeight,
     dispatch,
   ]);
 
+  const drawingPreview = useCallback(() => {
+    const previewCanvas = previewCanvasRef.current;
+
+    const canvas = cropperRef.current;
+    if (!canvas) return;
+    if (previewCanvas) {
+      const pCtx = previewCanvas.getContext('2d');
+      if (!pCtx) return;
+
+      const image = canvas.toDataURL('image/png', 1.0);
+      previewCanvas.width = originWidth;
+      previewCanvas.height = originHeight;
+      const img = new Image();
+      img.src = image;
+      img.onload = () => {
+        pCtx.clearRect(0, 0, originWidth, originHeight);
+        pCtx.imageSmoothingQuality = 'high';
+        pCtx.drawImage(img, 0, 0, originWidth, originHeight);
+        pCtx.globalCompositeOperation = 'destination-over';
+        pCtx.fillStyle = selectedInfo.bgColor || '#fff';
+        pCtx.fillRect(0, 0, originWidth, originHeight);
+      };
+      // pCtx.drawImage(
+      //   img,
+      //   crop.x * scaleX,
+      //   crop.y * scaleY,
+      //   (resizeWidth || w) * scaleX,
+      //   (resizeHeight || h) * scaleY,
+      //   0,
+      //   0,
+      //   resizeWidth || w,
+      //   resizeHeight || h,
+      // );
+    }
+  }, [originHeight, originWidth, selectedInfo.bgColor]);
+
   const createCropperCanvas = useCallback(
-    (canvas: HTMLCanvasElement, img: HTMLImageElement, preview?: boolean) => {
+    async (canvas: HTMLCanvasElement, img: HTMLImageElement) => {
       if (typeof selectedInfo.x !== 'number' || typeof selectedInfo.y !== 'number') {
         return;
       }
@@ -429,59 +477,34 @@ const ThirdStep = () => {
         }
       }
 
+      setOriginWidth(w);
+      setOriginHeight(h);
+
       const scaleX = naturalWidth / imgW;
       const scaleY = naturalHeight / imgH;
 
-      setCanvasWidth(canvasWidth ? canvasWidth : w);
-      setCanvasHeight(canvasHeight ? canvasHeight : h);
-      // const crop = cropperList.filter((lst) => lst.name === selectFrameName)[0];
+      const canvasW = resizeWidth || canvasWidth || w;
+      const canvasH = resizeHeight || canvasHeight || h;
+
+      setCanvasWidth(canvasW);
+      setCanvasHeight(canvasH);
+
       const crop = { x: selectedInfo.x, y: selectedInfo.y };
       cropperWrapper.style.top = `${crop.y}px`;
       cropperWrapper.style.left = `${crop.x}px`;
 
-      canvas.width = canvasWidth || w;
-      canvas.height = canvasHeight || h;
-      cropperWrapper.dataset.width = `${w}`;
-      cropperWrapper.dataset.height = `${h}`;
+      canvas.width = canvasW;
+      canvas.height = canvasH;
 
       ctx.clearRect(0, 0, imgW, imgH);
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, crop.x * scaleX, crop.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
-
-      // 프리뷰 드로잉
-      if (preview) {
-        const previewCanvas = previewCanvasRef.current;
-        if (previewCanvas) {
-          const pCtx = previewCanvas.getContext('2d');
-
-          previewCanvas.width = canvasWidth || w;
-          previewCanvas.height = canvasHeight || h;
-
-          if (!pCtx) return;
-
-          pCtx.clearRect(0, 0, imgW, imgH);
-          pCtx.imageSmoothingQuality = 'high';
-          pCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
-          pCtx.globalCompositeOperation = 'destination-over';
-          pCtx.fillStyle = selectedInfo.bgColor || '#fff';
-          pCtx.fillRect(0, 0, imgW * scaleX, imgH * scaleY);
-
-          setCropperList((prev) => {
-            const isExist = prev.find((lst) => lst.name === selectFrameName);
-            if (isExist) {
-              return prev;
-            } else {
-              return [...prev, { name: selectFrameName, x: 0, y: 0 }];
-            }
-          });
-        }
-      }
     },
     [
       canvasHeight,
       canvasWidth,
-      selectFrameName,
-      selectedInfo.bgColor,
+      resizeHeight,
+      resizeWidth,
       selectedInfo.size.height,
       selectedInfo.size.width,
       selectedInfo.type,
@@ -490,18 +513,8 @@ const ThirdStep = () => {
     ],
   );
 
-  const drawingPreview = useCallback(
-    (name: string, img: HTMLImageElement) => {
-      const canvas = previewCanvasRef.current;
-      if (canvas) {
-        createCropperCanvas(canvas, img, true);
-      }
-    },
-    [createCropperCanvas],
-  );
-
   const drawingCropper = useCallback(
-    (name: string, img: HTMLImageElement) => {
+    (img: HTMLImageElement) => {
       const canvas = cropperRef.current;
       if (canvas) {
         createCropperCanvas(canvas, img);
@@ -530,18 +543,19 @@ const ThirdStep = () => {
     ctx.drawImage(img, 0, 0, newW, newH);
   }, []);
 
-  // const handleResizeStart = useCallback((e) => {
-  //   const { cmd } = e.currentTarget.dataset;
-  //   setIsResizeMode(true);
-  //   setCmd(cmd);
-  //   setIsCalc(true);
-  // }, []);
+  const handleResizeStart = useCallback((e) => {
+    const { cmd } = e.currentTarget.dataset;
+    setIsResizeMode(true);
+    setCmd(cmd);
+    setIsCalc(true);
+  }, []);
 
   const handleResizeEnd = useCallback(() => {
     setIsResizeMode(false);
     setCmd(null);
     setIsCalc(false);
-  }, []);
+    drawingPreview();
+  }, [drawingPreview]);
 
   const handleResize = useCallback(
     (e) => {
@@ -552,12 +566,12 @@ const ThirdStep = () => {
         if (cursorX && cursorY && cmd) {
           const result = positioningImageResize(cropperWrapperRef, cmd, cursorX, cursorY);
           if (result) {
-            // const { newWidth, newHeight } = result;
+            const { newWidth, newHeight } = result;
             // if (newWidth + cropperX > imgWidth || newHeight + cropperY > imgHeight) {
             //   return;
             // }
-            // setResizeWidth(newWidth);
-            // setResizeHeight(newHeight);
+            setResizeWidth(newWidth);
+            setResizeHeight(newHeight);
           }
         }
       }
@@ -607,29 +621,10 @@ const ThirdStep = () => {
         const positionLeft = positionX >= 0 ? (positionX >= cropX * 2 ? cropX * 2 : positionX) : 0;
         const positionTop = positionY >= 0 ? (positionY >= cropY * 2 ? cropY * 2 : positionY) : 0;
 
-        const cropper = cropperList[0];
-
-        if (cropper) {
-          const { name } = cropper;
-          dispatch(updatePositionByFrame({ name, x: positionLeft, y: positionTop }));
-        }
-        setCropperList((prev) => {
-          const isExist = prev.find((lst) => lst.name === selectFrameName);
-          if (isExist) {
-            const res = prev.map((lst) => ({
-              ...lst,
-              name: lst.name === selectFrameName ? selectedInfo.name : lst.name,
-              x: lst.name === selectFrameName ? positionLeft : lst.x,
-              y: lst.name === selectFrameName ? positionTop : lst.y,
-            }));
-            return res;
-          } else {
-            return [...prev, { name: selectFrameName, x: positionLeft, y: positionTop }];
-          }
-        });
+        dispatch(updatePositionByFrame({ name: selectFrameName, x: positionLeft, y: positionTop }));
       }
     },
-    [isCalc, xDiff, yDiff, canvasWidth, canvasHeight, cropperList, dispatch, selectFrameName, selectedInfo.name],
+    [isCalc, xDiff, yDiff, canvasWidth, canvasHeight, dispatch, selectFrameName],
   );
 
   const handleActiveCropper = useCallback(() => {
@@ -641,7 +636,8 @@ const ThirdStep = () => {
     setIsMoving(false);
     setIsCalc(false);
     createSaveCanvas();
-  }, [createSaveCanvas]);
+    drawingPreview();
+  }, [createSaveCanvas, drawingPreview]);
 
   const handleColorChange = useCallback(
     (color: ColorResult) => {
@@ -652,6 +648,38 @@ const ThirdStep = () => {
     [createSaveCanvas, dispatch],
   );
 
+  // 처음 크로퍼 렌더링시 프리뷰 렌더링
+  useEffect(() => {
+    drawingPreview();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [originWidth, originHeight]);
+
+  // 사이즈 확대/축소시 크로퍼에 반영
+  useEffect(() => {
+    const img: HTMLImageElement = imgElements.get(selectFrameName);
+    drawingCropper(img);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resizeWidth, resizeHeight]);
+
+  // 움직일시 크로퍼에 반영
+  useEffect(() => {
+    const img: HTMLImageElement = imgElements.get(selectFrameName);
+    drawingCropper(img);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedInfo.x, selectedInfo.y]);
+
+  // 로드 true에 따라 이미지와 크로퍼 생성
+  useEffect(() => {
+    if (!isLoaded) return;
+    const img: HTMLImageElement = imgElements.get(selectFrameName);
+    const imgCanvas = imgCanvasRef.current;
+    if (!imgCanvas) return;
+    createImgCanvas(imgCanvas, img);
+    drawingCropper(img);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded]);
+
+  // 그리기 위한 이미지가 로드 되면 true로
   useEffect(() => {
     const img: HTMLImageElement = imgElements.get(selectFrameName);
 
@@ -660,26 +688,8 @@ const ThirdStep = () => {
         setIsLoaded(true);
       };
     }
-  }, [imgElements, isLoaded, selectFrameName]);
-
-  useEffect(() => {
-    const img: HTMLImageElement = imgElements.get(selectFrameName);
-
-    if (isLoaded) {
-      const imgCanvas = imgCanvasRef.current;
-      if (imgCanvas) {
-        new Promise((resolve) => {
-          createImgCanvas(imgCanvas, img);
-          resolve(true);
-        })
-          .then(() => {
-            drawingCropper(selectFrameName, img);
-            drawingPreview(selectFrameName, img);
-          })
-          .catch((err) => new Error(`캔버스 드로잉에 실패했습니다! ${err}`));
-      }
-    }
-  }, [selectFrameName, imgElements, isLoaded, createImgCanvas, drawingCropper, drawingPreview]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectFrameName]);
 
   // 초기 진입시 캔버스 저장
   useEffect(() => {
@@ -772,7 +782,7 @@ const ThirdStep = () => {
               onMouseLeave={isMoving ? handleCancelMoveCropper : undefined}
             />
 
-            {/* <div
+            <div
               data-cmd="top-left"
               onMouseDown={handleResizeStart}
               onTouchStart={isMobile ? handleResizeStart : undefined}
@@ -791,7 +801,7 @@ const ThirdStep = () => {
               data-cmd="bottom-right"
               onMouseDown={handleResizeStart}
               onTouchStart={isMobile ? handleResizeStart : undefined}
-            /> */}
+            />
             <span></span>
             <span></span>
             <span></span>
