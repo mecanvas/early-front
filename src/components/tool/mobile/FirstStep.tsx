@@ -42,27 +42,18 @@ const FirstStep = () => {
         {/* <FirstSelectedList /> */}
       </Tabs.TabPane>
 
-      <Tabs.TabPane key="1" tab={<TabTitle>정방형</TabTitle>}>
+      <Tabs.TabPane key="1" tab={<TabTitle>탁상형</TabTitle>}>
         <OpacityComponent>
-          <FirstGuideText>정사각형 액자입니다. 탁상에 놓기 부담없는 사이즈에요!</FirstGuideText>
+          <FirstGuideText>탁상에 놓기 부담없는 사이즈에요!</FirstGuideText>
         </OpacityComponent>
         <FirstFrameListByTab frameList={frameList} />
         <Divider />
         {/* <FirstSelectedList /> */}
       </Tabs.TabPane>
 
-      <Tabs.TabPane key="2" tab={<TabTitle>세로형</TabTitle>}>
+      <Tabs.TabPane key="2" tab={<TabTitle>벽걸이형</TabTitle>}>
         <OpacityComponent>
-          <FirstGuideText>세로가 긴 형태의 직사각형 액자입니다.</FirstGuideText>
-        </OpacityComponent>
-        <FirstFrameListByTab frameList={frameList} />
-        <Divider />
-        {/* <FirstSelectedList /> */}
-      </Tabs.TabPane>
-
-      <Tabs.TabPane key="3" tab={<TabTitle>가로형</TabTitle>}>
-        <OpacityComponent>
-          <FirstGuideText>가로가 긴 형태의 직사각형 액자입니다. </FirstGuideText>
+          <FirstGuideText>벽에 걸기 적합한 사이즈에요!</FirstGuideText>
         </OpacityComponent>
         <FirstFrameListByTab frameList={frameList} />
         <Divider />

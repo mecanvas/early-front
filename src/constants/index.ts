@@ -12,9 +12,9 @@ export const IMG_LIMIT_MINIMUM_SIZE = process.env.NODE_ENV === 'production' ? 1_
 export const API_URL =
   process.env.NODE_ENV === 'production'
     ? 'https://api.early21.com'
-    : `http://localhost:${process.env.NEXT_PUBLIC_PORT}`;
+    : `http://192.168.0.3:${process.env.NEXT_PUBLIC_PORT}`;
 
-export const MY_URL = process.env.NODE_ENV === 'production' ? 'https://early21.com' : 'http://localhost:3000';
+export const MY_URL = process.env.NODE_ENV === 'production' ? 'https://early21.com' : 'http://192.168.0.3:3000';
 
 // 해당하는 routes들은 false를 반환합니다. -> footer를 제외하고 불러옵니다.
 export const exceptionRoutes = ['/tool/divided', '/tool/single', '/404', '/success'];
@@ -28,131 +28,23 @@ export const CONTENT_HEIGHT = 'calc(100vh - 168px)';
 // App의 헤더 크기
 export const APP_HEADER_HEIGHT = 60;
 
-// 직사각형 3 -> 가로가 긴 모형
-export const frameRectangleMoreWidthThanHeight: FrameInfoList[] = [
-  {
-    id: 1,
-    type: 3,
-    name: 'P-2호',
-    widthCm: 25.8,
-    heightCm: 16,
-    price: 10000,
-    size: {
-      width: cmToPx(25.8),
-      height: cmToPx(16),
-    },
-    recommand: true,
-  },
-  {
-    id: 2,
-    type: 3,
-    name: 'P-4호',
-    widthCm: 33.3,
-    heightCm: 21,
-    price: 18000,
-    size: {
-      width: cmToPx(33.3),
-      height: cmToPx(21),
-    },
-    recommand: false,
-  },
-  {
-    id: 3,
-    type: 3,
-    name: 'F-0호',
-    widthCm: 18,
-    heightCm: 14,
-    price: 11000,
-    size: {
-      width: cmToPx(18),
-      height: cmToPx(14),
-    },
-    recommand: false,
-  },
-  {
-    id: 4,
-    type: 3,
-    name: 'F-2호',
-    widthCm: 25.8,
-    heightCm: 18,
-    price: 16000,
-    size: {
-      width: cmToPx(25.8),
-      height: cmToPx(18),
-    },
-    recommand: true,
-  },
-  {
-    id: 5,
-    type: 3,
-    name: 'F-4호',
-    widthCm: 33.3,
-    heightCm: 24,
-    price: 21000,
-    size: {
-      width: cmToPx(33.3),
-      height: cmToPx(24),
-    },
-    recommand: false,
-  },
-  {
-    id: 6,
-    type: 3,
-    name: 'M-4호',
-    widthCm: 33.3,
-    heightCm: 19,
-    price: 19000,
-    size: {
-      width: cmToPx(33.3),
-      height: cmToPx(19),
-    },
-    recommand: false,
-  },
-];
-
-// 직사각형 2 -> 세로가 긴 모형
+// 벽걸이용 추천 = 2
 export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
   {
     id: 1,
     type: 2,
-    name: 'P-2호',
-    widthCm: 16,
-    heightCm: 25.8,
-    price: 10000,
+    name: 'S-4호',
+    widthCm: 24,
+    heightCm: 24,
+    price: 15000,
     size: {
-      width: cmToPx(16),
-      height: cmToPx(25.8),
+      width: cmToPx(24),
+      height: cmToPx(24),
     },
     recommand: true,
   },
   {
     id: 2,
-    type: 2,
-    name: 'P-4호',
-    widthCm: 21,
-    heightCm: 33.3,
-    price: 18000,
-    size: {
-      width: cmToPx(21),
-      height: cmToPx(33.3),
-    },
-    recommand: false,
-  },
-  {
-    id: 3,
-    type: 2,
-    name: 'F-0호',
-    widthCm: 14,
-    heightCm: 18,
-    price: 11000,
-    size: {
-      width: cmToPx(14),
-      height: cmToPx(18),
-    },
-    recommand: false,
-  },
-  {
-    id: 4,
     type: 2,
     name: 'F-2호',
     widthCm: 18,
@@ -164,8 +56,9 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
     },
     recommand: true,
   },
+
   {
-    id: 5,
+    id: 3,
     type: 2,
     name: 'F-4호',
     widthCm: 24,
@@ -178,32 +71,32 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
     recommand: false,
   },
   {
-    id: 6,
+    id: 4,
     type: 2,
-    name: 'M-4호',
-    widthCm: 19,
+    name: 'P-4호',
+    widthCm: 21,
     heightCm: 33.3,
-    price: 19000,
+    price: 18000,
     size: {
-      width: cmToPx(19),
+      width: cmToPx(21),
       height: cmToPx(33.3),
     },
     recommand: false,
   },
 ];
 
-// 정사각형 = 1
+// 탁자용 = 1
 export const frameSquare: FrameInfoList[] = [
   {
     id: 1,
     type: 1,
-    name: 'S-0호',
-    widthCm: 12,
-    heightCm: 12,
-    price: 8000,
+    name: 'F-0호',
+    widthCm: 14,
+    heightCm: 18,
+    price: 11000,
     size: {
-      width: cmToPx(12),
-      height: cmToPx(12),
+      width: cmToPx(14),
+      height: cmToPx(18),
     },
     recommand: false,
   },
@@ -232,19 +125,6 @@ export const frameSquare: FrameInfoList[] = [
       height: cmToPx(19),
     },
     recommand: false,
-  },
-  {
-    id: 4,
-    type: 1,
-    name: 'S-4호',
-    widthCm: 24,
-    heightCm: 24,
-    price: 15000,
-    size: {
-      width: cmToPx(24),
-      height: cmToPx(24),
-    },
-    recommand: true,
   },
 ];
 

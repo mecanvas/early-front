@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { frameRectangleMoreHeightThanWidth, frameRectangleMoreWidthThanHeight, frameSquare } from 'src/constants';
+import { frameRectangleMoreHeightThanWidth, frameSquare } from 'src/constants';
 
 export interface FrameInfoList {
   id: number;
-  type: 1 | 2 | 3; // 1 = 정, 2 = 직-세로, 3= 직-가로
+  type: 1 | 2; // 1 = 탁상용, 2 = 벽걸이용
   name: string;
   widthCm: number;
   heightCm: number;
@@ -28,7 +28,7 @@ interface FrameState {
 }
 
 const initialState: FrameState = {
-  frameInfoList: [...frameSquare, ...frameRectangleMoreHeightThanWidth, ...frameRectangleMoreWidthThanHeight],
+  frameInfoList: [...frameSquare, ...frameRectangleMoreHeightThanWidth],
   selectedFrame: [],
 };
 
