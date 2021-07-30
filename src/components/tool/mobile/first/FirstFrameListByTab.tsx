@@ -29,6 +29,13 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
     setisRotate((prev) => !prev);
   }, []);
 
+  const handleLeave = useCallback(() => {
+    const selectedId = selectedFrameList[0].id;
+    const selectedType = selectedFrameList[0].type;
+    const showingIndex = frameList.findIndex((lst) => lst.type === selectedType && lst.id === selectedId);
+    setShowingIndex(showingIndex);
+  }, [frameList, selectedFrameList]);
+
   const handleSelectFrame = useCallback(
     (e) => {
       const { index } = e.currentTarget.dataset;
@@ -46,6 +53,7 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
         dataSource={frameList}
         renderItem={(item: FrameInfoList, index) => (
           <FirstListItems
+            onMouseLeave={handleLeave}
             onMouseOver={handleShowingFrameByHover}
             selected={selectedFrameList.some((lst) => lst.type === item.type && lst.name === item.name)}
             data-index={index}
