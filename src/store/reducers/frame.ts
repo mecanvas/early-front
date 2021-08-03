@@ -19,6 +19,8 @@ export interface SelectedFrame extends FrameInfoList {
   imgUrl?: string;
   x?: number;
   y?: number;
+  right?: number;
+  bottom?: number;
   bgColor?: string;
 }
 
@@ -80,16 +82,21 @@ const frame = createSlice({
     setBgColorFrame: (state, { payload }: PayloadAction<{ bgColor: string }>) => {
       state.selectedFrame = state.selectedFrame.map((lst) => ({ ...lst, bgColor: payload.bgColor }));
     },
-    updatePositionByFrame: (state, { payload }: PayloadAction<{ name: string; x: number; y: number }>) => {
+    updatePositionByFrame: (
+      state,
+      { payload }: PayloadAction<{ name: string; x: number; y: number; right?: number; bottom?: number }>,
+    ) => {
       state.selectedFrame = state.selectedFrame.map((lst) => ({
         ...lst,
         name: lst.name === payload.name ? payload.name : lst.name,
         x: lst.name === payload.name ? payload.x : lst.x,
         y: lst.name === payload.name ? payload.y : lst.y,
+        right: lst.name === payload.name ? payload.right : lst.right,
+        bottom: lst.name === payload.name ? payload.bottom : lst.bottom,
       }));
     },
     deletePositionByFrame: (state) => {
-      state.selectedFrame = state.selectedFrame.map((lst) => ({ ...lst, x: 0, y: 0 }));
+      state.selectedFrame = state.selectedFrame.map((lst) => ({ ...lst, x: 0, y: 0, right: 0, top: 0 }));
     },
   },
 });

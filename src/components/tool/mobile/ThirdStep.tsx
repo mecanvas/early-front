@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Popover, Button, Spin } from 'antd';
@@ -117,9 +118,7 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   position: absolute;
   width: ${({ width }) => width}px;
   height: ${({ height }) => height}px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
   /* top-left */
   div:nth-of-type(1) {
     z-index: 12;
@@ -249,6 +248,8 @@ const ThirdStep = () => {
 
   const [xDiff, setXDiff] = useState(0);
   const [yDiff, setYDiff] = useState(0);
+  const [cursorXDiff, setCursorXDiff] = useState(0);
+  const [cursorYDiff, setCursorYDiff] = useState(0);
   const [isCalc, setIsCalc] = useState(false);
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
@@ -407,17 +408,6 @@ const ThirdStep = () => {
         pCtx.fillStyle = selectedInfo.bgColor || '#fff';
         pCtx.fillRect(0, 0, originWidth, originHeight);
       };
-      // pCtx.drawImage(
-      //   img,
-      //   crop.x * scaleX,
-      //   crop.y * scaleY,
-      //   (resizeWidth || w) * scaleX,
-      //   (resizeHeight || h) * scaleY,
-      //   0,
-      //   0,
-      //   resizeWidth || w,
-      //   resizeHeight || h,
-      // );
     }
   }, [originHeight, originWidth, selectedInfo.bgColor]);
 
@@ -477,19 +467,20 @@ const ThirdStep = () => {
         }
       }
 
-      setOriginWidth(w);
-      setOriginHeight(h);
+      if (!originWidth && !originHeight) {
+        setOriginWidth(w);
+        setOriginHeight(h);
+      }
 
       const scaleX = naturalWidth / imgW;
       const scaleY = naturalHeight / imgH;
 
       const canvasW = resizeWidth || canvasWidth || w;
       const canvasH = resizeHeight || canvasHeight || h;
-
       setCanvasWidth(canvasW);
       setCanvasHeight(canvasH);
 
-      const crop = { x: selectedInfo.x, y: selectedInfo.y };
+      const crop = { x: selectedInfo.x, y: selectedInfo.y, right: selectedInfo.right, bottom: selectedInfo.bottom };
       cropperWrapper.style.top = `${crop.y}px`;
       cropperWrapper.style.left = `${crop.x}px`;
 
@@ -501,6 +492,8 @@ const ThirdStep = () => {
       ctx.drawImage(img, crop.x * scaleX, crop.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
     },
     [
+      originWidth,
+      originHeight,
       canvasHeight,
       canvasWidth,
       resizeHeight,
@@ -554,8 +547,10 @@ const ThirdStep = () => {
     setIsResizeMode(false);
     setCmd(null);
     setIsCalc(false);
+    setOriginWidth(resizeWidth);
+    setOriginHeight(resizeHeight);
     drawingPreview();
-  }, [drawingPreview]);
+  }, [drawingPreview, resizeWidth, resizeHeight]);
 
   const handleResize = useCallback(
     (e) => {
@@ -565,20 +560,116 @@ const ThirdStep = () => {
         const [cursorX, cursorY] = getPosition(e);
         if (cursorX && cursorY && cmd) {
           const result = positioningImageResize(cropperWrapperRef, cmd, cursorX, cursorY);
-          if (result) {
-            const { newWidth, newHeight } = result;
-            // if (newWidth + cropperX > imgWidth || newHeight + cropperY > imgHeight) {
-            //   return;
-            // }
-            setResizeWidth(newWidth);
-            setResizeHeight(newHeight);
+          const imgCanvas = imgCanvasRef.current;
+          if (result && imgCanvas) {
+            const {
+              left: imgPaddingLeft,
+              right: imgPaddingRight,
+              top: imgPaddingTop,
+              bottom: imgPaddingBottom,
+            } = imgCanvas.getBoundingClientRect();
+            const {
+              left: wrapperPaddingLeft,
+              right: wrapperPaddingRight,
+              top: wrapperPaddingTop,
+              bottom: wrapperPaddingBottom,
+            } = cropperWrapperRef.current.getBoundingClientRect();
+            const cropperWrapper = cropperWrapperRef.current;
+            const isWrapperLeft = wrapperPaddingLeft - imgPaddingLeft;
+            const isWrapperRight = wrapperPaddingRight - imgPaddingRight;
+            const isWrapperTop = wrapperPaddingTop - imgPaddingTop;
+            const isWrapperBottom = wrapperPaddingBottom - imgPaddingBottom;
+            const cursorXInImage = cursorX - imgPaddingLeft;
+            const cursorYInImage = cursorY - imgPaddingTop;
+
+            if (isCalc) {
+              setCursorXDiff(replacePx(cropperWrapper.style.left));
+              setCursorYDiff(replacePx(cropperWrapper.style.top));
+              setIsCalc(false);
+            }
+
+            if (!isCalc) {
+              // top-left에서 움직일시 크기
+              const cursorX = cursorXInImage - cursorXDiff;
+              const cursorY = cursorYInImage - cursorYDiff;
+
+              if (cmd === 'top-left') {
+                const resizeByTopLeft = originWidth - cursorX;
+                const resizeByBottomLeft = originHeight - cursorY;
+
+                dispatch(
+                  updatePositionByFrame({
+                    name: selectedInfo.name,
+                    x: cursorXInImage,
+                    y: cursorYInImage,
+                  }),
+                );
+                setResizeWidth(resizeByTopLeft);
+                setResizeHeight(resizeByBottomLeft);
+              }
+
+              // top-right에서 움직일시 크기
+              if (cmd === 'top-right') {
+                const resizeByTopRight = cursorX;
+                const resizeByBottomLeft = originHeight - cursorY;
+
+                dispatch(
+                  updatePositionByFrame({
+                    name: selectedInfo.name,
+                    x: cursorXDiff,
+                    y: cursorYInImage,
+                  }),
+                );
+                setResizeWidth(resizeByTopRight);
+                setResizeHeight(resizeByBottomLeft);
+              }
+
+              // bottom-left에서 움직일시 크기
+              const resizeByBottomLeft = isWrapperTop + cursorYInImage;
+              // bottom-right에서 움직일시 크기
+              const resizeByBottomRight = isWrapperTop + cursorYInImage;
+
+              const resizePaddingRight = 0;
+              const resizePaddingTop = 0;
+              const resizePaddingBottom = 0;
+
+              const { newWidth, newHeight } = result;
+              if (!newWidth || !newHeight) return;
+
+              const wrapperLeft = imgWidth - (newWidth + isWrapperRight);
+              const wrapperTop = imgHeight - (newHeight + isWrapperTop);
+              const wrapperRight = imgWidth - (newWidth + wrapperLeft);
+              const wrapperBottom = imgHeight - (newHeight + wrapperTop);
+              const diffWidth = wrapperLeft + (originWidth - newWidth);
+              const diffHeight = originHeight - newHeight;
+
+              if (newWidth + wrapperLeft > imgWidth || newHeight + wrapperTop > imgHeight) {
+                return;
+              }
+              // setResizeWidth(newWidth);
+              // setResizeHeight(newHeight);
+            }
           }
         }
       }
 
       requestAnimationFrame(() => handleResize);
     },
-    [isResizeMode, cmd],
+    [
+      isResizeMode,
+      cmd,
+      selectedInfo.x,
+      selectedInfo.y,
+      selectedInfo.name,
+      imgWidth,
+      imgHeight,
+      dispatch,
+      originWidth,
+      originHeight,
+      isCalc,
+      cursorXDiff,
+      cursorYDiff,
+    ],
   );
 
   const handleSelected = useCallback(
@@ -621,7 +712,15 @@ const ThirdStep = () => {
         const positionLeft = positionX >= 0 ? (positionX >= cropX * 2 ? cropX * 2 : positionX) : 0;
         const positionTop = positionY >= 0 ? (positionY >= cropY * 2 ? cropY * 2 : positionY) : 0;
 
-        dispatch(updatePositionByFrame({ name: selectFrameName, x: positionLeft, y: positionTop }));
+        dispatch(
+          updatePositionByFrame({
+            name: selectFrameName,
+            x: positionLeft,
+            right: width - (positionLeft + canvasWidth),
+            y: positionTop,
+            bottom: height - (positionTop + canvasHeight),
+          }),
+        );
       }
     },
     [isCalc, xDiff, yDiff, canvasWidth, canvasHeight, dispatch, selectFrameName],
@@ -636,8 +735,10 @@ const ThirdStep = () => {
     setIsMoving(false);
     setIsCalc(false);
     createSaveCanvas();
+    setOriginWidth(resizeWidth);
+    setOriginHeight(resizeHeight);
     drawingPreview();
-  }, [createSaveCanvas, drawingPreview]);
+  }, [createSaveCanvas, drawingPreview, resizeWidth, resizeHeight]);
 
   const handleColorChange = useCallback(
     (color: ColorResult) => {

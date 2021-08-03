@@ -14,7 +14,6 @@ export const positioningImageResize = (
   const absY = Math.abs(height + Math.ceil(top - y));
   const absLeftX = Math.abs(x - Math.ceil(right));
   const absBottomY = Math.abs(y + height - (top + height));
-
   let newWidth = width;
   let newHeight = height;
 
@@ -23,11 +22,11 @@ export const positioningImageResize = (
   };
 
   switch (resizeCmd) {
-    case 'bottom-right':
+    case 'top-right':
       newHeight = getNewHeight(absX);
       newWidth = absX;
       break;
-    case 'top-right':
+    case 'bottom-right':
       newHeight = getNewHeight(absX);
       newWidth = absX;
       break;
