@@ -19,8 +19,8 @@ export interface SelectedFrame extends FrameInfoList {
   imgUrl?: string;
   x?: number;
   y?: number;
-  right?: number;
-  bottom?: number;
+  width?: number;
+  height?: number;
   bgColor?: string;
 }
 
@@ -84,15 +84,18 @@ const frame = createSlice({
     },
     updatePositionByFrame: (
       state,
-      { payload }: PayloadAction<{ name: string; x: number; y: number; right?: number; bottom?: number }>,
+      { payload }: PayloadAction<{ name: string; x: number; y: number; width?: number; height?: number }>,
     ) => {
       state.selectedFrame = state.selectedFrame.map((lst) => ({
         ...lst,
         name: lst.name === payload.name ? payload.name : lst.name,
         x: lst.name === payload.name ? payload.x : lst.x,
         y: lst.name === payload.name ? payload.y : lst.y,
-        right: lst.name === payload.name ? payload.right : lst.right,
-        bottom: lst.name === payload.name ? payload.bottom : lst.bottom,
+        size: {
+          ...lst.size,
+          width: lst.name === payload.name && payload.width ? payload.width : lst.size.width,
+          height: lst.name === payload.name && payload.height ? payload.height : lst.size.height,
+        },
       }));
     },
     deletePositionByFrame: (state) => {
