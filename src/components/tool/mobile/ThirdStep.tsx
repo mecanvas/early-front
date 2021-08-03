@@ -246,6 +246,7 @@ const ThirdStep = () => {
   const [selectFrameName, setSelectFrameName] = useState(selectedFrame[0]?.name);
   const [isMoving, setIsMoving] = useState(false);
 
+  const [ratio, setRatio] = useState(0);
   const [xDiff, setXDiff] = useState(0);
   const [yDiff, setYDiff] = useState(0);
   const [cursorXDiff, setCursorXDiff] = useState(0);
@@ -562,23 +563,9 @@ const ThirdStep = () => {
           const result = positioningImageResize(cropperWrapperRef, cmd, cursorX, cursorY);
           const imgCanvas = imgCanvasRef.current;
           if (result && imgCanvas) {
-            const {
-              left: imgPaddingLeft,
-              right: imgPaddingRight,
-              top: imgPaddingTop,
-              bottom: imgPaddingBottom,
-            } = imgCanvas.getBoundingClientRect();
-            const {
-              left: wrapperPaddingLeft,
-              right: wrapperPaddingRight,
-              top: wrapperPaddingTop,
-              bottom: wrapperPaddingBottom,
-            } = cropperWrapperRef.current.getBoundingClientRect();
+            const { left: imgPaddingLeft, top: imgPaddingTop } = imgCanvas.getBoundingClientRect();
             const cropperWrapper = cropperWrapperRef.current;
-            const isWrapperLeft = wrapperPaddingLeft - imgPaddingLeft;
-            const isWrapperRight = wrapperPaddingRight - imgPaddingRight;
-            const isWrapperTop = wrapperPaddingTop - imgPaddingTop;
-            const isWrapperBottom = wrapperPaddingBottom - imgPaddingBottom;
+
             const cursorXInImage = cursorX - imgPaddingLeft;
             const cursorYInImage = cursorY - imgPaddingTop;
 
@@ -595,7 +582,8 @@ const ThirdStep = () => {
 
               if (cmd === 'top-left') {
                 const resizeByTopLeft = originWidth - cursorX;
-                const resizeByBottomLeft = originHeight - cursorY;
+                const resizeByBottomLeft = resizeByTopLeft * ratio;
+                // const resizeByBottomLeft = originHeight - cursorY;
 
                 dispatch(
                   updatePositionByFrame({
@@ -611,7 +599,8 @@ const ThirdStep = () => {
               // top-right에서 움직일시 크기
               if (cmd === 'top-right') {
                 const resizeByTopRight = cursorX;
-                const resizeByBottomRight = originHeight - cursorY;
+                const resizeByBottomRight = resizeByTopRight * ratio;
+                // const resizeByBottomRight = originHeight - cursorY;
 
                 dispatch(
                   updatePositionByFrame({
@@ -627,7 +616,9 @@ const ThirdStep = () => {
               // bottom-left에서 움직일시 크기
               if (cmd === 'bottom-left') {
                 const resizeByBottomLeft = originWidth - cursorX;
-                const resizeByTopLeft = cursorY;
+                const resizeByTopLeft = resizeByBottomLeft * ratio;
+                // const resizeByTopLeft = cursorY;
+
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
@@ -642,7 +633,8 @@ const ThirdStep = () => {
               // bottom-right에서 움직일시 크기
               if (cmd === 'bottom-right') {
                 const resizeByTopRight = cursorX;
-                const resizeByBottomRight = cursorY;
+                const resizeByBottomRight = resizeByTopRight * ratio;
+                // const resizeByBottomRight = cursorY;
 
                 dispatch(
                   updatePositionByFrame({
@@ -654,26 +646,6 @@ const ThirdStep = () => {
                 setResizeWidth(resizeByTopRight);
                 setResizeHeight(resizeByBottomRight);
               }
-
-              const resizePaddingRight = 0;
-              const resizePaddingTop = 0;
-              const resizePaddingBottom = 0;
-
-              const { newWidth, newHeight } = result;
-              if (!newWidth || !newHeight) return;
-
-              const wrapperLeft = imgWidth - (newWidth + isWrapperRight);
-              const wrapperTop = imgHeight - (newHeight + isWrapperTop);
-              const wrapperRight = imgWidth - (newWidth + wrapperLeft);
-              const wrapperBottom = imgHeight - (newHeight + wrapperTop);
-              const diffWidth = wrapperLeft + (originWidth - newWidth);
-              const diffHeight = originHeight - newHeight;
-
-              if (newWidth + wrapperLeft > imgWidth || newHeight + wrapperTop > imgHeight) {
-                return;
-              }
-              // setResizeWidth(newWidth);
-              // setResizeHeight(newHeight);
             }
           }
         }
@@ -682,6 +654,7 @@ const ThirdStep = () => {
       requestAnimationFrame(() => handleResize);
     },
     [
+      ratio,
       isResizeMode,
       cmd,
       selectedInfo.x,
@@ -774,6 +747,10 @@ const ThirdStep = () => {
     },
     [createSaveCanvas, dispatch],
   );
+
+  useEffect(() => {
+    setRatio(originHeight / originWidth);
+  }, [originWidth, originHeight]);
 
   // 처음 크로퍼 렌더링시 프리뷰 렌더링
   useEffect(() => {
