@@ -611,7 +611,7 @@ const ThirdStep = () => {
               // top-right에서 움직일시 크기
               if (cmd === 'top-right') {
                 const resizeByTopRight = cursorX;
-                const resizeByBottomLeft = originHeight - cursorY;
+                const resizeByBottomRight = originHeight - cursorY;
 
                 dispatch(
                   updatePositionByFrame({
@@ -621,13 +621,39 @@ const ThirdStep = () => {
                   }),
                 );
                 setResizeWidth(resizeByTopRight);
-                setResizeHeight(resizeByBottomLeft);
+                setResizeHeight(resizeByBottomRight);
               }
 
               // bottom-left에서 움직일시 크기
-              const resizeByBottomLeft = isWrapperTop + cursorYInImage;
+              if (cmd === 'bottom-left') {
+                const resizeByBottomLeft = originWidth - cursorX;
+                const resizeByTopLeft = cursorY;
+                dispatch(
+                  updatePositionByFrame({
+                    name: selectedInfo.name,
+                    x: cursorXInImage,
+                    y: cursorYDiff,
+                  }),
+                );
+                setResizeWidth(resizeByBottomLeft);
+                setResizeHeight(resizeByTopLeft);
+              }
+
               // bottom-right에서 움직일시 크기
-              const resizeByBottomRight = isWrapperTop + cursorYInImage;
+              if (cmd === 'bottom-right') {
+                const resizeByTopRight = cursorX;
+                const resizeByBottomRight = cursorY;
+
+                dispatch(
+                  updatePositionByFrame({
+                    name: selectedInfo.name,
+                    x: cursorXDiff,
+                    y: cursorYDiff,
+                  }),
+                );
+                setResizeWidth(resizeByTopRight);
+                setResizeHeight(resizeByBottomRight);
+              }
 
               const resizePaddingRight = 0;
               const resizePaddingTop = 0;
