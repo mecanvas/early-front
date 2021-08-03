@@ -4,11 +4,12 @@ import { Popover, Button, Spin } from 'antd';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ColorResult } from 'react-color';
 import { isMobile } from 'react-device-detect';
+import Img from 'src/components/common/Img';
 import { IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT } from 'src/constants';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { setCanvasSaveList } from 'src/store/reducers/canvas';
-import { SelectedFrame, setBgColorFrame, updatePositionByFrame } from 'src/store/reducers/frame';
+import { SelectedFrame, setBgColorFrame, setOriginSize, updatePositionByFrame } from 'src/store/reducers/frame';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getPosition } from 'src/utils/getPosition';
 import { replacePx } from 'src/utils/replacePx';
@@ -230,8 +231,7 @@ const ThirdPreviewCanvas = styled.div`
 
 const ThirdStep = () => {
   const dispatch = useAppDispatch();
-  const { selectedFrame, frameInfoList } = useAppSelector(({ frame }) => frame);
-  const { canvasSaveList } = useAppSelector(({ canvas }) => canvas);
+  const { selectedFrame } = useAppSelector(({ frame }) => frame);
 
   const [isResizeMode, setIsResizeMode] = useState(false);
   const [cmd, setCmd] = useState<ResizeCmd | null>(null);
@@ -240,10 +240,10 @@ const ThirdStep = () => {
   const imgCanvasRef = useRef<HTMLCanvasElement>(null);
   const cropperRef = useRef<HTMLCanvasElement>(null);
   const cropperWrapperRef = useRef<HTMLDivElement>(null);
-  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const [selectFrameName, setSelectFrameName] = useState(selectedFrame[0]?.name);
   const [isMoving, setIsMoving] = useState(false);
 
+  const [canvasUrl, setCanvasUrl] = useState('');
   const [ratio, setRatio] = useState(0);
   const [xDiff, setXDiff] = useState(0);
   const [yDiff, setYDiff] = useState(0);
@@ -258,11 +258,6 @@ const ThirdStep = () => {
   const [originHeight, setOriginHeight] = useState(0);
   const [resizeWidth, setResizeWidth] = useState(0);
   const [resizeHeight, setResizeHeight] = useState(0);
-
-  const selectInitialInfo = useMemo(() => {
-    const selectedCanvas = frameInfoList.filter((lst) => lst.name === selectFrameName)[0];
-    return selectedCanvas;
-  }, [frameInfoList, selectFrameName]);
 
   const selectedInfo = useMemo(() => {
     const selectedCanvas = selectedFrame.filter((lst) => lst.name === selectFrameName)[0];
@@ -292,7 +287,7 @@ const ThirdStep = () => {
       const img = new Image();
       img.src = info.imgUrl || '';
       img.crossOrigin = 'Anonymous';
-      img.onload = () => {
+      img.onload = async () => {
         if (!sCtx || !pCtx) return;
         if (typeof selectedInfo.x !== 'number' || typeof selectedInfo.y !== 'number') {
           return;
@@ -341,6 +336,7 @@ const ThirdStep = () => {
               h = ratioH;
             }
           }
+          dispatch(setOriginSize({ originWidth: w, originHeight: h }));
           setOriginWidth(w);
           setOriginHeight(h);
         }
@@ -348,10 +344,11 @@ const ThirdStep = () => {
         const scaleX = naturalWidth / imgW;
         const scaleY = naturalHeight / imgH;
 
+        const cropperSize = { w: selectedInfo.size.width, h: selectedInfo.size.height };
         const crop = { x: selectedInfo.x, y: selectedInfo.y };
 
-        const canvasW = originWidth || w;
-        const canvasH = originHeight || h;
+        const canvasW = cropperSize.w || originWidth || w;
+        const canvasH = cropperSize.h || originHeight || h;
 
         // 프리뷰
         previewCanvas.width = canvasW * scaleX;
@@ -374,6 +371,9 @@ const ThirdStep = () => {
         pCtx.fillStyle = selectedInfo.bgColor || '#fff';
         pCtx.fillRect(0, 0, canvasW * scaleX, canvasH * scaleY);
 
+        const url = await previewCanvas?.toDataURL('image/png', 1.0);
+        setCanvasUrl(url);
+        console.log('url change');
         dispatch(setCanvasSaveList({ name: info.name, previewCanvas }));
         setIsInitial(true);
       };
@@ -382,38 +382,13 @@ const ThirdStep = () => {
     selectedFrame,
     selectedInfo.x,
     selectedInfo.y,
-    selectedInfo.bgColor,
     selectedInfo.size.width,
     selectedInfo.size.height,
+    selectedInfo.bgColor,
     originWidth,
     originHeight,
     dispatch,
   ]);
-
-  const drawingPreview = useCallback(() => {
-    const previewCanvas = previewCanvasRef.current;
-
-    const canvas = cropperRef.current;
-    if (!canvas) return;
-    if (previewCanvas) {
-      const pCtx = previewCanvas.getContext('2d');
-      if (!pCtx) return;
-
-      const image = canvas.toDataURL('image/png', 1.0);
-      previewCanvas.width = selectInitialInfo.size.width;
-      previewCanvas.height = selectInitialInfo.size.height;
-      const img = new Image();
-      img.src = image;
-      img.onload = () => {
-        pCtx.clearRect(0, 0, selectInitialInfo.size.width, selectInitialInfo.size.height);
-        pCtx.imageSmoothingQuality = 'high';
-        pCtx.drawImage(img, 0, 0, selectInitialInfo.size.width, selectInitialInfo.size.height);
-        pCtx.globalCompositeOperation = 'destination-over';
-        pCtx.fillStyle = selectedInfo.bgColor || '#fff';
-        pCtx.fillRect(0, 0, selectInitialInfo.size.width, selectInitialInfo.size.height);
-      };
-    }
-  }, [selectInitialInfo.size.height, selectInitialInfo.size.width, selectedInfo.bgColor]);
 
   const createCropperCanvas = useCallback(
     async (canvas: HTMLCanvasElement, img: HTMLImageElement) => {
@@ -553,8 +528,8 @@ const ThirdStep = () => {
     setIsCalc(false);
     setOriginWidth(resizeWidth);
     setOriginHeight(resizeHeight);
-    drawingPreview();
-  }, [drawingPreview, resizeWidth, resizeHeight]);
+    createSaveCanvas();
+  }, [resizeWidth, resizeHeight, createSaveCanvas]);
 
   const handleResize = useCallback(
     (e) => {
@@ -726,11 +701,10 @@ const ThirdStep = () => {
   const handleCancelMoveCropper = useCallback(() => {
     setIsMoving(false);
     setIsCalc(false);
-    createSaveCanvas();
     setOriginWidth(resizeWidth);
     setOriginHeight(resizeHeight);
-    drawingPreview();
-  }, [createSaveCanvas, drawingPreview, resizeWidth, resizeHeight]);
+    createSaveCanvas();
+  }, [resizeWidth, resizeHeight, createSaveCanvas]);
 
   const handleColorChange = useCallback(
     (color: ColorResult) => {
@@ -743,12 +717,6 @@ const ThirdStep = () => {
 
   useEffect(() => {
     setRatio(originHeight / originWidth);
-  }, [originWidth, originHeight]);
-
-  // 처음 크로퍼 렌더링시 프리뷰 렌더링
-  useEffect(() => {
-    drawingPreview();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [originWidth, originHeight]);
 
   // 사이즈 확대/축소시 크로퍼에 반영
@@ -764,6 +732,13 @@ const ThirdStep = () => {
     drawingCropper(img);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedInfo.x, selectedInfo.y]);
+
+  // 초기 진입시 캔버스 저장
+  useEffect(() => {
+    if (isInitial) return;
+    createSaveCanvas();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInitial]);
 
   // 로드 true에 따라 이미지와 크로퍼 생성
   useEffect(() => {
@@ -788,20 +763,10 @@ const ThirdStep = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectFrameName]);
 
-  // 초기 진입시 캔버스 저장
-  useEffect(() => {
-    if (isInitial) return;
-    if (canvasSaveList.length === selectedFrame.length) {
-      setIsInitial(true);
-      return;
-    }
-
-    createSaveCanvas();
-  }, [canvasSaveList.length, createSaveCanvas, isInitial, selectedFrame.length]);
-
   useEffect(() => {
     return () => {
       setIsLoaded(false);
+      setIsInitial(false);
     };
   }, []);
 
@@ -907,7 +872,12 @@ const ThirdStep = () => {
         </ThirdContentDrawingCanvas>
 
         <ThirdPreviewCanvas>
-          <canvas ref={previewCanvasRef} />
+          <Img
+            src={canvasUrl}
+            width={selectedInfo.originWidth || 0}
+            height={selectedInfo.originHeight || 0}
+            alt="자른거 미리보기"
+          />
         </ThirdPreviewCanvas>
       </ThirdContent>
     </Container>

@@ -19,8 +19,8 @@ export interface SelectedFrame extends FrameInfoList {
   imgUrl?: string;
   x?: number;
   y?: number;
-  width?: number;
-  height?: number;
+  originWidth?: number;
+  originHeight?: number;
   bgColor?: string;
 }
 
@@ -98,6 +98,13 @@ const frame = createSlice({
         },
       }));
     },
+    setOriginSize: (state, { payload }: PayloadAction<{ originWidth: number; originHeight: number }>) => {
+      state.selectedFrame = state.selectedFrame.map((lst) => ({
+        ...lst,
+        originWidth: payload.originWidth,
+        originHeight: payload.originHeight,
+      }));
+    },
     deletePositionByFrame: (state) => {
       state.selectedFrame = state.selectedFrame.map((lst) => ({ ...lst, x: 0, y: 0, right: 0, top: 0 }));
     },
@@ -113,6 +120,7 @@ export const {
   updatePositionByFrame,
   deletePositionByFrame,
   setBgColorFrame,
+  setOriginSize,
 } = frame.actions;
 
 export default frame.reducer;
