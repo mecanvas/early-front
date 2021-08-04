@@ -42,20 +42,12 @@ const frame = createSlice({
       state.selectedFrame = [];
     },
     rotateSelectedFrameList: (state, { payload }: PayloadAction<{ type: number; id: number }>) => {
-      state.frameInfoList = state.frameInfoList.map((lst) => ({
-        ...lst,
-        widthCm: lst.id === payload.id && lst.type === payload.type ? lst.heightCm : lst.widthCm,
-        heightCm: lst.id === payload.id && lst.type === payload.type ? lst.widthCm : lst.heightCm,
-        size: {
-          ...lst.size,
-          width: lst.id === payload.id && lst.type === payload.type ? lst.size.height : lst.size.width,
-          height: lst.id === payload.id && lst.type === payload.type ? lst.size.width : lst.size.height,
-        },
-      }));
       state.selectedFrame = state.selectedFrame.map((lst) => ({
         ...lst,
         widthCm: lst.id === payload.id && lst.type === payload.type ? lst.heightCm : lst.widthCm,
         heightCm: lst.id === payload.id && lst.type === payload.type ? lst.widthCm : lst.heightCm,
+        originWidth: lst.id === payload.id && lst.type === payload.type ? lst.originHeight : lst.originWidth,
+        originHeight: lst.id === payload.id && lst.type === payload.type ? lst.originWidth : lst.originHeight,
         size: {
           ...lst.size,
           width: lst.id === payload.id && lst.type === payload.type ? lst.size.height : lst.size.width,
@@ -98,6 +90,16 @@ const frame = createSlice({
         },
       }));
     },
+    setFrameSize: (state, { payload }: PayloadAction<{ resizeWidth: number; resizeHeight: number }>) => {
+      state.selectedFrame = state.selectedFrame.map((lst) => ({
+        ...lst,
+        size: {
+          ...lst.size,
+          width: payload.resizeWidth,
+          height: payload.resizeHeight,
+        },
+      }));
+    },
     setOriginSize: (state, { payload }: PayloadAction<{ originWidth: number; originHeight: number }>) => {
       state.selectedFrame = state.selectedFrame.map((lst) => ({
         ...lst,
@@ -106,7 +108,13 @@ const frame = createSlice({
       }));
     },
     deletePositionByFrame: (state) => {
-      state.selectedFrame = state.selectedFrame.map((lst) => ({ ...lst, x: 0, y: 0, right: 0, top: 0 }));
+      state.selectedFrame = state.selectedFrame.map((lst) => ({
+        ...lst,
+        x: 0,
+        y: 0,
+        originWidth: 0,
+        originHeight: 0,
+      }));
     },
   },
 });
@@ -120,6 +128,7 @@ export const {
   updatePositionByFrame,
   deletePositionByFrame,
   setBgColorFrame,
+  setFrameSize,
   setOriginSize,
 } = frame.actions;
 
