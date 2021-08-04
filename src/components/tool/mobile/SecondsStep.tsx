@@ -78,6 +78,9 @@ const SecondsImageDropZoneWrapper = styled.div`
 const ImgRotateIcon = styled.div`
   cursor: pointer;
   margin-bottom: 0.6em;
+  img + img {
+    margin-left: 0.6em;
+  }
   img {
     width: 22px;
     &:nth-of-type(2) {

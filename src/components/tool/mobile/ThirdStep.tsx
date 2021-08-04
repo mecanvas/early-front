@@ -540,11 +540,17 @@ const ThirdStep = () => {
         if (cursorX && cursorY && cmd) {
           const imgCanvas = imgCanvasRef.current;
           if (imgCanvas) {
-            const { left: imgPaddingLeft } = imgCanvas.getBoundingClientRect();
+            const {
+              left: imgPaddingLeft,
+              // top: imgPaddingTop,
+              right: imgPaddingRight,
+            } = imgCanvas.getBoundingClientRect();
             const cropperWrapper = cropperWrapperRef.current;
+            const { right: cropperPaddingRight } = cropperWrapper.getBoundingClientRect();
 
             const cursorXInImage = cursorX - imgPaddingLeft;
             // const cursorYInImage = cursorY - imgPaddingTop;
+            const cropperRight = imgPaddingRight - cropperPaddingRight;
 
             if (isCalc) {
               setCursorXDiff(replacePx(cropperWrapper.style.left));
@@ -559,9 +565,10 @@ const ThirdStep = () => {
 
               if (cmd === 'top-left') {
                 const resizeByTopLeft = originWidth - cursorX;
+                if (resizeByTopLeft + cropperRight > imgWidth) return;
                 const resizeByBottomLeft = resizeByTopLeft * ratio;
+                if (resizeByBottomLeft + cursorYDiff > imgHeight) return;
                 // const resizeByBottomLeft = originHeight - cursorY;
-
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
@@ -578,7 +585,10 @@ const ThirdStep = () => {
               // top-right에서 움직일시 크기
               if (cmd === 'top-right') {
                 const resizeByTopRight = cursorX;
+                if (resizeByTopRight + cursorXDiff > imgWidth) return;
                 const resizeByBottomRight = resizeByTopRight * ratio;
+                if (resizeByBottomRight + cursorYDiff > imgHeight) return;
+
                 // const resizeByBottomRight = originHeight - cursorY;
 
                 dispatch(
@@ -597,7 +607,9 @@ const ThirdStep = () => {
               // bottom-left에서 움직일시 크기
               if (cmd === 'bottom-left') {
                 const resizeByBottomLeft = originWidth - cursorX;
+                if (resizeByBottomLeft + cropperRight > imgWidth) return;
                 const resizeByTopLeft = resizeByBottomLeft * ratio;
+                if (resizeByTopLeft + cursorYDiff > imgHeight) return;
                 // const resizeByTopLeft = cursorY;
 
                 dispatch(
@@ -616,7 +628,9 @@ const ThirdStep = () => {
               // bottom-right에서 움직일시 크기
               if (cmd === 'bottom-right') {
                 const resizeByTopRight = cursorX;
+                if (resizeByTopRight + cursorXDiff > imgWidth) return;
                 const resizeByBottomRight = resizeByTopRight * ratio;
+                if (resizeByBottomRight + cursorYDiff > imgHeight) return;
                 // const resizeByBottomRight = cursorY;
 
                 dispatch(
@@ -638,7 +652,19 @@ const ThirdStep = () => {
 
       requestAnimationFrame(() => handleResize);
     },
-    [ratio, isResizeMode, cmd, selectedInfo.name, dispatch, originWidth, isCalc, cursorXDiff, cursorYDiff],
+    [
+      isResizeMode,
+      cmd,
+      isCalc,
+      cursorXDiff,
+      originWidth,
+      imgWidth,
+      ratio,
+      cursorYDiff,
+      imgHeight,
+      dispatch,
+      selectedInfo.name,
+    ],
   );
 
   const handleSelected = useCallback(
@@ -719,19 +745,12 @@ const ThirdStep = () => {
     setRatio(originHeight / originWidth);
   }, [originWidth, originHeight]);
 
-  // 사이즈 확대/축소시 크로퍼에 반영
+  // 사이즈 확대/축소시 및 움직일때 크로퍼 반영
   useEffect(() => {
     const img: HTMLImageElement = imgElements.get(selectFrameName);
     drawingCropper(img);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resizeWidth, resizeHeight]);
-
-  // 움직일시 크로퍼에 반영
-  useEffect(() => {
-    const img: HTMLImageElement = imgElements.get(selectFrameName);
-    drawingCropper(img);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedInfo.x, selectedInfo.y]);
+  }, [resizeWidth, resizeHeight, selectedInfo.x, selectedInfo.y]);
 
   // 초기 진입시 캔버스 저장
   useEffect(() => {
