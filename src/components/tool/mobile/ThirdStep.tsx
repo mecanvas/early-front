@@ -373,7 +373,6 @@ const ThirdStep = () => {
 
         const url = await previewCanvas?.toDataURL('image/png', 1.0);
         setCanvasUrl(url);
-        console.log('url change');
         dispatch(setCanvasSaveList({ name: info.name, previewCanvas }));
         setIsInitial(true);
       };
@@ -503,16 +502,19 @@ const ThirdStep = () => {
 
     const [newW, newH] = getOriginRatio(naturalWidth, naturalHeight, IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT);
 
-    canvas.width = newW;
-    canvas.height = newH;
+    const w = newW;
+    const h = newH;
+
+    canvas.width = w;
+    canvas.height = h;
     canvas.style.filter = 'brightness(60%)';
 
-    setImgWidth(newW);
-    setImgHeight(newH);
+    setImgWidth(w);
+    setImgHeight(h);
 
-    ctx.clearRect(0, 0, newW, newH);
+    ctx.clearRect(0, 0, w, h);
     ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(img, 0, 0, newW, newH);
+    ctx.drawImage(img, 0, 0, w, h);
   }, []);
 
   const handleResizeStart = useCallback((e) => {
@@ -801,8 +803,8 @@ const ThirdStep = () => {
     <Container
       cmd={cmd}
       onMouseMove={isResizeMode ? handleResize : undefined}
-      onMouseUp={handleResizeEnd}
-      onMouseLeave={handleResizeEnd}
+      onMouseUp={isResizeMode ? handleResizeEnd : undefined}
+      onMouseLeave={isResizeMode ? handleResizeEnd : undefined}
     >
       <ThirdBgChanger>
         <Popover
@@ -837,29 +839,20 @@ const ThirdStep = () => {
         <></>
       )}
       <ThirdContent>
-        <ThirdContentDrawingCanvas
-          width={imgWidth}
-          height={imgHeight}
-          onMouseUp={isResizeMode ? handleResizeEnd : undefined}
-        >
+        <ThirdContentDrawingCanvas width={imgWidth} height={imgHeight}>
           <canvas ref={imgCanvasRef} />
 
-          <ThirdContentCropperWrapper
-            width={canvasWidth}
-            height={canvasHeight}
-            ref={cropperWrapperRef}
-            onMouseUp={isResizeMode ? handleResizeEnd : undefined}
-          >
+          <ThirdContentCropperWrapper width={canvasWidth} height={canvasHeight} ref={cropperWrapperRef}>
             <ThirdContentCropper
               cmd={cmd}
               ref={cropperRef}
               data-url={selectedInfo.imgUrl || ''}
-              onTouchStart={isMoving && isMobile ? handleMovingCropper : undefined}
+              onTouchStart={isMobile ? handleMovingCropper : undefined}
               onTouchEnd={isMobile ? handleActiveCropper : undefined}
               onTouchMove={isMobile ? handleCancelMoveCropper : undefined}
               onMouseMove={isMoving ? handleMovingCropper : undefined}
-              onMouseDown={handleActiveCropper}
-              onMouseUp={isMoving ? handleCancelMoveCropper : handleResizeEnd}
+              onMouseDown={!isResizeMode ? handleActiveCropper : undefined}
+              onMouseUp={isMoving ? handleCancelMoveCropper : undefined}
               onMouseLeave={isMoving ? handleCancelMoveCropper : undefined}
             />
 
