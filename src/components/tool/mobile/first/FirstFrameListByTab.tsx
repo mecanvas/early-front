@@ -10,7 +10,6 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
   const selectedFrameList = useAppSelector(({ frame }) => frame.selectedFrame);
   const dispatch = useAppDispatch();
   const [showingIndex, setShowingIndex] = useState(0);
-  const [isRotate, setisRotate] = useState(false);
 
   const showingFrame = useMemo(() => {
     const frame = frameList[showingIndex];
@@ -23,10 +22,6 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
   const handleShowingFrameByHover = useCallback((e) => {
     const { index } = e.currentTarget.dataset;
     setShowingIndex(+index);
-  }, []);
-
-  const handleRotate = useCallback(() => {
-    setisRotate((prev) => !prev);
   }, []);
 
   const handleLeave = useCallback(() => {
@@ -75,13 +70,12 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
         )}
       />
       <FirstFrameWrapper>
-        <FirstFramePreview {...showingFrame.size} isRotate={isRotate}>
+        <FirstFramePreview {...showingFrame.size}>
           <img
             src={
               'https://early-canvas.s3.ap-northeast-2.amazonaws.com/single/upload/%E1%84%92%E1%85%A6%E1%86%AB%E1%84%85%E1%85%B5.png'
             }
           />
-          <img src={icons.rotate} onClick={handleRotate} />
         </FirstFramePreview>
         <span>
           <h5>{showingFrame.name}</h5>

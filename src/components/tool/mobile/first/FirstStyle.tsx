@@ -69,15 +69,15 @@ export const FirstFrameWrapper = styled.div`
   }
 `;
 
-export const FirstFramePreview = styled.div<{ width: number; height: number; isRotate: boolean }>`
+export const FirstFramePreview = styled.div<{ width: number; height: number }>`
   position: relative;
-  ${({ width, height, theme, isRotate }) =>
+  ${({ width, height, theme }) =>
     width &&
     height &&
     css`
       background-color: ${theme.color.white};
-      width: ${isRotate ? height : width}px;
-      height: ${isRotate ? width : height}px;
+      width: ${width}px;
+      height: ${height}px;
       border: 1px solid ${theme.color.gray400};
       img:nth-of-type(1) {
         width: 100%;
