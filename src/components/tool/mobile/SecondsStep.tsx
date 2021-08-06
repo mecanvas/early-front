@@ -107,10 +107,12 @@ const SecondsStep = () => {
         const fd = new FormData();
         fd.append('image', file);
         dispatch(postImageUpload({ fd, type: +type as 1 | 2 | 3, id: +id }));
-        dispatch(deletePositionByFrame());
+        if (selectedFrame[0].imgUrl) {
+          dispatch(deletePositionByFrame());
+        }
       };
     },
-    [dispatch],
+    [dispatch, selectedFrame],
   );
 
   const handleDropImage = useCallback(
@@ -124,9 +126,11 @@ const SecondsStep = () => {
       const fd = new FormData();
       fd.append('image', file);
       dispatch(postImageUpload({ fd, type: +type as 1 | 2 | 3, id: +id }));
-      dispatch(deletePositionByFrame());
+      if (selectedFrame[0].imgUrl) {
+        dispatch(deletePositionByFrame());
+      }
     },
-    [dispatch],
+    [dispatch, selectedFrame],
   );
 
   const { getInputProps, getRootProps } = useDropzone({ onDrop: handleDropImage });

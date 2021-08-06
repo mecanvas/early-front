@@ -309,9 +309,6 @@ const ThirdStep = () => {
       img.crossOrigin = 'Anonymous';
       img.onload = () => {
         if (!sCtx || !pCtx) return;
-        if (typeof selectedInfo.x !== 'number' || typeof selectedInfo.y !== 'number') {
-          return;
-        }
         const { naturalWidth, naturalHeight } = img;
         const [imgW, imgH] = getOriginRatio(naturalWidth, naturalHeight, IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT);
 
@@ -358,8 +355,6 @@ const ThirdStep = () => {
           }
           dispatch(setOriginSize({ originWidth: w, originHeight: h }));
           dispatch(setFrameSize({ resizeWidth: w, resizeHeight: h }));
-          setInitialOriginWidth(w);
-          setInitialOriginHeight(h);
         }
 
         const scaleX = naturalWidth / imgW;
@@ -368,11 +363,11 @@ const ThirdStep = () => {
         const initialSize = frameInfoList.filter((lst) => lst.name === selectFrameName)[0].size;
         const ratio = initialSize.height / initialSize.width;
 
-        const cropperSize = { w: info.size.width, h: info.size.height };
         const crop = { x: info.x || 0, y: info.y || 0 };
 
-        const canvasW = (cropperSize.w || w) > imgW ? imgW : cropperSize.w || w;
-        const canvasH = (cropperSize.w || w) > imgW ? imgW / ratio : cropperSize.h || h;
+        const canvasW = originWidth ? selectedInfo.size.width : w;
+        const canvasH = originHeight ? selectedInfo.size.height : h;
+        // dispatch(setFrameSize({ resizeWidth: canvasW, resizeHeight: canvasH }));
         // 프리뷰
         previewCanvas.width = canvasW * scaleX;
         previewCanvas.height = canvasH * scaleY;
@@ -397,8 +392,14 @@ const ThirdStep = () => {
         if (preview) {
           const preCtx = preview.getContext('2d');
           if (!preCtx) return;
-          const pW = isRotate ? h || initialOriginHeight || canvasW : w || initialOriginWidth || canvasW;
-          const pH = isRotate ? w || initialOriginWidth || canvasH : h || initialOriginHeight || canvasH;
+          if (!initialOriginWidth && !initialOriginHeight) {
+            setInitialOriginWidth(canvasW > imgW ? imgW : canvasW);
+            setInitialOriginHeight(canvasW > imgW ? imgW / ratio : canvasH);
+          }
+          const initialWidth = isRotate ? initialOriginHeight || canvasH : initialOriginWidth || canvasW;
+          const initialHeight = isRotate ? initialOriginWidth || canvasW : initialOriginHeight || canvasH;
+          const pW = initialWidth;
+          const pH = initialHeight;
           preview.width = pW;
           preview.height = pH;
           preCtx.clearRect(0, 0, pW, pH);
@@ -413,23 +414,20 @@ const ThirdStep = () => {
     });
   }, [
     selectedFrame,
-    selectedInfo.x,
-    selectedInfo.y,
     originWidth,
     originHeight,
-    dispatch,
     frameInfoList,
-    isRotate,
-    initialOriginHeight,
-    initialOriginWidth,
+    selectedInfo.size.width,
+    selectedInfo.size.height,
+    dispatch,
     selectFrameName,
+    initialOriginWidth,
+    initialOriginHeight,
+    isRotate,
   ]);
 
   const createCropperCanvas = useCallback(
     async (canvas: HTMLCanvasElement, img: HTMLImageElement) => {
-      if (typeof selectedInfo.x !== 'number' || typeof selectedInfo.y !== 'number') {
-        return;
-      }
       const ctx = canvas.getContext('2d');
       const imgCanvas = imgCanvasRef.current;
       const cropperWrapper = cropperWrapperRef.current;
@@ -487,10 +485,11 @@ const ThirdStep = () => {
       const canvasW = originWidth ? selectedInfo.size.width : w;
       const canvasH = originHeight ? selectedInfo.size.height : h;
       const ratio = initialSize.height / initialSize.width;
+
       setCanvasWidth(canvasW > imgW ? imgW : canvasW);
       setCanvasHeight(canvasW > imgW ? imgW / ratio : canvasH);
 
-      const crop = { x: selectedInfo.x, y: selectedInfo.y };
+      const crop = { x: selectedInfo.x || 0, y: selectedInfo.y || 0 };
       cropperWrapper.style.top = `${crop.y}px`;
       cropperWrapper.style.left = `${crop.x}px`;
 

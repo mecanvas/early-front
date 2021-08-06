@@ -193,7 +193,7 @@ const MobileSingleTool = () => {
       return;
     }
 
-    const dataUrl = canvas.toDataURL('image/png', 1.0);
+    const dataUrl = canvas?.toDataURL('image/png', 1.0);
 
     const file = dataURLtoFile(
       dataUrl,

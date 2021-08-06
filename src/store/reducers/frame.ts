@@ -110,13 +110,7 @@ const frame = createSlice({
       }));
     },
     deletePositionByFrame: (state) => {
-      state.selectedFrame = state.selectedFrame.map((lst) => ({
-        ...lst,
-        x: 0,
-        y: 0,
-        originWidth: 0,
-        originHeight: 0,
-      }));
+      state.selectedFrame = state.frameInfoList.filter((lst) => lst.name === state.selectedFrame[0].name);
     },
   },
 });
