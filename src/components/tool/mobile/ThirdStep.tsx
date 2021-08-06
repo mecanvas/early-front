@@ -237,16 +237,18 @@ const ThirdPreviewCanvas = styled.div`
 
 const ThirdStep = () => {
   const dispatch = useAppDispatch();
-  const { selectedFrame } = useAppSelector(({ frame }) => frame);
+  const { selectedFrame, frameInfoList } = useAppSelector(({ frame }) => frame);
+  const imgCanvasRef = useRef<HTMLCanvasElement>(null);
+  const cropperRef = useRef<HTMLCanvasElement>(null);
+  const cropperWrapperRef = useRef<HTMLDivElement>(null);
 
   const [isResizeMode, setIsResizeMode] = useState(false);
   const [cmd, setCmd] = useState<ResizeCmd | null>(null);
 
   const [isCropperDrawing, setIsCropperDrawing] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const imgCanvasRef = useRef<HTMLCanvasElement>(null);
-  const cropperRef = useRef<HTMLCanvasElement>(null);
-  const cropperWrapperRef = useRef<HTMLDivElement>(null);
+  const [isRotate, setIsRotate] = useState(false);
+
   const [selectFrameName, setSelectFrameName] = useState(selectedFrame[0]?.name);
   const [isMoving, setIsMoving] = useState(false);
 
@@ -262,6 +264,8 @@ const ThirdStep = () => {
   const [canvasHeight, setCanvasHeight] = useState(0);
   const [resizeWidth, setResizeWidth] = useState(0);
   const [resizeHeight, setResizeHeight] = useState(0);
+  const [initialOriginWidth, setInitialOriginWidth] = useState(0);
+  const [initialOriginHeight, setInitialOriginHeight] = useState(0);
 
   const selectedInfo = useMemo(() => {
     const selectedCanvas = selectedFrame.filter((lst) => lst.name === selectFrameName)[0];
@@ -351,15 +355,17 @@ const ThirdStep = () => {
           }
           dispatch(setOriginSize({ originWidth: w, originHeight: h }));
           dispatch(setFrameSize({ resizeWidth: w, resizeHeight: h }));
+          setInitialOriginWidth(w);
+          setInitialOriginHeight(h);
         }
 
         const scaleX = naturalWidth / imgW;
         const scaleY = naturalHeight / imgH;
+
         const cropperSize = { w: info.size.width, h: info.size.height };
         const crop = { x: info.x || 0, y: info.y || 0 };
-
-        const canvasW = cropperSize.w || originWidth || w;
-        const canvasH = cropperSize.h || originHeight || h;
+        const canvasW = cropperSize.w || w;
+        const canvasH = cropperSize.h || h;
 
         // 프리뷰
         previewCanvas.width = canvasW * scaleX;
@@ -385,26 +391,35 @@ const ThirdStep = () => {
         if (preview) {
           const preCtx = preview.getContext('2d');
           if (!preCtx) return;
-          preview.width = originWidth || w;
-          preview.height = originHeight || h;
-          preCtx.clearRect(0, 0, originWidth || w, originHeight || h);
+          const initialSize = frameInfoList.filter((lst) => lst.name === selectFrameName)[0].size;
+          const ratio = initialSize.height / initialSize.width;
+          const calcW = (originWidth || w) > imgW ? imgW : originWidth || w;
+          const calcH = (originWidth || w) > imgW ? imgW / ratio : originHeight || h;
+
+          const pW = isRotate ? initialOriginHeight || calcH : initialOriginWidth || calcW;
+          const pH = isRotate ? initialOriginWidth || calcW : initialOriginHeight || calcH;
+          preview.width = pW;
+          preview.height = pH;
+          preCtx.clearRect(0, 0, pW, pH);
           preCtx.imageSmoothingQuality = 'high';
-          preCtx.drawImage(
-            img,
-            crop.x * scaleX,
-            crop.y * scaleY,
-            canvasW * scaleX,
-            canvasH * scaleY,
-            0,
-            0,
-            originWidth || w,
-            originHeight || h,
-          );
+          preCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, calcW * scaleX, calcH * scaleY, 0, 0, pW, pH);
           dispatch(setCanvasSaveList({ name: info.name, previewCanvas }));
         }
       };
     });
-  }, [selectedFrame, selectedInfo.x, selectedInfo.y, originWidth, originHeight, dispatch, previewRef]);
+  }, [
+    selectedFrame,
+    selectedInfo.x,
+    selectedInfo.y,
+    originWidth,
+    originHeight,
+    dispatch,
+    frameInfoList,
+    isRotate,
+    initialOriginHeight,
+    initialOriginWidth,
+    selectFrameName,
+  ]);
 
   const createCropperCanvas = useCallback(
     async (canvas: HTMLCanvasElement, img: HTMLImageElement) => {
@@ -425,14 +440,16 @@ const ThirdStep = () => {
       let w = 0;
       let h = 0;
 
+      const initialSize = frameInfoList.filter((lst) => lst.name == selectFrameName)[0].size;
+
       if (isSquare) {
         // 너비가 높이보다 크면 높이에 맞춰 렌더링
         if (imgW > imgH) {
-          const [ratioW, ratioH] = getOriginRatio(selectedInfo.size.width, selectedInfo.size.height, imgH, imgH);
+          const [ratioW, ratioH] = getOriginRatio(initialSize.width, initialSize.height, imgH, imgH);
           w = ratioW;
           h = ratioH;
         } else {
-          const [ratioW, ratioH] = getOriginRatio(selectedInfo.size.width, selectedInfo.size.height, imgW, imgW);
+          const [ratioW, ratioH] = getOriginRatio(initialSize.width, initialSize.height, imgW, imgW);
           w = ratioW;
           h = ratioH;
         }
@@ -440,8 +457,8 @@ const ThirdStep = () => {
       if (!isSquare) {
         if (imgW > imgH) {
           const [ratioW, ratioH] = getOriginRatio(
-            selectedInfo.size.width,
-            selectedInfo.size.height,
+            initialSize.width,
+            initialSize.height,
             imgH,
             imgH,
             IMAGE_MAXIMUM_WIDTH,
@@ -450,8 +467,8 @@ const ThirdStep = () => {
           h = ratioH;
         } else {
           const [ratioW, ratioH] = getOriginRatio(
-            selectedInfo.size.width,
-            selectedInfo.size.height,
+            initialSize.width,
+            initialSize.height,
             imgW,
             imgW,
             IMAGE_MAXIMUM_WIDTH,
@@ -463,25 +480,34 @@ const ThirdStep = () => {
 
       const scaleX = naturalWidth / imgW;
       const scaleY = naturalHeight / imgH;
-
-      const canvasW = selectedInfo.size.width || w;
-      const canvasH = selectedInfo.size.height || h;
-      const ratio = imgH / imgW;
+      const canvasW = originWidth ? selectedInfo.size.width : w;
+      const canvasH = originHeight ? selectedInfo.size.height : h;
+      const ratio = initialSize.height / initialSize.width;
       setCanvasWidth(canvasW > imgW ? imgW : canvasW);
-      setCanvasHeight(canvasH > imgH ? imgW * ratio : canvasH);
+      setCanvasHeight(canvasW > imgW ? imgW / ratio : canvasH);
 
       const crop = { x: selectedInfo.x, y: selectedInfo.y };
       cropperWrapper.style.top = `${crop.y}px`;
       cropperWrapper.style.left = `${crop.x}px`;
 
-      canvas.width = canvasW;
-      canvas.height = canvasH;
+      canvas.width = canvasW > imgW ? imgW : canvasW;
+      canvas.height = canvasW > imgW ? imgW / ratio : canvasH;
 
       ctx.clearRect(0, 0, imgW, imgH);
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, crop.x * scaleX, crop.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
     },
-    [selectedInfo],
+    [
+      frameInfoList,
+      originHeight,
+      originWidth,
+      selectFrameName,
+      selectedInfo.size.height,
+      selectedInfo.size.width,
+      selectedInfo.type,
+      selectedInfo.x,
+      selectedInfo.y,
+    ],
   );
 
   const drawingCropper = useCallback(
@@ -529,6 +555,7 @@ const ThirdStep = () => {
     setIsResizeMode(false);
     setCmd(null);
     setIsCalc(false);
+    dispatch(setOriginSize({ originWidth: resizeWidth, originHeight: resizeHeight }));
     dispatch(setFrameSize({ resizeWidth, resizeHeight }));
     setIsCropperDrawing(true);
   }, [dispatch, resizeWidth, resizeHeight]);
@@ -741,6 +768,7 @@ const ThirdStep = () => {
   const handleRotate = useCallback(
     (e) => {
       const { type, id } = e.currentTarget.dataset;
+      setIsRotate((prev) => !prev);
       dispatch(
         updatePositionByFrame({
           name: selectedInfo.name,
