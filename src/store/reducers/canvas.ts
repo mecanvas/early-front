@@ -62,11 +62,6 @@ const canvas = createSlice({
           },
         ];
       }
-      // state.canvasSaveList.push({
-      //   name: payload.name,
-      //   saveCanvas: payload.saveCanvas,
-      //   previewCanvas: payload.previewCanvas,
-      // });
     },
     setCanvasSaveScale: (state, { payload }: PayloadAction<{ scaleType: 1 | 2 }>) => {
       state.canvasOrder.scaleType = payload.scaleType;

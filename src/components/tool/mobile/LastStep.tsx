@@ -74,16 +74,16 @@ const LastStep = () => {
   }, []);
 
   useEffect(() => {
+    dispatch(setCanvasOrder(orderForm));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderForm]);
+
+  useEffect(() => {
     const canvas = canvasSaveList[0].previewCanvas;
     const url = canvas?.toDataURL('image/png', 1.0);
     setCanvasUrl(url);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    dispatch(setCanvasOrder(orderForm));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderForm]);
 
   return (
     <Container>

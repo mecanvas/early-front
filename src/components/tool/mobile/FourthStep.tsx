@@ -114,9 +114,9 @@ const FourthStep = () => {
       const { scale } = e.currentTarget.dataset;
       if (!scale) return;
       setSelectBox(selectBox.map((lst) => ({ ...lst, isSelected: lst.id === +scale ? true : false })));
+      dispatch(setCanvasSaveScale({ scaleType: +scale as 1 | 2 }));
       const saveCanvas = createExpandCanvas(selectedFrame, +scale as 1 | 2);
       dispatch(setCanvasSaveList({ name: selectedFrame[0].name, saveCanvas }));
-      dispatch(setCanvasSaveScale({ scaleType: +scale as 1 | 2 }));
     },
     [dispatch, selectBox, selectedFrame],
   );

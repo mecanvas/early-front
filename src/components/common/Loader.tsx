@@ -5,7 +5,7 @@ import React, { useMemo } from 'react';
 import { Spin } from 'antd';
 
 const Container = styled.div`
-  position: fixed;
+  position: absolute;
   top: 0;
   width: 100%;
   z-index: 50;
@@ -57,18 +57,24 @@ const LoadingBar = styled.div<{ progressPercentage: number }>`
 
 const Loader = () => {
   const { isImgUploadDone, isImgUploadLoad, progressPercentage } = useAppSelector((state) => state.progress);
+  const { isCanvasSaveDone, isCanvasSaveLoad } = useAppSelector((state) => state.canvas);
+
+  const isCanvasSave = useMemo(() => {
+    return !isCanvasSaveDone && isCanvasSaveLoad;
+  }, [isCanvasSaveDone, isCanvasSaveLoad]);
+
   const isImageUpload = useMemo(() => {
     return !isImgUploadDone && isImgUploadLoad;
   }, [isImgUploadDone, isImgUploadLoad]);
 
-  if (!isImageUpload) {
+  if (!isImageUpload && !isCanvasSaveLoad) {
     return null;
   }
 
   return (
     <>
       <LoaderSpin size="large" />
-      <LoadingBackground isImageUpload={isImageUpload} />
+      <LoadingBackground isImageUpload={isImageUpload || isCanvasSave} />
       <Container>
         <LoadingWrapper>
           <LoadingBar progressPercentage={progressPercentage}></LoadingBar>
