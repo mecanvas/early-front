@@ -355,32 +355,37 @@ const ThirdStep = () => {
         const scaleY = naturalHeight / imgH;
 
         const initialSize = frameInfoList.filter((lst) => lst.name === selectFrameName)[0].size;
+        const ratio = initialSize.height / initialSize.width;
 
         const crop = { x: info.x || 0, y: info.y || 0 };
 
         const canvasW = originWidth ? selectedInfo.size.width : w;
         const canvasH = originHeight ? selectedInfo.size.height : h;
         // dispatch(setFrameSize({ resizeWidth: canvasW, resizeHeight: canvasH }));
-        // 프리뷰
-        previewCanvas.width = canvasW * scaleX;
-        previewCanvas.height = canvasH * scaleY;
 
-        pCtx.clearRect(0, 0, canvasW * scaleX, canvasH * scaleY);
+        // 프리뷰
+        const previewW = canvasW > imgW ? imgW : canvasW;
+        const previewH = canvasW > imgW ? imgW / ratio : canvasH;
+
+        previewCanvas.width = previewW * scaleX;
+        previewCanvas.height = previewH * scaleY;
+
+        pCtx.clearRect(0, 0, previewW * scaleX, previewH * scaleY);
         pCtx.imageSmoothingQuality = 'high';
         pCtx.drawImage(
           img,
           crop.x * scaleX,
           crop.y * scaleY,
-          canvasW * scaleX,
-          canvasH * scaleY,
+          previewW * scaleX,
+          previewH * scaleY,
           0,
           0,
-          canvasW * scaleX,
-          canvasH * scaleY,
+          previewW * scaleX,
+          previewH * scaleY,
         );
         pCtx.globalCompositeOperation = 'destination-over';
         pCtx.fillStyle = info.bgColor || '#fff';
-        pCtx.fillRect(0, 0, canvasW * scaleX, canvasH * scaleY);
+        pCtx.fillRect(0, 0, previewW * scaleX, previewH * scaleY);
         const preview = previewRef.current;
         if (preview) {
           const preCtx = preview.getContext('2d');
@@ -392,7 +397,7 @@ const ThirdStep = () => {
           preview.height = pH;
           preCtx.clearRect(0, 0, pW, pH);
           preCtx.imageSmoothingQuality = 'high';
-          preCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, canvasW * scaleX, canvasH * scaleY, 0, 0, pW, pH);
+          preCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, previewW * scaleX, previewH * scaleY, 0, 0, pW, pH);
           preCtx.globalCompositeOperation = 'destination-over';
           preCtx.fillStyle = info.bgColor || '#fff';
           preCtx.fillRect(0, 0, pW, pH);
@@ -761,14 +766,12 @@ const ThirdStep = () => {
           name: selectedInfo.name,
           x: 0,
           y: 0,
-          width: originWidth,
-          height: originHeight,
         }),
       );
       dispatch(rotateSelectedFrameList({ type: +type, id: +id }));
       setIsCropperDrawing(true);
     },
-    [dispatch, originHeight, originWidth, selectedInfo.name],
+    [dispatch, selectedInfo.name],
   );
 
   useEffect(() => {

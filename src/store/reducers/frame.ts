@@ -83,8 +83,8 @@ const frame = createSlice({
       state.selectedFrame = state.selectedFrame.map((lst) => ({
         ...lst,
         name: lst.name === payload.name ? payload.name : lst.name,
-        x: lst.name === payload.name ? payload.x : lst.x,
-        y: lst.name === payload.name ? payload.y : lst.y,
+        x: lst.name === payload.name ? (payload.x > 0 ? payload.x : 0) : lst.x,
+        y: lst.name === payload.name ? (payload.y > 0 ? payload.y : 0) : lst.y,
         size: {
           ...lst.size,
           width: lst.name === payload.name && payload.width ? payload.width : lst.size.width,
