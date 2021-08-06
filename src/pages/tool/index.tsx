@@ -67,7 +67,7 @@ const SelectedSingle = styled.div`
 
   &:hover {
     opacity: 0.8;
-    box-shadow: ${({ theme }) => theme.canvasShadow};
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   }
 `;
 
@@ -107,7 +107,7 @@ const SelectedDivided = styled.div`
 
   &:hover {
     opacity: 0.8;
-    box-shadow: ${({ theme }) => theme.canvasShadow};
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   }
 `;
 
