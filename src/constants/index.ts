@@ -4,8 +4,8 @@ import { cmToPx } from 'src/utils/cmToPx';
 
 export const MAX_HEIGHT = 1000;
 
-export const IMAGE_MAXIMUM_WIDTH = 360;
-export const IMAGE_MAXIMUM_HEIGHT = 360;
+export const IMAGE_MAXIMUM_WIDTH = 320;
+export const IMAGE_MAXIMUM_HEIGHT = 320;
 
 //  1_000_000  = 1MB
 export const IMG_LIMIT_MINIMUM_SIZE = process.env.NODE_ENV === 'production' ? 1_000_000 : 0;

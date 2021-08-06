@@ -263,17 +263,11 @@ const ThirdStep = () => {
   const [canvasHeight, setCanvasHeight] = useState(0);
   const [resizeWidth, setResizeWidth] = useState(0);
   const [resizeHeight, setResizeHeight] = useState(0);
-  const [initialOriginWidth, setInitialOriginWidth] = useState(0);
-  const [initialOriginHeight, setInitialOriginHeight] = useState(0);
 
   const selectedInfo = useMemo(() => {
     const selectedCanvas = selectedFrame.filter((lst) => lst.name === selectFrameName)[0];
     return selectedCanvas;
   }, [selectFrameName, selectedFrame]);
-
-  const isRotate = useMemo(() => {
-    return selectedInfo.isRotate;
-  }, [selectedInfo.isRotate]);
 
   const originWidth = useMemo(() => {
     return selectedInfo.originWidth || 0;
@@ -361,7 +355,6 @@ const ThirdStep = () => {
         const scaleY = naturalHeight / imgH;
 
         const initialSize = frameInfoList.filter((lst) => lst.name === selectFrameName)[0].size;
-        const ratio = initialSize.height / initialSize.width;
 
         const crop = { x: info.x || 0, y: info.y || 0 };
 
@@ -392,14 +385,9 @@ const ThirdStep = () => {
         if (preview) {
           const preCtx = preview.getContext('2d');
           if (!preCtx) return;
-          if (!initialOriginWidth && !initialOriginHeight) {
-            setInitialOriginWidth(canvasW > imgW ? imgW : canvasW);
-            setInitialOriginHeight(canvasW > imgW ? imgW / ratio : canvasH);
-          }
-          const initialWidth = isRotate ? initialOriginHeight || canvasH : initialOriginWidth || canvasW;
-          const initialHeight = isRotate ? initialOriginWidth || canvasW : initialOriginHeight || canvasH;
-          const pW = initialWidth;
-          const pH = initialHeight;
+
+          const pW = info.isRotate ? initialSize.height / 1.2 : initialSize.width / 1.2;
+          const pH = info.isRotate ? initialSize.width / 1.2 : initialSize.height / 1.2;
           preview.width = pW;
           preview.height = pH;
           preCtx.clearRect(0, 0, pW, pH);
@@ -421,9 +409,6 @@ const ThirdStep = () => {
     selectedInfo.size.height,
     dispatch,
     selectFrameName,
-    initialOriginWidth,
-    initialOriginHeight,
-    isRotate,
   ]);
 
   const createCropperCanvas = useCallback(
