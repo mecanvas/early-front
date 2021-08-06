@@ -1,8 +1,6 @@
-import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Alert, Button } from 'antd';
-import { icons } from 'public/icons';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import ImageDropZone from 'src/components/common/ImageDropZone';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
@@ -75,33 +73,10 @@ const SecondsImageDropZoneWrapper = styled.div`
   }
 `;
 
-const ImgRotateIcon = styled.div`
-  cursor: pointer;
-  margin-bottom: 0.6em;
-  img + img {
-    margin-left: 0.6em;
-  }
-  img {
-    width: 22px;
-    &:nth-of-type(2) {
-      transform: scale(-1, 1);
-    }
-  }
-`;
-
-const ImageWrapper = styled.div<{ rotateCount?: number }>`
+const ImageWrapper = styled.div`
   width: 302px;
   height: 302px;
 
-  ${({ rotateCount }) =>
-    typeof rotateCount === 'number' &&
-    css`
-      -webkit-transform: rotate(${rotateCount}deg);
-      -moz-transform: rotate(${rotateCount}deg);
-      -ms-transform: rotate(${rotateCount}deg);
-      -o-transform: rotate(${rotateCount}deg);
-      transform: rotate(${rotateCount}deg);
-    `};
   img {
     width: 302px;
     height: 302px;
@@ -114,28 +89,6 @@ const ImageWrapper = styled.div<{ rotateCount?: number }>`
 const SecondsStep = () => {
   const { selectedFrame } = useAppSelector(({ frame }) => frame);
   const dispatch = useAppDispatch();
-  const [rotateCount, setRotateCount] = useState(0);
-
-  const handleRotate = useCallback((e) => {
-    const { type } = e.currentTarget.dataset;
-    // type === 1 ? 오른쪽 : 왼쪽
-    const count = +type === 1 ? 1 : -1;
-    setRotateCount((prev) => {
-      if (prev === 3) {
-        // 양수면
-        if (count > 0) {
-          return 0;
-        }
-      }
-      if (prev === -3) {
-        // 음수면
-        if (count < 0) {
-          return 0;
-        }
-      }
-      return prev + count;
-    });
-  }, []);
 
   const handleButtonUpload = useCallback(
     (e) => {
@@ -186,11 +139,7 @@ const SecondsStep = () => {
           {selectedFrame.length && selectedFrame.length === 1 ? (
             selectedFrame[0].imgUrl ? (
               <>
-                <ImgRotateIcon>
-                  <img src={icons.rotate} onClick={handleRotate} data-type={2} />
-                  <img src={icons.rotate} onClick={handleRotate} data-type={1} />
-                </ImgRotateIcon>
-                <ImageWrapper rotateCount={90 * rotateCount}>
+                <ImageWrapper>
                   <img src={selectedFrame[0].imgUrl} />
                 </ImageWrapper>
                 <Button type="text" {...getRootProps()} data-id={selectedFrame[0].id} data-type={selectedFrame[0].type}>
