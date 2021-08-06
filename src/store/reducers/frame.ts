@@ -22,6 +22,7 @@ export interface SelectedFrame extends FrameInfoList {
   originWidth?: number;
   originHeight?: number;
   bgColor?: string;
+  isRotate?: boolean;
 }
 
 interface FrameState {
@@ -53,6 +54,7 @@ const frame = createSlice({
           width: lst.id === payload.id && lst.type === payload.type ? lst.size.height : lst.size.width,
           height: lst.id === payload.id && lst.type === payload.type ? lst.size.width : lst.size.height,
         },
+        isRotate: !lst.isRotate,
       }));
     },
     selectedFrame: (state, { payload }: PayloadAction<FrameInfoList>) => {

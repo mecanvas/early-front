@@ -247,7 +247,6 @@ const ThirdStep = () => {
 
   const [isCropperDrawing, setIsCropperDrawing] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isRotate, setIsRotate] = useState(false);
 
   const [selectFrameName, setSelectFrameName] = useState(selectedFrame[0]?.name);
   const [isMoving, setIsMoving] = useState(false);
@@ -271,6 +270,10 @@ const ThirdStep = () => {
     const selectedCanvas = selectedFrame.filter((lst) => lst.name === selectFrameName)[0];
     return selectedCanvas;
   }, [selectFrameName, selectedFrame]);
+
+  const isRotate = useMemo(() => {
+    return selectedInfo.isRotate;
+  }, [selectedInfo.isRotate]);
 
   const originWidth = useMemo(() => {
     return selectedInfo.originWidth || 0;
@@ -362,11 +365,14 @@ const ThirdStep = () => {
         const scaleX = naturalWidth / imgW;
         const scaleY = naturalHeight / imgH;
 
+        const initialSize = frameInfoList.filter((lst) => lst.name === selectFrameName)[0].size;
+        const ratio = initialSize.height / initialSize.width;
+
         const cropperSize = { w: info.size.width, h: info.size.height };
         const crop = { x: info.x || 0, y: info.y || 0 };
-        const canvasW = cropperSize.w || w;
-        const canvasH = cropperSize.h || h;
 
+        const canvasW = (cropperSize.w || w) > imgW ? imgW : cropperSize.w || w;
+        const canvasH = (cropperSize.w || w) > imgW ? imgW / ratio : cropperSize.h || h;
         // 프리뷰
         previewCanvas.width = canvasW * scaleX;
         previewCanvas.height = canvasH * scaleY;
@@ -391,18 +397,16 @@ const ThirdStep = () => {
         if (preview) {
           const preCtx = preview.getContext('2d');
           if (!preCtx) return;
-          const initialSize = frameInfoList.filter((lst) => lst.name === selectFrameName)[0].size;
-          const ratio = initialSize.height / initialSize.width;
-          const calcW = (originWidth || w) > imgW ? imgW : originWidth || w;
-          const calcH = (originWidth || w) > imgW ? imgW / ratio : originHeight || h;
-
-          const pW = isRotate ? initialOriginHeight || calcH : initialOriginWidth || calcW;
-          const pH = isRotate ? initialOriginWidth || calcW : initialOriginHeight || calcH;
+          const pW = isRotate ? h || initialOriginHeight || canvasW : w || initialOriginWidth || canvasW;
+          const pH = isRotate ? w || initialOriginWidth || canvasH : h || initialOriginHeight || canvasH;
           preview.width = pW;
           preview.height = pH;
           preCtx.clearRect(0, 0, pW, pH);
           preCtx.imageSmoothingQuality = 'high';
-          preCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, calcW * scaleX, calcH * scaleY, 0, 0, pW, pH);
+          preCtx.drawImage(img, crop.x * scaleX, crop.y * scaleY, canvasW * scaleX, canvasH * scaleY, 0, 0, pW, pH);
+          preCtx.globalCompositeOperation = 'destination-over';
+          preCtx.fillStyle = info.bgColor || '#fff';
+          preCtx.fillRect(0, 0, pW, pH);
           dispatch(setCanvasSaveList({ name: info.name, previewCanvas }));
         }
       };
@@ -768,7 +772,6 @@ const ThirdStep = () => {
   const handleRotate = useCallback(
     (e) => {
       const { type, id } = e.currentTarget.dataset;
-      setIsRotate((prev) => !prev);
       dispatch(
         updatePositionByFrame({
           name: selectedInfo.name,
