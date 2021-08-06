@@ -51,7 +51,7 @@ const LoaderBg = styled.div`
   top: 0;
   left: 0;
   background-color: #fff;
-  opacity: 0.7;
+  opacity: 0.5;
   width: 100%;
   min-height: 100vh;
 `;

@@ -14,6 +14,7 @@ import man from './man.svg';
 import curi from './curi.svg';
 import rotate from './rotate.svg';
 import auto from './auto.svg';
+import success from './success.svg';
 
 export const icons = {
   home,
@@ -32,4 +33,5 @@ export const icons = {
   curi,
   rotate,
   auto,
+  success,
 };
