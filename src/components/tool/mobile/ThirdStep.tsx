@@ -278,13 +278,14 @@ const ThirdStep = () => {
   }, [selectedInfo.originHeight]);
 
   const imgElements = useMemo(() => {
-    const res = new Map();
+    let res: { [key: string]: HTMLImageElement } = {};
 
     for (const info of selectedFrame) {
       const img = new Image();
       img.src = info.imgUrl || '';
       img.crossOrigin = 'Anonymous';
-      res.set(info.name, img);
+      img.addEventListener('load', () => setIsLoaded(true));
+      res = { ...res, [info.name]: img };
     }
     return res;
   }, [selectedFrame]);
@@ -787,7 +788,7 @@ const ThirdStep = () => {
 
   useEffect(() => {
     if (isCropperDrawing) {
-      const img: HTMLImageElement = imgElements.get(selectFrameName);
+      const img: HTMLImageElement = imgElements[selectFrameName];
       drawingCropper(img);
       createSaveCanvas();
       setIsCropperDrawing(false);
@@ -797,7 +798,8 @@ const ThirdStep = () => {
 
   // 사이즈 확대/축소시 및 움직일때 크로퍼 반영
   useEffect(() => {
-    const img: HTMLImageElement = imgElements.get(selectFrameName);
+    const img: HTMLImageElement = imgElements[selectFrameName];
+
     drawingCropper(img);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resizeWidth, resizeHeight, selectedInfo.x, selectedInfo.y]);
@@ -805,7 +807,8 @@ const ThirdStep = () => {
   // 로드 true에 따라 이미지와 크로퍼 생성
   useEffect(() => {
     if (!isLoaded) return;
-    const img: HTMLImageElement = imgElements.get(selectFrameName);
+    const img: HTMLImageElement = imgElements[selectFrameName];
+
     const imgCanvas = imgCanvasRef.current;
     if (!imgCanvas) return;
     createImgCanvas(imgCanvas, img);
@@ -813,18 +816,6 @@ const ThirdStep = () => {
     createSaveCanvas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded]);
-
-  // 그리기 위한 이미지가 로드 되면 true로
-  useEffect(() => {
-    const img: HTMLImageElement = imgElements.get(selectFrameName);
-
-    if (!isLoaded) {
-      img.onload = () => {
-        setIsLoaded(true);
-      };
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectFrameName]);
 
   useEffect(() => {
     return () => {
