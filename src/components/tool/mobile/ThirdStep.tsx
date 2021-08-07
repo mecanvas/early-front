@@ -20,6 +20,7 @@ import { getPosition } from 'src/utils/getPosition';
 import { replacePx } from 'src/utils/replacePx';
 import ToolColorPalette from '../divided/DividedToolColorPalette';
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
+import { icons } from 'public/icons';
 
 const SpinLoader = styled.div`
   display: flex;
@@ -48,8 +49,14 @@ const ThirdBgChanger = styled.div`
   display: flex;
   justify-content: flex-end;
   font-size: 14px;
+  margin-bottom: 1em;
+  button {
+    padding: 0 0.6em;
+    font-size: 13px;
+  }
   img {
-    width: 18px;
+    transform: scale(-1, 1);
+    width: 17px;
   }
 `;
 
@@ -851,8 +858,7 @@ const ThirdStep = () => {
     >
       <ThirdBgChanger>
         <Button type="default" onClick={handleRotate} data-type={selectedInfo.type} data-id={selectedInfo.id}>
-          <span>액자 회전</span>
-          {/* <img src={icons.bgPaint} /> */}
+          <img src={icons.rotate} />
         </Button>
         <Popover
           style={{ padding: 0 }}
@@ -861,8 +867,7 @@ const ThirdStep = () => {
           content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
         >
           <Button type="default">
-            <span>배경 변경</span>
-            {/* <img src={icons.bgPaint} /> */}
+            <img src={icons.bgPaint} />
           </Button>
         </Popover>
       </ThirdBgChanger>
