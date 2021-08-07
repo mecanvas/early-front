@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import { Popover, Button, Spin } from 'antd';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ColorResult } from 'react-color';
-import { isMobile } from 'react-device-detect';
 import { IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT } from 'src/constants';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
@@ -20,6 +19,7 @@ import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getPosition } from 'src/utils/getPosition';
 import { replacePx } from 'src/utils/replacePx';
 import ToolColorPalette from '../divided/DividedToolColorPalette';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 const SpinLoader = styled.div`
   display: flex;
@@ -558,7 +558,6 @@ const ThirdStep = () => {
     (e) => {
       if (!isResizeMode) return;
       if (cropperWrapperRef.current) {
-        e.preventDefault();
         const [cursorX, cursorY] = getPosition(e);
         if (cursorX && cursorY && cmd) {
           const imgCanvas = imgCanvasRef.current;
@@ -701,7 +700,6 @@ const ThirdStep = () => {
   const handleMovingCropper = useCallback(
     (e) => {
       const [cursorX, cursorY] = getPosition(e);
-
       const cropperWrapper = cropperWrapperRef.current;
       const imgCanvas = imgCanvasRef.current;
       if (!cropperWrapper || !imgCanvas) return;
@@ -818,6 +816,16 @@ const ThirdStep = () => {
   }, [isLoaded]);
 
   useEffect(() => {
+    if (!isMoving && !isResizeMode) return;
+    const body = document.querySelector('body') as HTMLElement;
+    disableBodyScroll(body);
+
+    return () => {
+      enableBodyScroll(body);
+    };
+  }, [isMoving, isResizeMode]);
+
+  useEffect(() => {
     return () => {
       setIsLoaded(false);
     };
@@ -834,6 +842,9 @@ const ThirdStep = () => {
   return (
     <Container
       cmd={cmd}
+      onTouchMove={isResizeMode ? handleResize : undefined}
+      onTouchStart={isResizeMode ? handleResizeEnd : undefined}
+      onTouchEnd={isResizeMode ? handleResizeEnd : undefined}
       onMouseMove={isResizeMode ? handleResize : undefined}
       onMouseUp={isResizeMode ? handleResizeEnd : undefined}
       onMouseLeave={isResizeMode ? handleResizeEnd : undefined}
@@ -882,35 +893,19 @@ const ThirdStep = () => {
               cmd={cmd}
               ref={cropperRef}
               data-url={selectedInfo.imgUrl || ''}
-              onTouchStart={isMobile ? handleMovingCropper : undefined}
-              onTouchEnd={isMobile ? handleActiveCropper : undefined}
-              onTouchMove={isMobile ? handleCancelMoveCropper : undefined}
+              onTouchStart={handleActiveCropper}
+              onTouchEnd={handleCancelMoveCropper}
+              onTouchMove={handleMovingCropper}
               onMouseMove={isMoving ? handleMovingCropper : undefined}
               onMouseDown={!isResizeMode ? handleActiveCropper : undefined}
               onMouseUp={isMoving ? handleCancelMoveCropper : undefined}
               onMouseLeave={isMoving ? handleCancelMoveCropper : undefined}
             />
 
-            <div
-              data-cmd="top-left"
-              onMouseDown={handleResizeStart}
-              onTouchStart={isMobile ? handleResizeStart : undefined}
-            />
-            <div
-              data-cmd="top-right"
-              onMouseDown={handleResizeStart}
-              onTouchStart={isMobile ? handleResizeStart : undefined}
-            />
-            <div
-              data-cmd="bottom-left"
-              onMouseDown={handleResizeStart}
-              onTouchStart={isMobile ? handleResizeStart : undefined}
-            />
-            <div
-              data-cmd="bottom-right"
-              onMouseDown={handleResizeStart}
-              onTouchStart={isMobile ? handleResizeStart : undefined}
-            />
+            <div data-cmd="top-left" onMouseDown={handleResizeStart} onTouchStart={handleResizeStart} />
+            <div data-cmd="top-right" onMouseDown={handleResizeStart} onTouchStart={handleResizeStart} />
+            <div data-cmd="bottom-left" onMouseDown={handleResizeStart} onTouchStart={handleResizeStart} />
+            <div data-cmd="bottom-right" onMouseDown={handleResizeStart} onTouchStart={handleResizeStart} />
             <span></span>
             <span></span>
             <span></span>
