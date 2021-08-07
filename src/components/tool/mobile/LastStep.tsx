@@ -13,6 +13,9 @@ const Container = styled.div`
   h5 {
     margin-bottom: 2em;
   }
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    padding: 1em 0;
+  }
 `;
 
 const SaveForm = styled(Form)`
@@ -20,6 +23,9 @@ const SaveForm = styled(Form)`
   justify-content: center;
   flex-direction: column;
   padding: 0 2em;
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    padding: 0 1em;
+  }
 `;
 
 const PreivewCanvas = styled.div`
@@ -92,7 +98,7 @@ const LastStep = () => {
           {/* <AntdCarousel startIndex={0} lastIndex={1}> */}
           <div>
             <SliderItem>
-              <Img src={canvasUrl} alt="액자사진" width={300} height={350} />
+              <Img src={canvasUrl} alt="액자사진" width={300} height={300} />
             </SliderItem>
           </div>
 
