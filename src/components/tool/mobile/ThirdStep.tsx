@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import { Popover, Button, Spin } from 'antd';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ColorResult } from 'react-color';
-import { isMobile } from 'react-device-detect';
 import { IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT } from 'src/constants';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
@@ -20,6 +19,7 @@ import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getPosition } from 'src/utils/getPosition';
 import { replacePx } from 'src/utils/replacePx';
 import ToolColorPalette from '../divided/DividedToolColorPalette';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 const SpinLoader = styled.div`
   display: flex;
@@ -278,13 +278,14 @@ const ThirdStep = () => {
   }, [selectedInfo.originHeight]);
 
   const imgElements = useMemo(() => {
-    const res = new Map();
+    let res: { [key: string]: HTMLImageElement } = {};
 
     for (const info of selectedFrame) {
       const img = new Image();
       img.src = info.imgUrl || '';
       img.crossOrigin = 'Anonymous';
-      res.set(info.name, img);
+      img.addEventListener('load', () => setIsLoaded(true));
+      res = { ...res, [info.name]: img };
     }
     return res;
   }, [selectedFrame]);
@@ -557,7 +558,6 @@ const ThirdStep = () => {
     (e) => {
       if (!isResizeMode) return;
       if (cropperWrapperRef.current) {
-        e.preventDefault();
         const [cursorX, cursorY] = getPosition(e);
         if (cursorX && cursorY && cmd) {
           const imgCanvas = imgCanvasRef.current;
@@ -700,7 +700,6 @@ const ThirdStep = () => {
   const handleMovingCropper = useCallback(
     (e) => {
       const [cursorX, cursorY] = getPosition(e);
-
       const cropperWrapper = cropperWrapperRef.current;
       const imgCanvas = imgCanvasRef.current;
       if (!cropperWrapper || !imgCanvas) return;
@@ -787,7 +786,7 @@ const ThirdStep = () => {
 
   useEffect(() => {
     if (isCropperDrawing) {
-      const img: HTMLImageElement = imgElements.get(selectFrameName);
+      const img: HTMLImageElement = imgElements[selectFrameName];
       drawingCropper(img);
       createSaveCanvas();
       setIsCropperDrawing(false);
@@ -797,7 +796,8 @@ const ThirdStep = () => {
 
   // 사이즈 확대/축소시 및 움직일때 크로퍼 반영
   useEffect(() => {
-    const img: HTMLImageElement = imgElements.get(selectFrameName);
+    const img: HTMLImageElement = imgElements[selectFrameName];
+
     drawingCropper(img);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resizeWidth, resizeHeight, selectedInfo.x, selectedInfo.y]);
@@ -805,7 +805,8 @@ const ThirdStep = () => {
   // 로드 true에 따라 이미지와 크로퍼 생성
   useEffect(() => {
     if (!isLoaded) return;
-    const img: HTMLImageElement = imgElements.get(selectFrameName);
+    const img: HTMLImageElement = imgElements[selectFrameName];
+
     const imgCanvas = imgCanvasRef.current;
     if (!imgCanvas) return;
     createImgCanvas(imgCanvas, img);
@@ -814,17 +815,15 @@ const ThirdStep = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded]);
 
-  // 그리기 위한 이미지가 로드 되면 true로
   useEffect(() => {
-    const img: HTMLImageElement = imgElements.get(selectFrameName);
+    if (!isMoving && !isResizeMode) return;
+    const body = document.querySelector('body') as HTMLElement;
+    disableBodyScroll(body);
 
-    if (!isLoaded) {
-      img.onload = () => {
-        setIsLoaded(true);
-      };
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectFrameName]);
+    return () => {
+      enableBodyScroll(body);
+    };
+  }, [isMoving, isResizeMode]);
 
   useEffect(() => {
     return () => {
@@ -843,6 +842,9 @@ const ThirdStep = () => {
   return (
     <Container
       cmd={cmd}
+      onTouchMove={isResizeMode ? handleResize : undefined}
+      onTouchStart={isResizeMode ? handleResizeEnd : undefined}
+      onTouchEnd={isResizeMode ? handleResizeEnd : undefined}
       onMouseMove={isResizeMode ? handleResize : undefined}
       onMouseUp={isResizeMode ? handleResizeEnd : undefined}
       onMouseLeave={isResizeMode ? handleResizeEnd : undefined}
@@ -891,35 +893,19 @@ const ThirdStep = () => {
               cmd={cmd}
               ref={cropperRef}
               data-url={selectedInfo.imgUrl || ''}
-              onTouchStart={isMobile ? handleMovingCropper : undefined}
-              onTouchEnd={isMobile ? handleActiveCropper : undefined}
-              onTouchMove={isMobile ? handleCancelMoveCropper : undefined}
+              onTouchStart={handleActiveCropper}
+              onTouchEnd={handleCancelMoveCropper}
+              onTouchMove={handleMovingCropper}
               onMouseMove={isMoving ? handleMovingCropper : undefined}
               onMouseDown={!isResizeMode ? handleActiveCropper : undefined}
               onMouseUp={isMoving ? handleCancelMoveCropper : undefined}
               onMouseLeave={isMoving ? handleCancelMoveCropper : undefined}
             />
 
-            <div
-              data-cmd="top-left"
-              onMouseDown={handleResizeStart}
-              onTouchStart={isMobile ? handleResizeStart : undefined}
-            />
-            <div
-              data-cmd="top-right"
-              onMouseDown={handleResizeStart}
-              onTouchStart={isMobile ? handleResizeStart : undefined}
-            />
-            <div
-              data-cmd="bottom-left"
-              onMouseDown={handleResizeStart}
-              onTouchStart={isMobile ? handleResizeStart : undefined}
-            />
-            <div
-              data-cmd="bottom-right"
-              onMouseDown={handleResizeStart}
-              onTouchStart={isMobile ? handleResizeStart : undefined}
-            />
+            <div data-cmd="top-left" onMouseDown={handleResizeStart} onTouchStart={handleResizeStart} />
+            <div data-cmd="top-right" onMouseDown={handleResizeStart} onTouchStart={handleResizeStart} />
+            <div data-cmd="bottom-left" onMouseDown={handleResizeStart} onTouchStart={handleResizeStart} />
+            <div data-cmd="bottom-right" onMouseDown={handleResizeStart} onTouchStart={handleResizeStart} />
             <span></span>
             <span></span>
             <span></span>

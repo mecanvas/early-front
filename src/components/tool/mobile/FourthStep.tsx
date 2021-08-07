@@ -51,6 +51,9 @@ const SelectBox = styled.div<{ selected: boolean }>`
   }
   border: 1px solid ${({ theme }) => theme.color.gray200};
   text-align: center;
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    width: 250px;
+  }
 `;
 
 const SelectCheck = styled.div<{ selected: boolean }>`
@@ -82,6 +85,9 @@ const SelectImage = styled.div`
   padding: 2em;
   img {
     width: 100%;
+  }
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    width: 235px;
   }
 `;
 
