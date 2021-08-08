@@ -73,7 +73,6 @@ const LastStep = () => {
   const { selectedFrame } = useAppSelector((state) => state.frame);
   const [orderForm, setOrderForm] = useState<CanvasOrder>({ username: '', phone: '', orderRoute: 1 });
   const [canvasUrl, setCanvasUrl] = useState('');
-
   const handleFormChange = useCallback((e) => {
     const { name, value } = e[0];
     setOrderForm((prev) => ({ ...prev, [name[0]]: value }));

@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Loader from 'src/components/common/Loader';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { postCanvasForSave } from 'src/store/api/canvas';
-import { resetCanvasState } from 'src/store/reducers/canvas';
+import { resetCanvasState, setCanvasSaveScale } from 'src/store/reducers/canvas';
 import { resetFrameState } from 'src/store/reducers/frame';
 import { dataURLtoFile } from 'src/utils/dataUrlToFile';
 import FirstStep from './FirstStep';
@@ -231,6 +231,11 @@ const MobileSingleTool = () => {
   const handleFinished = useCallback(() => {
     saveCanvas();
   }, [saveCanvas]);
+
+  useEffect(() => {
+    if (stepCount === 3 && canvasOrder.scaleType) dispatch(setCanvasSaveScale({ scaleType: null }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepCount]);
 
   useEffect(() => {
     if (isCanvasSaveDone) {
