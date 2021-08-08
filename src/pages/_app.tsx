@@ -63,36 +63,41 @@ function MyApp({ Component, pageProps }: AppProps) {
       </div>
     );
   }
-
+  console.log(pathname);
   return (
     <>
-      {pathname.includes('admin') && <NextSeo nofollow={true} noindex={true} title="얼리21만의 어드민" />}
-      <DefaultSeo
-        title={MAIN_TITLE}
-        description={MAIN_DESC}
-        openGraph={{
-          type: 'website',
-          url: MY_URL,
-          title: MAIN_TITLE,
-          description: MAIN_DESC,
-          site_name: SITE_NAME,
-          images: [
-            {
-              url: MAIN_IMAGE_URL,
-              alt: MAIN_TITLE,
-            },
-          ],
-        }}
-        twitter={{
-          handle: '@handle',
-          site: '@site',
-          cardType: 'summary_large_image',
-        }}
-        canonical={MY_URL}
-      />
-      <Head>
-        <meta name="keywords" content="얼리21, 캔버스액자, 포스터, 핸드폰사진제작"></meta>
-      </Head>
+      {pathname.includes('admin') ? (
+        <DefaultSeo nofollow={true} noindex={true} title="얼리21만의 어드민" />
+      ) : (
+        <>
+          <DefaultSeo
+            title={MAIN_TITLE}
+            description={MAIN_DESC}
+            openGraph={{
+              type: 'website',
+              url: MY_URL,
+              title: MAIN_TITLE,
+              description: MAIN_DESC,
+              site_name: SITE_NAME,
+              images: [
+                {
+                  url: MAIN_IMAGE_URL,
+                  alt: MAIN_TITLE,
+                },
+              ],
+            }}
+            twitter={{
+              handle: '@handle',
+              site: '@site',
+              cardType: 'summary_large_image',
+            }}
+            canonical={MY_URL}
+          />
+          <Head>
+            <meta name="keywords" content="얼리21, 캔버스액자, 포스터, 핸드폰사진제작"></meta>
+          </Head>
+        </>
+      )}
 
       <Provider store={store}>
         <ThemeProvider theme={theme}>
