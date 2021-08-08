@@ -168,7 +168,7 @@ const SecondsStep = () => {
                   onDrop={handleDropImage}
                   text={
                     <SecondsContentDropZoneText>
-                      <small>jpg, png, webp, svg 등 이미지 확장자</small>
+                      <small>jpg, png, webp 등 이미지 확장자</small>
                       <small> 최소 1MB 이상</small>
                     </SecondsContentDropZoneText>
                   }
