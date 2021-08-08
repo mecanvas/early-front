@@ -66,7 +66,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       {pathname.includes('admin') ? (
-        <DefaultSeo nofollow={true} noindex={true} title="얼리21만의 어드민" />
+        <DefaultSeo nofollow={true} noindex={true} title="얼리21 어드민" />
       ) : (
         <>
           <DefaultSeo
