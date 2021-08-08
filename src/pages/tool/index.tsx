@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { Images } from 'public/index';
 import { useOpacity } from 'src/hooks/useOpacity';
 import Link from 'next/link';
+import SEO from 'src/components/common/SEO';
 
 const Container = styled.div`
   display: flex;
@@ -115,6 +116,7 @@ const Index = () => {
   const { OpacityComponent } = useOpacity('trigger');
   return (
     <Container>
+      <SEO title="내가 직접 고른 이미지를 내 품으로" desc="내 공간에 어울리는 이미지를 골라 제작해 보세요." />
       <h4>제작방식을 선택해 주세요.</h4>
       <OpacityComponent>
         <SelectedWrapper>
