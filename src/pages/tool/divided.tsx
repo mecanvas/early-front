@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
 import Loading from 'src/components/common/Loading';
 import SEO from 'src/components/common/SEO';
+import { TOOL_SEO } from 'src/constants/SeoOnly';
 const DividedTool = dynamic(() => import('src/components/tool/divided/DividedTool'), {
   loading: () => <Loading loading />,
 });
@@ -8,7 +9,7 @@ const DividedTool = dynamic(() => import('src/components/tool/divided/DividedToo
 const Divided = () => {
   return (
     <>
-      <SEO title="내가 직접 고른 이미지를 내 품으로" desc="내 공간에 어울리는 이미지를 골라 제작해 보세요." />
+      <SEO {...TOOL_SEO} />
       <DividedTool></DividedTool>
     </>
   );
