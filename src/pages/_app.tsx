@@ -11,6 +11,7 @@ import { icons } from 'public/icons';
 import { store } from 'src/store/config';
 import { Provider } from 'react-redux';
 import { DefaultSeo } from 'next-seo';
+import Head from 'next/head';
 import { MAIN_DESC, MAIN_IMAGE_URL, MAIN_TITLE, SITE_NAME } from 'src/constants/SeoOnly';
 
 const AppContainer = styled.main`
@@ -85,6 +86,9 @@ function MyApp({ Component, pageProps }: AppProps) {
         }}
         canonical={MY_URL}
       />
+      <Head>
+        <meta name="keywords" content="얼리21, 캔버스액자, 포스터, 핸드폰사진제작"></meta>
+      </Head>
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <AppLayout>
