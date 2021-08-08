@@ -10,7 +10,7 @@ import { isIE } from 'react-device-detect';
 import { icons } from 'public/icons';
 import { store } from 'src/store/config';
 import { Provider } from 'react-redux';
-import { DefaultSeo, NextSeo } from 'next-seo';
+import { DefaultSeo } from 'next-seo';
 import Head from 'next/head';
 import { MAIN_DESC, MAIN_IMAGE_URL, MAIN_TITLE, SITE_NAME } from 'src/constants/SeoOnly';
 import { useRouter } from 'next/router';
