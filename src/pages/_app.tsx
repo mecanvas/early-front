@@ -10,9 +10,10 @@ import { isIE } from 'react-device-detect';
 import { icons } from 'public/icons';
 import { store } from 'src/store/config';
 import { Provider } from 'react-redux';
-import { DefaultSeo } from 'next-seo';
+import { DefaultSeo, NextSeo } from 'next-seo';
 import Head from 'next/head';
 import { MAIN_DESC, MAIN_IMAGE_URL, MAIN_TITLE, SITE_NAME } from 'src/constants/SeoOnly';
+import { useRouter } from 'next/router';
 
 const AppContainer = styled.main`
   width: 100%;
@@ -21,6 +22,8 @@ const AppContainer = styled.main`
 axios.defaults.baseURL = API_URL;
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const { pathname } = useRouter();
+
   if (isIE) {
     return (
       <div
@@ -63,6 +66,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <>
+      {pathname.includes('admin') && <NextSeo nofollow={true} noindex={true} title="얼리21만의 어드민" />}
       <DefaultSeo
         title={MAIN_TITLE}
         description={MAIN_DESC}
@@ -89,6 +93,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <meta name="keywords" content="얼리21, 캔버스액자, 포스터, 핸드폰사진제작"></meta>
       </Head>
+
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <AppLayout>
