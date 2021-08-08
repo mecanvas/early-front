@@ -112,7 +112,7 @@ const FourthStep = () => {
         isSelected: canvasOrder.scaleType ? canvasOrder.scaleType === 2 : false,
       },
     ];
-  }, [canvasOrder]);
+  }, [canvasOrder.scaleType]);
   const [selectBox, setSelectBox] = useState(selectBoxList);
 
   const handleCheck = useCallback(
