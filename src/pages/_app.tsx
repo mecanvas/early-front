@@ -5,11 +5,13 @@ import AppLayout from 'src/components/layouts/AppLayout';
 import axios from 'axios';
 import { ThemeProvider } from '@emotion/react';
 import { theme } from 'src/style/theme';
-import { API_URL } from 'src/constants';
+import { API_URL, MY_URL } from 'src/constants';
 import { isIE } from 'react-device-detect';
 import { icons } from 'public/icons';
 import { store } from 'src/store/config';
 import { Provider } from 'react-redux';
+import { DefaultSeo } from 'next-seo';
+import { MAIN_DESC, MAIN_IMAGE_URL, MAIN_TITLE, SITE_NAME } from 'src/constants/SeoOnly';
 
 const AppContainer = styled.main`
   width: 100%;
@@ -60,6 +62,29 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <>
+      <DefaultSeo
+        title={MAIN_TITLE}
+        description={MAIN_DESC}
+        openGraph={{
+          type: 'website',
+          url: MY_URL,
+          title: MAIN_TITLE,
+          description: MAIN_DESC,
+          site_name: SITE_NAME,
+          images: [
+            {
+              url: MAIN_IMAGE_URL,
+              alt: MAIN_TITLE,
+            },
+          ],
+        }}
+        twitter={{
+          handle: '@handle',
+          site: '@site',
+          cardType: 'summary_large_image',
+        }}
+        canonical={MY_URL}
+      />
       <Provider store={store}>
         <ThemeProvider theme={theme}>
           <AppLayout>
