@@ -63,7 +63,6 @@ function MyApp({ Component, pageProps }: AppProps) {
       </div>
     );
   }
-  console.log(pathname);
   return (
     <>
       {pathname.includes('admin') ? (
