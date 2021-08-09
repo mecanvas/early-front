@@ -36,9 +36,9 @@ const MobileSingleToolHeader = styled.div`
     display: flex;
     align-items: center;
     margin: 0 auto;
+    cursor: pointer;
 
     img {
-      cursor: pointer;
       &:nth-of-type(1) {
         transform: rotateY(180deg);
         -webkit-transform: rotateY(180deg);
@@ -232,6 +232,10 @@ const MobileSingleTool = () => {
     saveCanvas();
   }, [saveCanvas]);
 
+  const handleMoveToolSelect = useCallback(() => {
+    router.push('/tool');
+  }, []);
+
   useEffect(() => {
     if (stepCount === 3 && canvasOrder.scaleType) dispatch(setCanvasSaveScale({ scaleType: null }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -255,7 +259,7 @@ const MobileSingleTool = () => {
     <Container>
       <Loader />
       <MobileSingleToolHeader>
-        <nav>
+        <nav onClick={handleMoveToolSelect}>
           <img src={icons.arrow} />
           <img src={icons.home} />
         </nav>
