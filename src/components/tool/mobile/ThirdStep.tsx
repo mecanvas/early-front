@@ -28,20 +28,8 @@ const SpinLoader = styled.div`
   height: 400px;
 `;
 
-const Container = styled.section<{ cmd: ResizeCmd | null }>`
+const Container = styled.section`
   padding: 1em 0;
-
-  ${({ cmd }) => {
-    if (!cmd) return;
-    if (cmd === 'top-left' || cmd === 'bottom-right') {
-      return css`
-        cursor: nwse-resize;
-      `;
-    }
-    return css`
-      cursor: nesw-resize;
-    `;
-  }}
 `;
 
 const ThirdBgChanger = styled.div`
@@ -115,7 +103,18 @@ const ThirdContent = styled.div`
   }
 `;
 
-const ThirdContentDrawingCanvas = styled.div<{ width: number; height: number }>`
+const ThirdContentDrawingCanvas = styled.div<{ width: number; height: number; cmd: ResizeCmd | null }>`
+  ${({ cmd }) => {
+    if (!cmd) return;
+    if (cmd === 'top-left' || cmd === 'bottom-right') {
+      return css`
+        cursor: nwse-resize;
+      `;
+    }
+    return css`
+      cursor: nesw-resize;
+    `;
+  }}
   position: relative;
   width: ${({ width }) => width}px;
   height: ${({ height }) => height}px;
@@ -557,6 +556,7 @@ const ThirdStep = () => {
   }, []);
 
   const handleResizeEnd = useCallback(() => {
+    console.log('씨발');
     setIsResizeMode(false);
     setCmd(null);
     setIsCalc(false);
@@ -567,6 +567,8 @@ const ThirdStep = () => {
 
   const handleResize = useCallback(
     (e) => {
+      console.log(isResizeMode);
+
       if (!isResizeMode) return;
       if (cropperWrapperRef.current) {
         const [cursorX, cursorY] = getPosition(e);
@@ -575,14 +577,14 @@ const ThirdStep = () => {
           if (imgCanvas) {
             const {
               left: imgPaddingLeft,
-              // top: imgPaddingTop,
+              top: imgPaddingTop,
               right: imgPaddingRight,
             } = imgCanvas.getBoundingClientRect();
             const cropperWrapper = cropperWrapperRef.current;
             const { right: cropperPaddingRight } = cropperWrapper.getBoundingClientRect();
 
             const cursorXInImage = cursorX - imgPaddingLeft;
-            // const cursorYInImage = cursorY - imgPaddingTop;
+            const cursorYInImage = cursorY - imgPaddingTop;
             const cropperRight = imgPaddingRight - cropperPaddingRight;
 
             if (isCalc) {
@@ -594,18 +596,21 @@ const ThirdStep = () => {
             if (!isCalc) {
               // top-left에서 움직일시 크기
               const cursorX = cursorXInImage - cursorXDiff;
-              // const cursorY = cursorYInImage - cursorYDiff;
+              const cursorY = cursorYInImage - cursorYDiff;
               if (cmd === 'top-left') {
-                const resizeByTopLeft = originWidth - cursorX;
-                if (resizeByTopLeft + cropperRight > imgWidth) return;
-                const resizeByBottomLeft = resizeByTopLeft * ratio;
+                const wRatio = originWidth / originHeight;
+                // const resizeByBottomLeft = resizeByTopLeft * ratio;
+                const resizeByBottomLeft = originHeight - cursorY;
                 if (resizeByBottomLeft + cursorYDiff > imgHeight) return;
-                // const resizeByBottomLeft = originHeight - cursorY;
+                const resizeByTopLeft = resizeByBottomLeft * wRatio;
+                const right = imgWidth - (resizeByTopLeft + cursorXInImage);
+                if (resizeByTopLeft + cropperRight > imgWidth) return;
+                console.log(imgWidth - (resizeByTopLeft + right), cursorXInImage);
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
-                    x: cursorXInImage,
-                    y: cursorYDiff,
+                    x: imgWidth - (resizeByTopLeft + right),
+                    y: cursorYInImage,
                     width: resizeByTopLeft,
                     height: resizeByBottomLeft,
                   }),
@@ -616,18 +621,18 @@ const ThirdStep = () => {
 
               // top-right에서 움직일시 크기
               if (cmd === 'top-right') {
-                const resizeByTopRight = cursorX;
-                if (resizeByTopRight + cursorXDiff > imgWidth) return;
-                const resizeByBottomRight = resizeByTopRight * ratio;
+                const wRatio = originWidth / originHeight;
+                const cursorY = cursorYInImage - cursorYDiff;
+                const resizeByBottomRight = originHeight - cursorY;
                 if (resizeByBottomRight + cursorYDiff > imgHeight) return;
-
-                // const resizeByBottomRight = originHeight - cursorY;
+                const resizeByTopRight = resizeByBottomRight * wRatio;
+                if (resizeByTopRight + cursorXDiff > imgWidth) return;
 
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
                     x: cursorXDiff,
-                    y: cursorYDiff,
+                    y: cursorYInImage,
                     width: resizeByTopRight,
                     height: resizeByBottomRight,
                   }),
@@ -689,13 +694,14 @@ const ThirdStep = () => {
       cmd,
       isCalc,
       cursorXDiff,
+      cursorYDiff,
       originWidth,
       imgWidth,
-      ratio,
-      cursorYDiff,
+      originHeight,
       imgHeight,
       dispatch,
       selectedInfo.name,
+      ratio,
     ],
   );
 
@@ -869,15 +875,7 @@ const ThirdStep = () => {
   }
 
   return (
-    <Container
-      cmd={cmd}
-      onTouchMove={isResizeMode ? handleResize : undefined}
-      onTouchStart={isResizeMode ? handleResizeEnd : undefined}
-      onTouchEnd={isResizeMode ? handleResizeEnd : undefined}
-      onMouseMove={isResizeMode ? handleResize : undefined}
-      onMouseUp={isResizeMode ? handleResizeEnd : undefined}
-      onMouseLeave={isResizeMode ? handleResizeEnd : undefined}
-    >
+    <Container>
       <ThirdBgChanger>
         <Button type="default" onClick={handleRotate} data-type={selectedInfo.type} data-id={selectedInfo.id}>
           <img src={icons.rotate} />
@@ -912,13 +910,17 @@ const ThirdStep = () => {
       ) : (
         <></>
       )}
-      <ThirdContent
-        onTouchMove={isResizeMode ? handleResize : undefined}
-        onTouchEnd={isResizeMode ? handleResizeEnd : undefined}
-        onMouseMove={isResizeMode ? handleResize : undefined}
-        onMouseUp={isResizeMode ? handleResizeEnd : undefined}
-      >
-        <ThirdContentDrawingCanvas width={imgWidth} height={imgHeight}>
+      <ThirdContent>
+        <ThirdContentDrawingCanvas
+          width={imgWidth}
+          cmd={cmd}
+          height={imgHeight}
+          onTouchMove={isResizeMode ? handleResize : undefined}
+          onTouchEnd={isResizeMode ? handleResizeEnd : undefined}
+          onMouseUp={isResizeMode ? handleResizeEnd : undefined}
+          onMouseMove={isResizeMode ? handleResize : undefined}
+          onMouseLeave={isResizeMode ? handleResizeEnd : undefined}
+        >
           <canvas ref={imgCanvasRef} />
           <ThirdContentCropperWrapper width={canvasWidth} height={canvasHeight} ref={cropperWrapperRef}>
             <ThirdContentCropper
