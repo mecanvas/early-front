@@ -1,14 +1,14 @@
 import React, { useCallback } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/router';
-import { icons } from 'public/icons';
+import { UtilityImg } from 'public/utils';
 
 const Logos = styled.div`
-  width: 28px;
+  width: 5.5em;
   cursor: pointer;
 
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-    width: 22px;
+    width: 4.5em;
   }
 
   img {
@@ -25,7 +25,7 @@ const Logo = () => {
 
   return (
     <Logos onClick={handlePushMainPage}>
-      <img src={icons.home} alt="로고 샘플" />
+      <img src={UtilityImg.early21Logo} alt="샘플용 필기체 로고" />
     </Logos>
   );
 };

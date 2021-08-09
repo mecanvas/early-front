@@ -71,6 +71,8 @@ export const PreviewCanvasWrapper = styled.div<{ isPreview: boolean }>`
     display: block;
     background-color: ${({ theme }) => theme.color.white};
     filter: ${({ theme }) => theme.canvasShadowFilter};
+    filter: none; /* IE 6-9 */
+    -webkit-filter: ${({ theme }) => theme.canvasShadowFilter};
   }
   ${({ isPreview }) =>
     isPreview
