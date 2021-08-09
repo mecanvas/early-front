@@ -855,9 +855,11 @@ const ThirdStep = () => {
   }, [isMoving, isResizeMode]);
 
   useEffect(() => {
+    dispatch(updatePositionByFrame({ name: selectFrameName, x: 0, y: 0 }));
     return () => {
       setIsLoaded(false);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!isLoaded) {
