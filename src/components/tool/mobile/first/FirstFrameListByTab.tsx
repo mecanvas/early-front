@@ -67,9 +67,9 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
             onClick={handleSelectFrame}
           >
             <div>
-              <div>{item.name}</div>
+              <span>{item.widthCm}cm</span> <span>X</span> <span>{item.heightCm}cm</span>
               <div>
-                <small>{item.widthCm}cm</small> <small>X</small> <small>{item.heightCm}cm</small>
+                <small>{item.name}</small>
               </div>
             </div>
             {selectedFrameList.some((lst) => lst.type === item.type && lst.name === item.name) ? (
