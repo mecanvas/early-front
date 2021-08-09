@@ -1,11 +1,12 @@
 import styled from '@emotion/styled';
 import { Alert, Button } from 'antd';
-import React, { useCallback } from 'react';
+import { icons } from 'public/icons';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import ImageDropZone from 'src/components/common/ImageDropZone';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { postImageUpload } from 'src/store/api/image';
-import { deletePositionByFrame } from 'src/store/reducers/frame';
+import { deletePositionByFrame, putSelectedFrameImage } from 'src/store/reducers/frame';
 import { imgSizeChecker } from 'src/utils/imgSizeChecker';
 
 const SecondsContent = styled.div`
@@ -73,22 +74,79 @@ const SecondsImageDropZoneWrapper = styled.div`
   }
 `;
 
-const ImageWrapper = styled.div`
-  width: 302px;
-  height: 302px;
-
-  img {
-    width: 302px;
-    height: 302px;
-    object-fit: contain;
+const ImgRotateIcon = styled.div`
+  cursor: pointer;
+  margin-bottom: 0.6em;
+  img + img {
+    margin-left: 0.6em;
   }
-  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+  img {
+    width: 22px;
+    &:nth-of-type(2) {
+      transform: scale(-1, 1);
+    }
+  }
+`;
+
+const ImageWrapper = styled.div`
+  img {
+    max-width: 400px;
   }
 `;
 
 const SecondsStep = () => {
   const { selectedFrame } = useAppSelector(({ frame }) => frame);
   const dispatch = useAppDispatch();
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [rotateCount, setRotateCount] = useState(0);
+  const [rotateType, setRotateType] = useState(0);
+
+  const handleRotate = useCallback((e) => {
+    const { type } = e.currentTarget.dataset;
+    // type === 1 ? 오른쪽 : 왼쪽
+    const count = +type === 1 ? 1 : -1;
+    setRotateType(+type);
+    setRotateCount((prev) => {
+      if (prev === 3) {
+        // 양수면
+        if (count > 0) {
+          return 0;
+        }
+      }
+      if (prev === -3) {
+        // 음수면
+        if (count < 0) {
+          return 0;
+        }
+      }
+      return prev + count;
+    });
+  }, []);
+
+  const createImgCanvas = useCallback(async () => {
+    const img = imgRef.current;
+    const imgCanvas = document.createElement('canvas');
+    if (!img) return;
+    const { width, height } = img.getBoundingClientRect();
+
+    // const [width, height] = getOriginRatio(naturalWidth, naturalHeight, 500, 500);
+
+    const angle = ((rotateType === 1 ? 90 : -90) * Math.PI) / 180;
+    imgCanvas.width = width;
+    imgCanvas.height = height;
+    const iCtx = imgCanvas.getContext('2d');
+    if (!iCtx) return;
+    iCtx.clearRect(0, 0, width, height);
+    iCtx.save();
+    iCtx.imageSmoothingQuality = 'high';
+    iCtx.translate(width / 2, height / 2);
+    iCtx.rotate(angle);
+    iCtx.drawImage(img, -width / 2, -height / 2);
+
+    iCtx.restore();
+    const imgUrl = await imgCanvas.toDataURL('image/png', 1.0);
+    dispatch(putSelectedFrameImage({ type: selectedFrame[0].type, id: selectedFrame[0].id, imgUrl }));
+  }, [dispatch, selectedFrame, rotateType]);
 
   const handleButtonUpload = useCallback(
     (e) => {
@@ -135,6 +193,10 @@ const SecondsStep = () => {
 
   const { getInputProps, getRootProps } = useDropzone({ onDrop: handleDropImage });
 
+  useEffect(() => {
+    createImgCanvas();
+  }, [rotateCount]);
+
   return (
     <>
       <SecondsContent>
@@ -143,8 +205,12 @@ const SecondsStep = () => {
           {selectedFrame.length && selectedFrame.length === 1 ? (
             selectedFrame[0].imgUrl ? (
               <>
+                <ImgRotateIcon>
+                  <img src={icons.rotate} onClick={handleRotate} data-type={2} />
+                  <img src={icons.rotate} onClick={handleRotate} data-type={1} />
+                </ImgRotateIcon>
                 <ImageWrapper>
-                  <img src={selectedFrame[0].imgUrl} />
+                  <img src={selectedFrame[0].imgUrl} ref={imgRef} crossOrigin="anonymous" />
                 </ImageWrapper>
                 <Button type="text" {...getRootProps()} data-id={selectedFrame[0].id} data-type={selectedFrame[0].type}>
                   변경
