@@ -135,10 +135,10 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   div:nth-of-type(1) {
     z-index: 12;
     position: absolute;
-    top: -4px;
-    left: -4px;
-    width: 12px;
-    height: 12px;
+    top: -6px;
+    left: -6px;
+    width: 1.1em;
+    height: 1.1em;
     background: ${({ theme }) => theme.color.primary};
     cursor: nwse-resize;
   }
@@ -147,10 +147,10 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   div:nth-of-type(2) {
     z-index: 12;
     position: absolute;
-    top: -4px;
-    right: -4px;
-    width: 12px;
-    height: 12px;
+    top: -6px;
+    right: -6px;
+    width: 1.1em;
+    height: 1.1em;
     background: ${({ theme }) => theme.color.primary};
     cursor: nesw-resize;
   }
@@ -159,10 +159,10 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   div:nth-of-type(3) {
     z-index: 12;
     position: absolute;
-    bottom: -4px;
-    left: -4px;
-    width: 12px;
-    height: 12px;
+    bottom: -6px;
+    left: -6px;
+    width: 1.1em;
+    height: 1.1em;
     background: ${({ theme }) => theme.color.primary};
     cursor: nesw-resize;
   }
@@ -171,10 +171,10 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   div:nth-of-type(4) {
     z-index: 12;
     position: absolute;
-    bottom: -4px;
-    right: -4px;
-    width: 12px;
-    height: 12px;
+    bottom: -6px;
+    right: -6px;
+    width: 1.1em;
+    height: 1.1em;
     background: ${({ theme }) => theme.color.primary};
     cursor: nwse-resize;
   }
