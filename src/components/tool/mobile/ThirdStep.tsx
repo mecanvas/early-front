@@ -19,7 +19,6 @@ import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getPosition } from 'src/utils/getPosition';
 import { replacePx } from 'src/utils/replacePx';
 import ToolColorPalette from '../divided/DividedToolColorPalette';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 import { icons } from 'public/icons';
 
 const SpinLoader = styled.div`
@@ -107,6 +106,7 @@ const ThirdContent = styled.div`
   gap: 1em;
   grid-template-columns: repeat(2, 1fr);
   justify-content: center;
+
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     width: 100%;
     display: grid;
@@ -130,6 +130,13 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   position: absolute;
   width: ${({ width }) => width}px;
   height: ${({ height }) => height}px;
+
+  /* 텍스트 드래그 제거 */
+  -ms-user-select: none;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
 
   /* top-left */
   div:nth-of-type(1) {
@@ -823,11 +830,27 @@ const ThirdStep = () => {
 
   useEffect(() => {
     if (!isMoving && !isResizeMode) return;
-    const body = document.querySelector('body') as HTMLElement;
-    disableBodyScroll(body);
+    const body = document.querySelector('main') as HTMLElement;
+    const cropper = cropperWrapperRef.current;
+    const scrollPosition = window.scrollY;
+    if (cropper) {
+      cropper.style.pointerEvents = 'auto';
+    }
+    body.style.overflow = 'hidden';
+    body.style.pointerEvents = 'none';
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollPosition}px`;
+    body.style.left = '0';
+    body.style.right = '0';
 
     return () => {
-      enableBodyScroll(body);
+      body.style.removeProperty('overflow');
+      body.style.removeProperty('pointer-events');
+      body.style.removeProperty('position');
+      body.style.removeProperty('top');
+      body.style.removeProperty('left');
+      body.style.removeProperty('right');
+      window.scrollTo(0, scrollPosition);
     };
   }, [isMoving, isResizeMode]);
 
@@ -847,6 +870,7 @@ const ThirdStep = () => {
 
   return (
     <Container
+      className="wra"
       cmd={cmd}
       onTouchMove={isResizeMode ? handleResize : undefined}
       onTouchStart={isResizeMode ? handleResizeEnd : undefined}

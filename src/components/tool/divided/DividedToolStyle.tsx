@@ -271,7 +271,8 @@ export const ImageWrapper = styled.div<{
     position: absolute;
     z-index: 1;
     filter: ${({ theme }) => theme.canvasShadowFilter};
-
+    filter: none; /* IE 6-9 */
+    -webkit-filter: ${({ theme }) => theme.canvasShadowFilter}
     ${({ isPreview }) =>
       isPreview &&
       css`

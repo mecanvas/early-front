@@ -33,15 +33,15 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
   {
     id: 1,
     type: 2,
-    name: 'F-0호',
-    widthCm: 14,
-    heightCm: 18,
-    price: 11000,
+    name: 'S-4호',
+    widthCm: 24,
+    heightCm: 24,
+    price: 15000,
     size: {
-      width: cmToPx(14),
-      height: cmToPx(18),
+      width: cmToPx(24),
+      height: cmToPx(24),
     },
-    recommand: false,
+    recommand: true,
   },
   {
     id: 2,
@@ -85,10 +85,23 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
   },
 ];
 
-// 정사각형 = 1
+// 탁자용 = 1
 export const frameSquare: FrameInfoList[] = [
   {
     id: 1,
+    type: 1,
+    name: 'F-0호',
+    widthCm: 14,
+    heightCm: 18,
+    price: 11000,
+    size: {
+      width: cmToPx(14),
+      height: cmToPx(18),
+    },
+    recommand: false,
+  },
+  {
+    id: 2,
     type: 1,
     name: 'S-1호',
     widthCm: 16,
@@ -101,7 +114,7 @@ export const frameSquare: FrameInfoList[] = [
     recommand: false,
   },
   {
-    id: 2,
+    id: 3,
     type: 1,
     name: 'S-2호',
     widthCm: 19,
@@ -112,19 +125,6 @@ export const frameSquare: FrameInfoList[] = [
       height: cmToPx(19),
     },
     recommand: false,
-  },
-  {
-    id: 3,
-    type: 1,
-    name: 'S-4호',
-    widthCm: 24,
-    heightCm: 24,
-    price: 15000,
-    size: {
-      width: cmToPx(24),
-      height: cmToPx(24),
-    },
-    recommand: true,
   },
 ];
 

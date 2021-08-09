@@ -47,6 +47,8 @@ const SliderItem = styled.div`
     max-width: 100%;
     max-height: 100%;
     filter: ${({ theme }) => theme.canvasShadowFilter};
+    filter: none; /* IE 6-9 */
+    -webkit-filter: ${({ theme }) => theme.canvasShadowFilter};
   }
 `;
 
