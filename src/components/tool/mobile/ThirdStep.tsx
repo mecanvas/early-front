@@ -591,16 +591,14 @@ const ThirdStep = () => {
               const cursorY = cursorYInImage - cursorYDiff;
               if (cmd === 'top-left') {
                 const wRatio = originWidth / originHeight;
-                // const resizeByBottomLeft = resizeByTopLeft * ratio;
                 const resizeByBottomLeft = originHeight - cursorY;
-                if (resizeByBottomLeft > imgHeight) return;
+                if (resizeByBottomLeft + cursorYDiff > imgHeight) return;
                 const resizeByTopLeft = resizeByBottomLeft * wRatio;
-                const right = imgWidth - (resizeByTopLeft + cursorXInImage);
-                if (resizeByTopLeft > imgWidth) return;
+                if (resizeByTopLeft + cursorXDiff > imgWidth) return;
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
-                    x: imgWidth - (resizeByTopLeft + right),
+                    x: cursorYInImage * wRatio,
                     y: cursorYInImage,
                     width: resizeByTopLeft,
                     height: resizeByBottomLeft,
@@ -614,10 +612,11 @@ const ThirdStep = () => {
               if (cmd === 'top-right') {
                 const wRatio = originWidth / originHeight;
                 const cursorY = cursorYInImage - cursorYDiff;
+
                 const resizeByBottomRight = originHeight - cursorY;
-                if (resizeByBottomRight > imgHeight) return;
+                if (resizeByBottomRight + cursorYDiff > imgHeight) return;
                 const resizeByTopRight = resizeByBottomRight * wRatio;
-                if (resizeByTopRight > imgWidth) return;
+                if (resizeByTopRight + cursorXDiff > imgWidth) return;
 
                 dispatch(
                   updatePositionByFrame({
@@ -635,9 +634,10 @@ const ThirdStep = () => {
               // bottom-left에서 움직일시 크기
               if (cmd === 'bottom-left') {
                 const resizeByBottomLeft = originWidth - cursorX;
-                if (resizeByBottomLeft > imgWidth) return;
+                if (resizeByBottomLeft + cursorXDiff > imgWidth) return;
                 const resizeByTopLeft = resizeByBottomLeft * ratio;
-                if (resizeByTopLeft > imgHeight) return;
+                if (resizeByTopLeft + cursorYDiff > imgHeight) return;
+
                 // const resizeByTopLeft = cursorY;
 
                 dispatch(
@@ -656,10 +656,9 @@ const ThirdStep = () => {
               // bottom-right에서 움직일시 크기
               if (cmd === 'bottom-right') {
                 const resizeByTopRight = cursorX;
-                if (resizeByTopRight > imgWidth) return;
+                if (resizeByTopRight + cursorXDiff > imgWidth) return;
                 const resizeByBottomRight = resizeByTopRight * ratio;
-                if (resizeByBottomRight > imgHeight) return;
-                // const resizeByBottomRight = cursorY;
+                if (resizeByBottomRight + cursorYDiff > imgHeight) return;
 
                 dispatch(
                   updatePositionByFrame({
