@@ -19,7 +19,6 @@ import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getPosition } from 'src/utils/getPosition';
 import { replacePx } from 'src/utils/replacePx';
 import ToolColorPalette from '../divided/DividedToolColorPalette';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 import { icons } from 'public/icons';
 
 const SpinLoader = styled.div`
