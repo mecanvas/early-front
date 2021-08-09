@@ -381,10 +381,8 @@ const ThirdStep = () => {
         // 프리뷰
         const previewW = canvasW > imgW ? imgW : canvasW;
         const previewH = canvasW > imgW ? imgW * ratio : canvasH;
-
         previewCanvas.width = previewW * scaleX;
         previewCanvas.height = previewH * scaleY;
-
         pCtx.clearRect(0, 0, previewW * scaleX, previewH * scaleY);
         pCtx.imageSmoothingQuality = 'high';
         pCtx.drawImage(
@@ -406,8 +404,8 @@ const ThirdStep = () => {
           const preCtx = preview.getContext('2d');
           if (!preCtx) return;
 
-          const pW = info.isRotate ? initialSize.width / 1.2 : initialSize.height / 1.2;
-          const pH = info.isRotate ? initialSize.height / 1.2 : initialSize.width / 1.2;
+          const pW = initialSize.width / 1.2;
+          const pH = initialSize.height / 1.2;
           preview.width = pW;
           preview.height = pH;
           preCtx.clearRect(0, 0, pW, pH);
@@ -870,7 +868,6 @@ const ThirdStep = () => {
 
   return (
     <Container
-      className="wra"
       cmd={cmd}
       onTouchMove={isResizeMode ? handleResize : undefined}
       onTouchStart={isResizeMode ? handleResizeEnd : undefined}
@@ -913,7 +910,12 @@ const ThirdStep = () => {
       ) : (
         <></>
       )}
-      <ThirdContent>
+      <ThirdContent
+        onTouchMove={isResizeMode ? handleResize : undefined}
+        onTouchEnd={isResizeMode ? handleResizeEnd : undefined}
+        onMouseMove={isResizeMode ? handleResize : undefined}
+        onMouseUp={isResizeMode ? handleResizeEnd : undefined}
+      >
         <ThirdContentDrawingCanvas width={imgWidth} height={imgHeight}>
           <canvas ref={imgCanvasRef} />
           <ThirdContentCropperWrapper width={canvasWidth} height={canvasHeight} ref={cropperWrapperRef}>
