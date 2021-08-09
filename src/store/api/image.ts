@@ -1,6 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { ImgToDataURL } from 'src/utils/ImgToDataURL';
 import { putSelectedFrameImage } from '../reducers/frame';
 import { getProgressPercentage, uploadImageProgress } from '../reducers/progress';
 
