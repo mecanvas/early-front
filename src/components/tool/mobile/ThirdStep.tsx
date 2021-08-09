@@ -823,11 +823,27 @@ const ThirdStep = () => {
 
   useEffect(() => {
     if (!isMoving && !isResizeMode) return;
-    const body = document.querySelector('body') as HTMLElement;
-    disableBodyScroll(body);
+    const body = document.querySelector('main') as HTMLElement;
+    const cropper = cropperWrapperRef.current;
+    const scrollPosition = window.scrollY;
+    if (cropper) {
+      cropper.style.pointerEvents = 'auto';
+    }
+    body.style.overflow = 'hidden';
+    body.style.pointerEvents = 'none';
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollPosition}px`;
+    body.style.left = '0';
+    body.style.right = '0';
 
     return () => {
-      enableBodyScroll(body);
+      body.style.removeProperty('overflow');
+      body.style.removeProperty('pointer-events');
+      body.style.removeProperty('position');
+      body.style.removeProperty('top');
+      body.style.removeProperty('left');
+      body.style.removeProperty('right');
+      window.scrollTo(0, scrollPosition);
     };
   }, [isMoving, isResizeMode]);
 
@@ -847,6 +863,7 @@ const ThirdStep = () => {
 
   return (
     <Container
+      className="wra"
       cmd={cmd}
       onTouchMove={isResizeMode ? handleResize : undefined}
       onTouchStart={isResizeMode ? handleResizeEnd : undefined}

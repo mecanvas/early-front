@@ -12,9 +12,9 @@ export const IMG_LIMIT_MINIMUM_SIZE = process.env.NODE_ENV === 'production' ? 1_
 export const API_URL =
   process.env.NODE_ENV === 'production'
     ? 'https://api.early21.com'
-    : `http://localhost:${process.env.NEXT_PUBLIC_PORT}`;
+    : `http://192.168.0.3:${process.env.NEXT_PUBLIC_PORT}`;
 
-export const MY_URL = process.env.NODE_ENV === 'production' ? 'https://early21.com' : 'http://localhost:3000';
+export const MY_URL = process.env.NODE_ENV === 'production' ? 'https://early21.com' : 'http://192.168.0.3:3000';
 
 // 해당하는 routes들은 false를 반환합니다. -> footer를 제외하고 불러옵니다.
 export const exceptionRoutes = ['/tool/divided', '/tool/single', '/404', '/success'];
