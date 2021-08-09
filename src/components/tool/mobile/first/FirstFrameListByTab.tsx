@@ -3,7 +3,7 @@ import { List } from 'antd';
 import { icons } from 'public/icons';
 import React, { useState, useMemo, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from 'src/hooks/useRedux';
-import { FrameInfoList, rotateFrameInfo, selectedFrame } from 'src/store/reducers/frame';
+import { FrameInfoList, rotateSelectedFrameList, selectedFrame } from 'src/store/reducers/frame';
 import { FirstContent, FirstListItems, FirstFrameWrapper, FirstFramePreview } from './FirstStyle';
 
 const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
@@ -48,7 +48,7 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
 
       if (!type || !id) return;
 
-      dispatch(rotateFrameInfo({ type: +type, id: +id }));
+      dispatch(rotateSelectedFrameList({ type: +type, id: +id }));
     },
     [dispatch],
   );
