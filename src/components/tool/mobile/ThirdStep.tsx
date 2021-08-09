@@ -106,6 +106,7 @@ const ThirdContent = styled.div`
   gap: 1em;
   grid-template-columns: repeat(2, 1fr);
   justify-content: center;
+
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     width: 100%;
     display: grid;
@@ -129,6 +130,13 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   position: absolute;
   width: ${({ width }) => width}px;
   height: ${({ height }) => height}px;
+
+  /* 텍스트 드래그 제거 */
+  -ms-user-select: none;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
 
   /* top-left */
   div:nth-of-type(1) {
