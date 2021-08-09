@@ -36,9 +36,9 @@ const MobileSingleToolHeader = styled.div`
     display: flex;
     align-items: center;
     margin: 0 auto;
+    cursor: pointer;
 
     img {
-      cursor: pointer;
       &:nth-of-type(1) {
         transform: rotateY(180deg);
         -webkit-transform: rotateY(180deg);
