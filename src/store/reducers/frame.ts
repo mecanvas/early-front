@@ -42,6 +42,31 @@ const frame = createSlice({
     resetFrameState: (state) => {
       state.selectedFrame = [];
     },
+    rotateFrameInfo: (state, { payload }: PayloadAction<{ type: number; id: number }>) => {
+      state.frameInfoList = state.frameInfoList.map((lst) => ({
+        ...lst,
+        widthCm: lst.id === payload.id && lst.type === payload.type ? lst.heightCm : lst.widthCm,
+        heightCm: lst.id === payload.id && lst.type === payload.type ? lst.widthCm : lst.heightCm,
+        size: {
+          ...lst.size,
+          width: lst.id === payload.id && lst.type === payload.type ? lst.size.height : lst.size.width,
+          height: lst.id === payload.id && lst.type === payload.type ? lst.size.width : lst.size.height,
+        },
+      }));
+      state.selectedFrame = state.selectedFrame.map((lst) => ({
+        ...lst,
+        widthCm: lst.id === payload.id && lst.type === payload.type ? lst.heightCm : lst.widthCm,
+        heightCm: lst.id === payload.id && lst.type === payload.type ? lst.widthCm : lst.heightCm,
+        originWidth: lst.id === payload.id && lst.type === payload.type ? lst.originHeight : lst.originWidth,
+        originHeight: lst.id === payload.id && lst.type === payload.type ? lst.originWidth : lst.originHeight,
+        size: {
+          ...lst.size,
+          width: lst.id === payload.id && lst.type === payload.type ? lst.size.height : lst.size.width,
+          height: lst.id === payload.id && lst.type === payload.type ? lst.size.width : lst.size.height,
+        },
+        isRotate: !lst.isRotate,
+      }));
+    },
     rotateSelectedFrameList: (state, { payload }: PayloadAction<{ type: number; id: number }>) => {
       state.selectedFrame = state.selectedFrame.map((lst) => ({
         ...lst,
@@ -126,6 +151,7 @@ export const {
   setBgColorFrame,
   setFrameSize,
   setOriginSize,
+  rotateFrameInfo,
 } = frame.actions;
 
 export default frame.reducer;
