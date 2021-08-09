@@ -28,8 +28,19 @@ const SpinLoader = styled.div`
   height: 400px;
 `;
 
-const Container = styled.section`
+const Container = styled.section<{ cmd: ResizeCmd | null }>`
   padding: 1em 0;
+  ${({ cmd }) => {
+    if (!cmd) return;
+    if (cmd === 'top-left' || cmd === 'bottom-right') {
+      return css`
+        cursor: nwse-resize;
+      `;
+    }
+    return css`
+      cursor: nesw-resize;
+    `;
+  }}
 `;
 
 const ThirdBgChanger = styled.div`
@@ -103,18 +114,7 @@ const ThirdContent = styled.div`
   }
 `;
 
-const ThirdContentDrawingCanvas = styled.div<{ width: number; height: number; cmd: ResizeCmd | null }>`
-  ${({ cmd }) => {
-    if (!cmd) return;
-    if (cmd === 'top-left' || cmd === 'bottom-right') {
-      return css`
-        cursor: nwse-resize;
-      `;
-    }
-    return css`
-      cursor: nesw-resize;
-    `;
-  }}
+const ThirdContentDrawingCanvas = styled.div<{ width: number; height: number }>`
   position: relative;
   width: ${({ width }) => width}px;
   height: ${({ height }) => height}px;
@@ -556,7 +556,6 @@ const ThirdStep = () => {
   }, []);
 
   const handleResizeEnd = useCallback(() => {
-    console.log('씨발');
     setIsResizeMode(false);
     setCmd(null);
     setIsCalc(false);
@@ -835,7 +834,7 @@ const ThirdStep = () => {
   useEffect(() => {
     if (!isMoving && !isResizeMode) return;
     const body = document.querySelector('main') as HTMLElement;
-    const cropper = cropperWrapperRef.current;
+    const cropper = document.querySelector('.cropper') as HTMLElement;
     const scrollPosition = window.scrollY;
     if (cropper) {
       cropper.style.pointerEvents = 'auto';
@@ -875,7 +874,15 @@ const ThirdStep = () => {
   }
 
   return (
-    <Container>
+    <Container
+      className="cropper"
+      cmd={cmd}
+      onTouchMove={isResizeMode ? handleResize : undefined}
+      onTouchEnd={isResizeMode ? handleResizeEnd : undefined}
+      onMouseUp={isResizeMode ? handleResizeEnd : undefined}
+      onMouseMove={isResizeMode ? handleResize : undefined}
+      onMouseLeave={isResizeMode ? handleResizeEnd : undefined}
+    >
       <ThirdBgChanger>
         <Button type="default" onClick={handleRotate} data-type={selectedInfo.type} data-id={selectedInfo.id}>
           <img src={icons.rotate} />
@@ -911,16 +918,7 @@ const ThirdStep = () => {
         <></>
       )}
       <ThirdContent>
-        <ThirdContentDrawingCanvas
-          width={imgWidth}
-          cmd={cmd}
-          height={imgHeight}
-          onTouchMove={isResizeMode ? handleResize : undefined}
-          onTouchEnd={isResizeMode ? handleResizeEnd : undefined}
-          onMouseUp={isResizeMode ? handleResizeEnd : undefined}
-          onMouseMove={isResizeMode ? handleResize : undefined}
-          onMouseLeave={isResizeMode ? handleResizeEnd : undefined}
-        >
+        <ThirdContentDrawingCanvas width={imgWidth} height={imgHeight}>
           <canvas ref={imgCanvasRef} />
           <ThirdContentCropperWrapper width={canvasWidth} height={canvasHeight} ref={cropperWrapperRef}>
             <ThirdContentCropper
