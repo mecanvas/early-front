@@ -1,6 +1,10 @@
 import React from 'react';
 
-const AdminHome = () => {
+interface Props {
+  user: { role: 1 };
+}
+
+const AdminHome = ({ user }: Props) => {
   return <div>g2</div>;
 };
 
