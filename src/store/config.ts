@@ -15,7 +15,7 @@ const reducer = combineReducers({
 
 export const store = configureStore({
   reducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }).concat(),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }).concat(logger),
   devTools: process.env.NODE_ENV !== 'production',
 });
 

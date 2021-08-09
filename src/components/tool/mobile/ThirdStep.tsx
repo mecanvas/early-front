@@ -373,7 +373,7 @@ const ThirdStep = () => {
 
         // 프리뷰
         const previewW = canvasW > imgW ? imgW : canvasW;
-        const previewH = canvasW > imgW ? imgW / ratio : canvasH;
+        const previewH = canvasW > imgW ? imgW * ratio : canvasH;
 
         previewCanvas.width = previewW * scaleX;
         previewCanvas.height = previewH * scaleY;
@@ -399,8 +399,8 @@ const ThirdStep = () => {
           const preCtx = preview.getContext('2d');
           if (!preCtx) return;
 
-          const pW = info.isRotate ? initialSize.height / 1.2 : initialSize.width / 1.2;
-          const pH = info.isRotate ? initialSize.width / 1.2 : initialSize.height / 1.2;
+          const pW = info.isRotate ? initialSize.width / 1.2 : initialSize.height / 1.2;
+          const pH = info.isRotate ? initialSize.height / 1.2 : initialSize.width / 1.2;
           preview.width = pW;
           preview.height = pH;
           preCtx.clearRect(0, 0, pW, pH);
@@ -483,16 +483,15 @@ const ThirdStep = () => {
       const canvasW = originWidth ? selectedInfo.size.width : w;
       const canvasH = originHeight ? selectedInfo.size.height : h;
       const ratio = initialSize.height / initialSize.width;
-
       setCanvasWidth(canvasW > imgW ? imgW : canvasW);
-      setCanvasHeight(canvasW > imgW ? imgW / ratio : canvasH);
+      setCanvasHeight(canvasW > imgW ? imgW * ratio : canvasH);
 
       const crop = { x: selectedInfo.x || 0, y: selectedInfo.y || 0 };
       cropperWrapper.style.top = `${crop.y}px`;
       cropperWrapper.style.left = `${crop.x}px`;
 
       canvas.width = canvasW > imgW ? imgW : canvasW;
-      canvas.height = canvasW > imgW ? imgW / ratio : canvasH;
+      canvas.height = canvasW > imgW ? imgW * ratio : canvasH;
 
       ctx.clearRect(0, 0, imgW, imgH);
       ctx.imageSmoothingQuality = 'high';
