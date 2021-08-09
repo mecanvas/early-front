@@ -74,7 +74,7 @@ const Loader = () => {
   return (
     <>
       <LoaderSpin size="large" />
-      <LoadingBackground isImageUpload={!isImageUpload || !isCanvasSave} />
+      <LoadingBackground isImageUpload={isImageUpload || isCanvasSave} />
       <Container>
         <LoadingWrapper>
           <LoadingBar progressPercentage={progressPercentage}></LoadingBar>
