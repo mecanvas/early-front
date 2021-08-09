@@ -12,9 +12,9 @@ export const IMG_LIMIT_MINIMUM_SIZE = process.env.NODE_ENV === 'production' ? 1_
 export const API_URL =
   process.env.NODE_ENV === 'production'
     ? 'https://api.early21.com'
-    : `http://192.168.0.3:${process.env.NEXT_PUBLIC_PORT}`;
+    : `http://localhost:${process.env.NEXT_PUBLIC_PORT}`;
 
-export const MY_URL = process.env.NODE_ENV === 'production' ? 'https://early21.com' : 'http://192.168.0.3:3000';
+export const MY_URL = process.env.NODE_ENV === 'production' ? 'https://early21.com' : 'http://localhost:3000';
 
 // 해당하는 routes들은 false를 반환합니다. -> footer를 제외하고 불러옵니다.
 export const exceptionRoutes = ['/tool/divided', '/tool/single', '/404', '/success'];
@@ -33,15 +33,15 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
   {
     id: 1,
     type: 2,
-    name: 'F-0호',
-    widthCm: 14,
-    heightCm: 18,
-    price: 11000,
+    name: 'S-4호',
+    widthCm: 24,
+    heightCm: 24,
+    price: 15000,
     size: {
-      width: cmToPx(14),
-      height: cmToPx(18),
+      width: cmToPx(24),
+      height: cmToPx(24),
     },
-    recommand: false,
+    recommand: true,
   },
   {
     id: 2,
@@ -85,10 +85,23 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
   },
 ];
 
-// 정사각형 = 1
+// 탁자용 = 1
 export const frameSquare: FrameInfoList[] = [
   {
     id: 1,
+    type: 1,
+    name: 'F-0호',
+    widthCm: 14,
+    heightCm: 18,
+    price: 11000,
+    size: {
+      width: cmToPx(14),
+      height: cmToPx(18),
+    },
+    recommand: false,
+  },
+  {
+    id: 2,
     type: 1,
     name: 'S-1호',
     widthCm: 16,
@@ -101,7 +114,7 @@ export const frameSquare: FrameInfoList[] = [
     recommand: false,
   },
   {
-    id: 2,
+    id: 3,
     type: 1,
     name: 'S-2호',
     widthCm: 19,
@@ -112,19 +125,6 @@ export const frameSquare: FrameInfoList[] = [
       height: cmToPx(19),
     },
     recommand: false,
-  },
-  {
-    id: 3,
-    type: 1,
-    name: 'S-4호',
-    widthCm: 24,
-    heightCm: 24,
-    price: 15000,
-    size: {
-      width: cmToPx(24),
-      height: cmToPx(24),
-    },
-    recommand: true,
   },
 ];
 
