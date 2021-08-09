@@ -566,25 +566,18 @@ const ThirdStep = () => {
 
   const handleResize = useCallback(
     (e) => {
-      console.log(isResizeMode);
-
       if (!isResizeMode) return;
       if (cropperWrapperRef.current) {
         const [cursorX, cursorY] = getPosition(e);
         if (cursorX && cursorY && cmd) {
           const imgCanvas = imgCanvasRef.current;
           if (imgCanvas) {
-            const {
-              left: imgPaddingLeft,
-              top: imgPaddingTop,
-              right: imgPaddingRight,
-            } = imgCanvas.getBoundingClientRect();
+            const { left: imgPaddingLeft, top: imgPaddingTop } = imgCanvas.getBoundingClientRect();
             const cropperWrapper = cropperWrapperRef.current;
-            const { right: cropperPaddingRight } = cropperWrapper.getBoundingClientRect();
 
             const cursorXInImage = cursorX - imgPaddingLeft;
             const cursorYInImage = cursorY - imgPaddingTop;
-            const cropperRight = imgPaddingRight - cropperPaddingRight;
+            // const cropperRight = imgPaddingRight - cropperPaddingRight;
 
             if (isCalc) {
               setCursorXDiff(replacePx(cropperWrapper.style.left));
@@ -600,11 +593,10 @@ const ThirdStep = () => {
                 const wRatio = originWidth / originHeight;
                 // const resizeByBottomLeft = resizeByTopLeft * ratio;
                 const resizeByBottomLeft = originHeight - cursorY;
-                if (resizeByBottomLeft + cursorYDiff > imgHeight) return;
+                if (resizeByBottomLeft > imgHeight) return;
                 const resizeByTopLeft = resizeByBottomLeft * wRatio;
                 const right = imgWidth - (resizeByTopLeft + cursorXInImage);
-                if (resizeByTopLeft + cropperRight > imgWidth) return;
-                console.log(imgWidth - (resizeByTopLeft + right), cursorXInImage);
+                if (resizeByTopLeft > imgWidth) return;
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
@@ -623,9 +615,9 @@ const ThirdStep = () => {
                 const wRatio = originWidth / originHeight;
                 const cursorY = cursorYInImage - cursorYDiff;
                 const resizeByBottomRight = originHeight - cursorY;
-                if (resizeByBottomRight + cursorYDiff > imgHeight) return;
+                if (resizeByBottomRight > imgHeight) return;
                 const resizeByTopRight = resizeByBottomRight * wRatio;
-                if (resizeByTopRight + cursorXDiff > imgWidth) return;
+                if (resizeByTopRight > imgWidth) return;
 
                 dispatch(
                   updatePositionByFrame({
@@ -643,9 +635,9 @@ const ThirdStep = () => {
               // bottom-left에서 움직일시 크기
               if (cmd === 'bottom-left') {
                 const resizeByBottomLeft = originWidth - cursorX;
-                if (resizeByBottomLeft + cropperRight > imgWidth) return;
+                if (resizeByBottomLeft > imgWidth) return;
                 const resizeByTopLeft = resizeByBottomLeft * ratio;
-                if (resizeByTopLeft + cursorYDiff > imgHeight) return;
+                if (resizeByTopLeft > imgHeight) return;
                 // const resizeByTopLeft = cursorY;
 
                 dispatch(
@@ -664,9 +656,9 @@ const ThirdStep = () => {
               // bottom-right에서 움직일시 크기
               if (cmd === 'bottom-right') {
                 const resizeByTopRight = cursorX;
-                if (resizeByTopRight + cursorXDiff > imgWidth) return;
+                if (resizeByTopRight > imgWidth) return;
                 const resizeByBottomRight = resizeByTopRight * ratio;
-                if (resizeByBottomRight + cursorYDiff > imgHeight) return;
+                if (resizeByBottomRight > imgHeight) return;
                 // const resizeByBottomRight = cursorY;
 
                 dispatch(
