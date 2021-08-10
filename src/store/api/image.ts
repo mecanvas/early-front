@@ -30,7 +30,7 @@ export const postImageUpload = createAsyncThunk<any, { type: 1 | 2 | 3; fd: any;
           return res.data;
         });
       dispatch(uploadImageProgress(uploadLoading && downloadLoading));
-      await dispatch(putSelectedFrameImage({ type, id, imgUrl }));
+      await dispatch(putSelectedFrameImage({ type, id, imgUrl: `${imgUrl}?${new Date().getTime()}` }));
     } catch (err: any) {
       return rejectWithValue(err.response.data);
     }
