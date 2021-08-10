@@ -1,8 +1,10 @@
 import { Form, Input, Button } from 'antd';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { useAppDispatch } from 'src/hooks/useRedux';
+import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { postUserLogin } from 'src/store/api/user';
+import router from 'next/router';
+import Loading from 'src/components/common/Loading';
 
 const Container = styled.div`
   display: flex;
@@ -26,6 +28,7 @@ const Container = styled.div`
 
 const AdminLogin = () => {
   const dispatch = useAppDispatch();
+  const { isUserLoad, isUserDone, userData } = useAppSelector((state) => state.user);
   const handleLogin = useCallback(
     (values: { email: string; password: string }) => {
       dispatch(postUserLogin(values));
@@ -33,8 +36,24 @@ const AdminLogin = () => {
     [dispatch],
   );
 
+  useEffect(() => {
+    if (userData) {
+      if (userData?.role !== 1) {
+        alert('당신은 관리자가 아닙니다.');
+        router.push('/');
+      }
+    }
+  }, [userData, userData?.role]);
+
+  useEffect(() => {
+    if (isUserDone) {
+      router.push('/admin');
+    }
+  }, [isUserDone]);
+
   return (
     <Container>
+      <Loading loading={isUserLoad} />
       <Form onFinish={handleLogin}>
         <Form.Item name="email" labelCol={{ span: 2 }} label="ID">
           <Input placeholder="관리자라면 알 ID" />
@@ -44,7 +63,7 @@ const AdminLogin = () => {
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">
-            화긴
+            화긴ㄴ
           </Button>
         </Form.Item>
       </Form>

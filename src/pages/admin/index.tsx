@@ -3,11 +3,17 @@ import AdminHome from 'src/components/admin/adminHome/AdminHome';
 import axios from 'axios';
 
 export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const cookie = ctx.req.cookies;
+  const cookie = ctx.req.headers.cookie || '';
   let user = null;
 
-  if (cookie['early_auth']) {
-    user = await axios.get('auth').then((res) => res.data);
+  if (cookie) {
+    user = await axios
+      .get('/auth', {
+        headers: {
+          cookie,
+        },
+      })
+      .then((res) => res.data);
   }
 
   if (user?.role === 1) {
