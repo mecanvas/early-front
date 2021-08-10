@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { getUserData, postUserLogin } from '../api/user';
+import { postUserLogin } from '../api/user';
 
 export type UserData = {
   id: number;
@@ -43,7 +43,6 @@ const user = createSlice({
   },
   extraReducers: (builder) =>
     builder
-      // uploadImage
       .addCase(postUserLogin.pending, (state) => {
         state.isUserLoad = true;
         state.isUserDone = false;

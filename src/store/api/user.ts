@@ -7,9 +7,12 @@ export const postUserLogin = createAsyncThunk<any, { email: string; password: st
   'user/postUserLogin',
   async (data, { rejectWithValue, dispatch }) => {
     try {
-      const user = await axios.post<UserData>(`/auth/login`, data).then((res) => res.data);
+      const user = await axios
+        .post<UserData>(`/auth/login`, data)
+        .then((res) => res.data)
+        .catch((err) => console.log(err));
       if (user) {
-        dispatch(getUser);
+        dispatch(getUser(user));
       }
     } catch (err: any) {
       return rejectWithValue(err.response.data);

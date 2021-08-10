@@ -1,7 +1,8 @@
 import { Form, Input, Button } from 'antd';
 import React, { useCallback } from 'react';
 import styled from '@emotion/styled';
-import axios from 'axios';
+import { useAppDispatch } from 'src/hooks/useRedux';
+import { postUserLogin } from 'src/store/api/user';
 
 const Container = styled.div`
   display: flex;
@@ -24,12 +25,13 @@ const Container = styled.div`
 `;
 
 const AdminLogin = () => {
-  const handleLogin = useCallback((values: { email: string; password: string }) => {
-    console.log(values);
-    (async () => {
-      await axios.post('/auth/login', values).then((res) => res.data);
-    })();
-  }, []);
+  const dispatch = useAppDispatch();
+  const handleLogin = useCallback(
+    async (values: { email: string; password: string }) => {
+      await dispatch(postUserLogin(values));
+    },
+    [dispatch],
+  );
 
   return (
     <Container>
