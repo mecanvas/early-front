@@ -264,16 +264,18 @@ const ThirdStep = () => {
   const [selectFrameName, setSelectFrameName] = useState(selectedFrame[0]?.name);
   const [isMoving, setIsMoving] = useState(false);
 
-  const [ratio, setRatio] = useState(0);
+  const [ratio, setRatio] = useState({ wRatio: 0, hRatio: 0 });
   const [xDiff, setXDiff] = useState(0);
   const [yDiff, setYDiff] = useState(0);
+  const [topLeftXControl, setTopLeftXControl] = useState(0);
+
   const [cursorXDiff, setCursorXDiff] = useState(0);
   const [cursorYDiff, setCursorYDiff] = useState(0);
   const [isCalc, setIsCalc] = useState(false);
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
-  const [canvasWidth, setCanvasWidth] = useState(0);
-  const [canvasHeight, setCanvasHeight] = useState(0);
+  const [cropperWidth, setCropperWidth] = useState(0);
+  const [cropperHeight, setCropperHeight] = useState(0);
   const [resizeWidth, setResizeWidth] = useState(0);
   const [resizeHeight, setResizeHeight] = useState(0);
 
@@ -375,7 +377,6 @@ const ThirdStep = () => {
 
         const canvasW = originWidth ? selectedInfo.size.width : w;
         const canvasH = originHeight ? selectedInfo.size.height : h;
-        // dispatch(setFrameSize({ resizeWidth: canvasW, resizeHeight: canvasH }));
 
         // 프리뷰
         const previewW = canvasW > imgW ? imgW : canvasW;
@@ -487,8 +488,24 @@ const ThirdStep = () => {
       const canvasW = originWidth ? selectedInfo.size.width : w;
       const canvasH = originHeight ? selectedInfo.size.height : h;
       const ratio = initialSize.height / initialSize.width;
-      setCanvasWidth(canvasW > imgW ? imgW : canvasW);
-      setCanvasHeight(canvasW > imgW ? imgW * ratio : canvasH);
+      setCropperWidth(canvasW > imgW ? imgW : canvasW);
+      setCropperHeight(canvasW > imgW ? imgW * ratio : canvasH);
+
+      // 처음 그릴때 cropper의 너비 높이를 저장합니다. resize 시 사용됩니다.
+      if (isCropperDrawing) {
+        dispatch(
+          setFrameSize({
+            resizeWidth: canvasW > imgW ? imgW : canvasW,
+            resizeHeight: canvasW > imgW ? imgW * ratio : canvasH,
+          }),
+        );
+        dispatch(
+          setOriginSize({
+            originWidth: canvasW > imgW ? imgW : canvasW,
+            originHeight: canvasW > imgW ? imgW * ratio : canvasH,
+          }),
+        );
+      }
 
       const crop = { x: selectedInfo.x || 0, y: selectedInfo.y || 0 };
       cropperWrapper.style.top = `${crop.y}px`;
@@ -502,7 +519,9 @@ const ThirdStep = () => {
       ctx.drawImage(img, crop.x * scaleX, crop.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
     },
     [
+      dispatch,
       frameInfoList,
+      isCropperDrawing,
       originHeight,
       originWidth,
       selectFrameName,
@@ -559,10 +578,8 @@ const ThirdStep = () => {
     setIsResizeMode(false);
     setCmd(null);
     setIsCalc(false);
-    dispatch(setOriginSize({ originWidth: resizeWidth, originHeight: resizeHeight }));
-    dispatch(setFrameSize({ resizeWidth, resizeHeight }));
     setIsCropperDrawing(true);
-  }, [dispatch, resizeWidth, resizeHeight]);
+  }, []);
 
   const handleResize = useCallback(
     (e) => {
@@ -580,25 +597,29 @@ const ThirdStep = () => {
             // const cropperRight = imgPaddingRight - cropperPaddingRight;
 
             if (isCalc) {
+              const hRatio = originHeight / originWidth;
+              const x = cursorYInImage / hRatio;
               setCursorXDiff(replacePx(cropperWrapper.style.left));
               setCursorYDiff(replacePx(cropperWrapper.style.top));
+              setTopLeftXControl(x - replacePx(cropperWrapper.style.left));
               setIsCalc(false);
             }
 
             if (!isCalc) {
-              // top-left에서 움직일시 크기
+              const { wRatio, hRatio } = ratio;
               const cursorX = cursorXInImage - cursorXDiff;
               const cursorY = cursorYInImage - cursorYDiff;
+              // top-left에서 움직일시 크기
               if (cmd === 'top-left') {
-                const wRatio = originWidth / originHeight;
                 const resizeByBottomLeft = originHeight - cursorY;
-                if (resizeByBottomLeft + cursorYDiff > imgHeight) return;
                 const resizeByTopLeft = resizeByBottomLeft * wRatio;
-                if (resizeByTopLeft + cursorXDiff > imgWidth) return;
+                if (resizeByBottomLeft > imgHeight || cursorYInImage < 0) return;
+                // if (cursorYInImage / hRatio - topLeftXControl < 0) return;
+                if (resizeByTopLeft > imgWidth) return;
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
-                    x: cursorYInImage * wRatio,
+                    x: cursorYInImage / hRatio - topLeftXControl,
                     y: cursorYInImage,
                     width: resizeByTopLeft,
                     height: resizeByBottomLeft,
@@ -610,14 +631,10 @@ const ThirdStep = () => {
 
               // top-right에서 움직일시 크기
               if (cmd === 'top-right') {
-                const wRatio = originWidth / originHeight;
-                const cursorY = cursorYInImage - cursorYDiff;
-
                 const resizeByBottomRight = originHeight - cursorY;
-                if (resizeByBottomRight + cursorYDiff > imgHeight) return;
                 const resizeByTopRight = resizeByBottomRight * wRatio;
+                if (cursorYInImage < 0) return;
                 if (resizeByTopRight + cursorXDiff > imgWidth) return;
-
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
@@ -634,12 +651,12 @@ const ThirdStep = () => {
               // bottom-left에서 움직일시 크기
               if (cmd === 'bottom-left') {
                 const resizeByBottomLeft = originWidth - cursorX;
-                if (resizeByBottomLeft + cursorXDiff > imgWidth) return;
-                const resizeByTopLeft = resizeByBottomLeft * ratio;
+                const resizeByTopLeft = resizeByBottomLeft * hRatio;
+
+                if (resizeByBottomLeft > imgWidth && cursorXInImage < 0) return;
+                if (cursorXInImage > imgWidth) return;
                 if (resizeByTopLeft + cursorYDiff > imgHeight) return;
-
                 // const resizeByTopLeft = cursorY;
-
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
@@ -656,8 +673,8 @@ const ThirdStep = () => {
               // bottom-right에서 움직일시 크기
               if (cmd === 'bottom-right') {
                 const resizeByTopRight = cursorX;
-                if (resizeByTopRight + cursorXDiff > imgWidth) return;
-                const resizeByBottomRight = resizeByTopRight * ratio;
+                const resizeByBottomRight = resizeByTopRight * hRatio;
+                if (cursorXInImage > imgWidth || cursorXInImage < 0) return;
                 if (resizeByBottomRight + cursorYDiff > imgHeight) return;
 
                 dispatch(
@@ -683,14 +700,15 @@ const ThirdStep = () => {
       isResizeMode,
       cmd,
       isCalc,
+      originHeight,
+      originWidth,
       cursorXDiff,
       cursorYDiff,
-      originWidth,
-      imgWidth,
-      originHeight,
       imgHeight,
+      imgWidth,
       dispatch,
       selectedInfo.name,
+      topLeftXControl,
       ratio,
     ],
   );
@@ -724,11 +742,10 @@ const ThirdStep = () => {
         const positionY = y - yDiff;
         const left = (window.innerWidth - width) / 2;
         const top = (window.innerHeight - height) / 2;
-        const cropperLeft = (window.innerWidth - canvasWidth) / 2;
-        const cropperTop = (window.innerHeight - canvasHeight) / 2;
+        const cropperLeft = (window.innerWidth - cropperWidth) / 2;
+        const cropperTop = (window.innerHeight - cropperHeight) / 2;
         const cropX = cropperLeft - left;
         const cropY = cropperTop - top;
-
         const positionLeft = positionX >= 0 ? (positionX >= cropX * 2 ? cropX * 2 : positionX) : 0;
         const positionTop = positionY >= 0 ? (positionY >= cropY * 2 ? cropY * 2 : positionY) : 0;
 
@@ -741,7 +758,7 @@ const ThirdStep = () => {
         );
       }
     },
-    [isCalc, xDiff, yDiff, canvasWidth, canvasHeight, dispatch, selectFrameName],
+    [isCalc, xDiff, yDiff, cropperWidth, cropperHeight, dispatch, selectFrameName],
   );
 
   const handleActiveCropper = useCallback(() => {
@@ -788,7 +805,7 @@ const ThirdStep = () => {
   }, [selectedInfo.bgColor]);
 
   useEffect(() => {
-    setRatio(originHeight / originWidth);
+    setRatio({ wRatio: originWidth / originHeight, hRatio: originHeight / originWidth });
   }, [originWidth, originHeight]);
 
   useEffect(() => {
@@ -911,7 +928,7 @@ const ThirdStep = () => {
       <ThirdContent>
         <ThirdContentDrawingCanvas width={imgWidth} height={imgHeight}>
           <canvas ref={imgCanvasRef} />
-          <ThirdContentCropperWrapper width={canvasWidth} height={canvasHeight} ref={cropperWrapperRef}>
+          <ThirdContentCropperWrapper width={cropperWidth} height={cropperHeight} ref={cropperWrapperRef}>
             <ThirdContentCropper
               cmd={cmd}
               ref={cropperRef}
