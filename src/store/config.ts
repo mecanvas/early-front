@@ -15,9 +15,16 @@ const reducer = combineReducers({
   user,
 });
 
+const middleware = (getDefaultMiddleware: any) => {
+  if (process.env.NODE_ENV === 'production') {
+    return getDefaultMiddleware({ serializableCheck: false });
+  }
+  return getDefaultMiddleware({ serializableCheck: false }).concat(logger);
+};
+
 export const store = configureStore({
   reducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }).concat(logger),
+  middleware,
   devTools: process.env.NODE_ENV !== 'production',
 });
 
