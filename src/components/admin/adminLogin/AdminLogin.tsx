@@ -27,8 +27,8 @@ const Container = styled.div`
 const AdminLogin = () => {
   const dispatch = useAppDispatch();
   const handleLogin = useCallback(
-    async (values: { email: string; password: string }) => {
-      await dispatch(postUserLogin(values));
+    (values: { email: string; password: string }) => {
+      dispatch(postUserLogin(values));
     },
     [dispatch],
   );

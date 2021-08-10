@@ -20,6 +20,7 @@ const AppContainer = styled.main`
 `;
 
 axios.defaults.baseURL = API_URL;
+axios.defaults.withCredentials = true;
 
 function MyApp({ Component, pageProps }: AppProps) {
   const { pathname } = useRouter();
