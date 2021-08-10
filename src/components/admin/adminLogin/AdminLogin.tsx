@@ -2,9 +2,9 @@ import { Form, Input, Button } from 'antd';
 import React, { useCallback, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
-import { postUserLogin } from 'src/store/api/user';
 import router from 'next/router';
 import Loading from 'src/components/common/Loading';
+import { postUserLogin } from 'src/store/api/user/user';
 
 const Container = styled.div`
   display: flex;

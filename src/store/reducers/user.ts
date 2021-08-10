@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { postUserLogin } from '../api/user';
+import { postUserLogin } from '../api/user/user';
+import { postUserLogout } from '../api/user/userLogout';
 
 export type UserData = {
   id: number;
@@ -15,16 +16,26 @@ export type UserData = {
 
 interface InitialState {
   userData: null | UserData;
+
   isUserLoad: boolean;
   isUserError: null | any;
   isUserDone: boolean;
+
+  isLogoutLoad: boolean;
+  isLogoutError: null | any;
+  isLogoutDone: boolean;
 }
 
 const initialState: InitialState = {
   userData: null,
+
   isUserLoad: false,
   isUserError: null,
   isUserDone: false,
+
+  isLogoutLoad: false,
+  isLogoutError: null,
+  isLogoutDone: false,
 };
 
 const user = createSlice({
@@ -34,15 +45,10 @@ const user = createSlice({
     getUser: (state, { payload }: PayloadAction<UserData>) => {
       state.userData = payload;
     },
-    logoutUser: (state) => {
-      state.userData = null;
-      state.isUserLoad = false;
-      state.isUserError = null;
-      state.isUserDone = false;
-    },
   },
   extraReducers: (builder) =>
     builder
+      // 유저 로그인
       .addCase(postUserLogin.pending, (state) => {
         state.isUserLoad = true;
         state.isUserDone = false;
@@ -55,9 +61,26 @@ const user = createSlice({
       .addCase(postUserLogin.rejected, (state, { payload }) => {
         state.isUserLoad = false;
         state.isUserError = payload;
+      })
+      // 유저 로그아웃
+      .addCase(postUserLogout.pending, (state) => {
+        state.isLogoutLoad = true;
+        state.isLogoutDone = false;
+        state.isLogoutError = null;
+      })
+      .addCase(postUserLogout.fulfilled, (state) => {
+        state.isLogoutLoad = false;
+        state.isLogoutDone = true;
+        state.isUserLoad = false;
+        state.isUserError = null;
+        state.isUserDone = false;
+      })
+      .addCase(postUserLogout.rejected, (state, { payload }) => {
+        state.isLogoutLoad = false;
+        state.isLogoutError = payload;
       }),
 });
 
-export const { getUser, logoutUser } = user.actions;
+export const { getUser } = user.actions;
 
 export default user.reducer;
