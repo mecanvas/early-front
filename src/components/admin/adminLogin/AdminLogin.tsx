@@ -1,6 +1,7 @@
 import { Form, Input, Button } from 'antd';
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from '@emotion/styled';
+import axios from 'axios';
 
 const Container = styled.div`
   display: flex;
@@ -23,14 +24,21 @@ const Container = styled.div`
 `;
 
 const AdminLogin = () => {
+  const handleLogin = useCallback((values: { email: string; password: string }) => {
+    console.log(values);
+    (async () => {
+      await axios.post('/auth/login', values).then((res) => res.data);
+    })();
+  }, []);
+
   return (
     <Container>
-      <Form>
-        <Form.Item labelCol={{ span: 2 }} label="ID">
+      <Form onFinish={handleLogin}>
+        <Form.Item name="email" labelCol={{ span: 2 }} label="ID">
           <Input placeholder="관리자라면 알 ID" />
         </Form.Item>
-        <Form.Item labelCol={{ span: 2 }} label="PW">
-          <Input placeholder="관리자라면 알 PW" />
+        <Form.Item name="password" labelCol={{ span: 2 }} label="PW">
+          <Input.Password placeholder="관리자라면 알 PW" />
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">
