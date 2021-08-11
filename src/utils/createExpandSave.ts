@@ -38,34 +38,11 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
       const { naturalWidth, naturalHeight } = img;
       const [imgW, imgH] = getOriginRatio(naturalWidth, naturalHeight, IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT);
 
-      const isSquare = info.type === 1;
-
       let w = 0;
       let h = 0;
 
-      if (isSquare) {
-        // 너비가 높이보다 크면 높이에 맞춰 렌더링
-        if (imgW > imgH) {
-          const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgH, imgH);
-          w = ratioW;
-          h = ratioH;
-        } else {
-          const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgW, imgW);
-          w = ratioW;
-          h = ratioH;
-        }
-      }
-      if (!isSquare) {
-        if (imgW > imgH) {
-          const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgH, imgH, IMAGE_MAXIMUM_WIDTH);
-          w = ratioW;
-          h = ratioH;
-        } else {
-          const [ratioW, ratioH] = getOriginRatio(info.size.width, info.size.height, imgW, imgW, IMAGE_MAXIMUM_WIDTH);
-          w = ratioW;
-          h = ratioH;
-        }
-      }
+      w = info.size.width;
+      h = info.size.height;
 
       const scaleX = naturalWidth / imgW;
       const scaleY = naturalHeight / imgH;

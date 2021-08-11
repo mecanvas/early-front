@@ -328,7 +328,8 @@ const ThirdStep = () => {
 
         let w = 0;
         let h = 0;
-
+        const initialSize = frameInfoList.filter((lst) => lst.name === selectFrameName)[0].size;
+        const ratio = initialSize.height / initialSize.width;
         if (!originWidth && !originHeight) {
           if (isSquare) {
             // 너비가 높이보다 크면 높이에 맞춰 렌더링
@@ -365,15 +366,14 @@ const ThirdStep = () => {
               h = ratioH;
             }
           }
-          dispatch(setOriginSize({ originWidth: w, originHeight: h }));
-          dispatch(setFrameSize({ resizeWidth: w, resizeHeight: h }));
+          if (w && h) {
+            dispatch(setFrameSize({ resizeWidth: w > imgW ? imgW : w, resizeHeight: w > imgW ? imgW * ratio : h }));
+            dispatch(setOriginSize({ originWidth: w > imgW ? imgW : w, originHeight: w > imgW ? imgW * ratio : h }));
+          }
         }
 
         const scaleX = naturalWidth / imgW;
         const scaleY = naturalHeight / imgH;
-
-        const initialSize = frameInfoList.filter((lst) => lst.name === selectFrameName)[0].size;
-        const ratio = initialSize.height / initialSize.width;
 
         const crop = { x: info.x || 0, y: info.y || 0 };
 
@@ -494,6 +494,7 @@ const ThirdStep = () => {
       setCropperHeight(canvasW > imgW ? imgW * ratio : canvasH);
 
       // 처음 그릴때 cropper의 너비 높이를 저장합니다. resize 시 사용됩니다.
+
       if (isCropperDrawing) {
         dispatch(
           setFrameSize({
@@ -815,6 +816,7 @@ const ThirdStep = () => {
       const img: HTMLImageElement = imgElements[selectFrameName];
       drawingCropper(img);
       createSaveCanvas();
+
       setIsCropperDrawing(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
