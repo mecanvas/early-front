@@ -54,9 +54,6 @@ const SliderItem = styled.div`
 
 const CanvasSaleInfo = styled.div`
   text-align: center;
-  div {
-    color: ${({ theme }) => theme.color.gray600};
-  }
   span {
     line-height: 20px;
     font-size: 15px;
@@ -65,6 +62,10 @@ const CanvasSaleInfo = styled.div`
       margin-right: 0.5em;
     }
   }
+`;
+
+const CanvasPrice = styled.div`
+  font-size: 20px;
 `;
 
 const LastStep = () => {
@@ -113,8 +114,8 @@ const LastStep = () => {
               {selectedFrame[0].widthCm}cm x {selectedFrame[0].heightCm}cm
             </span>
           </div>
-          <div>{selectedFrame[0].price.toLocaleString()}원</div>
           <div>{canvasOrder.scaleType === 2 ? `옆면 확장` : '기본 옆면'}</div>
+          <CanvasPrice>{selectedFrame[0].price.toLocaleString()}원</CanvasPrice>
         </CanvasSaleInfo>
 
         <Divider />
