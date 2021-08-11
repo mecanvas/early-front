@@ -297,9 +297,11 @@ const ThirdStep = () => {
 
     for (const info of selectedFrame) {
       const img = new Image();
-      img.src = info.imgUrl || '';
       img.crossOrigin = 'Anonymous';
-      img.addEventListener('load', () => setIsLoaded(true));
+      img.addEventListener('load', () => {
+        setIsLoaded(true);
+      });
+      img.src = info.imgUrl || '';
       res = { ...res, [info.name]: img };
     }
     return res;
