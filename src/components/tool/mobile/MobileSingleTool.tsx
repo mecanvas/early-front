@@ -93,11 +93,14 @@ const MobileSteps = styled(Steps)`
     }
   }
   span {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
   }
 
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    span {
+      font-size: 13px;
+    }
   }
 `;
 
@@ -135,9 +138,10 @@ const MobileStepButtonWrapper = styled.div`
 `;
 
 const MobileNextStepButton = styled(Button)`
-  font-size: 13px;
+  font-size: 14px;
   padding: 3px !important;
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    font-size: 13px;
   }
 `;
 const MobilePrevStepButton = styled(Button)`
