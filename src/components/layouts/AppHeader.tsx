@@ -1,9 +1,7 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { Button } from 'antd';
 import { useExceptionRoute } from 'src/hooks/useExceptionRoute';
 import Logo from './Logo';
-import Link from 'next/link';
 import { APP_HEADER_HEIGHT } from 'src/constants';
 
 const HeaderContainer = styled.header`
@@ -38,11 +36,6 @@ const AppHeader = () => {
       <Header>
         <>
           <Logo />
-          <div>
-            <Link href="/tool">
-              <Button type="default">시안 제작</Button>
-            </Link>
-          </div>
         </>
       </Header>
     </HeaderContainer>
