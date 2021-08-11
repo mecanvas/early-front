@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-      - feat/slack-notification
+      - feat/sitemap
 
 jobs:
   build-and-deploy:
@@ -27,11 +27,11 @@ jobs:
           node-version: '14'
           cache: 'yarn'
 
-      - run: yarn install
+      - run: yarn install && node ./scripts/sitemap.js
 
-      - name: Serverless AWS authentication
-        run: npx serverless --component=serverless-next config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - run: yarn deploy
+      # - name: Serverless AWS authentication
+      #   run: npx serverless --component=serverless-next config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # - run: yarn deploy
 
       - name: Slack Notification
         uses: act10ns/slack@v1
