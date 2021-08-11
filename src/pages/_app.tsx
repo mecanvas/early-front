@@ -94,6 +94,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             canonical={MY_URL}
           />
           <Head>
+            <meta name="naver-site-verification" content="0d191c659af4271cc443f4c7217aa1f4f56625a3" />
             <meta name="keywords" content="얼리21, 캔버스액자, 포스터, 핸드폰사진제작"></meta>
             <link rel="shortcut icon" href="/favicons/favicon.ico" />
             <link rel="apple-touch-icon" sizes="57x57" href="/favicons/apple-icon-57x57.png" />
