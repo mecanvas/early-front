@@ -2,7 +2,7 @@ module.exports = {
   siteUrl: 'https://early21.com',
   generateRobotsTxt: true, // (optional)
   changefreq: 'weekly',
-  exclude: ['/admin', '/admin/*'],
+  exclude: ['/admin', '/admin/*', '/success'],
 
   transform: async (config, path) => {
     return {
