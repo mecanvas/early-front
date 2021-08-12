@@ -81,13 +81,38 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
         )}
       />
       <FirstFrameWrapper>
-        <FirstFramePreview {...showingFrame.size}>
-          <img
-            src={
-              'https://early-canvas.s3.ap-northeast-2.amazonaws.com/single/upload/%E1%84%92%E1%85%A6%E1%86%AB%E1%84%85%E1%85%B5.png'
-            }
-            alt="액자 샘플 사진"
-          />
+        <FirstFramePreview>
+          {selectedFrameList[0] ? (
+            <>
+              <img
+                src={`https://early21-assets.s3.ap-northeast-2.amazonaws.com/img/example/${selectedFrameList[0]?.name
+                  .replace('-', '')
+                  .replace('호', '')}${
+                  selectedFrameList[0]?.type !== 1 && selectedFrameList[0]?.isRotate ? '-rotate' : ''
+                }.png`}
+                alt="액자 샘플 사진"
+              />
+            </>
+          ) : (
+            <>
+              <img
+                src={`https://early21-assets.s3.ap-northeast-2.amazonaws.com/img/example/${showingFrame?.name
+                  .replace('-', '')
+                  .replace('호', '')}.png`}
+                alt="액자 샘플 사진"
+              />
+              <img
+                src={icons.rotate}
+                alt="액자 회전 아이콘"
+                onClick={handleFrameRotate}
+                data-type={showingFrame?.type}
+                data-id={showingFrame?.id}
+              />
+            </>
+          )}
+        </FirstFramePreview>
+        <span>
+          <h5>{showingFrame.name}</h5>
           <img
             src={icons.rotate}
             alt="액자 회전 아이콘"
@@ -95,9 +120,6 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
             data-type={selectedFrameList[0]?.type}
             data-id={selectedFrameList[0]?.id}
           />
-        </FirstFramePreview>
-        <span>
-          <h5>{showingFrame.name}</h5>
         </span>
       </FirstFrameWrapper>
     </FirstContent>

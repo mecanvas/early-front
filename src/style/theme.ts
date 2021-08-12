@@ -1,6 +1,6 @@
 export const theme = {
   canvasShadow: '3px 4px 5px rgba(0, 0, 0, 0.4), 0px  4px 5px rgba(0, 0, 0, 0.32)',
-  canvasShadowFilter: 'drop-shadow(rgba(0, 0, 0, 0.4) 11.628px 31.9477px 10.4816px)',
+  canvasShadowFilter: 'drop-shadow(rgba(0, 0, 0, 0.5) 19.6883px 18.3596px 10.3744px)',
   size: {
     xs: '480px',
     sm: '768px',
