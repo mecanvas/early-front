@@ -20,6 +20,8 @@ import { getPosition } from 'src/utils/getPosition';
 import { replacePx } from 'src/utils/replacePx';
 import ToolColorPalette from '../divided/DividedToolColorPalette';
 import { icons } from 'public/icons';
+import { isIOS } from 'react-device-detect';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 const SpinLoader = styled.div`
   display: flex;
@@ -846,26 +848,35 @@ const ThirdStep = () => {
   useEffect(() => {
     if (!isMoving && !isResizeMode) return;
     const body = document.querySelector('main') as HTMLElement;
-    const cropper = document.querySelector('.cropper') as HTMLElement;
     const scrollPosition = window.scrollY;
-    if (cropper) {
-      cropper.style.pointerEvents = 'auto';
+    if (isIOS) {
+      const cropper = document.querySelector('.cropper') as HTMLElement;
+
+      if (cropper) {
+        cropper.style.pointerEvents = 'auto';
+      }
+      body.style.overflow = 'hidden';
+      body.style.pointerEvents = 'none';
+      body.style.position = 'fixed';
+      body.style.top = `-${scrollPosition}px`;
+      body.style.left = '0';
+      body.style.right = '0';
+    } else {
+      disableBodyScroll(body);
     }
-    body.style.overflow = 'hidden';
-    body.style.pointerEvents = 'none';
-    body.style.position = 'fixed';
-    body.style.top = `-${scrollPosition}px`;
-    body.style.left = '0';
-    body.style.right = '0';
 
     return () => {
-      body.style.removeProperty('overflow');
-      body.style.removeProperty('pointer-events');
-      body.style.removeProperty('position');
-      body.style.removeProperty('top');
-      body.style.removeProperty('left');
-      body.style.removeProperty('right');
-      window.scrollTo(0, scrollPosition);
+      if (isIOS) {
+        body.style.removeProperty('overflow');
+        body.style.removeProperty('pointer-events');
+        body.style.removeProperty('position');
+        body.style.removeProperty('top');
+        body.style.removeProperty('left');
+        body.style.removeProperty('right');
+        window.scrollTo(0, scrollPosition);
+      } else {
+        enableBodyScroll(body);
+      }
     };
   }, [isMoving, isResizeMode]);
 
