@@ -54,49 +54,41 @@ export const FirstFrameWrapper = styled.div`
   background-color: ${({ theme }) => theme.color.gray100};
   border-radius: 8px;
   padding: 2em 0;
-  min-height: 600px;
-  max-height: 600px;
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     padding: 1em 0;
     margin-top: 1em;
-    min-height: 400px;
-    max-height: 400px;
   }
   span {
     position: absolute;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
     top: 10px;
     left: 10px;
+    img:nth-of-type(1) {
+      position: absolute;
+      width: 22px;
+      right: 25px;
+      cursor: pointer;
+      top: -5px;
+    }
   }
 `;
 
-export const FirstFramePreview = styled.div<{ width: number; height: number }>`
+export const FirstFramePreview = styled.div`
   position: relative;
-  ${({ width, height, theme }) =>
-    width &&
-    height &&
-    css`
-      background-color: ${theme.color.white};
-      width: ${width}px;
-      height: ${height}px;
-      border: 1px solid ${theme.color.gray400};
-      img:nth-of-type(1) {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      }
-      @media all and (max-width: ${theme.size.sm}) {
-        width: ${width / 1.5}px;
-        height: ${height / 1.5}px;
-      }
-    `}
+  background-color: ${({ theme }) => theme.color.white};
+  width: 100%;
+  max-height: 600px;
 
-  img:nth-of-type(2) {
-    cursor: pointer;
-    position: absolute;
-    bottom: -25px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
+  border: 1px solid ${({ theme }) => theme.color.gray400};
+  img:nth-of-type(1) {
+    width: 100%;
+    object-fit: fill;
+  }
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    width: 100%;
   }
 `;
 

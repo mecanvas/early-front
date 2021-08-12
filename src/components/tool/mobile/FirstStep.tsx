@@ -1,4 +1,4 @@
-import { Tabs, Divider } from 'antd';
+import { Tabs } from 'antd';
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useOpacity } from 'src/hooks/useOpacity';
 import { useAppSelector } from 'src/hooks/useRedux';
@@ -38,7 +38,6 @@ const FirstStep = () => {
           <FirstGuideText>이런 액자는 어떠세요?</FirstGuideText>
         </OpacityComponent>
         <FirstFrameListByTab frameList={recommandList} />
-        <Divider />
         {/* <FirstSelectedList /> */}
       </Tabs.TabPane>
 
@@ -47,7 +46,6 @@ const FirstStep = () => {
           <FirstGuideText>탁상에 놓기 부담없는 사이즈에요!</FirstGuideText>
         </OpacityComponent>
         <FirstFrameListByTab frameList={frameList} />
-        <Divider />
         {/* <FirstSelectedList /> */}
       </Tabs.TabPane>
 
@@ -56,7 +54,6 @@ const FirstStep = () => {
           <FirstGuideText>벽에 걸기 적합한 사이즈에요!</FirstGuideText>
         </OpacityComponent>
         <FirstFrameListByTab frameList={frameList} />
-        <Divider />
         {/* <FirstSelectedList /> */}
       </Tabs.TabPane>
     </Tabs>
