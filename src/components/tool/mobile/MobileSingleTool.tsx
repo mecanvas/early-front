@@ -17,7 +17,8 @@ import ThirdStep from './ThirdStep';
 const { Step } = Steps;
 
 const Container = styled.div`
-  min-height: 100vh;
+  min-height: calc(100vh + env(safe-area-inset-bottom));
+  min-height: calc(100vh + constant(safe-area-inset-bottom));
   background-color: ${({ theme }) => theme.color.gray000};
 `;
 
