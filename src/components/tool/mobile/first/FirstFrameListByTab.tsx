@@ -101,13 +101,6 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
                   .replace('호', '')}.png`}
                 alt="액자 샘플 사진"
               />
-              <img
-                src={icons.rotate}
-                alt="액자 회전 아이콘"
-                onClick={handleFrameRotate}
-                data-type={showingFrame?.type}
-                data-id={showingFrame?.id}
-              />
             </>
           )}
         </FirstFramePreview>
