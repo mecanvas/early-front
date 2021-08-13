@@ -1,729 +1,347 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import ToolHeader from '../ToolHeader';
-import { Button, Popover } from 'antd';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { imgSizeChecker } from 'src/utils/imgSizeChecker';
-import axios from 'axios';
-import { useProgress } from 'src/hooks/useProgress';
-import Loading from 'src/components/common/Loading';
-import Upload, { RcFile } from 'antd/lib/upload';
-import { faChevronCircleDown, faChevronCircleUp } from '@fortawesome/free-solid-svg-icons';
-import SingleImgSizeController from 'src/components/tool/single/SingleImgSizeController';
-import { useGlobalState } from 'src/hooks';
-import { FramePrice, ResizeCmd } from 'src/interfaces/ToolInterface';
-import { getOriginRatio } from 'src/utils/getOriginRatio';
-import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
-import { frameSize, HEADER_HEIGHT } from 'src/constants';
-import { FrameSizeName } from '../divided/DividedToolStyle';
-import { replacePx } from 'src/utils/replacePx';
-import { cmToPx } from 'src/utils/cmToPx';
-import {
-  SingleToolContainer,
-  SingleToolFactory,
-  SingleFrameListHeader,
-  SingleFrameListGrid,
-  SingleFrameList,
-  FrameListGridHideButton,
-  PreviewCanvasWrapper,
-  SingleCanvasField,
-  SingleWrapper,
-  SingleSelectedFrame,
-  SingleImageWrapper,
-} from './SingleToolStyle';
-import ToolColorPalette from '../divided/DividedToolColorPalette';
-import { theme } from 'src/style/theme';
-import { ColorResult } from 'react-color';
-import ImageDropZone from 'src/components/common/ImageDropZone';
+import styled from '@emotion/styled';
+import { Button, Steps } from 'antd';
+import router from 'next/router';
 import { icons } from 'public/icons';
-import { PreventPageLeave } from 'src/hoc/PreventPageLeave';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import Loader from 'src/components/common/Loader';
+import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
+import { postCanvasForSave } from 'src/store/api/canvas';
+import { resetCanvasState, setCanvasSaveScale } from 'src/store/reducers/canvas';
+import { resetFrameState } from 'src/store/reducers/frame';
+import { dataURLtoFile } from 'src/utils/dataUrlToFile';
+import FirstStep from './FirstStep';
+import FourthStep from './FourthStep';
+import LastStep from './LastStep';
+import SecondsStep from './SecondsStep';
+import ThirdStep from './ThirdStep';
+const { Step } = Steps;
+
+const Container = styled.div`
+  min-height: calc(100vh + env(safe-area-inset-bottom));
+  min-height: calc(100vh + constant(safe-area-inset-bottom));
+  background-color: ${({ theme }) => theme.color.gray000};
+`;
+
+const SingleToolHeader = styled.div`
+  height: 45px;
+  display: flex;
+  align-items: center;
+  padding: 0 2em;
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray100};
+  background-color: ${({ theme }) => theme.color.white};
+
+  nav {
+    max-width: 1200px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+    cursor: pointer;
+
+    img {
+      &:nth-of-type(1) {
+        transform: rotateY(180deg);
+        -webkit-transform: rotateY(180deg);
+        -moz-transform: rotateY(180deg);
+        -o-transform: rotateY(180deg);
+        -ms-transform: rotateY(180deg);
+        unicode-bidi: bidi-override;
+        direction: rtl;
+        margin-right: 4px;
+        width: 20px;
+      }
+      width: 25px;
+    }
+  }
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    padding: 0 1em;
+
+    img {
+      &:nth-of-type(1) {
+        width: 15px;
+      }
+      width: 20px;
+    }
+  }
+`;
+
+const SingleToolContainer = styled.div`
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2em 1em;
+  background-color: ${({ theme }) => theme.color.white};
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    max-width: ${({ theme }) => theme.size.sm};
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+`;
+
+const SingleStepsWrapper = styled.div`
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2em 1em;
+`;
+
+const SingleSteps = styled(Steps)`
+  svg {
+    path {
+      fill: ${({ theme }) => theme.color.primary};
+    }
+  }
+  span {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    span {
+      font-size: 13px;
+    }
+  }
+`;
+
+const SingleContent = styled.div`
+  padding: 2em 1em;
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    width: 100%;
+    padding: 0.5em 0;
+  }
+`;
+
+const SingleStepButtonWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 1em;
+  div {
+    display: flex;
+    align-items: center;
+  }
+  & > button + button {
+    margin-left: 1em;
+  }
+  & > button {
+    width: 150px;
+  }
+
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    justify-content: center;
+    margin-top: 2em;
+    & > button {
+      width: 120px;
+    }
+  }
+`;
+
+const SingleNextStepButton = styled(Button)`
+  font-size: 14px;
+  padding: 3px !important;
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    font-size: 13px;
+  }
+`;
+const SinglePrevStepButton = styled(Button)`
+  font-size: 13px;
+  padding: 3px !important;
+  border: 1px solid ${({ theme }) => theme.color.gray700};
+
+  &:hover {
+    border: 1px solid ${({ theme }) => theme.color.gray500};
+  }
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+  }
+`;
 
 const SingleTool = () => {
-  const singleWrapperRef = useRef<HTMLDivElement>(null);
-  const singleSelectedFrameRef = useRef<HTMLDivElement>(null);
-  const ImageCanvasRef = useRef<HTMLCanvasElement>(null);
-  const [controllerNode, setControllerNode] = useState<HTMLDivElement | null>(null);
-  const [isHideFrameList, setIsHideFrameList] = useState(false);
-  const [frameListAnimation, setFrameListAnimation] = useState({
-    maxHeight: '150px',
-    overflow: 'auto',
-    height: '150px',
-    padding: '0.6em',
-  });
+  const FIRST_INDEX = 0;
+  const LAST_INDEX = 4;
 
-  const handleHideFrameList = useCallback(() => {
-    if (!isHideFrameList) {
-      setFrameListAnimation((prev) => ({
-        ...prev,
-        maxHeight: '0px',
-        height: '0px',
-        overflow: 'hidden',
-        padding: '0em',
-      }));
-    } else {
-      setFrameListAnimation((prev) => ({
-        ...prev,
-        maxHeight: '150px',
-        height: '150px',
-        overflow: 'auto',
-        padding: '0.6em',
-      }));
+  const dispatch = useAppDispatch();
+  const [stepCount, setStepCount] = useState(0);
+  const { selectedFrame } = useAppSelector((state) => state.frame);
+  const { canvasSaveList, canvasOrder, isCanvasSaveDone } = useAppSelector((state) => state.canvas);
+
+  const nextCondition = useMemo(() => {
+    const condition = new Map();
+    condition.set(0, selectedFrame.length);
+    condition.set(
+      1,
+      selectedFrame.every((lst) => lst.imgUrl),
+    );
+    condition.set(2, true);
+    condition.set(3, canvasOrder.scaleType ? true : false);
+    return condition;
+  }, [canvasOrder.scaleType, selectedFrame]);
+
+  const stepTitle = useMemo(() => {
+    const title = new Map();
+    title.set(0, '액자 선택');
+    title.set(1, '이미지 첨부');
+    title.set(2, `시안 제작`);
+    title.set(3, '옆면 선택');
+    title.set(4, '저장');
+    return title;
+  }, []);
+
+  const saveCanvas = useCallback(async () => {
+    const frame = selectedFrame[0];
+    const canvas = canvasSaveList[0].saveCanvas;
+    const order = canvasOrder;
+
+    if (!frame.imgUrl) {
+      alert('이미지가 정상적으로 저장되지 않았습니다. 사진을 변경해 주세요.');
+      return;
     }
 
-    setIsHideFrameList((prev) => !prev);
-  }, [isHideFrameList]);
+    const dataUrl = canvas?.toDataURL('image/png', 1.0);
 
-  const controllerRef = useCallback((node: HTMLDivElement | null) => {
-    if (!node) return;
-    setControllerNode(node);
-  }, []);
+    const file = dataURLtoFile(
+      dataUrl,
+      `${new Date().toLocaleDateString()}_${order.username}_${frame.name}_${frame.widthCm}px_${frame.heightCm}.png`,
+    );
 
-  const [isResizeMode] = useGlobalState('isResizeMode', false);
-  const [isPreview, setIsPreview] = useGlobalState<boolean>('isPreview');
-  const [isPreviewDrawing, setIsPreviewDrawing] = useState(false);
-  const [bgColor, setBgColor] = useState(theme.color.white);
-  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-  const [isDragDrop, setIsDragDrop] = useState(false);
-
-  const [isRotate, setIsRotate] = useState(false);
-
-  const [, setToolType] = useGlobalState<'single' | 'divided'>('toolType', 'single');
-  const [, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
-  const [isSaveCanvas, setIsSaveCanvas] = useGlobalState<boolean>('saveModal');
-  const [, setFramePrice] = useGlobalState<FramePrice[]>('framePrice');
-  const [resizeWidth, setResizeWidth] = useGlobalState<number>('resizeWidth');
-  const [resizeHeight, setResizeHeight] = useGlobalState<number>('resizeHeight');
-  const [wrapperWidth, setWrapperWidth] = useState(0);
-  const [wrapperHeight, setWrapperHeight] = useState(0);
-  const [originWidth, setOriginWidth] = useState<number>(0);
-  const [originHeight, setOriginHeight] = useState<number>(0);
-  const [resizeCmd] = useGlobalState<ResizeCmd>('resizeCmd');
-  const [nearingCenterX, setNearingCenterX] = useState<boolean>(false);
-  const [nearingCenterY, setNearingCenterY] = useState<boolean>(false);
-
-  const { getProgressGage, progressPercentage } = useProgress();
-  const [singleImgUploadUrl, setSingleimgUploadUrl] = useGlobalState<string>('singleImgUploadUrl', '');
-  const [isImgUploadLoading, setImgUploadLoading] = useState(false);
-  const [isMovingImage, setIsMovingImage] = useState(false);
-  const [xDiff, setXDiff] = useState(0);
-  const [yDiff, setYDiff] = useState(0);
-  const [isCalc, setIsCalc] = useState(false);
-
-  const [singleFrameWidth, setSingleFrameWidth] = useState(0);
-  const [singleFrameHeight, setSingleFrameHeight] = useState(0);
-
-  const [frameAttributes, setFrameAttributes] = useState<any>('정방');
-  const frameList = useMemo(() => frameSize().filter((lst) => lst.attribute === frameAttributes), [frameAttributes]);
-  const [singlePrice, setSinglePrice] = useState(0);
-  const [singleCanvasName, setSingleCanvasName] = useState('정방 S-1호');
-
-  const checkRotate = useCallback(
-    (originAxis: number, rotateAxis: number): number => {
-      if (!isRotate) {
-        return originAxis;
-      }
-      return rotateAxis;
-    },
-    [isRotate],
-  );
-
-  const getPosition = useCallback((event: any) => {
-    if (event.type === 'touchmove') {
-      const touchs = event.changedTouches[0];
-      const x = touchs.clientX;
-      const y = touchs.clientY;
-      return [x, y];
+    if (!file) {
+      alert('이미지가 정상적으로 저장되지 않았습니다. 사진을 변경해 주세요.');
+      return;
     }
-    const x = event.clientX;
-    const y = event.clientY;
-    return [x, y];
+
+    const fd = new FormData();
+    fd.append('username', order.username);
+    fd.append('phone', order.phone);
+    fd.append('orderRoute', order.orderRoute.toString());
+    fd.append('type', order.type?.toString() || '1'); // 1 = 캔버스 2 = 포스터
+    fd.append('image', file);
+    fd.append('paperNames', frame.name);
+    fd.append('originImgUrl', frame.imgUrl);
+    fd.append('scaleType', order.scaleType?.toString() || '1'); // 1 = 기본, 2 = 확장
+
+    await dispatch(postCanvasForSave(fd));
+  }, [canvasOrder, canvasSaveList, dispatch, selectedFrame]);
+
+  const handleNextStep = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setStepCount((prev) => prev + 1);
   }, []);
 
-  const createInitFrame = useCallback(() => {
-    // 정방 s-1호로 초기 생성
-    setSingleFrameWidth(cmToPx(16) * 1.5);
-    setSingleFrameHeight(cmToPx(16) * 1.5);
-    const myFrame = frameSize().filter((lst) => lst.name === 'S-1호');
-    setFramePrice(myFrame.map((lst) => ({ id: Date.now(), cm: lst.cm, name: lst.name, price: lst.price })));
-    setSinglePrice(myFrame[0].price);
-    setSingleCanvasName(`${myFrame[0].attribute} ${myFrame[0].name}`);
-  }, [setFramePrice]);
-
-  const createCanvasForSave = useCallback(
-    (canvasProps?: HTMLCanvasElement) => {
-      if (!controllerNode || !resizeWidth || !resizeHeight || !originWidth || !originHeight) return;
-      const singleFrameWidthByRotate = checkRotate(singleFrameWidth, singleFrameHeight);
-      const singleFrameHeightByRotate = checkRotate(singleFrameHeight, singleFrameWidth);
-      const left = (window.innerWidth - resizeWidth) / 2 + replacePx(controllerNode.style.left);
-      const top = (window.innerHeight - resizeHeight) / 2 + replacePx(controllerNode.style.top);
-      const frameLeft = (window.innerWidth - singleFrameWidthByRotate) / 2;
-      const frameTop = (window.innerHeight - singleFrameHeightByRotate) / 2;
-      const canvas = canvasProps || document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      if (ctx && singleImgUploadUrl) {
-        const img = new Image();
-        img.src = singleImgUploadUrl;
-        img.crossOrigin = 'Anonymous';
-        img.onload = () => {
-          const scaleX = img.naturalWidth / resizeWidth;
-          const scaleY = img.naturalHeight / resizeHeight;
-          const cropX = frameLeft - left;
-          const cropY = frameTop - top;
-
-          const originFrameWidth = singleFrameWidthByRotate * scaleX;
-          const originFrameHeight = singleFrameHeightByRotate * scaleY;
-          const canvasFrameWidth = canvasProps ? singleFrameWidthByRotate : originFrameWidth;
-          const canvasFrameHeight = canvasProps ? singleFrameHeightByRotate : originFrameHeight;
-
-          // const pixelRatio = window.devicePixelRatio;
-          canvas.width = canvasFrameWidth;
-          canvas.height = canvasFrameHeight;
-          canvas.setAttribute('data-paper', singleCanvasName);
-
-          ctx.clearRect(0, 0, canvasFrameWidth, canvasFrameHeight);
-
-          // ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-          ctx.imageSmoothingQuality = 'high';
-          ctx.drawImage(
-            img,
-            cropX * scaleX,
-            cropY * scaleY,
-            originFrameWidth,
-            originFrameHeight,
-            0,
-            0,
-            canvasFrameWidth,
-            canvasFrameHeight,
-          );
-
-          // 배경을 칠합니다.
-          ctx.globalCompositeOperation = 'destination-over';
-          ctx.fillStyle = bgColor;
-          ctx.fillRect(0, 0, canvasFrameWidth, canvasFrameHeight);
-        };
-      }
-      if (!canvasProps) {
-        return canvas;
-      }
-    },
-    [
-      controllerNode,
-      resizeWidth,
-      resizeHeight,
-      originWidth,
-      originHeight,
-      singleFrameWidth,
-      singleFrameHeight,
-      singleImgUploadUrl,
-      checkRotate,
-      singleCanvasName,
-      bgColor,
-    ],
-  );
-
-  const createPreviewCanvas = useCallback(() => {
-    createCanvasForSave(previewCanvasRef.current || undefined);
-  }, [createCanvasForSave]);
-
-  const handleColorChange = useCallback((color: ColorResult) => {
-    const { hex } = color;
-    setBgColor(hex);
-    setIsPreviewDrawing(true);
+  const handlePrevStep = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setStepCount((prev) => prev - 1);
   }, []);
 
-  const handleFrameRotate = useCallback(() => {
-    setIsRotate((prev) => !prev);
-    setIsPreviewDrawing(true);
+  const handleFinished = useCallback(() => {
+    saveCanvas();
+  }, [saveCanvas]);
+
+  const handleMoveToolSelect = useCallback(() => {
+    router.push('/tool');
   }, []);
-
-  const handleHorizontal = useCallback(() => {
-    if (controllerNode) {
-      controllerNode.style.top = `0`;
-      setNearingCenterY(true);
-      setTimeout(() => {
-        setNearingCenterY(false);
-      }, 300);
-      setIsPreviewDrawing(true);
-    }
-  }, [controllerNode]);
-
-  const handleVertical = useCallback(() => {
-    if (controllerNode) {
-      controllerNode.style.left = `0`;
-      setNearingCenterX(true);
-      setTimeout(() => {
-        setNearingCenterX(false);
-      }, 300);
-      setIsPreviewDrawing(true);
-    }
-  }, [controllerNode]);
-
-  const handleSelectFrame = useCallback(
-    (e) => {
-      const { width, height, price, name } = e.currentTarget.dataset;
-      const myFrame = frameSize().filter((lst) => lst.name === name);
-      setFramePrice(myFrame.map((lst) => ({ id: Date.now(), cm: lst.cm, name: lst.name, price: lst.price })));
-      const calcWidth = replacePx(width) * 1.5;
-      const calcHeight = replacePx(height) * 1.5;
-      setSingleFrameWidth(calcWidth);
-      setSingleFrameHeight(calcHeight);
-      setSinglePrice(+price);
-      setSingleCanvasName(`${myFrame[0].attribute} ${name}`);
-      setIsPreviewDrawing(true);
-    },
-    [setFramePrice],
-  );
-
-  const handleGetFrameAttribute = useCallback((e) => {
-    const { value } = e.currentTarget;
-    if (value) {
-      setFrameAttributes(value);
-    }
-  }, []);
-
-  const checkNearingCenter = useCallback(
-    (x: number, y: number) => {
-      if (!controllerNode) return;
-      if (1 >= Math.abs(x)) {
-        controllerNode.style.left = `${0}px`;
-        setNearingCenterX(true);
-      } else {
-        setNearingCenterX(false);
-      }
-
-      if (1 >= Math.abs(y)) {
-        controllerNode.style.top = `${0}px`;
-        setNearingCenterY(true);
-      } else {
-        setNearingCenterY(false);
-      }
-    },
-    [controllerNode],
-  );
-
-  const handleToImageInWrapper = useCallback(
-    (e) => {
-      if (!controllerNode) return;
-      const [cursorX, cursorY] = getPosition(e);
-      const x = cursorX - window.innerWidth / 2;
-      const y = cursorY - window.innerHeight / 2 - HEADER_HEIGHT;
-      if (isCalc) {
-        setXDiff(x - replacePx(controllerNode.style.left));
-        setYDiff(y - replacePx(controllerNode.style.top));
-        setIsCalc(false);
-      }
-      if (!isCalc) {
-        controllerNode.style.position = 'relative';
-        controllerNode.style.left = `${x - xDiff}px`;
-        controllerNode.style.top = `${y - yDiff}px`;
-        checkNearingCenter(x - xDiff, y - yDiff);
-      }
-    },
-
-    [checkNearingCenter, controllerNode, getPosition, isCalc, xDiff, yDiff],
-  );
-
-  const imageDropUpload = useCallback(
-    async (acceptedFiles) => {
-      if (!acceptedFiles[0].type.includes('image')) {
-        return alert('이미지 파일이 아닌건 지원하지 않습니다.');
-      }
-
-      if (!imgSizeChecker(acceptedFiles[0])) return;
-
-      setImgUploadLoading(true);
-      try {
-        const file = acceptedFiles[0];
-        const fd = new FormData();
-        fd.append('image', file);
-
-        await axios
-          .post('/canvas/single/upload', fd, {
-            onUploadProgress: getProgressGage,
-          })
-          .then((res) => {
-            setSingleimgUploadUrl(res.data || '');
-          });
-      } catch (err) {
-        alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
-        console.error(err);
-      } finally {
-        setImgUploadLoading(false);
-        setIsDragDrop(false);
-      }
-    },
-    [getProgressGage, setSingleimgUploadUrl],
-  );
-
-  const handleDragCancel = useCallback(() => {
-    setIsDragDrop(false);
-  }, []);
-
-  const handleDragImage = useCallback(() => {
-    setIsDragDrop(true);
-  }, []);
-
-  const handleSingleImgUpload = useCallback(
-    async (file: RcFile | any) => {
-      if (file instanceof File === false) {
-        // 드롭 로직
-        imageDropUpload(file);
-        return;
-      }
-      if (!file.type.includes('image')) {
-        return alert('이미지 파일이 아닌건 지원하지 않습니다.');
-      }
-
-      if (!imgSizeChecker(file)) return;
-
-      setImgUploadLoading(true);
-      try {
-        const fd = new FormData();
-        fd.append('image', file);
-
-        await axios
-          .post('/canvas/single/upload', fd, {
-            onUploadProgress: getProgressGage,
-          })
-          .then((res) => {
-            setSingleimgUploadUrl(res.data || '');
-          });
-      } catch (err) {
-        alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
-        console.error(err);
-      } finally {
-        setImgUploadLoading(false);
-      }
-    },
-    [getProgressGage, imageDropUpload, setSingleimgUploadUrl],
-  );
-
-  const handleMoveSingleImage = useCallback(() => {
-    setIsMovingImage(true);
-    setIsCalc(true);
-  }, []);
-
-  const handleMoveCancelSingleImage = useCallback(() => {
-    setIsMovingImage(false);
-    setNearingCenterX(false);
-    setNearingCenterY(false);
-    setIsCalc(false);
-    setIsPreviewDrawing(true);
-  }, []);
-
-  const drawingImage = useCallback(
-    (resizeWidth?: number, resizeHeight?: number, url?: string) => {
-      const imgCanvas = ImageCanvasRef.current;
-      if (!imgCanvas || !wrapperWidth || !wrapperHeight) return;
-
-      const imgCtx = imgCanvas.getContext('2d');
-      if (imgCtx && singleImgUploadUrl) {
-        const img = new Image();
-        img.src = url || singleImgUploadUrl;
-        img.onload = () => {
-          const { naturalWidth, naturalHeight } = img;
-          setOriginWidth(naturalWidth);
-          setOriginHeight(naturalHeight);
-          const [w, h] = getOriginRatio(
-            naturalWidth,
-            naturalHeight,
-            resizeWidth || singleFrameWidth || wrapperWidth,
-            resizeHeight || singleFrameHeight || wrapperHeight,
-          );
-          imgCanvas.width = w;
-          imgCanvas.height = filterOverMaxHeight(h);
-          setResizeWidth(w);
-          setResizeHeight(filterOverMaxHeight(h));
-          imgCtx.clearRect(0, 0, wrapperWidth, wrapperHeight);
-          imgCtx.imageSmoothingQuality = 'high';
-          imgCtx.drawImage(img, 0, 0, w, filterOverMaxHeight(h));
-          setIsPreviewDrawing(true);
-        };
-      }
-    },
-    [
-      setResizeHeight,
-      setResizeWidth,
-      singleFrameHeight,
-      singleFrameWidth,
-      singleImgUploadUrl,
-      wrapperHeight,
-      wrapperWidth,
-    ],
-  );
-
-  const handleImgRatioSetting = useCallback(() => {
-    if (!ImageCanvasRef.current || !controllerNode) return;
-    const canvas = ImageCanvasRef.current;
-    const {
-      width,
-      height,
-      dataset: { url },
-    } = canvas;
-    const [w, h] = getOriginRatio(originWidth, originHeight, width, height);
-    drawingImage(w, h, url);
-  }, [controllerNode, drawingImage, originHeight, originWidth]);
-
-  const handleRatioForFrame = useCallback(() => {
-    const [w, h] = getOriginRatio(originWidth, originHeight, singleFrameWidth, singleFrameHeight);
-    drawingImage(w, h);
-    if (controllerNode) {
-      controllerNode.style.position = 'relative';
-      controllerNode.style.left = `${0}px`;
-      controllerNode.style.top = `${0}px`;
-    }
-  }, [controllerNode, drawingImage, originHeight, originWidth, singleFrameHeight, singleFrameWidth]);
 
   useEffect(() => {
-    if (isPreview) {
-      setFrameListAnimation((prev) => ({
-        ...prev,
-        maxHeight: '0px',
-        height: '0px',
-        overflow: 'hidden',
-        padding: '0em',
-      }));
-      setIsHideFrameList(true);
-    } else {
-      setFrameListAnimation((prev) => ({
-        ...prev,
-        maxHeight: '150px',
-        height: '150px',
-        overflow: 'auto',
-        padding: '0.6em',
-      }));
-      setIsHideFrameList(false);
-    }
-  }, [isPreview]);
-
-  useEffect(() => {
-    if (isPreviewDrawing) {
-      createPreviewCanvas();
-      setIsPreviewDrawing(false);
-    }
-  }, [createPreviewCanvas, isPreviewDrawing]);
-
-  useEffect(() => {
-    drawingImage();
-    if (controllerNode) {
-      controllerNode.style.position = 'relative';
-      controllerNode.style.left = `${0}px`;
-      controllerNode.style.top = `${0}px`;
-    }
-  }, [singleImgUploadUrl, wrapperWidth, wrapperHeight, drawingImage, controllerNode]);
-
-  useEffect(() => {
-    if (isSaveCanvas) {
-      const imgCanvas = createCanvasForSave();
-      setSelectedFrameList(imgCanvas ? [imgCanvas] : []);
-    }
+    if (stepCount === 3 && canvasOrder.scaleType) dispatch(setCanvasSaveScale({ scaleType: null }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSaveCanvas]);
+  }, [stepCount]);
 
   useEffect(() => {
-    if (isResizeMode) {
-      createPreviewCanvas();
+    if (isCanvasSaveDone) {
+      router.push('/success');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isResizeMode]);
+  }, [isCanvasSaveDone]);
 
   useEffect(() => {
-    setToolType('single');
-    const sCanvasWrapper = singleWrapperRef.current;
-    if (!sCanvasWrapper) return;
-
-    const { width, height } = sCanvasWrapper.getBoundingClientRect();
-    setWrapperWidth(width);
-    setWrapperHeight(height);
-    createInitFrame();
-
     return () => {
-      setIsPreview(false);
-      setFramePrice([]);
-      setSelectedFrameList([]);
-      setBgColor(theme.color.gray200);
-      setSingleimgUploadUrl('');
-      setIsSaveCanvas(false);
+      dispatch(resetCanvasState());
+      dispatch(resetFrameState());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <>
+    <Container>
+      <Loader />
+      <SingleToolHeader>
+        <nav onClick={handleMoveToolSelect}>
+          <img src={icons.arrow} />
+          <img src={icons.home} />
+        </nav>
+      </SingleToolHeader>
+      <SingleStepsWrapper>
+        <SingleSteps size="small" labelPlacement="vertical" responsive current={stepCount}>
+          <Step title={stepTitle.get(0)} />
+          <Step title={stepTitle.get(1)} />
+          <Step title={stepTitle.get(2)} />
+          <Step title={stepTitle.get(3)} />
+          <Step title={stepTitle.get(4)} />
+        </SingleSteps>
+      </SingleStepsWrapper>
       <SingleToolContainer>
-        <Loading loading={isImgUploadLoading} progressPercentage={progressPercentage} />
-        <ToolHeader
-          imgUrl={singleImgUploadUrl || ''}
-          singlePrice={singlePrice.toLocaleString()}
-          singleCanvasName={singleCanvasName}
-        />
-        <SingleToolFactory>
-          <Button type="text"></Button>
-          <Upload accept="image/*" beforeUpload={handleSingleImgUpload} showUploadList={false}>
-            <Button type="text">
-              <img src={icons.imgUpload} style={{ width: '22px' }} />
-            </Button>
-          </Upload>
-          <Button type="text" onClick={handleFrameRotate}>
-            <img src={icons.rotate} />
-          </Button>
-          <Button type="text" onClick={handleHorizontal}>
-            <img src={icons.horizontal} />
-          </Button>
-
-          <Button type="text" onClick={handleVertical}>
-            <img src={icons.vertical} />
-          </Button>
-          <Popover
-            style={{ padding: 0 }}
-            trigger="click"
-            placement="bottom"
-            content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
-          >
-            <Button type="text">
-              <img src={icons.bgPaint} />
-            </Button>
-          </Popover>
-
-          <Button type="text" onClick={handleRatioForFrame}>
-            <img src={icons.auto} />
-          </Button>
-          <Button type="text" onClick={handleImgRatioSetting}>
-            <img src={icons.ratioFrame} style={{ width: '24px' }} />
-          </Button>
-        </SingleToolFactory>
-
-        {/* 액자 리스트 선택 */}
-        {singleImgUploadUrl && (
-          <SingleFrameListHeader>
-            <div>
-              <Button
-                type={frameAttributes === '정방' ? 'primary' : 'text'}
-                onClick={handleGetFrameAttribute}
-                value="정방"
-              >
-                정방
-              </Button>
-              <Button
-                type={frameAttributes === '인물' ? 'primary' : 'text'}
-                onClick={handleGetFrameAttribute}
-                value="인물"
-              >
-                인물
-              </Button>
-              <Button
-                type={frameAttributes === '해경' ? 'primary' : 'text'}
-                onClick={handleGetFrameAttribute}
-                value="해경"
-              >
-                해경
-              </Button>
-              <Button
-                type={frameAttributes === '풍경' ? 'primary' : 'text'}
-                onClick={handleGetFrameAttribute}
-                value="풍경"
-              >
-                풍경
-              </Button>
-            </div>
-
-            <SingleFrameListGrid {...frameListAnimation}>
-              {frameList.map((lst, index) => (
-                <div
-                  key={index}
-                  data-width={lst.size.width}
-                  data-height={lst.size.height}
-                  data-price={lst.price}
-                  data-name={lst.name}
-                  onClick={handleSelectFrame}
-                >
-                  <SingleFrameList
-                    {...lst.size}
-                    rotate={isRotate}
-                    clicked={`${frameAttributes} ${lst.name}` === singleCanvasName}
-                  >
-                    <FrameSizeName>{lst.name}</FrameSizeName>
-                  </SingleFrameList>
-                  <small>{lst.cm}</small>
-                </div>
-              ))}
-            </SingleFrameListGrid>
-
-            <FrameListGridHideButton onClick={handleHideFrameList}>
-              <FontAwesomeIcon icon={isHideFrameList ? faChevronCircleDown : faChevronCircleUp} />{' '}
-              <small>{isHideFrameList ? '펼치기' : '접기'}</small>
-            </FrameListGridHideButton>
-          </SingleFrameListHeader>
+        {/* step1 액자 선택 */}
+        {stepCount === 0 && (
+          <SingleContent>
+            <FirstStep />
+          </SingleContent>
+        )}
+        {/* step2 이미지 */}
+        {stepCount === 1 && (
+          <SingleContent>
+            <SecondsStep />
+          </SingleContent>
+        )}
+        {/* step3 제작 */}
+        {stepCount === 2 && (
+          <SingleContent>
+            <ThirdStep />
+          </SingleContent>
+        )}
+        {/* step4  옆면 */}
+        {stepCount === 3 && (
+          <SingleContent>
+            <FourthStep />
+          </SingleContent>
         )}
 
-        {/* 본격적인 툴  */}
-        <PreviewCanvasWrapper isPreview={isPreview || false}>
-          <canvas ref={previewCanvasRef} />
-        </PreviewCanvasWrapper>
+        {/* step5 저장 */}
+        {stepCount === 4 && (
+          <SingleContent>
+            <LastStep />
+          </SingleContent>
+        )}
 
-        <SingleCanvasField isPreview={isPreview || false} onDragOver={handleDragImage} onMouseLeave={handleDragCancel}>
-          <SingleWrapper
-            nearingCenterX={nearingCenterX}
-            nearingCenterY={nearingCenterY}
-            cmd={resizeCmd ?? null}
-            ref={singleWrapperRef}
-            clicked={isMovingImage}
-            onDragOver={handleDragImage}
-            onMouseMove={isMovingImage ? handleToImageInWrapper : undefined}
-            onMouseUp={isMovingImage ? handleMoveCancelSingleImage : undefined}
-            onMouseLeave={isDragDrop ? handleDragCancel : handleMoveCancelSingleImage}
-            onTouchMove={isMovingImage ? handleToImageInWrapper : undefined}
-            onTouchEnd={isMovingImage ? handleMoveCancelSingleImage : undefined}
-          >
-            {/* 선택한 액자 렌더링  */}
-            <SingleSelectedFrame
-              rotate={isRotate}
-              bgColor={bgColor}
-              isImgUploadUrl={singleImgUploadUrl ? true : false}
-              ref={singleSelectedFrameRef}
-              width={singleFrameWidth}
-              height={singleFrameHeight}
+        <SingleStepButtonWrapper>
+          {FIRST_INDEX !== stepCount && (
+            <SinglePrevStepButton type="text" onClick={handlePrevStep}>
+              {stepTitle.get(stepCount - 1)}
+            </SinglePrevStepButton>
+          )}
+
+          {LAST_INDEX !== stepCount && (
+            <SingleNextStepButton type="primary" onClick={handleNextStep} disabled={!nextCondition.get(stepCount)}>
+              {stepTitle.get(stepCount + 1)}
+            </SingleNextStepButton>
+          )}
+
+          {LAST_INDEX === stepCount && (
+            <SingleNextStepButton
+              type="primary"
+              onClick={handleFinished}
+              disabled={
+                !canvasOrder.username ||
+                !canvasOrder.phone.match(/(^02.{0}|^01.{1})([0-9]{3})([0-9]+)([0-9]{4})/g) ||
+                !canvasOrder.orderRoute ||
+                false
+              }
             >
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
-            </SingleSelectedFrame>
-
-            {!singleImgUploadUrl || isDragDrop ? (
-              <ImageDropZone
-                isDragDrop={isDragDrop}
-                width={'100%'}
-                height={`calc(100vh - 86px)`}
-                onDrop={handleSingleImgUpload}
-              />
-            ) : null}
-
-            {/* 첨부한 이미지 렌더링 */}
-            {singleImgUploadUrl && (
-              <SingleImageWrapper clicked={isMovingImage}>
-                <SingleImgSizeController
-                  controllerRef={(node) => controllerRef(node)}
-                  isMovingImage={isMovingImage}
-                  imgRef={ImageCanvasRef}
-                  wrapperRef={singleWrapperRef}
-                >
-                  <canvas
-                    data-url={singleImgUploadUrl}
-                    ref={ImageCanvasRef}
-                    onTouchStart={handleMoveSingleImage}
-                    onTouchEnd={isMovingImage ? handleMoveCancelSingleImage : undefined}
-                    onMouseDown={handleMoveSingleImage}
-                    onMouseUp={isMovingImage ? handleMoveCancelSingleImage : undefined}
-                  />
-                </SingleImgSizeController>
-              </SingleImageWrapper>
-            )}
-          </SingleWrapper>
-        </SingleCanvasField>
+              저장하기
+            </SingleNextStepButton>
+          )}
+        </SingleStepButtonWrapper>
       </SingleToolContainer>
-    </>
+    </Container>
   );
 };
 
-export default PreventPageLeave(SingleTool);
+export default SingleTool;
