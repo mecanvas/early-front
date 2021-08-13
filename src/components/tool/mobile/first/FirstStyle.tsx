@@ -53,9 +53,9 @@ export const FirstFrameWrapper = styled.div`
   align-items: center;
   background-color: ${({ theme }) => theme.color.gray100};
   border-radius: 8px;
-  padding: 2em 0;
+  padding-top: 2em;
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-    padding: 1em 0;
+    padding-top: 2em;
     margin-top: 1em;
   }
   span {
@@ -81,7 +81,6 @@ export const FirstFramePreview = styled.div`
   background-color: ${({ theme }) => theme.color.white};
   width: 100%;
   max-height: 600px;
-
   border: 1px solid ${({ theme }) => theme.color.gray400};
   img:nth-of-type(1) {
     width: 100%;
@@ -89,6 +88,12 @@ export const FirstFramePreview = styled.div`
   }
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     width: 100%;
+    max-height: 400px;
+    img:nth-of-type(1) {
+      width: 100%;
+      object-fit: contain;
+      max-height: 400px;
+    }
   }
 `;
 
