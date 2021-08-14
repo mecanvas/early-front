@@ -6,6 +6,7 @@ export const MAX_HEIGHT = 1000;
 
 export const IMAGE_MAXIMUM_WIDTH = 320;
 export const IMAGE_MAXIMUM_HEIGHT = 320;
+export const CROPPER_LIMIT_SIZE = 30;
 
 //  1_000_000  = 1MB
 export const IMG_LIMIT_MINIMUM_SIZE = process.env.NODE_ENV === 'production' ? 1_000_000 : 0;

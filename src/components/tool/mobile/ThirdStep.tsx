@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { Popover, Button, Spin } from 'antd';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ColorResult } from 'react-color';
-import { IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT } from 'src/constants';
+import { IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT, CROPPER_LIMIT_SIZE } from 'src/constants';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { setCanvasSaveList } from 'src/store/reducers/canvas';
@@ -621,6 +621,7 @@ const ThirdStep = () => {
                 if (resizeByBottomLeft > imgHeight || cursorYInImage < 0) return;
                 // if (cursorYInImage / hRatio - topLeftXControl < 0) return;
                 if (resizeByTopLeft > imgWidth) return;
+                if (resizeByTopLeft < CROPPER_LIMIT_SIZE || resizeByTopLeft < CROPPER_LIMIT_SIZE) return;
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
@@ -640,6 +641,7 @@ const ThirdStep = () => {
                 const resizeByTopRight = resizeByBottomRight * wRatio;
                 if (cursorYInImage < 0) return;
                 if (resizeByTopRight + cursorXDiff > imgWidth) return;
+                if (resizeByBottomRight < CROPPER_LIMIT_SIZE || resizeByTopRight < CROPPER_LIMIT_SIZE) return;
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
@@ -661,6 +663,7 @@ const ThirdStep = () => {
                 if (resizeByBottomLeft > imgWidth && cursorXInImage < 0) return;
                 if (cursorXInImage > imgWidth) return;
                 if (resizeByTopLeft + cursorYDiff > imgHeight) return;
+                if (resizeByTopLeft < CROPPER_LIMIT_SIZE || resizeByBottomLeft < CROPPER_LIMIT_SIZE) return;
                 // const resizeByTopLeft = cursorY;
                 dispatch(
                   updatePositionByFrame({
@@ -681,7 +684,7 @@ const ThirdStep = () => {
                 const resizeByBottomRight = resizeByTopRight * hRatio;
                 if (cursorXInImage > imgWidth || cursorXInImage < 0) return;
                 if (resizeByBottomRight + cursorYDiff > imgHeight) return;
-
+                if (resizeByBottomRight < CROPPER_LIMIT_SIZE || resizeByTopRight < CROPPER_LIMIT_SIZE) return;
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
