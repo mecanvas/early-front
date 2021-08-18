@@ -3,6 +3,8 @@ import styled from '@emotion/styled';
 import { Images } from 'public/index';
 import { useOpacity } from 'src/hooks/useOpacity';
 import Link from 'next/link';
+import SEO from 'src/components/common/SEO';
+import { TOOL_SEO } from 'src/constants/SeoOnly';
 
 const Container = styled.div`
   display: flex;
@@ -115,6 +117,7 @@ const Index = () => {
   const { OpacityComponent } = useOpacity('trigger');
   return (
     <Container>
+      <SEO {...TOOL_SEO} />
       <h4>제작방식을 선택해 주세요.</h4>
       <OpacityComponent>
         <SelectedWrapper>

@@ -1,10 +1,12 @@
-import { Menu, Layout } from 'antd';
+import { Menu, Layout, Button } from 'antd';
 import SubMenu from 'antd/lib/menu/SubMenu';
 import { useRouter } from 'next/router';
 import React, { useCallback } from 'react';
 import Link from 'next/link';
 import styled from '@emotion/styled';
 import { APP_HEADER_HEIGHT } from 'src/constants';
+import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
+import { postUserLogout } from 'src/store/api/user/userLogout';
 
 const { Header, Content } = Layout;
 
@@ -68,12 +70,21 @@ interface Props {
 
 const AdminLayout = ({ children }: Props) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { userData } = useAppSelector((state) => state.user);
+
   const handleTitleClick = useCallback(
     (e) => {
       router.push(e.key);
     },
     [router],
   );
+
+  const handleLogout = useCallback(() => {
+    if (userData) {
+      dispatch(postUserLogout());
+    }
+  }, [dispatch, userData]);
 
   return (
     <Layout>
@@ -84,6 +95,9 @@ const AdminLayout = ({ children }: Props) => {
           </Link>
         </AdminLogo>
         <AdminMenu>
+          <Button type="default" onClick={handleLogout}>
+            로그아웃
+          </Button>
           <Menu mode="horizontal" theme="light" defaultSelectedKeys={['/']} selectedKeys={[router.pathname]}>
             <SubMenu key="/admin/order/divided" title="주문 목록" onTitleClick={handleTitleClick}>
               <Menu.Item key="/admin/order/divided">

@@ -13,6 +13,9 @@ const Container = styled.div`
   h5 {
     margin-bottom: 2em;
   }
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    padding: 1em 0;
+  }
 `;
 
 const SaveForm = styled(Form)`
@@ -20,6 +23,9 @@ const SaveForm = styled(Form)`
   justify-content: center;
   flex-direction: column;
   padding: 0 2em;
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    padding: 0 1em;
+  }
 `;
 
 const PreivewCanvas = styled.div`
@@ -41,14 +47,13 @@ const SliderItem = styled.div`
     max-width: 100%;
     max-height: 100%;
     filter: ${({ theme }) => theme.canvasShadowFilter};
+    filter: none; /* IE 6-9 */
+    -webkit-filter: ${({ theme }) => theme.canvasShadowFilter};
   }
 `;
 
 const CanvasSaleInfo = styled.div`
   text-align: center;
-  div {
-    color: ${({ theme }) => theme.color.gray600};
-  }
   span {
     line-height: 20px;
     font-size: 15px;
@@ -59,6 +64,10 @@ const CanvasSaleInfo = styled.div`
   }
 `;
 
+const CanvasPrice = styled.div`
+  font-size: 20px;
+`;
+
 const LastStep = () => {
   const [form] = useForm();
 
@@ -67,7 +76,6 @@ const LastStep = () => {
   const { selectedFrame } = useAppSelector((state) => state.frame);
   const [orderForm, setOrderForm] = useState<CanvasOrder>({ username: '', phone: '', orderRoute: 1 });
   const [canvasUrl, setCanvasUrl] = useState('');
-
   const handleFormChange = useCallback((e) => {
     const { name, value } = e[0];
     setOrderForm((prev) => ({ ...prev, [name[0]]: value }));
@@ -92,7 +100,7 @@ const LastStep = () => {
           {/* <AntdCarousel startIndex={0} lastIndex={1}> */}
           <div>
             <SliderItem>
-              <Img src={canvasUrl} alt="액자사진" width={300} height={350} />
+              <Img src={canvasUrl} alt="액자사진" width={300} height={300} />
             </SliderItem>
           </div>
 
@@ -106,8 +114,8 @@ const LastStep = () => {
               {selectedFrame[0].widthCm}cm x {selectedFrame[0].heightCm}cm
             </span>
           </div>
-          <div>{selectedFrame[0].price.toLocaleString()}원</div>
           <div>{canvasOrder.scaleType === 2 ? `옆면 확장` : '기본 옆면'}</div>
+          <CanvasPrice>{selectedFrame[0].price.toLocaleString()}원</CanvasPrice>
         </CanvasSaleInfo>
 
         <Divider />

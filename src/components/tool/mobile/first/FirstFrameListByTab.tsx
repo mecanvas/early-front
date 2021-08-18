@@ -3,7 +3,7 @@ import { List } from 'antd';
 import { icons } from 'public/icons';
 import React, { useState, useMemo, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from 'src/hooks/useRedux';
-import { FrameInfoList, selectedFrame } from 'src/store/reducers/frame';
+import { FrameInfoList, rotateSelectedFrameList, selectedFrame } from 'src/store/reducers/frame';
 import { FirstContent, FirstListItems, FirstFrameWrapper, FirstFramePreview } from './FirstStyle';
 
 const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
@@ -42,6 +42,17 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
     [dispatch, frameList],
   );
 
+  const handleFrameRotate = useCallback(
+    (e) => {
+      const { type, id } = e.currentTarget.dataset;
+
+      if (!type || !id) return;
+
+      dispatch(rotateSelectedFrameList({ type: +type, id: +id }));
+    },
+    [dispatch],
+  );
+
   return (
     <FirstContent>
       <List
@@ -56,9 +67,9 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
             onClick={handleSelectFrame}
           >
             <div>
-              <div>{item.name}</div>
+              <span>{item.widthCm}cm</span> <span>X</span> <span>{item.heightCm}cm</span>
               <div>
-                <small>{item.widthCm}cm</small> <small>X</small> <small>{item.heightCm}cm</small>
+                <small>{item.name}</small>
               </div>
             </div>
             {selectedFrameList.some((lst) => lst.type === item.type && lst.name === item.name) ? (
@@ -70,15 +81,38 @@ const FirstFrameListByTab = ({ frameList }: { frameList: FrameInfoList[] }) => {
         )}
       />
       <FirstFrameWrapper>
-        <FirstFramePreview {...showingFrame.size}>
-          <img
-            src={
-              'https://early-canvas.s3.ap-northeast-2.amazonaws.com/single/upload/%E1%84%92%E1%85%A6%E1%86%AB%E1%84%85%E1%85%B5.png'
-            }
-          />
+        <FirstFramePreview>
+          {selectedFrameList[0] ? (
+            <>
+              <img
+                src={`https://early21-assets.s3.ap-northeast-2.amazonaws.com/img/example/${selectedFrameList[0]?.name
+                  .replace('-', '')
+                  .replace('호', '')}${
+                  selectedFrameList[0]?.type !== 1 && selectedFrameList[0]?.isRotate ? '-rotate' : ''
+                }.png`}
+                alt="액자 샘플 사진"
+              />
+            </>
+          ) : (
+            <>
+              <img
+                src={`https://early21-assets.s3.ap-northeast-2.amazonaws.com/img/example/${showingFrame?.name
+                  .replace('-', '')
+                  .replace('호', '')}.png`}
+                alt="액자 샘플 사진"
+              />
+            </>
+          )}
         </FirstFramePreview>
         <span>
           <h5>{showingFrame.name}</h5>
+          <img
+            src={icons.rotate}
+            alt="액자 회전 아이콘"
+            onClick={handleFrameRotate}
+            data-type={selectedFrameList[0]?.type}
+            data-id={selectedFrameList[0]?.id}
+          />
         </span>
       </FirstFrameWrapper>
     </FirstContent>

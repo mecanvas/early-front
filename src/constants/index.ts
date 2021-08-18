@@ -6,6 +6,7 @@ export const MAX_HEIGHT = 1000;
 
 export const IMAGE_MAXIMUM_WIDTH = 320;
 export const IMAGE_MAXIMUM_HEIGHT = 320;
+export const CROPPER_LIMIT_SIZE = 30;
 
 //  1_000_000  = 1MB
 export const IMG_LIMIT_MINIMUM_SIZE = process.env.NODE_ENV === 'production' ? 1_000_000 : 0;
@@ -33,16 +34,17 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
   {
     id: 1,
     type: 2,
-    name: 'S-4호',
-    widthCm: 24,
-    heightCm: 24,
-    price: 15000,
+    name: 'F-0호',
+    widthCm: 14,
+    heightCm: 18,
+    price: 11000,
     size: {
-      width: cmToPx(24),
-      height: cmToPx(24),
+      width: cmToPx(14),
+      height: cmToPx(18),
     },
-    recommand: true,
+    recommand: false,
   },
+
   {
     id: 2,
     type: 2,
@@ -90,13 +92,13 @@ export const frameSquare: FrameInfoList[] = [
   {
     id: 1,
     type: 1,
-    name: 'F-0호',
+    name: 'S-0호',
     widthCm: 14,
-    heightCm: 18,
-    price: 11000,
+    heightCm: 14,
+    price: 10000,
     size: {
       width: cmToPx(14),
-      height: cmToPx(18),
+      height: cmToPx(14),
     },
     recommand: false,
   },
@@ -125,6 +127,19 @@ export const frameSquare: FrameInfoList[] = [
       height: cmToPx(19),
     },
     recommand: false,
+  },
+  {
+    id: 4,
+    type: 1,
+    name: 'S-4호',
+    widthCm: 24,
+    heightCm: 24,
+    price: 15000,
+    size: {
+      width: cmToPx(24),
+      height: cmToPx(24),
+    },
+    recommand: true,
   },
 ];
 

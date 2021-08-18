@@ -43,6 +43,16 @@ const frame = createSlice({
       state.selectedFrame = [];
     },
     rotateSelectedFrameList: (state, { payload }: PayloadAction<{ type: number; id: number }>) => {
+      state.frameInfoList = state.frameInfoList.map((lst) => ({
+        ...lst,
+        widthCm: lst.id === payload.id && lst.type === payload.type ? lst.heightCm : lst.widthCm,
+        heightCm: lst.id === payload.id && lst.type === payload.type ? lst.widthCm : lst.heightCm,
+        size: {
+          ...lst.size,
+          width: lst.id === payload.id && lst.type === payload.type ? lst.size.height : lst.size.width,
+          height: lst.id === payload.id && lst.type === payload.type ? lst.size.width : lst.size.height,
+        },
+      }));
       state.selectedFrame = state.selectedFrame.map((lst) => ({
         ...lst,
         widthCm: lst.id === payload.id && lst.type === payload.type ? lst.heightCm : lst.widthCm,

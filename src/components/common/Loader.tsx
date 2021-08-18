@@ -5,14 +5,14 @@ import React, { useMemo } from 'react';
 import { Spin } from 'antd';
 
 const Container = styled.div`
-  position: absolute;
+  position: fixed;
   top: 0;
   width: 100%;
   z-index: 50;
 `;
 
 const LoaderSpin = styled(Spin)`
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -20,8 +20,8 @@ const LoaderSpin = styled(Spin)`
 `;
 
 const LoadingBackground = styled.div<{ isImageUpload: boolean }>`
-  position: absolute;
-  width: calc(100% - 45px);
+  position: fixed;
+  width: 100%;
   height: calc(100% - 45px);
   top: 45px;
   left: 0;
@@ -36,7 +36,7 @@ const LoadingBackground = styled.div<{ isImageUpload: boolean }>`
 
 const LoadingWrapper = styled.div`
   width: 100%;
-  height: 3px;
+  height: 5px;
   background: ${({ theme }) => theme.color.gray100};
   border-radius: 6px;
 `;
@@ -74,7 +74,7 @@ const Loader = () => {
   return (
     <>
       <LoaderSpin size="large" />
-      <LoadingBackground isImageUpload={isImageUpload || isCanvasSave} />
+      <LoadingBackground isImageUpload={!isImageUpload || !isCanvasSave} />
       <Container>
         <LoadingWrapper>
           <LoadingBar progressPercentage={progressPercentage}></LoadingBar>

@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Loader from 'src/components/common/Loader';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { postCanvasForSave } from 'src/store/api/canvas';
-import { resetCanvasState } from 'src/store/reducers/canvas';
+import { resetCanvasState, setCanvasSaveScale } from 'src/store/reducers/canvas';
 import { resetFrameState } from 'src/store/reducers/frame';
 import { dataURLtoFile } from 'src/utils/dataUrlToFile';
 import FirstStep from './FirstStep';
@@ -17,7 +17,8 @@ import ThirdStep from './ThirdStep';
 const { Step } = Steps;
 
 const Container = styled.div`
-  min-height: 100vh;
+  min-height: calc(100vh + env(safe-area-inset-bottom));
+  min-height: calc(100vh + constant(safe-area-inset-bottom));
   background-color: ${({ theme }) => theme.color.gray000};
 `;
 
@@ -36,9 +37,9 @@ const MobileSingleToolHeader = styled.div`
     display: flex;
     align-items: center;
     margin: 0 auto;
+    cursor: pointer;
 
     img {
-      cursor: pointer;
       &:nth-of-type(1) {
         transform: rotateY(180deg);
         -webkit-transform: rotateY(180deg);
@@ -93,11 +94,14 @@ const MobileSteps = styled(Steps)`
     }
   }
   span {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
   }
 
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    span {
+      font-size: 13px;
+    }
   }
 `;
 
@@ -135,9 +139,10 @@ const MobileStepButtonWrapper = styled.div`
 `;
 
 const MobileNextStepButton = styled(Button)`
-  font-size: 13px;
+  font-size: 14px;
   padding: 3px !important;
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    font-size: 13px;
   }
 `;
 const MobilePrevStepButton = styled(Button)`
@@ -232,6 +237,15 @@ const MobileSingleTool = () => {
     saveCanvas();
   }, [saveCanvas]);
 
+  const handleMoveToolSelect = useCallback(() => {
+    router.push('/tool');
+  }, []);
+
+  useEffect(() => {
+    if (stepCount === 3 && canvasOrder.scaleType) dispatch(setCanvasSaveScale({ scaleType: null }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepCount]);
+
   useEffect(() => {
     if (isCanvasSaveDone) {
       router.push('/success');
@@ -250,7 +264,7 @@ const MobileSingleTool = () => {
     <Container>
       <Loader />
       <MobileSingleToolHeader>
-        <nav>
+        <nav onClick={handleMoveToolSelect}>
           <img src={icons.arrow} />
           <img src={icons.home} />
         </nav>

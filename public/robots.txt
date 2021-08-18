@@ -1,0 +1,33 @@
+# *
+User-agent: *
+Disallow: /admin*/
+
+# Googlebot
+User-agent: Googlebot
+Allow: /
+
+# AdsBot-Google
+User-agent: AdsBot-Google
+Allow: /
+
+# Googlebot-Image
+User-agent: Googlebot-Image
+Allow: /
+
+# Yeti
+User-agent: Yeti
+Allow: /
+
+# Twitterbot
+User-agent: Twitterbot
+Allow: /
+
+# facebookexternalhit
+User-agent: facebookexternalhit
+Allow: /
+
+# Host
+Host: https://early21.com
+
+# Sitemaps
+Sitemap: https://early21.com/sitemap.xml

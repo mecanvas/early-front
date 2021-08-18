@@ -3,8 +3,7 @@ import styled from '@emotion/styled';
 import { Popover, Button, Spin } from 'antd';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ColorResult } from 'react-color';
-import { isMobile } from 'react-device-detect';
-import { IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT } from 'src/constants';
+import { IMAGE_MAXIMUM_WIDTH, IMAGE_MAXIMUM_HEIGHT, CROPPER_LIMIT_SIZE } from 'src/constants';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { ResizeCmd } from 'src/interfaces/ToolInterface';
 import { setCanvasSaveList } from 'src/store/reducers/canvas';
@@ -20,6 +19,9 @@ import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { getPosition } from 'src/utils/getPosition';
 import { replacePx } from 'src/utils/replacePx';
 import ToolColorPalette from '../divided/DividedToolColorPalette';
+import { icons } from 'public/icons';
+import { isIOS } from 'react-device-detect';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 const SpinLoader = styled.div`
   display: flex;
@@ -30,7 +32,6 @@ const SpinLoader = styled.div`
 
 const Container = styled.section<{ cmd: ResizeCmd | null }>`
   padding: 1em 0;
-
   ${({ cmd }) => {
     if (!cmd) return;
     if (cmd === 'top-left' || cmd === 'bottom-right') {
@@ -48,8 +49,14 @@ const ThirdBgChanger = styled.div`
   display: flex;
   justify-content: flex-end;
   font-size: 14px;
+  margin-bottom: 1em;
+  button {
+    padding: 0 0.6em;
+    font-size: 13px;
+  }
   img {
-    width: 18px;
+    transform: scale(-1, 1);
+    width: 17px;
   }
 `;
 
@@ -100,6 +107,7 @@ const ThirdContent = styled.div`
   gap: 1em;
   grid-template-columns: repeat(2, 1fr);
   justify-content: center;
+
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     width: 100%;
     display: grid;
@@ -124,14 +132,21 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   width: ${({ width }) => width}px;
   height: ${({ height }) => height}px;
 
+  /* 텍스트 드래그 제거 */
+  -ms-user-select: none;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+
   /* top-left */
   div:nth-of-type(1) {
     z-index: 12;
     position: absolute;
-    top: -4px;
-    left: -4px;
-    width: 12px;
-    height: 12px;
+    top: -6px;
+    left: -6px;
+    width: 1.1em;
+    height: 1.1em;
     background: ${({ theme }) => theme.color.primary};
     cursor: nwse-resize;
   }
@@ -140,10 +155,10 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   div:nth-of-type(2) {
     z-index: 12;
     position: absolute;
-    top: -4px;
-    right: -4px;
-    width: 12px;
-    height: 12px;
+    top: -6px;
+    right: -6px;
+    width: 1.1em;
+    height: 1.1em;
     background: ${({ theme }) => theme.color.primary};
     cursor: nesw-resize;
   }
@@ -152,10 +167,10 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   div:nth-of-type(3) {
     z-index: 12;
     position: absolute;
-    bottom: -4px;
-    left: -4px;
-    width: 12px;
-    height: 12px;
+    bottom: -6px;
+    left: -6px;
+    width: 1.1em;
+    height: 1.1em;
     background: ${({ theme }) => theme.color.primary};
     cursor: nesw-resize;
   }
@@ -164,10 +179,10 @@ const ThirdContentCropperWrapper = styled.div<{ width: number; height: number }>
   div:nth-of-type(4) {
     z-index: 12;
     position: absolute;
-    bottom: -4px;
-    right: -4px;
-    width: 12px;
-    height: 12px;
+    bottom: -6px;
+    right: -6px;
+    width: 1.1em;
+    height: 1.1em;
     background: ${({ theme }) => theme.color.primary};
     cursor: nwse-resize;
   }
@@ -251,16 +266,18 @@ const ThirdStep = () => {
   const [selectFrameName, setSelectFrameName] = useState(selectedFrame[0]?.name);
   const [isMoving, setIsMoving] = useState(false);
 
-  const [ratio, setRatio] = useState(0);
+  const [ratio, setRatio] = useState({ wRatio: 0, hRatio: 0 });
   const [xDiff, setXDiff] = useState(0);
   const [yDiff, setYDiff] = useState(0);
+  const [topLeftXControl, setTopLeftXControl] = useState(0);
+
   const [cursorXDiff, setCursorXDiff] = useState(0);
   const [cursorYDiff, setCursorYDiff] = useState(0);
   const [isCalc, setIsCalc] = useState(false);
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
-  const [canvasWidth, setCanvasWidth] = useState(0);
-  const [canvasHeight, setCanvasHeight] = useState(0);
+  const [cropperWidth, setCropperWidth] = useState(0);
+  const [cropperHeight, setCropperHeight] = useState(0);
   const [resizeWidth, setResizeWidth] = useState(0);
   const [resizeHeight, setResizeHeight] = useState(0);
 
@@ -278,13 +295,16 @@ const ThirdStep = () => {
   }, [selectedInfo.originHeight]);
 
   const imgElements = useMemo(() => {
-    const res = new Map();
+    let res: { [key: string]: HTMLImageElement } = {};
 
     for (const info of selectedFrame) {
       const img = new Image();
-      img.src = info.imgUrl || '';
       img.crossOrigin = 'Anonymous';
-      res.set(info.name, img);
+      img.addEventListener('load', () => {
+        setIsLoaded(true);
+      });
+      img.src = info.imgUrl || '';
+      res = { ...res, [info.name]: img };
     }
     return res;
   }, [selectedFrame]);
@@ -310,7 +330,8 @@ const ThirdStep = () => {
 
         let w = 0;
         let h = 0;
-
+        const initialSize = frameInfoList.filter((lst) => lst.name === selectFrameName)[0].size;
+        const ratio = initialSize.height / initialSize.width;
         if (!originWidth && !originHeight) {
           if (isSquare) {
             // 너비가 높이보다 크면 높이에 맞춰 렌더링
@@ -347,29 +368,25 @@ const ThirdStep = () => {
               h = ratioH;
             }
           }
-          dispatch(setOriginSize({ originWidth: w, originHeight: h }));
-          dispatch(setFrameSize({ resizeWidth: w, resizeHeight: h }));
+          if (w && h) {
+            dispatch(setFrameSize({ resizeWidth: w > imgW ? imgW : w, resizeHeight: w > imgW ? imgW * ratio : h }));
+            dispatch(setOriginSize({ originWidth: w > imgW ? imgW : w, originHeight: w > imgW ? imgW * ratio : h }));
+          }
         }
 
         const scaleX = naturalWidth / imgW;
         const scaleY = naturalHeight / imgH;
 
-        const initialSize = frameInfoList.filter((lst) => lst.name === selectFrameName)[0].size;
-        const ratio = initialSize.height / initialSize.width;
-
         const crop = { x: info.x || 0, y: info.y || 0 };
 
         const canvasW = originWidth ? selectedInfo.size.width : w;
         const canvasH = originHeight ? selectedInfo.size.height : h;
-        // dispatch(setFrameSize({ resizeWidth: canvasW, resizeHeight: canvasH }));
 
         // 프리뷰
         const previewW = canvasW > imgW ? imgW : canvasW;
-        const previewH = canvasW > imgW ? imgW / ratio : canvasH;
-
+        const previewH = canvasW > imgW ? imgW * ratio : canvasH;
         previewCanvas.width = previewW * scaleX;
         previewCanvas.height = previewH * scaleY;
-
         pCtx.clearRect(0, 0, previewW * scaleX, previewH * scaleY);
         pCtx.imageSmoothingQuality = 'high';
         pCtx.drawImage(
@@ -391,8 +408,8 @@ const ThirdStep = () => {
           const preCtx = preview.getContext('2d');
           if (!preCtx) return;
 
-          const pW = info.isRotate ? initialSize.height / 1.2 : initialSize.width / 1.2;
-          const pH = info.isRotate ? initialSize.width / 1.2 : initialSize.height / 1.2;
+          const pW = initialSize.width / 1.2;
+          const pH = initialSize.height / 1.2;
           preview.width = pW;
           preview.height = pH;
           preCtx.clearRect(0, 0, pW, pH);
@@ -475,23 +492,41 @@ const ThirdStep = () => {
       const canvasW = originWidth ? selectedInfo.size.width : w;
       const canvasH = originHeight ? selectedInfo.size.height : h;
       const ratio = initialSize.height / initialSize.width;
+      setCropperWidth(canvasW > imgW ? imgW : canvasW);
+      setCropperHeight(canvasW > imgW ? imgW * ratio : canvasH);
 
-      setCanvasWidth(canvasW > imgW ? imgW : canvasW);
-      setCanvasHeight(canvasW > imgW ? imgW / ratio : canvasH);
+      // 처음 그릴때 cropper의 너비 높이를 저장합니다. resize 시 사용됩니다.
+
+      if (isCropperDrawing) {
+        dispatch(
+          setFrameSize({
+            resizeWidth: canvasW > imgW ? imgW : canvasW,
+            resizeHeight: canvasW > imgW ? imgW * ratio : canvasH,
+          }),
+        );
+        dispatch(
+          setOriginSize({
+            originWidth: canvasW > imgW ? imgW : canvasW,
+            originHeight: canvasW > imgW ? imgW * ratio : canvasH,
+          }),
+        );
+      }
 
       const crop = { x: selectedInfo.x || 0, y: selectedInfo.y || 0 };
       cropperWrapper.style.top = `${crop.y}px`;
       cropperWrapper.style.left = `${crop.x}px`;
 
       canvas.width = canvasW > imgW ? imgW : canvasW;
-      canvas.height = canvasW > imgW ? imgW / ratio : canvasH;
+      canvas.height = canvasW > imgW ? imgW * ratio : canvasH;
 
       ctx.clearRect(0, 0, imgW, imgH);
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, crop.x * scaleX, crop.y * scaleY, imgW * scaleX, imgH * scaleY, 0, 0, imgW, imgH);
     },
     [
+      dispatch,
       frameInfoList,
+      isCropperDrawing,
       originHeight,
       originWidth,
       selectFrameName,
@@ -548,53 +583,50 @@ const ThirdStep = () => {
     setIsResizeMode(false);
     setCmd(null);
     setIsCalc(false);
-    dispatch(setOriginSize({ originWidth: resizeWidth, originHeight: resizeHeight }));
-    dispatch(setFrameSize({ resizeWidth, resizeHeight }));
     setIsCropperDrawing(true);
-  }, [dispatch, resizeWidth, resizeHeight]);
+  }, []);
 
   const handleResize = useCallback(
     (e) => {
       if (!isResizeMode) return;
       if (cropperWrapperRef.current) {
-        e.preventDefault();
         const [cursorX, cursorY] = getPosition(e);
         if (cursorX && cursorY && cmd) {
           const imgCanvas = imgCanvasRef.current;
           if (imgCanvas) {
-            const {
-              left: imgPaddingLeft,
-              // top: imgPaddingTop,
-              right: imgPaddingRight,
-            } = imgCanvas.getBoundingClientRect();
+            const { left: imgPaddingLeft, top: imgPaddingTop } = imgCanvas.getBoundingClientRect();
             const cropperWrapper = cropperWrapperRef.current;
-            const { right: cropperPaddingRight } = cropperWrapper.getBoundingClientRect();
 
             const cursorXInImage = cursorX - imgPaddingLeft;
-            // const cursorYInImage = cursorY - imgPaddingTop;
-            const cropperRight = imgPaddingRight - cropperPaddingRight;
+            const cursorYInImage = cursorY - imgPaddingTop;
+            // const cropperRight = imgPaddingRight - cropperPaddingRight;
 
             if (isCalc) {
+              const hRatio = originHeight / originWidth;
+              const x = cursorYInImage / hRatio;
               setCursorXDiff(replacePx(cropperWrapper.style.left));
               setCursorYDiff(replacePx(cropperWrapper.style.top));
+              setTopLeftXControl(x - replacePx(cropperWrapper.style.left));
               setIsCalc(false);
             }
 
             if (!isCalc) {
-              // top-left에서 움직일시 크기
+              const { wRatio, hRatio } = ratio;
               const cursorX = cursorXInImage - cursorXDiff;
-              // const cursorY = cursorYInImage - cursorYDiff;
+              const cursorY = cursorYInImage - cursorYDiff;
+              // top-left에서 움직일시 크기
               if (cmd === 'top-left') {
-                const resizeByTopLeft = originWidth - cursorX;
-                if (resizeByTopLeft + cropperRight > imgWidth) return;
-                const resizeByBottomLeft = resizeByTopLeft * ratio;
-                if (resizeByBottomLeft + cursorYDiff > imgHeight) return;
-                // const resizeByBottomLeft = originHeight - cursorY;
+                const resizeByBottomLeft = originHeight - cursorY;
+                const resizeByTopLeft = resizeByBottomLeft * wRatio;
+                if (resizeByBottomLeft > imgHeight || cursorYInImage < 0) return;
+                // if (cursorYInImage / hRatio - topLeftXControl < 0) return;
+                if (resizeByTopLeft > imgWidth) return;
+                if (resizeByTopLeft < CROPPER_LIMIT_SIZE || resizeByTopLeft < CROPPER_LIMIT_SIZE) return;
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
-                    x: cursorXInImage,
-                    y: cursorYDiff,
+                    x: cursorYInImage / hRatio - topLeftXControl,
+                    y: cursorYInImage,
                     width: resizeByTopLeft,
                     height: resizeByBottomLeft,
                   }),
@@ -605,18 +637,16 @@ const ThirdStep = () => {
 
               // top-right에서 움직일시 크기
               if (cmd === 'top-right') {
-                const resizeByTopRight = cursorX;
+                const resizeByBottomRight = originHeight - cursorY;
+                const resizeByTopRight = resizeByBottomRight * wRatio;
+                if (cursorYInImage < 0) return;
                 if (resizeByTopRight + cursorXDiff > imgWidth) return;
-                const resizeByBottomRight = resizeByTopRight * ratio;
-                if (resizeByBottomRight + cursorYDiff > imgHeight) return;
-
-                // const resizeByBottomRight = originHeight - cursorY;
-
+                if (resizeByBottomRight < CROPPER_LIMIT_SIZE || resizeByTopRight < CROPPER_LIMIT_SIZE) return;
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
                     x: cursorXDiff,
-                    y: cursorYDiff,
+                    y: cursorYInImage,
                     width: resizeByTopRight,
                     height: resizeByBottomRight,
                   }),
@@ -628,11 +658,13 @@ const ThirdStep = () => {
               // bottom-left에서 움직일시 크기
               if (cmd === 'bottom-left') {
                 const resizeByBottomLeft = originWidth - cursorX;
-                if (resizeByBottomLeft + cropperRight > imgWidth) return;
-                const resizeByTopLeft = resizeByBottomLeft * ratio;
-                if (resizeByTopLeft + cursorYDiff > imgHeight) return;
-                // const resizeByTopLeft = cursorY;
+                const resizeByTopLeft = resizeByBottomLeft * hRatio;
 
+                if (resizeByBottomLeft > imgWidth && cursorXInImage < 0) return;
+                if (cursorXInImage > imgWidth) return;
+                if (resizeByTopLeft + cursorYDiff > imgHeight) return;
+                if (resizeByTopLeft < CROPPER_LIMIT_SIZE || resizeByBottomLeft < CROPPER_LIMIT_SIZE) return;
+                // const resizeByTopLeft = cursorY;
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
@@ -649,11 +681,10 @@ const ThirdStep = () => {
               // bottom-right에서 움직일시 크기
               if (cmd === 'bottom-right') {
                 const resizeByTopRight = cursorX;
-                if (resizeByTopRight + cursorXDiff > imgWidth) return;
-                const resizeByBottomRight = resizeByTopRight * ratio;
+                const resizeByBottomRight = resizeByTopRight * hRatio;
+                if (cursorXInImage > imgWidth || cursorXInImage < 0) return;
                 if (resizeByBottomRight + cursorYDiff > imgHeight) return;
-                // const resizeByBottomRight = cursorY;
-
+                if (resizeByBottomRight < CROPPER_LIMIT_SIZE || resizeByTopRight < CROPPER_LIMIT_SIZE) return;
                 dispatch(
                   updatePositionByFrame({
                     name: selectedInfo.name,
@@ -677,14 +708,16 @@ const ThirdStep = () => {
       isResizeMode,
       cmd,
       isCalc,
-      cursorXDiff,
+      originHeight,
       originWidth,
-      imgWidth,
-      ratio,
+      cursorXDiff,
       cursorYDiff,
       imgHeight,
+      imgWidth,
       dispatch,
       selectedInfo.name,
+      topLeftXControl,
+      ratio,
     ],
   );
 
@@ -700,7 +733,6 @@ const ThirdStep = () => {
   const handleMovingCropper = useCallback(
     (e) => {
       const [cursorX, cursorY] = getPosition(e);
-
       const cropperWrapper = cropperWrapperRef.current;
       const imgCanvas = imgCanvasRef.current;
       if (!cropperWrapper || !imgCanvas) return;
@@ -718,11 +750,10 @@ const ThirdStep = () => {
         const positionY = y - yDiff;
         const left = (window.innerWidth - width) / 2;
         const top = (window.innerHeight - height) / 2;
-        const cropperLeft = (window.innerWidth - canvasWidth) / 2;
-        const cropperTop = (window.innerHeight - canvasHeight) / 2;
+        const cropperLeft = (window.innerWidth - cropperWidth) / 2;
+        const cropperTop = (window.innerHeight - cropperHeight) / 2;
         const cropX = cropperLeft - left;
         const cropY = cropperTop - top;
-
         const positionLeft = positionX >= 0 ? (positionX >= cropX * 2 ? cropX * 2 : positionX) : 0;
         const positionTop = positionY >= 0 ? (positionY >= cropY * 2 ? cropY * 2 : positionY) : 0;
 
@@ -735,7 +766,7 @@ const ThirdStep = () => {
         );
       }
     },
-    [isCalc, xDiff, yDiff, canvasWidth, canvasHeight, dispatch, selectFrameName],
+    [isCalc, xDiff, yDiff, cropperWidth, cropperHeight, dispatch, selectFrameName],
   );
 
   const handleActiveCropper = useCallback(() => {
@@ -782,14 +813,15 @@ const ThirdStep = () => {
   }, [selectedInfo.bgColor]);
 
   useEffect(() => {
-    setRatio(originHeight / originWidth);
+    setRatio({ wRatio: originWidth / originHeight, hRatio: originHeight / originWidth });
   }, [originWidth, originHeight]);
 
   useEffect(() => {
     if (isCropperDrawing) {
-      const img: HTMLImageElement = imgElements.get(selectFrameName);
+      const img: HTMLImageElement = imgElements[selectFrameName];
       drawingCropper(img);
       createSaveCanvas();
+
       setIsCropperDrawing(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -797,7 +829,8 @@ const ThirdStep = () => {
 
   // 사이즈 확대/축소시 및 움직일때 크로퍼 반영
   useEffect(() => {
-    const img: HTMLImageElement = imgElements.get(selectFrameName);
+    const img: HTMLImageElement = imgElements[selectFrameName];
+
     drawingCropper(img);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resizeWidth, resizeHeight, selectedInfo.x, selectedInfo.y]);
@@ -805,7 +838,8 @@ const ThirdStep = () => {
   // 로드 true에 따라 이미지와 크로퍼 생성
   useEffect(() => {
     if (!isLoaded) return;
-    const img: HTMLImageElement = imgElements.get(selectFrameName);
+    const img: HTMLImageElement = imgElements[selectFrameName];
+
     const imgCanvas = imgCanvasRef.current;
     if (!imgCanvas) return;
     createImgCanvas(imgCanvas, img);
@@ -814,22 +848,47 @@ const ThirdStep = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded]);
 
-  // 그리기 위한 이미지가 로드 되면 true로
   useEffect(() => {
-    const img: HTMLImageElement = imgElements.get(selectFrameName);
+    if (!isMoving && !isResizeMode) return;
+    const body = document.querySelector('main') as HTMLElement;
+    const scrollPosition = window.scrollY;
+    if (isIOS) {
+      const cropper = document.querySelector('.cropper') as HTMLElement;
 
-    if (!isLoaded) {
-      img.onload = () => {
-        setIsLoaded(true);
-      };
+      if (cropper) {
+        cropper.style.pointerEvents = 'auto';
+      }
+      body.style.overflow = 'hidden';
+      body.style.pointerEvents = 'none';
+      body.style.position = 'fixed';
+      body.style.top = `-${scrollPosition}px`;
+      body.style.left = '0';
+      body.style.right = '0';
+    } else {
+      disableBodyScroll(body);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectFrameName]);
+
+    return () => {
+      if (isIOS) {
+        body.style.removeProperty('overflow');
+        body.style.removeProperty('pointer-events');
+        body.style.removeProperty('position');
+        body.style.removeProperty('top');
+        body.style.removeProperty('left');
+        body.style.removeProperty('right');
+        window.scrollTo(0, scrollPosition);
+      } else {
+        enableBodyScroll(body);
+      }
+    };
+  }, [isMoving, isResizeMode]);
 
   useEffect(() => {
+    dispatch(updatePositionByFrame({ name: selectFrameName, x: 0, y: 0 }));
     return () => {
       setIsLoaded(false);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!isLoaded) {
@@ -842,15 +901,17 @@ const ThirdStep = () => {
 
   return (
     <Container
+      className="cropper"
       cmd={cmd}
-      onMouseMove={isResizeMode ? handleResize : undefined}
+      onTouchMove={isResizeMode ? handleResize : undefined}
+      onTouchEnd={isResizeMode ? handleResizeEnd : undefined}
       onMouseUp={isResizeMode ? handleResizeEnd : undefined}
+      onMouseMove={isResizeMode ? handleResize : undefined}
       onMouseLeave={isResizeMode ? handleResizeEnd : undefined}
     >
       <ThirdBgChanger>
         <Button type="default" onClick={handleRotate} data-type={selectedInfo.type} data-id={selectedInfo.id}>
-          <span>액자 회전</span>
-          {/* <img src={icons.bgPaint} /> */}
+          <img src={icons.rotate} />
         </Button>
         <Popover
           style={{ padding: 0 }}
@@ -859,8 +920,7 @@ const ThirdStep = () => {
           content={<ToolColorPalette type="bg" onChange={handleColorChange} />}
         >
           <Button type="default">
-            <span>배경 변경</span>
-            {/* <img src={icons.bgPaint} /> */}
+            <img src={icons.bgPaint} />
           </Button>
         </Popover>
       </ThirdBgChanger>
@@ -886,40 +946,24 @@ const ThirdStep = () => {
       <ThirdContent>
         <ThirdContentDrawingCanvas width={imgWidth} height={imgHeight}>
           <canvas ref={imgCanvasRef} />
-          <ThirdContentCropperWrapper width={canvasWidth} height={canvasHeight} ref={cropperWrapperRef}>
+          <ThirdContentCropperWrapper width={cropperWidth} height={cropperHeight} ref={cropperWrapperRef}>
             <ThirdContentCropper
               cmd={cmd}
               ref={cropperRef}
               data-url={selectedInfo.imgUrl || ''}
-              onTouchStart={isMobile ? handleMovingCropper : undefined}
-              onTouchEnd={isMobile ? handleActiveCropper : undefined}
-              onTouchMove={isMobile ? handleCancelMoveCropper : undefined}
+              onTouchStart={handleActiveCropper}
+              onTouchEnd={handleCancelMoveCropper}
+              onTouchMove={handleMovingCropper}
               onMouseMove={isMoving ? handleMovingCropper : undefined}
               onMouseDown={!isResizeMode ? handleActiveCropper : undefined}
               onMouseUp={isMoving ? handleCancelMoveCropper : undefined}
               onMouseLeave={isMoving ? handleCancelMoveCropper : undefined}
             />
 
-            <div
-              data-cmd="top-left"
-              onMouseDown={handleResizeStart}
-              onTouchStart={isMobile ? handleResizeStart : undefined}
-            />
-            <div
-              data-cmd="top-right"
-              onMouseDown={handleResizeStart}
-              onTouchStart={isMobile ? handleResizeStart : undefined}
-            />
-            <div
-              data-cmd="bottom-left"
-              onMouseDown={handleResizeStart}
-              onTouchStart={isMobile ? handleResizeStart : undefined}
-            />
-            <div
-              data-cmd="bottom-right"
-              onMouseDown={handleResizeStart}
-              onTouchStart={isMobile ? handleResizeStart : undefined}
-            />
+            <div data-cmd="top-left" onMouseDown={handleResizeStart} onTouchStart={handleResizeStart} />
+            <div data-cmd="top-right" onMouseDown={handleResizeStart} onTouchStart={handleResizeStart} />
+            <div data-cmd="bottom-left" onMouseDown={handleResizeStart} onTouchStart={handleResizeStart} />
+            <div data-cmd="bottom-right" onMouseDown={handleResizeStart} onTouchStart={handleResizeStart} />
             <span></span>
             <span></span>
             <span></span>
