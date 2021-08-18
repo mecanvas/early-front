@@ -11,7 +11,7 @@ const Error404 = () => {
 
   useEffect(() => {
     if (count === 0) {
-      router.replace('/');
+      router.replace('/tool');
     }
   }, [count, router]);
 

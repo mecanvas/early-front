@@ -6,8 +6,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Loader from 'src/components/common/Loader';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import { postCanvasForSave } from 'src/store/api/canvas';
-import { resetCanvasState, setCanvasSaveScale } from 'src/store/reducers/canvas';
-import { resetFrameState } from 'src/store/reducers/frame';
+import { setCanvasSaveScale } from 'src/store/reducers/canvas';
 import { dataURLtoFile } from 'src/utils/dataUrlToFile';
 import FirstStep from './FirstStep';
 import FourthStep from './FourthStep';
@@ -251,14 +250,6 @@ const MobileSingleTool = () => {
       router.push('/success');
     }
   }, [isCanvasSaveDone]);
-
-  useEffect(() => {
-    return () => {
-      dispatch(resetCanvasState());
-      dispatch(resetFrameState());
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <Container>
