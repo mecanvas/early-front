@@ -92,6 +92,19 @@ export const frameSquare: FrameInfoList[] = [
   {
     id: 1,
     type: 1,
+    name: 'S-0호',
+    widthCm: 14,
+    heightCm: 14,
+    price: 10000,
+    size: {
+      width: cmToPx(14),
+      height: cmToPx(14),
+    },
+    recommand: false,
+  },
+  {
+    id: 2,
+    type: 1,
     name: 'S-1호',
     widthCm: 16,
     heightCm: 16,
@@ -103,7 +116,7 @@ export const frameSquare: FrameInfoList[] = [
     recommand: false,
   },
   {
-    id: 2,
+    id: 3,
     type: 1,
     name: 'S-2호',
     widthCm: 19,
@@ -116,7 +129,7 @@ export const frameSquare: FrameInfoList[] = [
     recommand: false,
   },
   {
-    id: 3,
+    id: 4,
     type: 1,
     name: 'S-4호',
     widthCm: 24,
