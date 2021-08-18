@@ -9,7 +9,7 @@ interface InitialState {
 
 const initialState: InitialState = {
   redirect: {
-    naver: '',
+    naver: 'products=5798217286',
     idus: '',
   },
 };

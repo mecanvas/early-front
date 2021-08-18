@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { Result, Tabs } from 'antd';
 import router from 'next/router';
 import { icons } from 'public/icons';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useMoveTab } from 'src/hooks/useMoveTab';
 import { useAppSelector } from 'src/hooks/useRedux';
 
@@ -20,7 +20,14 @@ const Container = styled.div`
 const Success = () => {
   const { canvasOrder, isCanvasSaveDone } = useAppSelector((state) => state.canvas);
   const { selectedFrame } = useAppSelector((state) => state.frame);
+  const { redirect } = useAppSelector((state) => state.redirects);
   const { defaultTab, setDefaultTab } = useMoveTab('1');
+
+  const url = useMemo(() => {
+    if (redirect.naver) {
+      return redirect.naver;
+    }
+  }, [redirect.naver]);
 
   const handleTabKey = (key: string) => {
     setDefaultTab(key);
@@ -54,6 +61,11 @@ const Success = () => {
           <ul>
             <li>
               <div>여기는 사진을 넣장</div>
+              {redirect.naver && url && (
+                <a target="_blank" href={`https://smartstore.naver.com/early21/${url.replace('=', '/')}`}>
+                  ㅎ하
+                </a>
+              )}
               <p>
                 스마트스토어로 돌아가 저장한 정보와 일치하도록 선택해 주세요.
                 <br />
