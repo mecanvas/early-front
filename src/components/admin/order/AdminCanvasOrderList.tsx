@@ -15,7 +15,7 @@ const { TabPane } = Tabs;
 
 const AdminOrderList = () => {
   const { pathname } = useRouter();
-  const [defaultTab, handleTabKey, setDefaultTab] = useMoveTab('order/divided');
+  const { defaultTab, handleTabKey, setDefaultTab } = useMoveTab('order/divided');
   const [columns, setColumns] = useState<ColumnsType<any>>([]);
   const { queryStringify } = useGetQueryString();
   const { data } = useSWR(`/${defaultTab}/?${queryStringify() || `page=1&per_page=10`}` || null, adminGetFetcher);
