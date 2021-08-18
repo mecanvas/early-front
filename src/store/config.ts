@@ -5,10 +5,12 @@ import frame from './reducers/frame';
 import image from './reducers/image';
 import canvas from './reducers/canvas';
 import progress from './reducers/progress';
+import redirects from './reducers/redirects';
 import user from './reducers/user';
 
 const reducer = combineReducers({
   frame,
+  redirects,
   image,
   canvas,
   progress,

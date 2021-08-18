@@ -1,12 +1,17 @@
 import { Tabs } from 'antd';
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useGetQueryString } from 'src/hooks/useGetQueryString';
 import { useOpacity } from 'src/hooks/useOpacity';
 import { useAppSelector } from 'src/hooks/useRedux';
+import { setRedirect } from 'src/store/reducers/redirects';
 import FirstFrameListByTab from './first/FirstFrameListByTab';
 import { TabTitle, FirstGuideText } from './first/FirstStyle';
 
 const FirstStep = () => {
   const { frameInfoList } = useAppSelector(({ frame }) => frame);
+  const { queryStringify } = useGetQueryString();
+  const dispatch = useDispatch();
   const [isOpacityOn, setIsOpacityOn] = useState(false);
   const { OpacityComponent } = useOpacity(isOpacityOn);
   const [defaultTab, setDefaultTab] = useState('0');
@@ -30,6 +35,13 @@ const FirstStep = () => {
       setIsOpacityOn(false);
     }
   }, [isOpacityOn]);
+
+  useEffect(() => {
+    const query = queryStringify();
+    if (!query) return;
+    dispatch(setRedirect({ name: 'naver', value: query }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryStringify]);
 
   return (
     <Tabs defaultActiveKey={defaultTab} onTabClick={handleTabClick} activeKey={defaultTab}>
