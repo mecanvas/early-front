@@ -37,7 +37,7 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
     name: 'F-0호',
     widthCm: 14,
     heightCm: 18,
-    price: 11000,
+    price: 6900,
     size: {
       width: cmToPx(14),
       height: cmToPx(18),
@@ -51,7 +51,7 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
     name: 'F-2호',
     widthCm: 18,
     heightCm: 25.8,
-    price: 16000,
+    price: 11800,
     size: {
       width: cmToPx(18),
       height: cmToPx(25.8),
@@ -65,7 +65,7 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
     name: 'F-4호',
     widthCm: 24,
     heightCm: 33.3,
-    price: 21000,
+    price: 15700,
     size: {
       width: cmToPx(24),
       height: cmToPx(33.3),
@@ -78,7 +78,7 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
     name: 'P-4호',
     widthCm: 21,
     heightCm: 33.3,
-    price: 18000,
+    price: 15700,
     size: {
       width: cmToPx(21),
       height: cmToPx(33.3),
@@ -95,7 +95,7 @@ export const frameSquare: FrameInfoList[] = [
     name: 'S-0호',
     widthCm: 14,
     heightCm: 14,
-    price: 10000,
+    price: 6900,
     size: {
       width: cmToPx(14),
       height: cmToPx(14),
@@ -108,7 +108,7 @@ export const frameSquare: FrameInfoList[] = [
     name: 'S-1호',
     widthCm: 16,
     heightCm: 16,
-    price: 10000,
+    price: 9800,
     size: {
       width: cmToPx(16),
       height: cmToPx(16),
@@ -121,7 +121,7 @@ export const frameSquare: FrameInfoList[] = [
     name: 'S-2호',
     widthCm: 19,
     heightCm: 19,
-    price: 12000,
+    price: 11800,
     size: {
       width: cmToPx(19),
       height: cmToPx(19),
@@ -134,7 +134,7 @@ export const frameSquare: FrameInfoList[] = [
     name: 'S-4호',
     widthCm: 24,
     heightCm: 24,
-    price: 15000,
+    price: 15700,
     size: {
       width: cmToPx(24),
       height: cmToPx(24),
