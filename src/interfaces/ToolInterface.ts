@@ -12,7 +12,7 @@ export type TutorialType = 'all' | 'frame' | 'preview' | 'order' | 'price' | 'ed
 
 export interface FrameAttributes {
   // 미대오빠 캔버스 참고
-  attribute: '정방' | '해경' | '인물' | '풍경';
+  attribute: '정방' | '인물' | '풍경';
 }
 
 export interface FrameSize extends FrameAttributes {

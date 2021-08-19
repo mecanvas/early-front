@@ -214,14 +214,4 @@ export const frameSize = (changeVertical?: boolean): FrameSize[] => [
     },
     price: 16700,
   },
-  {
-    name: 'M-4호',
-    attribute: '해경',
-    cm: !changeVertical ? '19cm X 33.3cm' : '33.3cm X 19cm',
-    size: {
-      width: `${cmToPx(!changeVertical ? 19 : 33.3)}px`,
-      height: `${cmToPx(!changeVertical ? 33.3 : 19)}px`,
-    },
-    price: 16700,
-  },
 ];

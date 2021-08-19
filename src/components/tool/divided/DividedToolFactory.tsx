@@ -24,10 +24,7 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
   const [resizeWidth, setResizeWidth] = useGlobalState<number>('resizeWidth');
   const [resizeHeight, setResizeHeight] = useGlobalState<number>('resizeHeight');
   const [isResizeMode] = useGlobalState<boolean>('isResizeMode');
-  const [frameAttribute, setFrameAttribute] = useGlobalState<'정방' | '해경' | '인물' | '풍경'>(
-    'frameAttribute',
-    '정방',
-  );
+  const [frameAttribute, setFrameAttribute] = useGlobalState<'정방' | '인물' | '풍경'>('frameAttribute', '정방');
   const [isGridGuideLine, setIsGridGuideLine] = useGlobalState<boolean>('isGridGuideLine');
   const [, setBgColor] = useGlobalState<string>('bgColor');
   const [imgUploadUrl, setImgUploadUrl] = useGlobalState<string>('imgUploadUrl');
@@ -143,13 +140,6 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
               value="인물"
             >
               인물
-            </Button>
-            <Button
-              type={frameAttribute === '해경' ? 'primary' : 'text'}
-              onClick={handleGetFrameAttribute}
-              value="해경"
-            >
-              해경
             </Button>
             <Button
               type={frameAttribute === '풍경' ? 'primary' : 'text'}
