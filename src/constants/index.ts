@@ -51,7 +51,7 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
     name: 'F-2호',
     widthCm: 18,
     heightCm: 25.8,
-    price: 11800,
+    price: 12800,
     size: {
       width: cmToPx(18),
       height: cmToPx(25.8),
@@ -65,7 +65,7 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
     name: 'F-4호',
     widthCm: 24,
     heightCm: 33.3,
-    price: 15700,
+    price: 16700,
     size: {
       width: cmToPx(24),
       height: cmToPx(33.3),
@@ -78,7 +78,7 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
     name: 'P-4호',
     widthCm: 21,
     heightCm: 33.3,
-    price: 15700,
+    price: 16700,
     size: {
       width: cmToPx(21),
       height: cmToPx(33.3),
@@ -108,7 +108,7 @@ export const frameSquare: FrameInfoList[] = [
     name: 'S-1호',
     widthCm: 16,
     heightCm: 16,
-    price: 9800,
+    price: 10800,
     size: {
       width: cmToPx(16),
       height: cmToPx(16),
@@ -121,7 +121,7 @@ export const frameSquare: FrameInfoList[] = [
     name: 'S-2호',
     widthCm: 19,
     heightCm: 19,
-    price: 11800,
+    price: 12800,
     size: {
       width: cmToPx(19),
       height: cmToPx(19),
@@ -134,7 +134,7 @@ export const frameSquare: FrameInfoList[] = [
     name: 'S-4호',
     widthCm: 24,
     heightCm: 24,
-    price: 15700,
+    price: 16700,
     size: {
       width: cmToPx(24),
       height: cmToPx(24),
@@ -152,7 +152,7 @@ export const frameSize = (changeVertical?: boolean): FrameSize[] => [
       width: `${cmToPx(16)}px`,
       height: `${cmToPx(16)}px`,
     },
-    price: 55000,
+    price: 10800,
   },
   {
     name: 'S-2호',
@@ -162,7 +162,7 @@ export const frameSize = (changeVertical?: boolean): FrameSize[] => [
       width: `${cmToPx(19)}px`,
       height: `${cmToPx(19)}px`,
     },
-    price: 40000,
+    price: 12800,
   },
   {
     name: 'S-4호',
@@ -172,7 +172,7 @@ export const frameSize = (changeVertical?: boolean): FrameSize[] => [
       width: `${cmToPx(24)}px`,
       height: `${cmToPx(24)}px`,
     },
-    price: 30000,
+    price: 16700,
   },
   {
     name: 'P-2호',
@@ -182,7 +182,7 @@ export const frameSize = (changeVertical?: boolean): FrameSize[] => [
       width: `${cmToPx(!changeVertical ? 16 : 25.8)}px`,
       height: `${cmToPx(!changeVertical ? 25.8 : 16)}px`,
     },
-    price: 30000,
+    price: 12800,
   },
   {
     name: 'P-4호',
@@ -192,7 +192,7 @@ export const frameSize = (changeVertical?: boolean): FrameSize[] => [
       width: `${cmToPx(!changeVertical ? 21.2 : 33.3)}px`,
       height: `${cmToPx(!changeVertical ? 33.3 : 21.2)}px`,
     },
-    price: 30000,
+    price: 16700,
   },
   {
     name: 'F-2호',
@@ -202,7 +202,7 @@ export const frameSize = (changeVertical?: boolean): FrameSize[] => [
       width: `${cmToPx(!changeVertical ? 18 : 25.8)}px`,
       height: `${cmToPx(!changeVertical ? 25.8 : 18)}px`,
     },
-    price: 40000,
+    price: 12800,
   },
   {
     name: 'F-4호',
@@ -212,7 +212,7 @@ export const frameSize = (changeVertical?: boolean): FrameSize[] => [
       width: `${cmToPx(!changeVertical ? 24 : 33.3)}px`,
       height: `${cmToPx(!changeVertical ? 33.3 : 24)}px`,
     },
-    price: 40000,
+    price: 16700,
   },
   {
     name: 'M-4호',
@@ -222,6 +222,6 @@ export const frameSize = (changeVertical?: boolean): FrameSize[] => [
       width: `${cmToPx(!changeVertical ? 19 : 33.3)}px`,
       height: `${cmToPx(!changeVertical ? 33.3 : 19)}px`,
     },
-    price: 30000,
+    price: 16700,
   },
 ];

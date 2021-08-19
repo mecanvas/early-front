@@ -73,45 +73,45 @@ const SelectedSingle = styled.div`
   }
 `;
 
-const SelectedDivided = styled.div`
-  cursor: pointer;
-  border-radius: 8px;
-  width: 300px;
-  border: 1px solid ${({ theme }) => theme.color.gray300};
-  display: flex;
-  flex-direction: column;
-  margin-left: 3em;
-  text-align: center;
-  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
-    margin-bottom: 2em;
-    margin-left: 0;
-  }
-  div:nth-of-type(1) {
-    background-color: ${({ theme }) => theme.color.white};
-    height: 350px;
-    border-radius: 8px;
-    padding: 0.3em 0.3em;
-    img {
-      background-color: ${({ theme }) => theme.color.gray100};
-      object-fit: contain;
-      width: 100%;
-      padding: 0.7em 0.3em;
-      height: 100%;
-    }
-  }
-  p {
-    background-color: ${({ theme }) => theme.color.white};
-    font-weight: 500;
-    margin: 0;
-    padding: 1em 0;
-    border-radius: 8px;
-  }
+// const SelectedDivided = styled.div`
+//   cursor: pointer;
+//   border-radius: 8px;
+//   width: 300px;
+//   border: 1px solid ${({ theme }) => theme.color.gray300};
+//   display: flex;
+//   flex-direction: column;
+//   margin-left: 3em;
+//   text-align: center;
+//   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+//     margin-bottom: 2em;
+//     margin-left: 0;
+//   }
+//   div:nth-of-type(1) {
+//     background-color: ${({ theme }) => theme.color.white};
+//     height: 350px;
+//     border-radius: 8px;
+//     padding: 0.3em 0.3em;
+//     img {
+//       background-color: ${({ theme }) => theme.color.gray100};
+//       object-fit: contain;
+//       width: 100%;
+//       padding: 0.7em 0.3em;
+//       height: 100%;
+//     }
+//   }
+//   p {
+//     background-color: ${({ theme }) => theme.color.white};
+//     font-weight: 500;
+//     margin: 0;
+//     padding: 1em 0;
+//     border-radius: 8px;
+//   }
 
-  &:hover {
-    opacity: 0.8;
-    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-  }
-`;
+//   &:hover {
+//     opacity: 0.8;
+//     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+//   }
+// `;
 
 const Index = () => {
   const { OpacityComponent } = useOpacity('trigger');
@@ -130,14 +130,14 @@ const Index = () => {
             </SelectedSingle>
           </Link>
 
-          <Link href="/tool/divided">
+          {/* <Link href="/tool/divided">
             <SelectedDivided>
               <div>
                 <img src={Images.div} />
               </div>
               <p>하나의 사진으로 여러개의 캔버스</p>
             </SelectedDivided>
-          </Link>
+          </Link> */}
         </SelectedWrapper>
       </OpacityComponent>
     </Container>
