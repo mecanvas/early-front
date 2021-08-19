@@ -35,6 +35,16 @@ const Tool = () => {
   const frameSize = useMemo<FrameSize[]>(
     () => [
       {
+        name: 'S-0호',
+        attribute: '정방',
+        cm: '14cm X 14cm',
+        size: {
+          width: `${cmToPx(14)}px`,
+          height: `${cmToPx(14)}px`,
+        },
+        price: 10800,
+      },
+      {
         name: 'S-1호',
         attribute: '정방',
         cm: '16cm X 16cm',
@@ -42,7 +52,7 @@ const Tool = () => {
           width: `${cmToPx(16)}px`,
           height: `${cmToPx(16)}px`,
         },
-        price: 55000,
+        price: 10800,
       },
       {
         name: 'S-2호',
@@ -52,7 +62,7 @@ const Tool = () => {
           width: `${cmToPx(19)}px`,
           height: `${cmToPx(19)}px`,
         },
-        price: 40000,
+        price: 12800,
       },
       {
         name: 'S-4호',
@@ -62,27 +72,27 @@ const Tool = () => {
           width: `${cmToPx(24)}px`,
           height: `${cmToPx(24)}px`,
         },
-        price: 30000,
+        price: 16700,
       },
       {
-        name: 'P-2호',
+        name: 'P-4호',
         attribute: '풍경',
         cm: !changeVertical ? '16cm X 25.8cm' : '25.8cm X 16cm',
         size: {
           width: `${cmToPx(!changeVertical ? 16 : 25.8)}px`,
           height: `${cmToPx(!changeVertical ? 25.8 : 16)}px`,
         },
-        price: 30000,
+        price: 16700,
       },
       {
-        name: 'P-4호',
-        attribute: '풍경',
-        cm: !changeVertical ? '21.2cm X 33.3cm' : '33.3cm X 21.2cm',
+        name: 'F-0호',
+        attribute: '인물',
+        cm: !changeVertical ? '14cm X 18cm' : '18cm X 14cm',
         size: {
-          width: `${cmToPx(!changeVertical ? 21.2 : 33.3)}px`,
-          height: `${cmToPx(!changeVertical ? 33.3 : 21.2)}px`,
+          width: `${cmToPx(!changeVertical ? 14 : 18)}px`,
+          height: `${cmToPx(!changeVertical ? 18 : 14)}px`,
         },
-        price: 30000,
+        price: 6900,
       },
       {
         name: 'F-2호',
@@ -92,7 +102,7 @@ const Tool = () => {
           width: `${cmToPx(!changeVertical ? 18 : 25.8)}px`,
           height: `${cmToPx(!changeVertical ? 25.8 : 18)}px`,
         },
-        price: 40000,
+        price: 12800,
       },
       {
         name: 'F-4호',
@@ -102,17 +112,7 @@ const Tool = () => {
           width: `${cmToPx(!changeVertical ? 24 : 33.3)}px`,
           height: `${cmToPx(!changeVertical ? 33.3 : 24)}px`,
         },
-        price: 40000,
-      },
-      {
-        name: 'M-4호',
-        attribute: '해경',
-        cm: !changeVertical ? '19cm X 33.3cm' : '33.3cm X 19cm',
-        size: {
-          width: `${cmToPx(!changeVertical ? 19 : 33.3)}px`,
-          height: `${cmToPx(!changeVertical ? 33.3 : 19)}px`,
-        },
-        price: 30000,
+        price: 16700,
       },
     ],
     [changeVertical],
@@ -157,7 +157,7 @@ const Tool = () => {
   const [gridHeight, setGridHeight] = useState(0);
 
   // 액자 사이즈들 변경
-  const [frameAttribute] = useGlobalState<'정방' | '해경' | '인물' | '풍경'>('frameAttribute', '정방');
+  const [frameAttribute] = useGlobalState<'정방' | '인물' | '풍경'>('frameAttribute', '정방');
 
   // 가운데 근접 컨트롤
   const [, setCenterX] = useGlobalState<number>('centerX', 0);

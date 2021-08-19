@@ -612,13 +612,6 @@ const SingleTool = () => {
                 인물
               </Button>
               <Button
-                type={frameAttributes === '해경' ? 'primary' : 'text'}
-                onClick={handleGetFrameAttribute}
-                value="해경"
-              >
-                해경
-              </Button>
-              <Button
                 type={frameAttributes === '풍경' ? 'primary' : 'text'}
                 onClick={handleGetFrameAttribute}
                 value="풍경"
