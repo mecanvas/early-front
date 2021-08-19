@@ -261,6 +261,7 @@ export const ImageWrapper = styled.div<{
       cursor: nesw-resize;
     `;
   }}
+  
   img {
     @media all and (max-width: ${({ theme }) => theme.size.sm}) {
       max-width: 96vw;
@@ -272,14 +273,14 @@ export const ImageWrapper = styled.div<{
     z-index: 1;
     filter: ${({ theme }) => theme.canvasShadowFilter};
     filter: none; /* IE 6-9 */
-    -webkit-filter: ${({ theme }) => theme.canvasShadowFilter}
+    -webkit-filter: ${({ theme }) => theme.canvasShadowFilter};
     ${({ isPreview }) =>
       isPreview &&
       css`
         img {
           box-shadow: none !important;
         }
-      `}
+      `};
 
     &:hover .cropped-img-delete {
       ${({ isPreview }) =>
@@ -292,6 +293,7 @@ export const ImageWrapper = styled.div<{
             `}
     }
   }
+
   .cropped-img-delete {
     display: none;
     cursor: pointer;
