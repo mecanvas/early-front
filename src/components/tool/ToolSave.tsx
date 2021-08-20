@@ -140,7 +140,7 @@ const ToolSave = ({ yourPriceList, totalPrice }: Props) => {
 
   useEffect(() => {
     if (isDone) {
-      router.push('/success');
+      router.push('/success?divided=true');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDone]);

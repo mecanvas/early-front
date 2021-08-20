@@ -29,17 +29,15 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
   const [, setBgColor] = useGlobalState<string>('bgColor');
   const [imgUploadUrl, setImgUploadUrl] = useGlobalState<string>('imgUploadUrl');
   const [, setImgUploadLoading] = useGlobalState<boolean>('imgUploadLoading');
-  const [selectedFrameList, setSelectedFrameList] = useGlobalState<HTMLCanvasElement[]>('selectedFrameList');
   const [framePrice, setFramePrice] = useGlobalState<FramePrice[]>('framePrice');
 
   const { getProgressGage } = useProgress();
 
   const handleImgGoBack = useCallback(() => {
-    if (!croppedList?.length || !framePrice?.length || !selectedFrameList?.length) return;
+    if (!croppedList?.length || !framePrice?.length) return;
     setCroppedList(croppedList.slice(0, -1));
     setFramePrice(framePrice.slice(0, -1));
-    setSelectedFrameList(selectedFrameList.slice(0, -1));
-  }, [croppedList, framePrice, selectedFrameList, setCroppedList, setFramePrice, setSelectedFrameList]);
+  }, [croppedList, framePrice, setCroppedList, setFramePrice]);
 
   // 이미지 업로드
   const handleImgReUpload = useCallback(
@@ -103,7 +101,7 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
             </Button>
           </Upload>
           {isResizeMode && resizeWidth && resizeHeight && <ToolImageResizerModal />}
-          <Button type="text" style={{ opacity: selectedFrameList?.length ? 1 : 0.4 }} onClick={handleImgGoBack}>
+          <Button type="text" style={{ opacity: croppedList?.length ? 1 : 0.4 }} onClick={handleImgGoBack}>
             <img src={icons.undo} />
           </Button>
           <Popover
