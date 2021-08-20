@@ -47,40 +47,40 @@ const Tool = () => {
       {
         name: 'S-1호',
         attribute: '정방',
-        cm: '16cm X 16cm',
+        cm: '15.8cm X 15.8cm',
         size: {
-          width: `${cmToPx(16)}px`,
-          height: `${cmToPx(16)}px`,
+          width: `${cmToPx(15.8)}px`,
+          height: `${cmToPx(15.8)}px`,
         },
         price: 10800,
       },
       {
         name: 'S-2호',
         attribute: '정방',
-        cm: '19cm X 19cm',
+        cm: '17.9cm X 17.9cm',
         size: {
-          width: `${cmToPx(19)}px`,
-          height: `${cmToPx(19)}px`,
+          width: `${cmToPx(17.9)}px`,
+          height: `${cmToPx(17.9)}px`,
         },
         price: 12800,
       },
       {
         name: 'S-4호',
         attribute: '정방',
-        cm: '24cm X 24cm',
+        cm: '24.2cm X 24.2cm',
         size: {
-          width: `${cmToPx(24)}px`,
-          height: `${cmToPx(24)}px`,
+          width: `${cmToPx(24.2)}px`,
+          height: `${cmToPx(24.2)}px`,
         },
         price: 16700,
       },
       {
         name: 'P-4호',
         attribute: '풍경',
-        cm: !changeVertical ? '16cm X 25.8cm' : '25.8cm X 16cm',
+        cm: !changeVertical ? '21.2cm X 33.4cm' : '33.4cm X 21.2cm',
         size: {
-          width: `${cmToPx(!changeVertical ? 16 : 25.8)}px`,
-          height: `${cmToPx(!changeVertical ? 25.8 : 16)}px`,
+          width: `${cmToPx(!changeVertical ? 21.2 : 33.4)}px`,
+          height: `${cmToPx(!changeVertical ? 33.4 : 21.2)}px`,
         },
         price: 16700,
       },
@@ -97,20 +97,20 @@ const Tool = () => {
       {
         name: 'F-2호',
         attribute: '인물',
-        cm: !changeVertical ? '18cm X 25.8cm' : '25.8cm X 18cm',
+        cm: !changeVertical ? '17.9cm X 25.8cm' : '25.8cm X 17.9cm',
         size: {
-          width: `${cmToPx(!changeVertical ? 18 : 25.8)}px`,
-          height: `${cmToPx(!changeVertical ? 25.8 : 18)}px`,
+          width: `${cmToPx(!changeVertical ? 17.9 : 25.8)}px`,
+          height: `${cmToPx(!changeVertical ? 25.8 : 17.9)}px`,
         },
         price: 12800,
       },
       {
         name: 'F-4호',
         attribute: '인물',
-        cm: !changeVertical ? '24cm X 33.3cm' : '33.3cm X 24cm',
+        cm: !changeVertical ? '24.2cm X 33.4cm' : '33.4cm X 24.2cm',
         size: {
-          width: `${cmToPx(!changeVertical ? 24 : 33.3)}px`,
-          height: `${cmToPx(!changeVertical ? 33.3 : 24)}px`,
+          width: `${cmToPx(!changeVertical ? 24.2 : 33.4)}px`,
+          height: `${cmToPx(!changeVertical ? 33.4 : 24.2)}px`,
         },
         price: 16700,
       },
@@ -700,7 +700,6 @@ const Tool = () => {
     }
     return () => {
       setIsPreview(false);
-      setFramePrice([]);
       setSelectedFrameList([]);
       setBgColor(theme.color.gray100);
       setImgUploadUrl('');

@@ -1,77 +1,77 @@
 import { Divider } from 'antd';
 import React, { useMemo } from 'react';
 import { S3_URL } from 'src/constants';
-import { useAppSelector } from 'src/hooks/useRedux';
-import { DescContent, ImgLinker, DescOrderInformation, DescOrder } from './Success';
+import { useGlobalState } from 'src/hooks';
+import { FramePrice } from 'src/interfaces/ToolInterface';
+import AppTable from '../antd/AppTable';
+import { DescContent, ImgLinker, DescOrder } from './Success';
+
+const OrderColumns = [
+  { title: '호수', dataIndex: 'name', key: 'name' },
+  { title: '실측', dataIndex: 'cm', key: 'cm' },
+  { title: '개수', dataIndex: 'quantity', key: 'quantity' },
+];
 
 const DividedNaverDesc = () => {
-  const { selectedFrame } = useAppSelector((state) => state.frame);
-  const { redirect } = useAppSelector((state) => state.redirects);
-  const { canvasOrder } = useAppSelector((state) => state.canvas);
-  const frame = useMemo(() => selectedFrame[0], [selectedFrame]);
+  const [framePrice] = useGlobalState<FramePrice[]>('framePrice');
 
-  const url = useMemo(() => {
-    if (redirect.naver) {
-      return redirect.naver;
-    }
-  }, [redirect.naver]);
+  const yourPriceList = useMemo(() => {
+    if (!framePrice?.length) return;
+    return Object.entries(
+      framePrice.reduce((acc: { [key: string]: any }, cur) => {
+        const name = cur.name;
+        if (!acc[name]) {
+          acc[name] = { quantity: 1, price: cur.price, cm: cur.cm };
+          return acc;
+        }
+        acc[name].quantity++;
+        return acc;
+      }, {}),
+    );
+  }, [framePrice]);
 
   return (
     <div style={{ textAlign: 'center' }}>
       <DescContent>
         <h3>- 1 -</h3>
         <p>먼저 아래의 링크로 얼리21 스마트스토어에 들어가 주세요.</p>
-        {redirect.naver && url ? (
-          <ImgLinker target="_blank" href={`https://smartstore.naver.com/early21/${url.replace('=', '/')}`}>
-            <img
-              src="https://shop-phinf.pstatic.net/20210818_251/16292744909008aQoM_PNG/30410318680101258_485478705.png?type=o640"
-              alt="스마트스토어링크이미지"
-            />
-            <p>클릭해 얼리21 스마트스토어로 이동</p>
-          </ImgLinker>
-        ) : (
-          <ImgLinker target="_blank" href={`https://smartstore.naver.com/early21/products/5798217286}`}>
-            <img
-              src="https://shop-phinf.pstatic.net/20210818_251/16292744909008aQoM_PNG/30410318680101258_485478705.png?type=o640"
-              alt="스마트스토어링크이미지"
-            />
-            <p>클릭해 얼리21 스마트스토어로 이동</p>
-          </ImgLinker>
-        )}
+        <ImgLinker target="_blank" href={`https://smartstore.naver.com/early21/products/5804261413`}>
+          <img
+            src="https://shop-phinf.pstatic.net/20210818_251/16292744909008aQoM_PNG/30410318680101258_485478705.png?type=o640"
+            alt="스마트스토어링크이미지"
+          />
+          <p>클릭해 얼리21 스마트스토어로 이동</p>
+        </ImgLinker>
       </DescContent>
       <Divider />
       <DescContent>
         <h3>- 2 -</h3>
         <p>스마트스토어로 돌아가 주문하신 정보와 일치하도록 선택해 주세요.</p>
-        {frame && (
+        {yourPriceList && (
           <>
             <p>주문하신 정보는 다음과 같습니다.</p>
-            <DescOrderInformation>
-              <span>{frame.name}</span>
-              <span>
-                {frame.widthCm}cm x {frame.heightCm}cm
-              </span>
-              <div>{canvasOrder.scaleType === 2 ? `옆면 확장` : '기본 옆면'}</div>
-            </DescOrderInformation>
+            <AppTable
+              bordered
+              style={{ maxWidth: '300px', margin: '0 auto', padding: '2em 0' }}
+              dataSource={yourPriceList?.map(([key, value], index) => {
+                return { name: key, ...value, key: index };
+              })}
+              columns={OrderColumns}
+              pagination={false}
+            />
           </>
         )}
         <DescOrder>
           <div>
-            <img src={`${S3_URL}/img/guide/editor-order.png`} alt="에디터주문 선택" />
+            <img src={`${S3_URL}/img/guide/divided-order.png`} alt="에디터주문 선택" />
             <p>
-              <b>주문방식</b>에서 <b>에디터주문</b>을 선택해 주세요.
+              먼저 <b>주문방식</b>에서 <b>에디터주문</b>을 선택해 주세요.
             </p>
           </div>
           <div>
-            <img src={`${S3_URL}/img/guide/size-select.png`} alt="액자 선택" />
+            <img src={`${S3_URL}/img/guide/divided-size.png`} alt="액자 선택" />
             <p>
-              <b>액자 사이즈</b>에서 <b>주문하신 액자와 같은 액자를</b> 선택해 주세요.
-            </p>
-          </div>
-          <div>
-            <img src={`${S3_URL}/img/guide/expand.png`} alt="액자 옆면 선택" />
-            <p>
-              <b>옆면 확장 여부</b> 역시 <b>주문하신 액자의 옆면 설정</b>과 같게 선택해 주세요.
+              이후 <b>액자 사이즈</b>에서 <b>주문하신 액자와 같은 액자를</b> 선택해 주세요.
             </p>
           </div>
           <div>
