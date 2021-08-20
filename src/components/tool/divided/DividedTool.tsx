@@ -348,37 +348,109 @@ const Tool = () => {
       const { left: canvasLeft, top: canvasTop } = canvasPosition;
       const image = imgNode.current;
       const oCanvas = document.createElement('canvas');
+      const scaleX = image.naturalWidth / resizeWidth;
+      const scaleY = image.naturalHeight / resizeHeight;
+
       oCanvas.id = id.toString();
       oCanvas.dataset.paper = name;
       oCanvas.dataset.bgColor = bgColor;
       const cropX = canvasLeft - left;
       const cropY = canvasTop - top;
 
-      const scaleX = image.naturalWidth / resizeWidth;
-      const scaleY = image.naturalHeight / resizeHeight;
       const oCtx = oCanvas.getContext('2d');
       // const pixelRatio = window.devicePixelRatio;
 
-      const canvasFrameWidth = frameWidth * scaleX;
-      const canvasFrameHeight = frameHeight * scaleY;
+      const cmPxX = (cm: number) => cmToPx(cm) * scaleX;
+      const cmPxY = (cm: number) => cmToPx(cm) * scaleY;
+
+      const originFrameWidth = frameWidth * scaleX;
+      const originFrameHeight = frameHeight * scaleY;
+      const canvasFrameWidth = originFrameWidth + cmPxX(8);
+      const canvasFrameHeight = originFrameHeight + cmPxY(8);
 
       oCanvas.width = canvasFrameWidth;
       oCanvas.height = canvasFrameHeight;
 
-      // oCtx?.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
       (oCtx as CanvasRenderingContext2D).imageSmoothingQuality = 'high';
+
+      if (!oCtx) return;
 
       oCtx?.drawImage(
         image,
         cropX * scaleX,
         cropY * scaleY,
-        canvasFrameWidth,
-        canvasFrameHeight,
-        0,
-        0,
-        canvasFrameWidth,
-        canvasFrameHeight,
+        originFrameWidth,
+        originFrameHeight,
+        cmPxX(4),
+        cmPxY(4),
+        originFrameWidth,
+        originFrameHeight,
       );
+
+      oCtx.save();
+      //회전축을 위해 기준점을 센터로
+      oCtx.translate(canvasFrameWidth / 2, canvasFrameHeight / 2);
+      //180도 회전
+      oCtx.rotate((180 * Math.PI) / 180);
+      // 이미지 반전
+      oCtx.scale(-1, 1);
+
+      // top
+      oCtx.drawImage(
+        image,
+        cropX * scaleX,
+        cropY * scaleY,
+        originFrameWidth,
+        cmPxY(4),
+        -canvasFrameWidth / 2 + cmPxX(4),
+        canvasFrameHeight / 2 - cmPxY(4),
+        canvasFrameWidth - cmPxX(8),
+        cmPxY(4),
+      );
+
+      // bottom
+      oCtx.drawImage(
+        image,
+        cropX * scaleX,
+        cropY * scaleY + (frameHeight - cmToPx(4)) * scaleY,
+        originFrameWidth,
+        cmPxY(4),
+        -canvasFrameWidth / 2 + cmPxX(4),
+        -canvasFrameHeight / 2,
+        canvasFrameWidth - cmPxX(8),
+        cmPxY(4),
+      );
+
+      //좌우를 위해 다시 한번 180도 회전 (총 360도)
+      oCtx.rotate((180 * Math.PI) / 180);
+
+      // right
+      oCtx.drawImage(
+        image,
+        cropX * scaleX + (frameWidth - cmToPx(4)) * scaleX,
+        cropY * scaleY,
+        cmPxX(4),
+        originFrameHeight,
+        -canvasFrameWidth / 2,
+        -canvasFrameHeight / 2 + cmPxY(4),
+        cmPxX(4),
+        originFrameHeight,
+      );
+
+      // left
+      oCtx.drawImage(
+        image,
+        cropX * scaleX,
+        cropY * scaleY,
+        cmPxX(4),
+        originFrameHeight,
+        canvasFrameWidth / 2 - cmPxX(4),
+        -canvasFrameHeight / 2 + cmPxY(4),
+        cmPxX(4),
+        originFrameHeight,
+      );
+
+      oCtx.restore();
 
       if (selectedFrameList) {
         setSelectedFrameList([...selectedFrameList, oCanvas]);
