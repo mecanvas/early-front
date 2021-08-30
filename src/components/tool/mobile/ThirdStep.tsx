@@ -20,7 +20,7 @@ import { getPosition } from 'src/utils/getPosition';
 import { replacePx } from 'src/utils/replacePx';
 import ToolColorPalette from '../divided/DividedToolColorPalette';
 import { icons } from 'public/icons';
-import { isIOS } from 'react-device-detect';
+import { isIOS, isMobile } from 'react-device-detect';
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 const SpinLoader = styled.div`
@@ -852,7 +852,7 @@ const ThirdStep = () => {
     if (!isMoving && !isResizeMode) return;
     const body = document.querySelector('main') as HTMLElement;
     const scrollPosition = window.scrollY;
-    if (isIOS) {
+    if (isIOS && isMobile) {
       const cropper = document.querySelector('.cropper') as HTMLElement;
 
       if (cropper) {
@@ -865,11 +865,12 @@ const ThirdStep = () => {
       body.style.left = '0';
       body.style.right = '0';
     } else {
+      if (!isMobile) return;
       disableBodyScroll(body);
     }
 
     return () => {
-      if (isIOS) {
+      if (isIOS && isMobile) {
         body.style.removeProperty('overflow');
         body.style.removeProperty('pointer-events');
         body.style.removeProperty('position');
@@ -878,6 +879,7 @@ const ThirdStep = () => {
         body.style.removeProperty('right');
         window.scrollTo(0, scrollPosition);
       } else {
+        if (!isMobile) return;
         enableBodyScroll(body);
       }
     };
