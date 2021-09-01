@@ -70,12 +70,14 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
         ctx.fillRect(0, 0, w * scaleX, h * scaleY);
       } else {
         // 세이브 캔버스
+        const SIDE_EXPAND_CM = 4;
+
         const cmPxX = (cm: number) => cmToPx(cm) * scaleX;
         const cmPxY = (cm: number) => cmToPx(cm) * scaleY;
         const originFrameWidth = cmToPx(info.widthCm) * scaleX;
         const originFrameHeight = cmToPx(info.heightCm) * scaleY;
-        const canvasFrameWidth = originFrameWidth + cmPxX(8);
-        const canvasFrameHeight = originFrameHeight + cmPxY(8);
+        const canvasFrameWidth = originFrameWidth + cmPxX(SIDE_EXPAND_CM * 2);
+        const canvasFrameHeight = originFrameHeight + cmPxY(SIDE_EXPAND_CM * 2);
 
         canvas.width = canvasFrameWidth;
         canvas.height = canvasFrameHeight;
@@ -88,8 +90,8 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
           crop.y * scaleY,
           w * scaleX,
           h * scaleY,
-          cmPxX(4),
-          cmPxY(4),
+          cmPxX(SIDE_EXPAND_CM),
+          cmPxY(SIDE_EXPAND_CM),
           originFrameWidth,
           originFrameHeight,
         );
@@ -108,24 +110,24 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
           crop.x * scaleX,
           crop.y * scaleY,
           w * scaleX,
-          cmPxY(4),
-          -canvasFrameWidth / 2 + cmPxX(4),
-          canvasFrameHeight / 2 - cmPxY(4),
-          canvasFrameWidth - cmPxX(8),
-          cmPxY(4),
+          cmPxY(SIDE_EXPAND_CM),
+          -canvasFrameWidth / 2 + cmPxX(SIDE_EXPAND_CM),
+          canvasFrameHeight / 2 - cmPxY(SIDE_EXPAND_CM),
+          canvasFrameWidth - cmPxX(SIDE_EXPAND_CM * 2),
+          cmPxY(SIDE_EXPAND_CM),
         );
 
         // bottom
         ctx.drawImage(
           img,
           crop.x * scaleX,
-          crop.y * scaleY + (h - cmToPx(4)) * scaleY,
+          crop.y * scaleY + (h - cmToPx(SIDE_EXPAND_CM)) * scaleY,
           w * scaleX,
-          cmPxY(4),
-          -canvasFrameWidth / 2 + cmPxX(4),
+          cmPxY(SIDE_EXPAND_CM),
+          -canvasFrameWidth / 2 + cmPxX(SIDE_EXPAND_CM),
           -canvasFrameHeight / 2,
-          canvasFrameWidth - cmPxX(8),
-          cmPxY(4),
+          canvasFrameWidth - cmPxX(SIDE_EXPAND_CM * 2),
+          cmPxY(SIDE_EXPAND_CM),
         );
 
         //좌우를 위해 다시 한번 180도 회전 (총 360도)
@@ -134,13 +136,13 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
         // right
         ctx.drawImage(
           img,
-          crop.x * scaleX + (w - cmToPx(4)) * scaleX,
+          crop.x * scaleX + (w - cmToPx(SIDE_EXPAND_CM)) * scaleX,
           crop.y * scaleY,
-          cmPxX(4),
+          cmPxX(SIDE_EXPAND_CM),
           h * scaleY,
           -canvasFrameWidth / 2,
-          -canvasFrameHeight / 2 + cmPxY(4),
-          cmPxX(4),
+          -canvasFrameHeight / 2 + cmPxY(SIDE_EXPAND_CM),
+          cmPxX(SIDE_EXPAND_CM),
           originFrameHeight,
         );
 
@@ -149,11 +151,11 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
           img,
           crop.x * scaleX,
           crop.y * scaleY,
-          cmPxX(4),
+          cmPxX(SIDE_EXPAND_CM),
           h * scaleY,
-          canvasFrameWidth / 2 - cmPxX(4),
-          -canvasFrameHeight / 2 + cmPxY(4),
-          cmPxX(4),
+          canvasFrameWidth / 2 - cmPxX(SIDE_EXPAND_CM),
+          -canvasFrameHeight / 2 + cmPxY(SIDE_EXPAND_CM),
+          cmPxX(SIDE_EXPAND_CM),
           originFrameHeight,
         );
 
