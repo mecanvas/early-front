@@ -72,10 +72,10 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
         // 세이브 캔버스
         const cmPxX = (cm: number) => cmToPx(cm) * scaleX;
         const cmPxY = (cm: number) => cmToPx(cm) * scaleY;
-        const originFrameWidth = w * scaleX;
-        const originFrameHeight = h * scaleY;
-        const canvasFrameWidth = (w + cmToPx(8)) * scaleX;
-        const canvasFrameHeight = (h + cmToPx(8)) * scaleY;
+        const originFrameWidth = cmToPx(info.widthCm) * scaleX;
+        const originFrameHeight = cmToPx(info.heightCm) * scaleY;
+        const canvasFrameWidth = originFrameWidth + cmPxX(8);
+        const canvasFrameHeight = originFrameHeight + cmPxY(8);
 
         canvas.width = canvasFrameWidth;
         canvas.height = canvasFrameHeight;
@@ -86,8 +86,8 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
           img,
           crop.x * scaleX,
           crop.y * scaleY,
-          originFrameWidth,
-          originFrameHeight,
+          w * scaleX,
+          h * scaleY,
           cmPxX(4),
           cmPxY(4),
           originFrameWidth,
@@ -107,7 +107,7 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
           img,
           crop.x * scaleX,
           crop.y * scaleY,
-          originFrameWidth,
+          w * scaleX,
           cmPxY(4),
           -canvasFrameWidth / 2 + cmPxX(4),
           canvasFrameHeight / 2 - cmPxY(4),
@@ -120,7 +120,7 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
           img,
           crop.x * scaleX,
           crop.y * scaleY + (h - cmToPx(4)) * scaleY,
-          originFrameWidth,
+          w * scaleX,
           cmPxY(4),
           -canvasFrameWidth / 2 + cmPxX(4),
           -canvasFrameHeight / 2,
@@ -137,7 +137,7 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
           crop.x * scaleX + (w - cmToPx(4)) * scaleX,
           crop.y * scaleY,
           cmPxX(4),
-          originFrameHeight,
+          h * scaleY,
           -canvasFrameWidth / 2,
           -canvasFrameHeight / 2 + cmPxY(4),
           cmPxX(4),
@@ -150,7 +150,7 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
           crop.x * scaleX,
           crop.y * scaleY,
           cmPxX(4),
-          originFrameHeight,
+          h * scaleY,
           canvasFrameWidth / 2 - cmPxX(4),
           -canvasFrameHeight / 2 + cmPxY(4),
           cmPxX(4),
@@ -162,6 +162,7 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
         ctx.globalCompositeOperation = 'destination-over';
         ctx.fillStyle = info.bgColor || '#fff';
         ctx.fillRect(0, 0, canvasFrameWidth, canvasFrameHeight);
+        document.body.appendChild(canvas);
       }
     };
   });
