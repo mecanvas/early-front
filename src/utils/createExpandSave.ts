@@ -164,7 +164,6 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
         ctx.globalCompositeOperation = 'destination-over';
         ctx.fillStyle = info.bgColor || '#fff';
         ctx.fillRect(0, 0, canvasFrameWidth, canvasFrameHeight);
-        document.body.appendChild(canvas);
       }
     };
   });
