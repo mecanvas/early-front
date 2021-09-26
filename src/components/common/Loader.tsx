@@ -22,8 +22,8 @@ const LoaderSpin = styled(Spin)`
 const LoadingBackground = styled.div<{ isImageUpload: boolean }>`
   position: fixed;
   width: 100%;
-  height: calc(100% - 45px);
-  top: 45px;
+  height: calc(100%);
+  top: 0px;
   left: 0;
   z-index: 50;
   ${({ isImageUpload, theme }) =>

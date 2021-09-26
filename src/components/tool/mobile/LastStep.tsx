@@ -4,7 +4,8 @@ import { Input, Form, Select, Divider } from 'antd';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
 import Img from 'src/components/common/Img';
 import { useForm } from 'antd/lib/form/Form';
-import { CanvasOrder, setCanvasOrder } from 'src/store/reducers/canvas';
+import { CanvasOrder, setCanvasOrder, setCanvasSaveList } from 'src/store/reducers/canvas';
+import { createExpandCanvas } from 'src/utils/createExpandSave';
 
 const Container = styled.div`
   margin: 1em 0;
@@ -90,6 +91,8 @@ const LastStep = () => {
     const canvas = canvasSaveList[0].previewCanvas;
     const url = canvas?.toDataURL('image/png', 1.0);
     setCanvasUrl(url);
+    const saveCanvas = createExpandCanvas(selectedFrame, canvasOrder.scaleType as 1 | 2 | 3);
+    dispatch(setCanvasSaveList({ name: selectedFrame[0].name, saveCanvas }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

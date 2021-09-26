@@ -3,8 +3,7 @@ import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import { icons } from 'public/icons';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useRedux';
-import { setCanvasSaveList, setCanvasSaveScale } from 'src/store/reducers/canvas';
-import { createExpandCanvas } from 'src/utils/createExpandSave';
+import { setCanvasSaveScale } from 'src/store/reducers/canvas';
 
 const Container = styled.div`
   h4 {
@@ -92,7 +91,6 @@ const SelectImage = styled.div`
 
 const FourthStep = () => {
   const { canvasOrder } = useAppSelector((state) => state.canvas);
-  const { selectedFrame } = useAppSelector((state) => state.frame);
   const dispatch = useAppDispatch();
   const selectBoxList = useMemo(() => {
     return [
@@ -129,10 +127,8 @@ const FourthStep = () => {
       if (!scale) return;
       setSelectBox(selectBox.map((lst) => ({ ...lst, isSelected: lst.id === +scale ? true : false })));
       dispatch(setCanvasSaveScale({ scaleType: +scale as 1 | 2 | 3 }));
-      const saveCanvas = createExpandCanvas(selectedFrame, +scale as 1 | 2);
-      dispatch(setCanvasSaveList({ name: selectedFrame[0].name, saveCanvas }));
     },
-    [dispatch, selectBox, selectedFrame],
+    [dispatch, selectBox],
   );
 
   return (
