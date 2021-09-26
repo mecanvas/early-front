@@ -6,7 +6,7 @@ export interface CanvasOrder {
   phone: string;
   orderRoute: 1 | 2 | 3;
   type?: 1 | 2;
-  scaleType?: 1 | 2 | null; // 1 = 기본 , 2 = 확장
+  scaleType?: 1 | 2 | 3 | null; // 1 = 옆면-흰 , 2 = 옆면-배경, 3 = 옆면-좌우반전
 }
 
 interface CanvasState {
@@ -63,7 +63,7 @@ const canvas = createSlice({
         ];
       }
     },
-    setCanvasSaveScale: (state, { payload }: PayloadAction<{ scaleType: 1 | 2 | null }>) => {
+    setCanvasSaveScale: (state, { payload }: PayloadAction<{ scaleType: 1 | 2 | 3 | null }>) => {
       state.canvasOrder.scaleType = payload.scaleType;
     },
     resetCanvasState: (state) => {

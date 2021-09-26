@@ -98,17 +98,26 @@ const FourthStep = () => {
     return [
       {
         id: 1,
-        title: '기본으로 해주세요.',
+        title: '옆면-흰색',
         subTitle: '흰색 옆면이 적용됩니다.',
         exampleImg: 'https://early21-assets.s3.ap-northeast-2.amazonaws.com/img/example/side1.png',
         isSelected: canvasOrder.scaleType ? canvasOrder.scaleType === 1 : false,
       },
       {
         id: 2,
-        title: '옆면을 확장해 주세요',
-        subTitle: '선택 시 이미지가 옆면까지 확장됩니다.',
-        exampleImg: 'https://early21-assets.s3.ap-northeast-2.amazonaws.com/img/example/side2.jpeg',
+        title: '옆면-배경색',
+        subTitle: '이미지의 배경색이 옆면으로 됩니다.',
+        exampleImg:
+          'https://shop-phinf.pstatic.net/20210925_22/1632563174673Hzam6_JPEG/SE-4e3bdc2c-c5d6-4f20-b7bf-b9fcca6b6a44.jpg?type=w860',
         isSelected: canvasOrder.scaleType ? canvasOrder.scaleType === 2 : false,
+      },
+      {
+        id: 3,
+        title: '옆면-좌우반전',
+        subTitle: '이미지가 옆면으로 좌우반전되어 확장됩니다.',
+        exampleImg:
+          'https://shop-phinf.pstatic.net/20210925_255/1632567786905o7IKp_JPEG/SE-e4dd335c-8a4d-4aeb-a765-dafc0418630f.jpg?type=w860',
+        isSelected: canvasOrder.scaleType ? canvasOrder.scaleType === 3 : false,
       },
     ];
   }, [canvasOrder.scaleType]);
@@ -119,7 +128,7 @@ const FourthStep = () => {
       const { scale } = e.currentTarget.dataset;
       if (!scale) return;
       setSelectBox(selectBox.map((lst) => ({ ...lst, isSelected: lst.id === +scale ? true : false })));
-      dispatch(setCanvasSaveScale({ scaleType: +scale as 1 | 2 }));
+      dispatch(setCanvasSaveScale({ scaleType: +scale as 1 | 2 | 3 }));
       const saveCanvas = createExpandCanvas(selectedFrame, +scale as 1 | 2);
       dispatch(setCanvasSaveList({ name: selectedFrame[0].name, saveCanvas }));
     },

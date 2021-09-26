@@ -51,8 +51,13 @@ const SingleNaverDesc = () => {
               <span>
                 {frame.widthCm}cm x {frame.heightCm}cm
               </span>
-              <div>{canvasOrder.scaleType === 2 ? `옆면 확장` : '기본 옆면'}</div>
+              <div>
+                {(canvasOrder.scaleType === 1 && '옆면-흰색') ||
+                  (canvasOrder.scaleType === 2 && `옆면-배경색`) ||
+                  '옆면-좌우반전'}
+              </div>
             </DescOrderInformation>
+            <br />
           </>
         )}
         <DescOrder>

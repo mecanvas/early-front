@@ -114,7 +114,11 @@ const LastStep = () => {
               {selectedFrame[0].widthCm}cm x {selectedFrame[0].heightCm}cm
             </span>
           </div>
-          <div>{canvasOrder.scaleType === 2 ? `옆면 확장` : '기본 옆면'}</div>
+          <div>
+            {(canvasOrder.scaleType === 1 && '옆면-흰색') ||
+              (canvasOrder.scaleType === 2 && `옆면-배경색`) ||
+              '옆면-좌우반전'}
+          </div>
           <CanvasPrice>{selectedFrame[0].price.toLocaleString()}원</CanvasPrice>
         </CanvasSaleInfo>
 

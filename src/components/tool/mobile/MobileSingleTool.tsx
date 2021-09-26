@@ -217,7 +217,7 @@ const MobileSingleTool = () => {
     fd.append('image', file);
     fd.append('paperNames', frame.name);
     fd.append('originImgUrl', frame.imgUrl);
-    fd.append('scaleType', order.scaleType?.toString() || '1'); // 1 = 기본, 2 = 확장
+    fd.append('scaleType', order.scaleType?.toString() || '1'); // 1 = 기본, 2 = 배경, 3 = 확장
 
     await dispatch(postCanvasForSave(fd));
   }, [canvasOrder, canvasSaveList, dispatch, selectedFrame]);

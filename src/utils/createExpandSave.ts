@@ -23,8 +23,9 @@ const drawing = (
   return;
 };
 
-export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1 | 2) => {
+export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1 | 2 | 3) => {
   const canvas = document.createElement('canvas');
+
   selectedFrame.forEach((info: SelectedFrame) => {
     const ctx = canvas.getContext('2d');
     const img = new Image();
@@ -33,6 +34,7 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
     img.onload = () => {
       if (!ctx) return;
       if (typeof info.x !== 'number' || typeof info.y !== 'number') {
+        console.error('position is Not Number');
         return;
       }
       const { naturalWidth, naturalHeight } = img;
@@ -47,6 +49,14 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
       const scaleX = naturalWidth / imgW;
       const scaleY = naturalHeight / imgH;
       const crop = { x: info.x, y: info.y };
+      const SIDE_EXPAND_CM = 4;
+
+      const cmPxX = (cm: number) => cmToPx(cm) * scaleX;
+      const cmPxY = (cm: number) => cmToPx(cm) * scaleY;
+      const originFrameWidth = cmToPx(info.widthCm) * scaleX;
+      const originFrameHeight = cmToPx(info.heightCm) * scaleY;
+      const canvasFrameWidth = originFrameWidth + cmPxX(SIDE_EXPAND_CM * 2);
+      const canvasFrameHeight = originFrameHeight + cmPxY(SIDE_EXPAND_CM * 2);
 
       const NotExpandDrawingOption = {
         img,
@@ -54,26 +64,25 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
         cropY: crop.y * scaleY,
         imgW: w * scaleX,
         imgH: h * scaleY,
-        canvasX: 0,
-        canvasY: 0,
-        canvasW: w * scaleX,
-        canvasH: h * scaleY,
+        canvasX: cmPxX(SIDE_EXPAND_CM),
+        canvasY: cmPxY(SIDE_EXPAND_CM),
+        canvasW: originFrameWidth,
+        canvasH: originFrameHeight,
       };
 
-      if (expandType === 1) {
-        canvas.width = w * scaleX;
-        canvas.height = h * scaleY;
-        ctx.clearRect(0, 0, w * scaleX, h * scaleY);
+      if (expandType === 1 || expandType === 2) {
+        canvas.width = canvasFrameWidth;
+        canvas.height = canvasFrameHeight;
+        ctx.clearRect(0, 0, canvasFrameWidth, canvasFrameHeight);
+        ctx.imageSmoothingQuality = 'high';
+
         drawing(ctx, NotExpandDrawingOption);
+
         ctx.globalCompositeOperation = 'destination-over';
         ctx.fillStyle = info.bgColor || '#fff';
-        ctx.fillRect(0, 0, w * scaleX, h * scaleY);
+        ctx.fillRect(0, 0, canvasFrameWidth, canvasFrameHeight);
       } else {
         // 세이브 캔버스
-        const SIDE_EXPAND_CM = 4;
-
-        const cmPxX = (cm: number) => cmToPx(cm) * scaleX;
-        const cmPxY = (cm: number) => cmToPx(cm) * scaleY;
         const originFrameWidth = cmToPx(info.widthCm) * scaleX;
         const originFrameHeight = cmToPx(info.heightCm) * scaleY;
         const canvasFrameWidth = originFrameWidth + cmPxX(SIDE_EXPAND_CM * 2);
