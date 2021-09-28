@@ -67,10 +67,12 @@ const HomeProducts = ({ title, productList, moreLink }: Props) => {
       <h1>{title}</h1>
       <ProductCardContainer>
         {productList.map((lst) => (
-          <ProductCard key={lst.id} hoverable cover={<img alt={lst.title} src={lst.thumb} />}>
-            <ProductMeta title={lst.title} description={lst.meta} />
-            <small>{lst.price.toLocaleString()}W</small>
-          </ProductCard>
+          <Link href={`/product/${lst.id}`} key={lst.id}>
+            <ProductCard hoverable cover={<img alt={lst.title} src={lst.thumb} />}>
+              <ProductMeta title={lst.title} description={lst.meta} />
+              <small>{lst.price.toLocaleString()}W</small>
+            </ProductCard>
+          </Link>
         ))}
       </ProductCardContainer>
       {moreLink && (
