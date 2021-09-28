@@ -5,6 +5,8 @@ import Logo from './Logo';
 import { APP_HEADER_HEIGHT } from 'src/constants';
 
 const HeaderContainer = styled.header`
+  position: fixed;
+  z-index: 1;
   width: 100%;
   height: ${APP_HEADER_HEIGHT}px;
   padding: 0 2em;
