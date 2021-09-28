@@ -1,3 +1,4 @@
+import { InstagramOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { Divider } from 'antd';
 import { ProductList } from 'src/interfaces/ProductInterface';
@@ -9,6 +10,18 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+`;
+
+const HomeIcons = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1em;
+  svg {
+    cursor: pointer;
+    margin-bottom: 0.5em;
+    font-size: 30px;
+  }
 `;
 
 const Divide = styled(Divider)`
@@ -72,12 +85,19 @@ const Home = () => {
   return (
     <Container>
       <HomeBanner />
+
+      <HomeIcons>
+        <a href="https://www.instagram.com/early_bro21/" target="blank">
+          <InstagramOutlined />
+        </a>
+        <small>Early_bro21</small>
+      </HomeIcons>
       <Divide />
-      <HomeProducts title="Recommend" productList={productList} />
+      <HomeProducts title="Recommend" productList={productList.slice(0, 3)} />
       <Divide />
-      <HomeProducts moreLink="/" title="Frame" productList={productList} />
+      <HomeProducts moreLink="/frame" title="Frame" productList={productList} />
       <Divide />
-      <HomeProducts moreLink="/" title="Poster" productList={productList} />
+      <HomeProducts moreLink="/poster" title="Poster" productList={productList} />
     </Container>
   );
 };
