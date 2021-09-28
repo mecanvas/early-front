@@ -16,7 +16,7 @@ const HeaderContainer = styled.header`
   height: ${APP_HEADER_HEIGHT}px;
   padding: 0 2em;
   background-color: ${({ theme }) => theme.color.white};
-  border-bottom: 1px solid ${({ theme }) => theme.color.gray200};
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray100};
 `;
 
 const Header = styled.div`

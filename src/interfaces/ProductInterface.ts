@@ -16,9 +16,15 @@ export interface ProductSeo {
   seoKeywords: string;
 }
 
+export interface ProductOptionDetail {
+  id: number;
+  text: string;
+  additionalPrice: number;
+}
+
 export interface ProductOption {
   type: 1 | 2; // 1 = 단독형 2 = 조합형
-  options: { id: number; optionName: string; value: string[] }[] | null;
+  options: { id: number; optionName: string; value: ProductOptionDetail[] }[] | null;
 }
 
 export interface DeliveryOption {
