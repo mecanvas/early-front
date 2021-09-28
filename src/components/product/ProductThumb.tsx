@@ -11,10 +11,15 @@ const Container = styled.div`
 `;
 
 const Thumb = styled.img`
-  width: 98%;
+  width: 100%;
   height: 100%;
   max-width: 450px;
   max-height: 450px;
+  @media all and (max-width: ${({ theme }) => theme.size.md}) {
+    max-width: 60%;
+    max-height: 60%;
+    margin: 0 auto;
+  }
 `;
 
 const SubThumbList = styled.div`

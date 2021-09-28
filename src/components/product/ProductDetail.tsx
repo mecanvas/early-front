@@ -7,6 +7,8 @@ import ProductOrderItem from './ProductOrderItem';
 import ProductThumb from './ProductThumb';
 
 const Container = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -28,7 +30,7 @@ const ProductDetail = () => {
   const product: Product = {
     id: 1,
     title: '앙리 마티스',
-    meta: '이걸 외 안사?',
+    meta: '이걸 외 안사? 이거만 붙여놔도 스타일링 끝임..;',
     price: 3900,
     thumb: 'https://shop-phinf.pstatic.net/20210729_267/1627557958996mnAfE_PNG/003.png?type=w860',
     status: 1,

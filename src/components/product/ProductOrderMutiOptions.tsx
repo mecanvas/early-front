@@ -1,7 +1,40 @@
-import { CloseCircleOutlined } from '@ant-design/icons';
-import { Divider } from 'antd';
+import { CloseCircleOutlined, DownOutlined } from '@ant-design/icons';
 import React, { useState, useMemo, useCallback } from 'react';
 import { ProductOption, DeliveryOption } from 'src/interfaces/ProductInterface';
+import styled from '@emotion/styled';
+import ProductOrderDeliver from './ProductOrderDeliver';
+
+export const OrderOptionContainer = styled.div``;
+
+const SelectBox = styled.div`
+  position: relative;
+  div {
+    padding: 0.7em;
+  }
+  span {
+    position: absolute;
+    top: 10px;
+    right: 5px;
+  }
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  cursor: pointer;
+  border: 1px solid ${({ theme }) => theme.color.gray300};
+`;
+
+const SelectList = styled.ul`
+  border-top: 1px solid ${({ theme }) => theme.color.gray300};
+  li {
+    padding: 0.7em;
+    &:hover {
+      background-color: ${({ theme }) => theme.color.gray100};
+    }
+  }
+  li ~ li {
+    border-top: 1px solid ${({ theme }) => theme.color.gray300};
+  }
+`;
 
 interface OrderList {
   optionName: string;
@@ -10,6 +43,81 @@ interface OrderList {
   qty: number;
   additionalPrice: number;
 }
+
+const SelectItemList = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1.5em;
+  margin-bottom: 1em;
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
+`;
+
+const EmptyTitle = styled.div`
+  width: 100%;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: ${({ theme }) => theme.color.gray700};
+  margin: 2em 0;
+`;
+
+const SelecItemTitle = styled.div`
+  position: relative;
+  width: 100%;
+  font-weight: bold;
+  margin-right: auto;
+  color: ${({ theme }) => theme.color.gray700};
+  span {
+    position: absolute;
+    top: 0;
+    right: 5px;
+    cursor: pointer;
+  }
+`;
+
+const SelectItemPriceSetting = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+export const SelectItemQty = styled.div`
+  display: flex;
+  align-items: center;
+  button {
+    outline: none;
+    background: ${({ theme }) => theme.color.white};
+    color: ${({ theme }) => theme.color.black};
+    border: 1px solid ${({ theme }) => theme.color.gray700};
+    padding: 0 0.5em;
+    font-size: 18px;
+    margin: 0 0.4em;
+  }
+`;
+
+export const TotalPrice = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  span {
+    margin-right: 0.5em;
+
+    &:nth-of-type(1) {
+      span {
+        margin: 0;
+        font-weight: bold;
+        font-size: 1.25rem;
+      }
+    }
+
+    &:nth-of-type(3) {
+      font-weight: bold;
+      font-size: 1.25rem;
+    }
+  }
+`;
 
 interface Props {
   productOption: ProductOption;
@@ -67,12 +175,13 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props
     setShowOptionList((prev) => !prev);
   }, []);
 
-  const handleOptionSelect = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+  const handleOptionSelect = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
     const { optionname: optionName, value, id, additionalprice: additionalPrice } = e.currentTarget.dataset;
     if (optionName && value && id && additionalPrice) {
       setOrderList((prev) => {
         if (prev.length) {
           if (prev.find((lst) => lst.id === +id)) {
+            alert('이미 추가 되었습니다 :)');
             return prev;
           }
           return [...prev, { id: +id, optionName, value, qty: 1, additionalPrice: +additionalPrice }];
@@ -84,14 +193,14 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props
   }, []);
 
   return (
-    <div>
+    <OrderOptionContainer>
       {options?.map((lst) => (
-        <div key={lst.id} onClick={handleOptionSelectStart}>
-          {lst.optionName}
+        <SelectBox key={lst.id} onClick={handleOptionSelectStart}>
+          <div>{lst.optionName}</div>
           {showOptionList && (
-            <div>
+            <SelectList>
               {lst.value.map((value) => (
-                <div
+                <li
                   key={value.id}
                   onClick={handleOptionSelect}
                   data-additionalprice={value.additionalPrice}
@@ -100,59 +209,60 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props
                   data-value={value.text}
                 >
                   {value.text} {value.additionalPrice ? `(+${value.additionalPrice.toLocaleString()})` : ''}
-                </div>
+                </li>
               ))}
-            </div>
+            </SelectList>
           )}
-        </div>
+          <span>
+            <DownOutlined />
+          </span>
+        </SelectBox>
       ))}
-      <div>
-        <div>
-          {deliveryOption.deliveryPrice.toLocaleString()}원{' '}
-          {deliveryOption.limit && `(${deliveryOption.limit.toLocaleString()}원 이상 구매시 무료 배송)`}
-        </div>
-        <div>도서산간 지역의 경우 {deliveryOption.additionalPrice.toLocaleString()}원 추가</div>
-      </div>
+
+      <ProductOrderDeliver deliveryOption={deliveryOption} />
 
       {orderList.length ? (
         <div>
           {orderList.map((item) => (
-            <div key={item.id}>
-              <span>
+            <SelectItemList key={item.id}>
+              <SelecItemTitle>
                 {item.optionName} - {item.value}{' '}
-              </span>
-              <span>
-                <div>
+                <span onClick={handleDelete} data-id={item.id}>
+                  <CloseCircleOutlined />
+                </span>
+              </SelecItemTitle>
+
+              <SelectItemPriceSetting>
+                <SelectItemQty>
                   <button onClick={handleCount} data-id={item.id} data-type="-">
                     -
                   </button>
-                  <div>{item.qty}</div>
+                  <span>{item.qty}</span>
                   <button onClick={handleCount} data-id={item.id} data-type="+">
                     +
                   </button>
+                </SelectItemQty>
+                <div>
+                  {item.additionalPrice ? `${(price + item.additionalPrice).toLocaleString()}원` : `${price}원`}
                 </div>
-              </span>
-              <span>
-                {item.additionalPrice ? `${(price + item.additionalPrice).toLocaleString()}원` : `${price}원`}
-              </span>
-              <span onClick={handleDelete} data-id={item.id}>
-                <CloseCircleOutlined />
-              </span>
-            </div>
+              </SelectItemPriceSetting>
+            </SelectItemList>
           ))}
         </div>
-      ) : null}
-
-      <Divider />
+      ) : (
+        <EmptyTitle>선택하신 상품이 없어요 :) 얼른 담아주세요.</EmptyTitle>
+      )}
 
       {orderList.length ? (
-        <div>
-          <span>총 상품 개수 {totalQty}개</span>
+        <TotalPrice>
+          <span>
+            총 상품 개수 <span>{totalQty}</span>개
+          </span>
           <span>|</span>
           <span>{totalPrice.toLocaleString()}원</span>
-        </div>
+        </TotalPrice>
       ) : null}
-    </div>
+    </OrderOptionContainer>
   );
 };
 

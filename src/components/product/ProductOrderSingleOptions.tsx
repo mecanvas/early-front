@@ -1,6 +1,8 @@
 import { Divider } from 'antd';
 import React, { useState } from 'react';
 import { DeliveryOption } from 'src/interfaces/ProductInterface';
+import ProductOrderDeliver from './ProductOrderDeliver';
+import { SelectItemQty, TotalPrice } from './ProductOrderMutiOptions';
 
 const ProductOrderSingleOptions = ({ deliveryOption, price }: { deliveryOption: DeliveryOption; price: number }) => {
   const [count, setCount] = useState(1);
@@ -22,7 +24,7 @@ const ProductOrderSingleOptions = ({ deliveryOption, price }: { deliveryOption: 
   };
   return (
     <div>
-      <div>
+      <SelectItemQty>
         <button onClick={handleCount} data-type="-">
           -
         </button>
@@ -30,24 +32,18 @@ const ProductOrderSingleOptions = ({ deliveryOption, price }: { deliveryOption: 
         <button onClick={handleCount} data-type="+">
           +
         </button>
-      </div>
+      </SelectItemQty>
 
-      <div>
-        <div>
-          {deliveryOption.deliveryPrice.toLocaleString()}원{' '}
-          {deliveryOption.limit && `(${deliveryOption.limit.toLocaleString()}원 이상 구매시 무료 배송)`}
-        </div>
-        <div>도서산간 지역의 경우 {deliveryOption.additionalPrice.toLocaleString()}원 추가</div>
-      </div>
+      <ProductOrderDeliver deliveryOption={deliveryOption} />
 
       <Divider />
 
       {count && (
-        <div>
+        <TotalPrice>
           <span>총 상품 개수 {count}개</span>
           <span>|</span>
           <span>{(count * price).toLocaleString()}원</span>
-        </div>
+        </TotalPrice>
       )}
     </div>
   );
