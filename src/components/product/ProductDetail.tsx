@@ -19,6 +19,7 @@ const Container = styled.div`
 const ProductIntro = styled.div`
   width: 100%;
   padding: 1em;
+  margin-bottom: 3em;
   display: flex;
   justify-content: space-around;
   @media all and (max-width: ${({ theme }) => theme.size.md}) {
@@ -43,7 +44,7 @@ const ProductDetail = () => {
       email: 'earlystudio21@naver.com',
       username: '얼리21',
     },
-    description: '이 상품 개쩌는데 왜 안사?',
+    description: '이거아니야?!',
     // productOption: { type: 1, options: null },
     productOption: {
       type: 2,
@@ -71,7 +72,10 @@ const ProductDetail = () => {
   return (
     <Container>
       <ProductIntro>
+        {/* 썸넬 */}
         <ProductThumb thumb={product.thumb} subThumb={product.subThumb} alt={product.title} />
+
+        {/* 옵션 선택 */}
         <ProductOrderItem
           title={product.title}
           meta={product.meta}
@@ -83,6 +87,7 @@ const ProductDetail = () => {
         />
       </ProductIntro>
 
+      {/* 상품 설명 */}
       <ProductDescription description={product.description} />
     </Container>
   );

@@ -101,6 +101,7 @@ export const TotalPrice = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  margin: 1.5em 0;
   span {
     margin-right: 0.5em;
 
