@@ -60,7 +60,7 @@ const HeaderNavigation = styled.nav<{ openNavi: boolean }>`
       }
     }
     li {
-      font-size: 24px;
+      font-size: 20px;
       cursor: pointer;
 
       &:hover {
@@ -208,7 +208,6 @@ const AppHeader = () => {
             <CloseOutlined />
           </HeaderClose>
           <ul>
-            <Li link="/all" txt="All" />
             <Li link="/frame" txt="Frame" />
             <Li link="/poster" txt="Poster" />
             <Li link="/about" txt="About" />

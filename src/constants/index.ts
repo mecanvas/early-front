@@ -28,7 +28,7 @@ export const HEADER_HEIGHT = 86;
 export const CONTENT_HEIGHT = 'calc(100vh - 168px)';
 
 // App의 헤더 크기
-export const APP_HEADER_HEIGHT = 60;
+export const APP_HEADER_HEIGHT = 68;
 
 // 벽걸이용 추천 = 2
 export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
