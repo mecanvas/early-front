@@ -54,8 +54,26 @@ const ProductDetail = () => {
           optionName: '사진 선택',
           value: [
             { id: 1, text: '모네1', additionalPrice: 0 },
-            { id: 2, text: '모네2', additionalPrice: 1000 },
-            { id: 3, text: '모네3', additionalPrice: 3000 },
+            { id: 2, text: '모네2', additionalPrice: 0 },
+            { id: 3, text: '모네3', additionalPrice: 0 },
+          ],
+        },
+        {
+          id: 2,
+          optionName: '사이즈 선택',
+          value: [
+            { id: 1, text: 'A4', additionalPrice: 0 },
+            { id: 2, text: 'A3', additionalPrice: 0 },
+            { id: 3, text: 'A2', additionalPrice: 0 },
+          ],
+        },
+        {
+          id: 3,
+          optionName: '색감 선택',
+          value: [
+            { id: 1, text: 'red', additionalPrice: 0 },
+            { id: 2, text: 'blue', additionalPrice: 1000 },
+            { id: 3, text: 'orange', additionalPrice: 3000 },
           ],
         },
       ],

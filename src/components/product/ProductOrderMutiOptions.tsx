@@ -3,11 +3,18 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { ProductOption, DeliveryOption } from 'src/interfaces/ProductInterface';
 import styled from '@emotion/styled';
 import ProductOrderDeliver from './ProductOrderDeliver';
+import { css } from '@emotion/react';
 
 export const OrderOptionContainer = styled.div``;
 
-const SelectBox = styled.div`
+const SelectBox = styled.div<{ disabled: boolean }>`
   position: relative;
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      pointer-events: none;
+      opacity: 0.3;
+    `}
   div {
     padding: 0.7em;
   }
@@ -21,6 +28,7 @@ const SelectBox = styled.div`
   margin: 0 auto;
   cursor: pointer;
   border: 1px solid ${({ theme }) => theme.color.gray300};
+  margin-bottom: 0.5em;
 `;
 
 const SelectList = styled.ul`
@@ -35,14 +43,6 @@ const SelectList = styled.ul`
     border-top: 1px solid ${({ theme }) => theme.color.gray300};
   }
 `;
-
-interface OrderList {
-  optionName: string;
-  value: string;
-  id: number;
-  qty: number;
-  additionalPrice: number;
-}
 
 const SelectItemList = styled.div`
   display: flex;
@@ -126,10 +126,18 @@ interface Props {
   price: number;
 }
 
+interface OrderList {
+  value: string;
+  id: number;
+  qty: number;
+  additionalPrice: number;
+}
+
 const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props) => {
   const { options } = productOption;
   const [orderList, setOrderList] = useState<OrderList[]>([]);
-  const [showOptionList, setShowOptionList] = useState(false);
+  const [showOptionList, setShowOptionList] = useState(0);
+  const [selectedOptionValue, setSelectedOptionValue] = useState<string[]>([]);
 
   const totalQty = useMemo(() => {
     return orderList.reduce((acc, cur) => {
@@ -152,67 +160,112 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props
   }, [orderList, price]);
 
   const handleCount = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const { type, id } = e.currentTarget.dataset;
+    const { type, id, value } = e.currentTarget.dataset;
 
     if (type === '-' && id) {
       setOrderList((prev) =>
-        prev.map((item) => ({ ...item, qty: item.id === +id && item.qty > 1 ? item.qty - 1 : item.qty })),
+        prev.map((item) => ({
+          ...item,
+          qty: item.id === +id && item.value === value && item.qty > 1 ? item.qty - 1 : item.qty,
+        })),
       );
     }
     if (type === '+' && id) {
-      setOrderList((prev) => prev.map((item) => ({ ...item, qty: item.id === +id ? item.qty + 1 : item.qty })));
+      setOrderList((prev) =>
+        prev.map((item) => ({ ...item, qty: item.id === +id && item.value === value ? item.qty + 1 : item.qty })),
+      );
     }
   };
 
   const handleDelete = useCallback((e: React.MouseEvent<HTMLSpanElement>) => {
+    const { value } = e.currentTarget.dataset;
+
+    if (value) {
+      setOrderList((prev) => prev.filter((item) => item.value !== value));
+    }
+  }, []);
+
+  const handleOptionSelectStart = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const { id } = e.currentTarget.dataset;
-
     if (id) {
-      setOrderList((prev) => prev.filter((item) => item.id !== +id));
+      setShowOptionList((prev) => (prev === +id ? 0 : +id));
     }
   }, []);
 
-  const handleOptionSelectStart = useCallback(() => {
-    setShowOptionList((prev) => !prev);
-  }, []);
+  const handleOptionSelect = useCallback(
+    (e: React.MouseEvent<HTMLLIElement>) => {
+      e.stopPropagation();
+      const {
+        optionname: optionName,
+        value,
+        id,
+        additionalprice: additionalPrice,
+        parentid: parentId,
+      } = e.currentTarget.dataset;
+      setShowOptionList(0);
 
-  const handleOptionSelect = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
-    const { optionname: optionName, value, id, additionalprice: additionalPrice } = e.currentTarget.dataset;
-    if (optionName && value && id && additionalPrice) {
-      setOrderList((prev) => {
-        if (prev.length) {
-          if (prev.find((lst) => lst.id === +id)) {
-            alert('이미 추가 되었습니다 :)');
-            return prev;
+      if (optionName && value && id && additionalPrice && parentId) {
+        const last = options?.length === +parentId;
+
+        setSelectedOptionValue((prev) => {
+          if (prev) {
+            if (prev[+parentId - 1]) {
+              prev[+parentId - 1] = value;
+              return prev;
+            }
+            return [...prev, value];
           }
-          return [...prev, { id: +id, optionName, value, qty: 1, additionalPrice: +additionalPrice }];
-        } else {
-          return [{ id: +id, optionName, value, qty: 1, additionalPrice: +additionalPrice }];
+          return [value];
+        });
+
+        // 마지막 옵션값까지 골랐을때
+        if (last) {
+          setOrderList((prev) => {
+            const txt = selectedOptionValue ? `${selectedOptionValue.join(', ')}, ${value}` : value;
+            if (prev.length) {
+              if (prev.find((lst) => lst.id === +id && lst.value === txt)) {
+                alert('이미 추가 되었습니다 :)');
+                return prev;
+              }
+
+              return [...prev, { id: +id, value: txt, qty: 1, additionalPrice: +additionalPrice }];
+            } else {
+              return [{ id: +id, value: txt, qty: 1, additionalPrice: +additionalPrice }];
+            }
+          });
+          setSelectedOptionValue([]);
         }
-      });
-    }
-  }, []);
+      }
+    },
+    [options?.length, selectedOptionValue],
+  );
 
   return (
     <OrderOptionContainer>
-      {options?.map((lst) => (
-        <SelectBox key={lst.id} onClick={handleOptionSelectStart}>
-          <div>{lst.optionName}</div>
-          {showOptionList && (
-            <SelectList>
-              {lst.value.map((value) => (
+      {options?.map((lst, index) => (
+        <SelectBox
+          disabled={index > 0 ? (selectedOptionValue[index - 1] ? false : true) : false}
+          key={lst.id}
+          data-id={lst.id}
+          onClick={handleOptionSelectStart}
+        >
+          <div>{selectedOptionValue[index] || lst.optionName}</div>
+          {lst.value.map((value) =>
+            lst.id === showOptionList ? (
+              <SelectList>
                 <li
                   key={value.id}
                   onClick={handleOptionSelect}
                   data-additionalprice={value.additionalPrice}
+                  data-parentid={lst.id}
                   data-id={value.id}
                   data-optionname={lst.optionName}
                   data-value={value.text}
                 >
                   {value.text} {value.additionalPrice ? `(+${value.additionalPrice.toLocaleString()})` : ''}
                 </li>
-              ))}
-            </SelectList>
+              </SelectList>
+            ) : null,
           )}
           <span>
             <DownOutlined />
@@ -227,19 +280,19 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props
           {orderList.map((item) => (
             <SelectItemList key={item.id}>
               <SelecItemTitle>
-                {item.optionName} - {item.value}{' '}
-                <span onClick={handleDelete} data-id={item.id}>
+                {item.value}{' '}
+                <span onClick={handleDelete} data-value={item.value} data-id={item.id}>
                   <CloseCircleOutlined />
                 </span>
               </SelecItemTitle>
 
               <SelectItemPriceSetting>
                 <SelectItemQty>
-                  <button onClick={handleCount} data-id={item.id} data-type="-">
+                  <button onClick={handleCount} data-value={item.value} data-id={item.id} data-type="-">
                     -
                   </button>
                   <span>{item.qty}</span>
-                  <button onClick={handleCount} data-id={item.id} data-type="+">
+                  <button onClick={handleCount} data-value={item.value} data-id={item.id} data-type="+">
                     +
                   </button>
                 </SelectItemQty>

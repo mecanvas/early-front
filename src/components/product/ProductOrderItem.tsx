@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Divider } from 'antd';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { DeliveryOption, ProductOption } from 'src/interfaces/ProductInterface';
 import { User } from 'src/interfaces/User';
 import ProductOrderMutiOptions from './ProductOrderMutiOptions';
@@ -58,6 +58,9 @@ const ProductOrderBtn = styled.div`
     }
 
     &:nth-of-type(2) {
+      &:disabled {
+        background: ${({ theme }) => theme.color.gray600};
+      }
       border: 1px solid ${({ theme }) => theme.color.gray100};
       color: ${({ theme }) => theme.color.white};
       background: ${({ theme }) => theme.color.black};
@@ -76,6 +79,7 @@ interface Props {
 }
 
 const ProductOrderItem = ({ title, meta, uploader, price, status, productOption, deliveryOption }: Props) => {
+  const handleOrder = useCallback(() => {}, []);
   return (
     <Container>
       <HostInfomation>
@@ -101,7 +105,7 @@ const ProductOrderItem = ({ title, meta, uploader, price, status, productOption,
 
       <ProductOrderBtn>
         <button>장바구니</button>
-        {status === 1 ? <button>바로구매</button> : <button disabled>임시품절</button>}
+        {status === 1 ? <button onClick={handleOrder}>바로구매</button> : <button disabled>임시품절</button>}
       </ProductOrderBtn>
     </Container>
   );
