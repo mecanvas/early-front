@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
 import React from 'react';
-import { APP_HEADER_HEIGHT } from 'src/constants';
 import { Product } from 'src/interfaces/ProductInterface';
 import ProductDescription from './ProductDescription';
 import ProductOrderItem from './ProductOrderItem';
@@ -12,7 +11,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: ${APP_HEADER_HEIGHT + 40}px;
+  padding-top: 2em;
   padding-bottom: 2em;
 `;
 

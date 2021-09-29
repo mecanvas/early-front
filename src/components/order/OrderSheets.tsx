@@ -3,7 +3,6 @@ import { Divider } from 'antd';
 import router from 'next/router';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { APP_HEADER_HEIGHT } from 'src/constants';
 import { useAppSelector } from 'src/hooks/useRedux';
 import { setProductOrderInfo } from 'src/store/reducers/order';
 import { TotalPrice } from '../product/ProductOrderMutiOptions';
@@ -11,7 +10,7 @@ import OrderProductList from './OrderProductList';
 
 const Container = styled.div`
   background-color: ${({ theme }) => theme.color.gray000};
-  padding-top: ${APP_HEADER_HEIGHT}px;
+  padding-top: 2em;
   min-height: 100vh;
   padding-bottom: 2em;
   h3 {

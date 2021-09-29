@@ -4,8 +4,6 @@ import { useExceptionRoute } from 'src/hooks/useExceptionRoute';
 import Logo from './Logo';
 import { APP_HEADER_HEIGHT } from 'src/constants';
 import { CloseOutlined, MenuOutlined, ShoppingCartOutlined, UserOutlined } from '@ant-design/icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingBag } from '@fortawesome/free-solid-svg-icons';
 import { Divider } from 'antd';
 import Link from 'next/link';
 import { useAppSelector } from 'src/hooks/useRedux';

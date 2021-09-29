@@ -5,7 +5,7 @@ import AppLayout from 'src/components/layouts/AppLayout';
 import axios from 'axios';
 import { ThemeProvider } from '@emotion/react';
 import { theme } from 'src/style/theme';
-import { API_URL, MY_URL } from 'src/constants';
+import { API_URL, APP_HEADER_HEIGHT, MY_URL } from 'src/constants';
 import { isIE } from 'react-device-detect';
 import { icons } from 'public/icons';
 import { store } from 'src/store/config';
@@ -16,6 +16,7 @@ import { MAIN_DESC, MAIN_IMAGE_URL, MAIN_TITLE, SITE_NAME } from 'src/constants/
 import { useRouter } from 'next/router';
 
 const AppContainer = styled.main`
+  padding-top: ${APP_HEADER_HEIGHT}px;
   width: 100%;
 `;
 

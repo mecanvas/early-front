@@ -2,13 +2,12 @@ import styled from '@emotion/styled';
 import { Collapse, Divider } from 'antd';
 import router from 'next/router';
 import React, { useMemo } from 'react';
-import { APP_HEADER_HEIGHT } from 'src/constants';
 import Link from 'next/link';
 import { useAppSelector } from 'src/hooks/useRedux';
 import OrderProductList from '../order/OrderProductList';
 
 const Container = styled.div`
-  padding-top: ${APP_HEADER_HEIGHT}px;
+  padding: 2.5em 0;
   background: ${({ theme }) => theme.color.gray000};
 `;
 
