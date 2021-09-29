@@ -21,7 +21,7 @@ export interface Cart {
   product: ProductList[];
 }
 
-export interface User {
+export interface Uploader {
   id: number;
   email: string;
   username: string;

@@ -7,6 +7,8 @@ import canvas from './reducers/canvas';
 import progress from './reducers/progress';
 import redirects from './reducers/redirects';
 import user from './reducers/user';
+import order from './reducers/order';
+import utils from './reducers/utils';
 
 const reducer = combineReducers({
   frame,
@@ -15,6 +17,8 @@ const reducer = combineReducers({
   canvas,
   progress,
   user,
+  order,
+  utils,
 });
 
 const middleware = (getDefaultMiddleware: any) => {

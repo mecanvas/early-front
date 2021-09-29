@@ -1,17 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { postUserLogin } from '../api/user/user';
 import { postUserLogout } from '../api/user/userLogout';
+import { Address } from './order';
 
 export type UserData = {
   id: number;
   email: string;
-  password: string;
   role: 0 | 1; // 0 = 일반 1 = 어드민
   username: string;
   phone: string;
-  address: string;
-  addressDetail: string;
-  createdAt: string;
+  address: Address;
 };
 
 interface InitialState {

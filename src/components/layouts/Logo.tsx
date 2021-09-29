@@ -20,7 +20,7 @@ const Logo = () => {
   const router = useRouter();
 
   const handlePushMainPage = useCallback(() => {
-    router.push('/tool');
+    router.push('/');
   }, [router]);
 
   return (

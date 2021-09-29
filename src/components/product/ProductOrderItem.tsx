@@ -1,8 +1,13 @@
 import styled from '@emotion/styled';
 import { Divider } from 'antd';
-import React from 'react';
+import router from 'next/router';
+import React, { useCallback, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNoticeModal } from 'src/hooks/useNoticeModal';
+import { useAppSelector } from 'src/hooks/useRedux';
 import { DeliveryOption, ProductOption } from 'src/interfaces/ProductInterface';
-import { User } from 'src/interfaces/User';
+import { Uploader } from 'src/interfaces/User';
+import { setModalVisible } from 'src/store/reducers/utils';
 import ProductOrderMutiOptions from './ProductOrderMutiOptions';
 import ProductOrderSingleOptions from './ProductOrderSingleOptions';
 
@@ -58,6 +63,9 @@ const ProductOrderBtn = styled.div`
     }
 
     &:nth-of-type(2) {
+      &:disabled {
+        background: ${({ theme }) => theme.color.gray600};
+      }
       border: 1px solid ${({ theme }) => theme.color.gray100};
       color: ${({ theme }) => theme.color.white};
       background: ${({ theme }) => theme.color.black};
@@ -68,16 +76,60 @@ const ProductOrderBtn = styled.div`
 interface Props {
   title: string;
   meta: string;
-  uploader: User;
+  uploader: Uploader;
   price: number;
+  thumb: string;
   status: 1 | 2;
   productOption: ProductOption;
   deliveryOption: DeliveryOption;
 }
 
-const ProductOrderItem = ({ title, meta, uploader, price, status, productOption, deliveryOption }: Props) => {
+const ProductOrderItem = ({ title, meta, uploader, price, thumb, status, productOption, deliveryOption }: Props) => {
+  const { productOrder } = useAppSelector((state) => state.order);
+  const { userData } = useAppSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  const productId = useMemo(() => {
+    if (process.browser) {
+      const { productId } = router.query;
+      if (productId) {
+        return +productId;
+      }
+    }
+    return 0;
+  }, []);
+
+  const { NoticeModal } = useNoticeModal({
+    bodyText: '비회원으로 구매하시면 적립 혜택을 받으실 수 없어요 :)',
+    okText: '계속하기',
+    cancelText: '로그인',
+    okUrl: process.browser ? `/product/order/${router.query.productId}` : '',
+    cancelUrl: '/login',
+  });
+
+  const handleSaveCart = useCallback(() => {
+    if (!productOrder.length) {
+      return alert('선택하신 상품이 없어요 :)');
+    }
+  }, [productOrder.length]);
+
+  const handleOrder = useCallback(() => {
+    const { productId } = router.query;
+    if (!productOrder.length) {
+      return alert('선택하신 상품이 없어요 :)');
+    }
+    if (!userData) {
+      dispatch(setModalVisible(true));
+      return;
+    }
+    if (productId) {
+      router.push(`/product/order/${productId}`);
+    }
+  }, [productOrder.length, userData, dispatch]);
+
   return (
     <Container>
+      <NoticeModal />
       <HostInfomation>
         <div>
           <div>{uploader.username}</div>
@@ -94,14 +146,27 @@ const ProductOrderItem = ({ title, meta, uploader, price, status, productOption,
 
       <Divider />
 
-      {productOption.type === 1 && <ProductOrderSingleOptions price={price} deliveryOption={deliveryOption} />}
+      {productOption.type === 1 && (
+        <ProductOrderSingleOptions
+          thumb={thumb}
+          productId={productId as number}
+          title={title}
+          price={price}
+          deliveryOption={deliveryOption}
+        />
+      )}
       {productOption.type === 2 && (
-        <ProductOrderMutiOptions productOption={productOption} price={price} deliveryOption={deliveryOption} />
+        <ProductOrderMutiOptions
+          thumb={thumb}
+          productOption={productOption}
+          price={price}
+          deliveryOption={deliveryOption}
+        />
       )}
 
       <ProductOrderBtn>
-        <button>장바구니</button>
-        {status === 1 ? <button>바로구매</button> : <button disabled>임시품절</button>}
+        <button onClick={handleSaveCart}>장바구니</button>
+        {status === 1 ? <button onClick={handleOrder}>바로구매</button> : <button disabled>임시품절</button>}
       </ProductOrderBtn>
     </Container>
   );
