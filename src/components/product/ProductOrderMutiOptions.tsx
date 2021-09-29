@@ -1,6 +1,6 @@
 import { CloseCircleOutlined, DownOutlined } from '@ant-design/icons';
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { ProductOption, DeliveryOption } from 'src/interfaces/ProductInterface';
+import { ProductOption, DeliveryOption, ProductOptionList } from 'src/interfaces/ProductInterface';
 import styled from '@emotion/styled';
 import ProductOrderDeliver from './ProductOrderDeliver';
 import { css } from '@emotion/react';
@@ -129,19 +129,11 @@ interface Props {
   thumb: string;
 }
 
-interface OrderList {
-  value: string;
-  productId: number;
-  optionId: number;
-  qty: number;
-  additionalPrice: number;
-}
-
 const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb }: Props) => {
   const dispatch = useDispatch();
 
   const { options } = productOption;
-  const [orderList, setOrderList] = useState<OrderList[]>([]);
+  const [orderList, setOrderList] = useState<ProductOptionList[]>([]);
   const [showOptionList, setShowOptionList] = useState(0);
   const [selectedOptionValue, setSelectedOptionValue] = useState<string[]>([]);
 
