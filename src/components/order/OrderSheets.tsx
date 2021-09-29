@@ -1,9 +1,11 @@
 import styled from '@emotion/styled';
 import { Divider } from 'antd';
 import router from 'next/router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
 import { APP_HEADER_HEIGHT } from 'src/constants';
 import { useAppSelector } from 'src/hooks/useRedux';
+import { setProductOrderInfo } from 'src/store/reducers/order';
 import { TotalPrice } from '../product/ProductOrderMutiOptions';
 
 const Container = styled.div`
@@ -135,15 +137,50 @@ const OrderPayButton = styled.div`
     color: ${({ theme }) => theme.color.white};
     margin-top: 2em;
     padding: 0.5em 2em;
+    cursor: pointer;
   }
 `;
 
 declare const daum: any;
 
 const OrderSheets = () => {
-  const { productOrder, deliveryOption } = useAppSelector((state) => state.order);
+  const dispatch = useDispatch();
   const { userData } = useAppSelector((state) => state.user);
-  const [address, setAddress] = useState({ postCode: '', address: '', sido: '', sigungu: '' });
+  const { productOrder, deliveryOption, productOrderInfo } = useAppSelector((state) => state.order);
+
+  const handleDeliveryMemo = useCallback(
+    (e) => {
+      dispatch(setProductOrderInfo({ ...productOrderInfo, memo: e.target.value }));
+    },
+    [dispatch, productOrderInfo],
+  );
+
+  const handleDeliveryReceiver = useCallback(
+    (e) => {
+      dispatch(setProductOrderInfo({ ...productOrderInfo, receiver: e.target.value }));
+    },
+    [dispatch, productOrderInfo],
+  );
+
+  const handlePhoneNum = useCallback(
+    (e) => {
+      const { name, value } = e.target;
+      dispatch(setProductOrderInfo({ ...productOrderInfo, [name]: value }));
+    },
+    [dispatch, productOrderInfo],
+  );
+
+  const handleAddressDetail = useCallback(
+    (e) => {
+      dispatch(
+        setProductOrderInfo({
+          ...productOrderInfo,
+          address: { ...productOrderInfo.address, addressDetail: e.target.value },
+        }),
+      );
+    },
+    [dispatch, productOrderInfo],
+  );
 
   const handleAddress = useCallback(() => {
     if (process.browser) {
@@ -171,8 +208,11 @@ const OrderSheets = () => {
               address,
               sido: data.sido,
               sigungu: data.sigungu,
+              addressDetail: '',
             };
-            setAddress(userAddr);
+            dispatch(
+              setProductOrderInfo({ ...productOrderInfo, address: { ...productOrderInfo.address, ...userAddr } }),
+            );
           } else {
             const address = data.jibunAddress + extraRoadAddr;
             const userAddr = {
@@ -180,13 +220,16 @@ const OrderSheets = () => {
               address,
               sido: data.sido,
               sigungu: data.sigungu,
+              addressDetail: '',
             };
-            setAddress(userAddr);
+            dispatch(
+              setProductOrderInfo({ ...productOrderInfo, address: { ...productOrderInfo.address, ...userAddr } }),
+            );
           }
         },
       }).open();
     }
-  }, []);
+  }, [dispatch, productOrderInfo]);
 
   const deliveryPrice = useMemo(() => {
     return deliveryOption.deliveryPrice;
@@ -212,10 +255,19 @@ const OrderSheets = () => {
     }, 0);
   }, [productOrder]);
 
+  const handlePayNow = useCallback(() => {
+    router.push('/pay?status=1');
+  }, []);
+
   useEffect(() => {
     if (!productOrder.length) {
       router.back();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    dispatch(setProductOrderInfo({ ...productOrderInfo, productOrder }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -255,35 +307,54 @@ const OrderSheets = () => {
           <DeliverySetting>
             <DeliveryReceiver>
               <h5>수령인 :</h5>
-              <input type="text" placeholder="이름" />
+              <input type="text" placeholder="이름" onChange={handleDeliveryReceiver} />
             </DeliveryReceiver>
             <DeliveryAddress>
               <h5>주소 입력 :</h5>
               <div>
-                <input type="text" placeholder="우편번호" />
+                <input
+                  type="text"
+                  placeholder="우편번호"
+                  value={userData ? userData.address.postCode : productOrderInfo.address.postCode}
+                />
                 <button onClick={handleAddress}>찾기</button>
               </div>
               <div>
-                <input type="text" placeholder="주소" />
+                <input
+                  type="text"
+                  placeholder="주소"
+                  value={userData ? userData.address.address : productOrderInfo.address.address}
+                />
               </div>
               <div>
-                <input type="text" placeholder="상세주소" />
+                <input
+                  type="text"
+                  placeholder="상세주소"
+                  value={userData ? userData.address.addressDetail : productOrderInfo.address.addressDetail}
+                  onChange={handleAddressDetail}
+                />
               </div>
             </DeliveryAddress>
 
             <DeliveryPhone>
               <h5>연락처 :</h5>
               <div>
-                <input type="text" placeholder="연락처 1" />
+                <input
+                  type="text"
+                  placeholder="연락처 1"
+                  name="phone"
+                  value={userData ? userData.phone : productOrderInfo.phone}
+                  onChange={handlePhoneNum}
+                />
               </div>
               <div>
-                <input type="text" placeholder="연락처 2" />
+                <input type="text" placeholder="연락처 2" name="phone2" onChange={handlePhoneNum} />
               </div>
             </DeliveryPhone>
 
             <DeliveryMemo>
               <h5>배송 메모 :</h5>
-              <textarea placeholder="배송 메모를 입력하세요." />
+              <textarea placeholder="배송 메모를 입력하세요." onChange={handleDeliveryMemo} />
             </DeliveryMemo>
           </DeliverySetting>
         </ProductDelivery>
@@ -298,7 +369,9 @@ const OrderSheets = () => {
             </div>
           </div>
           <OrderPayButton>
-            <button type="button">결제</button>
+            <button type="button" onClick={handlePayNow}>
+              결제
+            </button>
           </OrderPayButton>
         </DeliveryOrderPay>
       </OrderTable>

@@ -90,9 +90,11 @@ const ProductOrderItem = ({ title, meta, uploader, price, thumb, status, product
   const dispatch = useDispatch();
 
   const productId = useMemo(() => {
-    const { productId } = router.query;
-    if (productId) {
-      return +productId;
+    if (process.browser) {
+      const { productId } = router.query;
+      if (productId) {
+        return +productId;
+      }
     }
     return 0;
   }, []);
