@@ -1,10 +1,21 @@
 import { Divider } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { DeliveryOption } from 'src/interfaces/ProductInterface';
+import { setProductOrder } from 'src/store/reducers/order';
 import ProductOrderDeliver from './ProductOrderDeliver';
 import { SelectItemQty, TotalPrice } from './ProductOrderMutiOptions';
 
-const ProductOrderSingleOptions = ({ deliveryOption, price }: { deliveryOption: DeliveryOption; price: number }) => {
+const ProductOrderSingleOptions = ({
+  title,
+  deliveryOption,
+  price,
+}: {
+  title: string;
+  deliveryOption: DeliveryOption;
+  price: number;
+}) => {
+  const dispatch = useDispatch();
   const [count, setCount] = useState(1);
 
   const handleCount = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -22,6 +33,12 @@ const ProductOrderSingleOptions = ({ deliveryOption, price }: { deliveryOption: 
       setCount((prev) => prev + 1);
     }
   };
+
+  useEffect(() => {
+    dispatch(setProductOrder([{ id: 1, value: title, qty: count, price: count * price }]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [count]);
+
   return (
     <div>
       <SelectItemQty>

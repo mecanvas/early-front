@@ -1,9 +1,11 @@
 import { CloseCircleOutlined, DownOutlined } from '@ant-design/icons';
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { ProductOption, DeliveryOption } from 'src/interfaces/ProductInterface';
 import styled from '@emotion/styled';
 import ProductOrderDeliver from './ProductOrderDeliver';
 import { css } from '@emotion/react';
+import { useDispatch } from 'react-redux';
+import { setProductOrder } from 'src/store/reducers/order';
 
 export const OrderOptionContainer = styled.div``;
 
@@ -134,6 +136,8 @@ interface OrderList {
 }
 
 const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props) => {
+  const dispatch = useDispatch();
+
   const { options } = productOption;
   const [orderList, setOrderList] = useState<OrderList[]>([]);
   const [showOptionList, setShowOptionList] = useState(0);
@@ -240,6 +244,17 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props
     [options?.length, selectedOptionValue],
   );
 
+  useEffect(() => {
+    const productOrder = orderList.map((lst) => ({
+      id: lst.id,
+      value: lst.value,
+      qty: lst.qty,
+      price: lst.qty * (price + lst.additionalPrice),
+    }));
+    dispatch(setProductOrder(productOrder));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderList]);
+
   return (
     <OrderOptionContainer>
       {options?.map((lst, index) => (
@@ -252,9 +267,8 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props
           <div>{selectedOptionValue[index] || lst.optionName}</div>
           {lst.value.map((value) =>
             lst.id === showOptionList ? (
-              <SelectList>
+              <SelectList key={value.id}>
                 <li
-                  key={value.id}
                   onClick={handleOptionSelect}
                   data-additionalprice={value.additionalPrice}
                   data-parentid={lst.id}
@@ -278,7 +292,7 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props
       {orderList.length ? (
         <div>
           {orderList.map((item) => (
-            <SelectItemList key={item.id}>
+            <SelectItemList key={item.value}>
               <SelecItemTitle>
                 {item.value}{' '}
                 <span onClick={handleDelete} data-value={item.value} data-id={item.id}>

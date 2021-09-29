@@ -98,7 +98,9 @@ const ProductOrderItem = ({ title, meta, uploader, price, status, productOption,
 
       <Divider />
 
-      {productOption.type === 1 && <ProductOrderSingleOptions price={price} deliveryOption={deliveryOption} />}
+      {productOption.type === 1 && (
+        <ProductOrderSingleOptions title={title} price={price} deliveryOption={deliveryOption} />
+      )}
       {productOption.type === 2 && (
         <ProductOrderMutiOptions productOption={productOption} price={price} deliveryOption={deliveryOption} />
       )}
