@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
 import ProductOrderDeliver from './ProductOrderDeliver';
 import { css } from '@emotion/react';
 import { useDispatch } from 'react-redux';
-import { setProductOrder } from 'src/store/reducers/order';
+import { setProductDeliveryOption, setProductOrder } from 'src/store/reducers/order';
 
 export const OrderOptionContainer = styled.div``;
 
@@ -252,6 +252,8 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props
       price: lst.qty * (price + lst.additionalPrice),
     }));
     dispatch(setProductOrder(productOrder));
+    dispatch(setProductDeliveryOption(deliveryOption));
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderList]);
 

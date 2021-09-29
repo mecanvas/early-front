@@ -2,7 +2,7 @@ import { Divider } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { DeliveryOption } from 'src/interfaces/ProductInterface';
-import { setProductOrder } from 'src/store/reducers/order';
+import { setProductDeliveryOption, setProductOrder } from 'src/store/reducers/order';
 import ProductOrderDeliver from './ProductOrderDeliver';
 import { SelectItemQty, TotalPrice } from './ProductOrderMutiOptions';
 
@@ -36,6 +36,7 @@ const ProductOrderSingleOptions = ({
 
   useEffect(() => {
     dispatch(setProductOrder([{ id: 1, value: title, qty: count, price: count * price }]));
+    dispatch(setProductDeliveryOption(deliveryOption));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
 
