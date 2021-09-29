@@ -14,15 +14,6 @@ const nextConfig = {
   webpack(config) {
     return merge(config, webpackConfig);
   },
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/tool',
-        permanent: true,
-      },
-    ];
-  },
 };
 
 module.exports = withPlugins(
