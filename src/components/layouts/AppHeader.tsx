@@ -3,11 +3,12 @@ import styled from '@emotion/styled';
 import { useExceptionRoute } from 'src/hooks/useExceptionRoute';
 import Logo from './Logo';
 import { APP_HEADER_HEIGHT } from 'src/constants';
-import { CloseOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
+import { CloseOutlined, MenuOutlined, ShoppingCartOutlined, UserOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBox } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingBag } from '@fortawesome/free-solid-svg-icons';
 import { Divider } from 'antd';
 import Link from 'next/link';
+import { useAppSelector } from 'src/hooks/useRedux';
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -114,6 +115,8 @@ const HeaderUser = styled.div`
 const UserMyPageIcon = styled.div<{ openMyInfo?: boolean }>`
   margin: 0 0.4em;
   cursor: pointer;
+  display: flex;
+  align-items: center;
   width: 20px;
   svg {
     font-size: 20px;
@@ -138,6 +141,19 @@ const UserMyPageIcon = styled.div<{ openMyInfo?: boolean }>`
   }
 `;
 
+const NotUserData = styled.ul`
+  display: flex;
+  align-items: center;
+  li {
+    cursor: pointer;
+    margin-right: 0.5em;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+`;
+
 const MobileMenuBar = styled.div<{ openNavi: boolean }>`
   display: none;
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
@@ -156,7 +172,7 @@ const MobileMenuBar = styled.div<{ openNavi: boolean }>`
 
 const AppHeader = () => {
   const { exceptionRoute } = useExceptionRoute();
-
+  const { userData } = useAppSelector((state) => state.user);
   const [openNavi, setOpenNavi] = useState(false);
   const [openMyInfo, setOpenMyInfo] = useState(false);
   const handleMyInfo = useCallback(() => {
@@ -214,26 +230,44 @@ const AppHeader = () => {
 
             <HeaderNavigationMobile openNavi={openNavi}>
               <Divider />
-              <small>마이페이지</small>
-              <small>배송조회</small>
-              <small>문의하기</small>
-              <small>로그아웃</small>
+              {userData ? (
+                <>
+                  <small>마이페이지</small>
+                  <small>배송조회</small>
+                  <small>문의하기</small>
+                  <small>로그아웃</small>
+                </>
+              ) : (
+                <>
+                  <small>회원가입</small>
+                  <small>로그인</small>
+                </>
+              )}
             </HeaderNavigationMobile>
           </ul>
         </HeaderNavigation>
         <HeaderUser>
           <UserMyPageIcon>
-            <FontAwesomeIcon icon={faBox} />
+            <ShoppingCartOutlined />
           </UserMyPageIcon>
-          <UserMyPageIcon onClick={handleMyInfo} openMyInfo={openMyInfo}>
-            <UserOutlined />
-            <ul>
-              <Li link="/me" txt="마이페이지" />
-              <Li link="/delivery" txt="배송조회" />
-              <Li link="/q" txt="문의하기" />
-              <Li txt="로그아웃" />
-            </ul>
-          </UserMyPageIcon>
+
+          {userData ? (
+            <UserMyPageIcon onClick={handleMyInfo} openMyInfo={openMyInfo}>
+              <UserOutlined />
+              <ul>
+                <Li link="/me" txt="마이페이지" />
+                <Li link="/delivery" txt="배송조회" />
+                <Li link="/cart" txt="장바구니" />
+                <Li link="/q" txt="문의하기" />
+                <Li txt="로그아웃" />
+              </ul>
+            </UserMyPageIcon>
+          ) : (
+            <NotUserData>
+              <Li link="/register" txt="회원가입"></Li>
+              <Li link="/login" txt="로그인"></Li>
+            </NotUserData>
+          )}
         </HeaderUser>
         <MobileMenuBar openNavi={openNavi} onClick={handleOpenNavi}>
           <MenuOutlined />
