@@ -117,9 +117,25 @@ const DeliveryMemo = styled.div`
   }
 `;
 
-const DeliveryOrder = styled.div`
+const DeliveryOrderPay = styled.div`
   margin-top: 4em;
   padding: 0.5em 0;
+
+  div {
+    text-align: center;
+  }
+`;
+
+const OrderPayButton = styled.div`
+  button {
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    background: ${({ theme }) => theme.color.black};
+    color: ${({ theme }) => theme.color.white};
+    margin-top: 2em;
+    padding: 0.5em 2em;
+  }
 `;
 
 declare const daum: any;
@@ -272,12 +288,19 @@ const OrderSheets = () => {
           </DeliverySetting>
         </ProductDelivery>
 
-        <DeliveryOrder>
+        <DeliveryOrderPay>
           <h2>- 결제 진행</h2>
-          <div>총 {(totalPrice + deliveryPrice).toLocaleString()}원 결제를 진행합니다.</div>
-          <small>배송비 {deliveryPrice.toLocaleString()}원</small>
-          <button type="button">결제</button>
-        </DeliveryOrder>
+          <Divider />
+          <div>
+            총 {(totalPrice + deliveryPrice).toLocaleString()}원에 대한 결제를 진행합니다.
+            <div>
+              <small>(배송비 {deliveryPrice.toLocaleString()}원)</small>
+            </div>
+          </div>
+          <OrderPayButton>
+            <button type="button">결제</button>
+          </OrderPayButton>
+        </DeliveryOrderPay>
       </OrderTable>
     </Container>
   );

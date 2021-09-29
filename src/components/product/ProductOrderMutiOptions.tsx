@@ -166,7 +166,7 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb }
   }, [orderList, price]);
 
   const handleCount = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const { type, optionId, value } = e.currentTarget.dataset;
+    const { type, optionid: optionId, value } = e.currentTarget.dataset;
 
     if (type === '-' && optionId) {
       setOrderList((prev) =>
@@ -207,19 +207,19 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb }
       const {
         optionname: optionName,
         value,
-        id,
+        optionid: optionId,
         additionalprice: additionalPrice,
-        parentid: parentId,
+        productid: productId,
       } = e.currentTarget.dataset;
       setShowOptionList(0);
 
-      if (optionName && value && id && additionalPrice && parentId) {
-        const last = options?.length === +parentId;
+      if (optionName && value && optionId && additionalPrice && productId) {
+        const last = options?.length === +productId;
 
         setSelectedOptionValue((prev) => {
           if (prev) {
-            if (prev[+parentId - 1]) {
-              prev[+parentId - 1] = value;
+            if (prev[+productId - 1]) {
+              prev[+productId - 1] = value;
               return prev;
             }
             return [...prev, value];
@@ -232,17 +232,19 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb }
           setOrderList((prev) => {
             const txt = selectedOptionValue ? `${selectedOptionValue.join(', ')}, ${value}` : value;
             if (prev.length) {
-              if (prev.find((lst) => lst.optionId === +id && lst.value === txt)) {
+              if (prev.find((lst) => lst.optionId === +optionId && lst.value === txt)) {
                 alert('이미 추가 되었습니다 :)');
                 return prev;
               }
 
               return [
                 ...prev,
-                { optionId: +id, productId: +parentId, value: txt, qty: 1, additionalPrice: +additionalPrice },
+                { optionId: +optionId, productId: +productId, value: txt, qty: 1, additionalPrice: +additionalPrice },
               ];
             } else {
-              return [{ optionId: +id, productId: +parentId, value: txt, qty: 1, additionalPrice: +additionalPrice }];
+              return [
+                { optionId: +optionId, productId: +productId, value: txt, qty: 1, additionalPrice: +additionalPrice },
+              ];
             }
           });
           setSelectedOptionValue([]);
@@ -283,8 +285,8 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb }
                 <li
                   onClick={handleOptionSelect}
                   data-additionalprice={value.additionalPrice}
-                  data-parentid={lst.id}
-                  data-id={value.id}
+                  data-productid={lst.id}
+                  data-optionid={value.id}
                   data-optionname={lst.optionName}
                   data-value={value.text}
                 >
@@ -314,11 +316,11 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb }
 
               <SelectItemPriceSetting>
                 <SelectItemQty>
-                  <button onClick={handleCount} data-value={item.value} data-optionId={item.optionId} data-type="-">
+                  <button onClick={handleCount} data-value={item.value} data-optionid={item.optionId} data-type="-">
                     -
                   </button>
                   <span>{item.qty}</span>
-                  <button onClick={handleCount} data-value={item.value} data-optionId={item.optionId} data-type="+">
+                  <button onClick={handleCount} data-value={item.value} data-optionid={item.optionId} data-type="+">
                     +
                   </button>
                 </SelectItemQty>
