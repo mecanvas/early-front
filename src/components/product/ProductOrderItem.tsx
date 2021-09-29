@@ -1,8 +1,13 @@
 import styled from '@emotion/styled';
 import { Divider } from 'antd';
+import router from 'next/router';
 import React, { useCallback } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNoticeModal } from 'src/hooks/useNoticeModal';
+import { useAppSelector } from 'src/hooks/useRedux';
 import { DeliveryOption, ProductOption } from 'src/interfaces/ProductInterface';
 import { Uploader } from 'src/interfaces/User';
+import { setModalVisible } from 'src/store/reducers/utils';
 import ProductOrderMutiOptions from './ProductOrderMutiOptions';
 import ProductOrderSingleOptions from './ProductOrderSingleOptions';
 
@@ -79,9 +84,41 @@ interface Props {
 }
 
 const ProductOrderItem = ({ title, meta, uploader, price, status, productOption, deliveryOption }: Props) => {
-  const handleOrder = useCallback(() => {}, []);
+  const { productOrder } = useAppSelector((state) => state.order);
+  const { userData } = useAppSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  const { NoticeModal } = useNoticeModal({
+    bodyText: '비회원으로 구매하시면 적립 혜택을 받으실 수 없어요 :)',
+    okText: '계속하기',
+    cancelText: '로그인',
+    okUrl: `/product/order/${router.query.productId}`,
+    cancelUrl: '/login',
+  });
+
+  const handleSaveCart = useCallback(() => {
+    if (!productOrder.length) {
+      return alert('선택하신 상품이 없어요 :)');
+    }
+  }, [productOrder.length]);
+
+  const handleOrder = useCallback(() => {
+    const { productId } = router.query;
+    if (!productOrder.length) {
+      return alert('선택하신 상품이 없어요 :)');
+    }
+    if (!userData) {
+      dispatch(setModalVisible(true));
+      return;
+    }
+    if (productId) {
+      router.push(`/product/order/${productId}`);
+    }
+  }, [productOrder.length, userData, dispatch]);
+
   return (
     <Container>
+      <NoticeModal />
       <HostInfomation>
         <div>
           <div>{uploader.username}</div>
@@ -106,7 +143,7 @@ const ProductOrderItem = ({ title, meta, uploader, price, status, productOption,
       )}
 
       <ProductOrderBtn>
-        <button>장바구니</button>
+        <button onClick={handleSaveCart}>장바구니</button>
         {status === 1 ? <button onClick={handleOrder}>바로구매</button> : <button disabled>임시품절</button>}
       </ProductOrderBtn>
     </Container>

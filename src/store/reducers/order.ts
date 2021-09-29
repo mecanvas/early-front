@@ -8,7 +8,7 @@ export interface ProductOrder {
 }
 
 interface InitialState {
-  productOrder: ProductOrder[] | null;
+  productOrder: ProductOrder[];
 }
 
 const initialState: InitialState = {
