@@ -67,15 +67,6 @@ const ProductDetail = () => {
             { id: 3, text: 'A2', additionalPrice: 0 },
           ],
         },
-        {
-          id: 3,
-          optionName: '색감 선택',
-          value: [
-            { id: 1, text: 'red', additionalPrice: 0 },
-            { id: 2, text: 'blue', additionalPrice: 1000 },
-            { id: 3, text: 'orange', additionalPrice: 3000 },
-          ],
-        },
       ],
     },
     deliveryOption: { deliveryPrice: 3000, additionalPrice: 5000, limit: 20000 },

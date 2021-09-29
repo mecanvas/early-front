@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { Divider } from 'antd';
 import React, { useCallback } from 'react';
 import { DeliveryOption, ProductOption } from 'src/interfaces/ProductInterface';
-import { User } from 'src/interfaces/User';
+import { Uploader } from 'src/interfaces/User';
 import ProductOrderMutiOptions from './ProductOrderMutiOptions';
 import ProductOrderSingleOptions from './ProductOrderSingleOptions';
 
@@ -71,7 +71,7 @@ const ProductOrderBtn = styled.div`
 interface Props {
   title: string;
   meta: string;
-  uploader: User;
+  uploader: Uploader;
   price: number;
   status: 1 | 2;
   productOption: ProductOption;

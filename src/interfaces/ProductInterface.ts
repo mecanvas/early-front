@@ -1,4 +1,4 @@
-import { User } from './User';
+import { Uploader } from './User';
 
 export interface ProductList {
   id: number;
@@ -44,7 +44,7 @@ export interface Product extends ProductList {
    *
    */
   subThumb: string[]; // 추가 썸네일
-  uploader: User; // 업로더
+  uploader: Uploader; // 업로더
   description: string; // 상품설명
   productOption: ProductOption; // 단독 or 조합형 옵션
   deliveryOption: DeliveryOption; // 배송 요금

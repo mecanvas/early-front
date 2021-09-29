@@ -21,8 +21,17 @@ export interface Cart {
   product: ProductList[];
 }
 
+export interface Uploader {
+  id: number;
+  email: string;
+  username: string;
+}
+
 export interface User {
   id: number;
   email: string;
   username: string;
+  phone: string;
+  address: string;
+  addressDetail: string;
 }
