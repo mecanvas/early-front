@@ -7,6 +7,7 @@ import { APP_HEADER_HEIGHT } from 'src/constants';
 import { useAppSelector } from 'src/hooks/useRedux';
 import { setProductOrderInfo } from 'src/store/reducers/order';
 import { TotalPrice } from '../product/ProductOrderMutiOptions';
+import OrderProductList from './OrderProductList';
 
 const Container = styled.div`
   background-color: ${({ theme }) => theme.color.gray000};
@@ -26,37 +27,6 @@ const OrderTable = styled.div`
   margin: 2em auto;
   background-color: ${({ theme }) => theme.color.white};
   min-height: 100vh;
-`;
-
-const ProductOrder = styled.div`
-  padding: 0.5em 0;
-  width: 100%;
-
-  div {
-    display: flex;
-  }
-  img {
-    width: 200px;
-  }
-`;
-
-const ProductInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-left: 1em;
-  padding: 0.5em;
-  width: 100%;
-
-  h3 {
-    margin-bottom: 2em;
-  }
-
-  div {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    font-size: 1.25rem;
-  }
 `;
 
 const ProductDelivery = styled.div`
@@ -276,20 +246,7 @@ const OrderSheets = () => {
       <OrderTable>
         <h2>- 주문 내역</h2>
         <Divider />
-        <ProductOrder>
-          {productOrder.map((lst) => (
-            <ProductOrder key={lst.value}>
-              <img src={lst.thumb} alt="상품 썸네일" />
-              <ProductInfo>
-                <h3>{lst.value}</h3>
-                <div>
-                  <div>{lst.qty}개</div>
-                  <div>{lst.price.toLocaleString()}원</div>
-                </div>
-              </ProductInfo>
-            </ProductOrder>
-          ))}
-        </ProductOrder>
+        <OrderProductList productOrder={productOrder} />
 
         <Divider />
 
