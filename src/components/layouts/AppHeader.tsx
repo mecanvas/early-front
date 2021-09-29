@@ -237,8 +237,8 @@ const AppHeader = () => {
                 </>
               ) : (
                 <>
-                  <small>회원가입</small>
                   <small>로그인</small>
+                  <small>회원가입</small>
                 </>
               )}
             </HeaderNavigationMobile>
@@ -262,8 +262,8 @@ const AppHeader = () => {
             </UserMyPageIcon>
           ) : (
             <NotUserData>
-              <Li link="/register" txt="회원가입"></Li>
               <Li link="/login" txt="로그인"></Li>
+              <Li link="/register" txt="회원가입"></Li>
             </NotUserData>
           )}
         </HeaderUser>
