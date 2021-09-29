@@ -2,7 +2,9 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { DeliveryOption } from 'src/interfaces/ProductInterface';
 
 export interface ProductOrder {
-  id: number;
+  optionId: number;
+  productId: number;
+  thumb: string;
   value: string;
   qty: number;
   price: number;

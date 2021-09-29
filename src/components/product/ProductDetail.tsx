@@ -91,6 +91,7 @@ const ProductDetail = () => {
           uploader={product.uploader}
           price={product.price}
           status={product.status}
+          thumb={product.thumb}
           productOption={product.productOption}
           deliveryOption={product.deliveryOption}
         />

@@ -126,16 +126,18 @@ interface Props {
   productOption: ProductOption;
   deliveryOption: DeliveryOption;
   price: number;
+  thumb: string;
 }
 
 interface OrderList {
   value: string;
-  id: number;
+  productId: number;
+  optionId: number;
   qty: number;
   additionalPrice: number;
 }
 
-const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props) => {
+const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb }: Props) => {
   const dispatch = useDispatch();
 
   const { options } = productOption;
@@ -164,19 +166,22 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props
   }, [orderList, price]);
 
   const handleCount = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const { type, id, value } = e.currentTarget.dataset;
+    const { type, optionId, value } = e.currentTarget.dataset;
 
-    if (type === '-' && id) {
+    if (type === '-' && optionId) {
       setOrderList((prev) =>
         prev.map((item) => ({
           ...item,
-          qty: item.id === +id && item.value === value && item.qty > 1 ? item.qty - 1 : item.qty,
+          qty: item.optionId === +optionId && item.value === value && item.qty > 1 ? item.qty - 1 : item.qty,
         })),
       );
     }
-    if (type === '+' && id) {
+    if (type === '+' && optionId) {
       setOrderList((prev) =>
-        prev.map((item) => ({ ...item, qty: item.id === +id && item.value === value ? item.qty + 1 : item.qty })),
+        prev.map((item) => ({
+          ...item,
+          qty: item.optionId === +optionId && item.value === value ? item.qty + 1 : item.qty,
+        })),
       );
     }
   };
@@ -227,14 +232,17 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props
           setOrderList((prev) => {
             const txt = selectedOptionValue ? `${selectedOptionValue.join(', ')}, ${value}` : value;
             if (prev.length) {
-              if (prev.find((lst) => lst.id === +id && lst.value === txt)) {
+              if (prev.find((lst) => lst.optionId === +id && lst.value === txt)) {
                 alert('이미 추가 되었습니다 :)');
                 return prev;
               }
 
-              return [...prev, { id: +id, value: txt, qty: 1, additionalPrice: +additionalPrice }];
+              return [
+                ...prev,
+                { optionId: +id, productId: +parentId, value: txt, qty: 1, additionalPrice: +additionalPrice },
+              ];
             } else {
-              return [{ id: +id, value: txt, qty: 1, additionalPrice: +additionalPrice }];
+              return [{ optionId: +id, productId: +parentId, value: txt, qty: 1, additionalPrice: +additionalPrice }];
             }
           });
           setSelectedOptionValue([]);
@@ -246,7 +254,9 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props
 
   useEffect(() => {
     const productOrder = orderList.map((lst) => ({
-      id: lst.id,
+      optionId: lst.optionId,
+      productId: lst.productId,
+      thumb: thumb,
       value: lst.value,
       qty: lst.qty,
       price: lst.qty * (price + lst.additionalPrice),
@@ -297,18 +307,18 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price }: Props
             <SelectItemList key={item.value}>
               <SelecItemTitle>
                 {item.value}{' '}
-                <span onClick={handleDelete} data-value={item.value} data-id={item.id}>
+                <span onClick={handleDelete} data-value={item.value}>
                   <CloseCircleOutlined />
                 </span>
               </SelecItemTitle>
 
               <SelectItemPriceSetting>
                 <SelectItemQty>
-                  <button onClick={handleCount} data-value={item.value} data-id={item.id} data-type="-">
+                  <button onClick={handleCount} data-value={item.value} data-optionId={item.optionId} data-type="-">
                     -
                   </button>
                   <span>{item.qty}</span>
-                  <button onClick={handleCount} data-value={item.value} data-id={item.id} data-type="+">
+                  <button onClick={handleCount} data-value={item.value} data-optionId={item.optionId} data-type="+">
                     +
                   </button>
                 </SelectItemQty>

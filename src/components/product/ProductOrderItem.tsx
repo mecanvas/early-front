@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { Divider } from 'antd';
 import router from 'next/router';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNoticeModal } from 'src/hooks/useNoticeModal';
 import { useAppSelector } from 'src/hooks/useRedux';
@@ -78,21 +78,30 @@ interface Props {
   meta: string;
   uploader: Uploader;
   price: number;
+  thumb: string;
   status: 1 | 2;
   productOption: ProductOption;
   deliveryOption: DeliveryOption;
 }
 
-const ProductOrderItem = ({ title, meta, uploader, price, status, productOption, deliveryOption }: Props) => {
+const ProductOrderItem = ({ title, meta, uploader, price, thumb, status, productOption, deliveryOption }: Props) => {
   const { productOrder } = useAppSelector((state) => state.order);
   const { userData } = useAppSelector((state) => state.user);
   const dispatch = useDispatch();
+
+  const productId = useMemo(() => {
+    const { productId } = router.query;
+    if (productId) {
+      return +productId;
+    }
+    return 0;
+  }, []);
 
   const { NoticeModal } = useNoticeModal({
     bodyText: '비회원으로 구매하시면 적립 혜택을 받으실 수 없어요 :)',
     okText: '계속하기',
     cancelText: '로그인',
-    okUrl: `/product/order/${router.query.productId}`,
+    okUrl: process.browser ? `/product/order/${router.query.productId}` : '',
     cancelUrl: '/login',
   });
 
@@ -136,10 +145,21 @@ const ProductOrderItem = ({ title, meta, uploader, price, status, productOption,
       <Divider />
 
       {productOption.type === 1 && (
-        <ProductOrderSingleOptions title={title} price={price} deliveryOption={deliveryOption} />
+        <ProductOrderSingleOptions
+          thumb={thumb}
+          productId={productId as number}
+          title={title}
+          price={price}
+          deliveryOption={deliveryOption}
+        />
       )}
       {productOption.type === 2 && (
-        <ProductOrderMutiOptions productOption={productOption} price={price} deliveryOption={deliveryOption} />
+        <ProductOrderMutiOptions
+          thumb={thumb}
+          productOption={productOption}
+          price={price}
+          deliveryOption={deliveryOption}
+        />
       )}
 
       <ProductOrderBtn>

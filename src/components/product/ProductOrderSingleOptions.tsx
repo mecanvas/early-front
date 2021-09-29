@@ -10,9 +10,13 @@ const ProductOrderSingleOptions = ({
   title,
   deliveryOption,
   price,
+  productId,
+  thumb,
 }: {
   title: string;
   deliveryOption: DeliveryOption;
+  productId: number;
+  thumb: string;
   price: number;
 }) => {
   const dispatch = useDispatch();
@@ -35,7 +39,7 @@ const ProductOrderSingleOptions = ({
   };
 
   useEffect(() => {
-    dispatch(setProductOrder([{ id: 1, value: title, qty: count, price: count * price }]));
+    dispatch(setProductOrder([{ optionId: 0, productId, thumb, value: title, qty: count, price: count * price }]));
     dispatch(setProductDeliveryOption(deliveryOption));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);

@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { Divider } from 'antd';
 import router from 'next/router';
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { APP_HEADER_HEIGHT } from 'src/constants';
 import { useAppSelector } from 'src/hooks/useRedux';
 import { TotalPrice } from '../product/ProductOrderMutiOptions';
@@ -11,6 +11,9 @@ const Container = styled.div`
   padding-top: ${APP_HEADER_HEIGHT}px;
   min-height: 100vh;
   padding-bottom: 2em;
+  h3 {
+    color: ${({ theme }) => theme.color.gray700};
+  }
 `;
 
 const OrderTable = styled.div`
@@ -25,29 +28,153 @@ const OrderTable = styled.div`
 
 const ProductOrder = styled.div`
   padding: 0.5em 0;
+  width: 100%;
 
-  h3 {
-    color: ${({ theme }) => theme.color.gray700};
+  div {
+    display: flex;
+  }
+  img {
+    width: 200px;
   }
 `;
 
 const ProductInfo = styled.div`
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  margin-left: 1em;
+  padding: 0.5em;
+  width: 100%;
+
+  h3 {
+    margin-bottom: 2em;
+  }
 
   div {
-    margin: 0 0.5em;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     font-size: 1.25rem;
   }
 `;
 
+const ProductDelivery = styled.div`
+  margin-top: 4em;
+  padding: 0.5em 0;
+`;
+
+const DeliverySetting = styled.div`
+  h5 {
+    margin-bottom: 0.5em;
+  }
+  input {
+    outline: none;
+    border: 1px solid ${({ theme }) => theme.color.gray300};
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+  }
+`;
+
+const DeliveryReceiver = styled.div``;
+
+const DeliveryAddress = styled.div`
+  margin-top: 2em;
+
+  /* 우편번호 */
+  div:nth-of-type(1) {
+    display: flex;
+    input {
+      width: 120px;
+      margin-right: 2px;
+    }
+    button {
+      margin-bottom: 0.5em;
+      padding: 0 1.5em;
+      border: 1px solid ${({ theme }) => theme.color.gray300};
+      &:hover {
+        opacity: 0.5;
+      }
+    }
+  }
+
+  input {
+    width: 100%;
+  }
+`;
+
+const DeliveryPhone = styled.div`
+  margin-top: 2em;
+`;
+
+const DeliveryMemo = styled.div`
+  margin-top: 2em;
+
+  textarea {
+    border: 1px solid ${({ theme }) => theme.color.gray300};
+    width: 90%;
+    height: 100px;
+    outline: none;
+    padding: 0.5em;
+  }
+`;
+
+const DeliveryOrder = styled.div`
+  margin-top: 4em;
+  padding: 0.5em 0;
+`;
+
+declare const daum: any;
+
 const OrderSheets = () => {
   const { productOrder, deliveryOption } = useAppSelector((state) => state.order);
   const { userData } = useAppSelector((state) => state.user);
+  const [address, setAddress] = useState({ postCode: '', address: '', sido: '', sigungu: '' });
+
+  const handleAddress = useCallback(() => {
+    if (process.browser) {
+      new daum.Postcode({
+        oncomplete: (data: any) => {
+          let extraRoadAddr = '';
+          //   도로명 선택시,
+          //   https://postcode.map.daum.net/guide 기본 설저 참고
+          if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+            extraRoadAddr += data.bname;
+          }
+          // 건물명이 있고, 공동주택일 경우 추가한다.
+          if (data.buildingName !== '' && data.apartment === 'Y') {
+            extraRoadAddr += extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName;
+          }
+          // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+          if (extraRoadAddr !== '') {
+            extraRoadAddr = ' (' + extraRoadAddr + ')';
+          }
+
+          if (data.userSelectedType === 'R') {
+            const address = data.roadAddress + extraRoadAddr;
+            const userAddr = {
+              postCode: data.zonecode,
+              address,
+              sido: data.sido,
+              sigungu: data.sigungu,
+            };
+            setAddress(userAddr);
+          } else {
+            const address = data.jibunAddress + extraRoadAddr;
+            const userAddr = {
+              postCode: data.zonecode,
+              address,
+              sido: data.sido,
+              sigungu: data.sigungu,
+            };
+            setAddress(userAddr);
+          }
+        },
+      }).open();
+    }
+  }, []);
 
   const deliveryPrice = useMemo(() => {
     return deliveryOption.deliveryPrice;
-  });
+  }, [deliveryOption]);
 
   const totalQty = useMemo(() => {
     return productOrder.reduce((acc, cur) => {
@@ -73,22 +200,26 @@ const OrderSheets = () => {
     if (!productOrder.length) {
       router.back();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <Container>
       <OrderTable>
-        <h2>주문 내역</h2>
+        <h2>- 주문 내역</h2>
         <Divider />
         <ProductOrder>
           {productOrder.map((lst) => (
-            <div key={lst.value}>
-              <h3>{lst.value}</h3>
+            <ProductOrder key={lst.value}>
+              <img src={lst.thumb} alt="상품 썸네일" />
               <ProductInfo>
-                <div>{lst.qty}개</div>
-                <div>{lst.price.toLocaleString()}원</div>
+                <h3>{lst.value}</h3>
+                <div>
+                  <div>{lst.qty}개</div>
+                  <div>{lst.price.toLocaleString()}원</div>
+                </div>
               </ProductInfo>
-            </div>
+            </ProductOrder>
           ))}
         </ProductOrder>
 
@@ -102,24 +233,51 @@ const OrderSheets = () => {
           <span>{totalPrice.toLocaleString()}원</span>
         </TotalPrice>
 
-        <div>
-          <h3>배송 정보 입력</h3>
-          <div>
-            <div>수령인</div>
-            <div>주소 찾기</div>
-            <div>연락처 1</div>
-            <div>연락처 2</div>
-            <div>배송 메모</div>
-            <div></div>
-          </div>
-        </div>
+        <ProductDelivery>
+          <h2>- 배송 정보 입력</h2>
+          <Divider />
+          <DeliverySetting>
+            <DeliveryReceiver>
+              <h5>수령인 :</h5>
+              <input type="text" placeholder="이름" />
+            </DeliveryReceiver>
+            <DeliveryAddress>
+              <h5>주소 입력 :</h5>
+              <div>
+                <input type="text" placeholder="우편번호" />
+                <button onClick={handleAddress}>찾기</button>
+              </div>
+              <div>
+                <input type="text" placeholder="주소" />
+              </div>
+              <div>
+                <input type="text" placeholder="상세주소" />
+              </div>
+            </DeliveryAddress>
 
-        <div>
-          <h3>결제 진행</h3>
+            <DeliveryPhone>
+              <h5>연락처 :</h5>
+              <div>
+                <input type="text" placeholder="연락처 1" />
+              </div>
+              <div>
+                <input type="text" placeholder="연락처 2" />
+              </div>
+            </DeliveryPhone>
+
+            <DeliveryMemo>
+              <h5>배송 메모 :</h5>
+              <textarea placeholder="배송 메모를 입력하세요." />
+            </DeliveryMemo>
+          </DeliverySetting>
+        </ProductDelivery>
+
+        <DeliveryOrder>
+          <h2>- 결제 진행</h2>
           <div>총 {(totalPrice + deliveryPrice).toLocaleString()}원 결제를 진행합니다.</div>
           <small>배송비 {deliveryPrice.toLocaleString()}원</small>
           <button type="button">결제</button>
-        </div>
+        </DeliveryOrder>
       </OrderTable>
     </Container>
   );
