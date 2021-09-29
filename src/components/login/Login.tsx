@@ -3,7 +3,7 @@ import { APP_HEADER_HEIGHT } from 'src/constants';
 import styled from '@emotion/styled';
 import { Btn } from '../common/Button';
 import Link from 'next/link';
-import { theme } from 'src/style/theme';
+import { Divide } from '../common/Divide';
 
 const Container = styled.div`
   display: flex;
@@ -132,7 +132,8 @@ const Login = () => {
         </SocialLoginContainer>
       </LoginForm>
 
-      <div style={{ width: '100px', margin: '1em auto', height: '1px', backgroundColor: theme.color.gray300 }}></div>
+      <Divide />
+
       <Register>
         <Link href="/register">
           <Btn>1분만에 회원가입하기</Btn>
