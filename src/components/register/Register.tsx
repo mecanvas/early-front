@@ -1,21 +1,18 @@
 import React, { useCallback, useState } from 'react';
 import styled from '@emotion/styled';
-import { APP_HEADER_HEIGHT } from 'src/constants';
-import RegisterTerm from './RegisterTerm';
-import RegisterTerm2 from './RegisterTerm2';
-import { Checkbox, Divider } from 'antd';
 import { Btn } from '../common/Button';
 import { Divide } from '../common/Divide';
+import RegisterWith from './RegisterIdPw';
+import { APP_HEADER_HEIGHT } from 'src/constants';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   width: 98%;
-  padding-top: 5em;
   max-width: 800px;
   margin: 1em auto;
-  min-height: calc(90vh - ${APP_HEADER_HEIGHT}px);
+  min-height: calc(80vh - ${APP_HEADER_HEIGHT}px);
 
   h4 {
     margin: 1em auto;
@@ -23,252 +20,70 @@ const Container = styled.div`
   }
 `;
 
-const TermsContainer = styled.div`
-  max-width: 800px;
-  width: 100%;
-  margin-bottom: 2em;
-`;
-
-const RegisterForm = styled.form`
+const SocialRegister = styled.div`
   display: flex;
-  justify-content: center;
   flex-direction: column;
-  width: 100%;
-`;
-
-const RegisterInput = styled.div`
-  align-items: center;
-  display: flex;
-  margin-bottom: 1em;
-  max-width: 350px;
-  width: 100%;
-
-  @media all and (max-width: ${({ theme }) => theme.size.xs}) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  label {
-    font-size: 13px;
-    text-align: left;
-    width: 60px;
-    @media all and (max-width: ${({ theme }) => theme.size.xs}) {
-      margin-left: 0.6em;
-      margin-bottom: 0.7em;
-    }
-  }
-
-  input {
-    border: 1px solid ${({ theme }) => theme.color.gray300};
-    padding: 0.5em 1.5em;
-    width: 93%;
-    margin-left: 0.5em;
-    border-radius: 8px;
-
-    @media all and (max-width: ${({ theme }) => theme.size.xs}) {
-      margin: 0 auto;
-    }
-  }
-`;
-
-const AddressForm = styled.div`
-  margin: 1.5em 0;
-`;
-
-const DeliveryAddress = styled.div`
-  input {
-    outline: none;
-    border: 1px solid ${({ theme }) => theme.color.gray300};
-    padding: 0.5em;
-    margin-bottom: 0.5em;
-    width: 100%;
-  }
-  /* 우편번호 */
-  div:nth-of-type(1) {
+  & > div {
     display: flex;
-    input {
-      width: 120px;
-      margin-right: 2px;
-    }
-    button {
-      margin-bottom: 0.5em;
-      padding: 0 1.5em;
-      border: 1px solid ${({ theme }) => theme.color.gray300};
-      &:hover {
-        opacity: 0.5;
-      }
+    justify-content: center;
+
+    div {
+      margin: 0 0.3em;
     }
   }
 `;
 
-const FinishForm = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 1em;
+const DivideWrapper = styled.div`
+  margin: 0 auto;
 `;
-
-declare const daum: any;
 
 const Register = () => {
-  const [address, setAddress] = useState({
-    postCode: '',
-    address: '',
-    sido: '',
-    sigungu: '',
-    addressDetail: '',
-  });
+  const [idPwRegister, setIdPwRegister] = useState(false);
+  const [socialRegister, setSocialRegister] = useState(false);
 
-  const handleAddressDetail = useCallback((e) => {
-    setAddress((prev) => ({ ...prev, addressDetail: e.target.value }));
+  const handleNaverRegister = useCallback(() => {
+    setSocialRegister(true);
   }, []);
 
-  const handleAddress = useCallback(() => {
-    if (process.browser) {
-      new daum.Postcode({
-        oncomplete: (data: any) => {
-          let extraRoadAddr = '';
-          //   도로명 선택시,
-          //   https://postcode.map.daum.net/guide 기본 설저 참고
-          if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-            extraRoadAddr += data.bname;
-          }
-          // 건물명이 있고, 공동주택일 경우 추가한다.
-          if (data.buildingName !== '' && data.apartment === 'Y') {
-            extraRoadAddr += extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName;
-          }
-          // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
-          if (extraRoadAddr !== '') {
-            extraRoadAddr = ' (' + extraRoadAddr + ')';
-          }
+  const handleKakaoRegister = useCallback(() => {
+    setSocialRegister(true);
+  }, []);
 
-          if (data.userSelectedType === 'R') {
-            const address = data.roadAddress + extraRoadAddr;
-            const userAddr = {
-              postCode: data.zonecode,
-              address,
-              sido: data.sido,
-              sigungu: data.sigungu,
-              addressDetail: '',
-            };
-            setAddress(userAddr);
-          } else {
-            const address = data.jibunAddress + extraRoadAddr;
-            const userAddr = {
-              postCode: data.zonecode,
-              address,
-              sido: data.sido,
-              sigungu: data.sigungu,
-              addressDetail: '',
-            };
-            setAddress(userAddr);
-          }
-        },
-      }).open();
-    }
+  const handleIdPwRegister = useCallback(() => {
+    setIdPwRegister(true);
   }, []);
 
   return (
     <Container>
-      <h2>회원가입</h2>
-
-      <Divider />
-
-      {/* 상거래 이용약관 */}
-
-      <TermsContainer>
-        <h4>이용약관</h4>
-        <RegisterTerm />
-        <div>
-          <Checkbox>이용약관에 동의합니다.</Checkbox>
-        </div>
-      </TermsContainer>
-      {/* 개인정보수집동의 */}
-
-      <TermsContainer>
-        <h4>개인정보 수집 및 동의</h4>
-        <RegisterTerm2 />
-        <div>
-          <Checkbox>개인정보 수집에 동의합니다.</Checkbox>
-        </div>
-      </TermsContainer>
-
-      <Divider />
-
-      <div>
-        <h4>정보 입력</h4>
-        <RegisterForm>
-          <RegisterInput>
-            <label>아이디</label>
-            <input autoComplete="off" type="text" placeholder="아이디" />
-          </RegisterInput>
-
-          <RegisterInput>
-            <label>비밀번호</label>
-            <input autoComplete="off" type="text" placeholder="비밀번호" />
-          </RegisterInput>
-
-          <RegisterInput>
-            <label>확인</label>
-            <input autoComplete="off" type="text" placeholder="비밀번호 확인" />
-          </RegisterInput>
-
-          <RegisterInput>
-            <label>연락처</label>
-            <input autoComplete="off" type="text" placeholder="연락처" />
-          </RegisterInput>
-
-          <RegisterInput>
-            <label>이메일</label>
-            <input autoComplete="off" type="text" placeholder="이메일" />
-          </RegisterInput>
-
-          <div>
-            <Checkbox>마케팅 메일을 수신하시나요?</Checkbox>
-          </div>
-
-          <AddressForm>
-            <h4>주소 입력</h4>
-            <DeliveryAddress>
-              <div>
-                <input autoComplete="off" type="text" placeholder="우편번호" defaultValue={address.postCode} />
-                <button type="button" onClick={handleAddress}>
-                  찾기
-                </button>
+      {!idPwRegister && !socialRegister ? (
+        <>
+          <SocialRegister>
+            <h4>간편 회원가입</h4>
+            <div>
+              <div onClick={handleNaverRegister}>
+                <Btn>네이버</Btn>
               </div>
-              <div>
-                <input autoComplete="off" type="text" placeholder="주소" defaultValue={address.address} />
+              <div onClick={handleKakaoRegister}>
+                <Btn>카카오</Btn>
               </div>
-              <div>
-                <input
-                  type="text"
-                  placeholder="상세주소"
-                  autoComplete="off"
-                  defaultValue={address.addressDetail}
-                  onChange={handleAddressDetail}
-                />
-              </div>
-            </DeliveryAddress>
-          </AddressForm>
-        </RegisterForm>
-      </div>
+            </div>
+          </SocialRegister>
 
-      <div>
-        <h4>어떻게 오셨나요?</h4>
+          <DivideWrapper>
+            <Divide />
+          </DivideWrapper>
 
-        <div>
-          <Checkbox>광고</Checkbox>
-          <Checkbox>검색</Checkbox>
-          <Checkbox>블로그</Checkbox>
-          <Checkbox>유튜브</Checkbox>
-          <Checkbox>기타</Checkbox>
-        </div>
-      </div>
+          <SocialRegister>
+            <h4>ID, PW 회원가입</h4>
+            <div onClick={handleIdPwRegister}>
+              <Btn>회원가입</Btn>
+            </div>
+          </SocialRegister>
+        </>
+      ) : null}
 
-      <FinishForm>
-        <Divide />
-        <Btn type="button">가입</Btn>
-      </FinishForm>
+      {idPwRegister && <RegisterWith />}
+      {socialRegister && <RegisterWith />}
     </Container>
   );
 };
