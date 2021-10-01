@@ -3,8 +3,9 @@ import { Terms } from './RegisterTerm';
 
 const RegisterTerm2 = () => {
   return (
-    <Terms
-      defaultValue={`얼리는(이하 “회사”는) 고객님의 개인정보를 중요시하며, “정보통신망 이용촉진 및 정보보호”에 관한 법률을 준수하고 있습니다.
+    <div style={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
+      <Terms
+        defaultValue={`얼리는(이하 “회사”는) 고객님의 개인정보를 중요시하며, “정보통신망 이용촉진 및 정보보호”에 관한 법률을 준수하고 있습니다.
 
 1. 개인정보 수집목적 및 이용목적
 
@@ -53,7 +54,8 @@ o 로그 기록
 -보존기간 : 3개월
 
 ※ 동의를 거부할 수 있으나 거부시 회원 가입이 불가능합니다.`}
-    />
+      />
+    </div>
   );
 };
 

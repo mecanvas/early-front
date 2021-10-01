@@ -1,32 +1,54 @@
 import styled from '@emotion/styled';
 import { Checkbox } from 'antd';
 import React from 'react';
-import RegisterTerm from './RegisterTerm';
-import RegisterTerm2 from './RegisterTerm2';
 
 const TermsContainer = styled.div`
-  max-width: 800px;
   width: 100%;
-  margin-bottom: 2em;
+  width: 200px;
+  margin: 0.5em auto;
+  text-align: left;
+`;
+
+const CheckText = styled.span`
+  margin-left: 0.5em;
+  font-size: 0.95rem;
+  a {
+    font-size: 0.95rem;
+  }
 `;
 
 const TermsAgree = () => {
   return (
     <>
       <TermsContainer>
-        <h4>이용약관</h4>
-        <RegisterTerm />
         <div>
-          <Checkbox>이용약관에 동의합니다.</Checkbox>
+          <Checkbox />
+          <CheckText>
+            <a target="blank" href="/register/terms2">
+              이용약관
+            </a>
+            에 동의합니다.
+          </CheckText>
         </div>
       </TermsContainer>
       {/* 개인정보수집동의 */}
 
       <TermsContainer>
-        <h4>개인정보 수집 및 동의</h4>
-        <RegisterTerm2 />
         <div>
-          <Checkbox>개인정보 수집에 동의합니다.</Checkbox>
+          <Checkbox />
+          <CheckText>
+            <a target="blank" href="/register/terms">
+              개인정보 수집
+            </a>
+            에 동의합니다.
+          </CheckText>
+        </div>
+      </TermsContainer>
+
+      <TermsContainer>
+        <div>
+          <Checkbox></Checkbox>
+          <CheckText>이벤트 및 마케팅 수신 여부</CheckText>
         </div>
       </TermsContainer>
     </>

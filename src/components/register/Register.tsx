@@ -2,10 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { Btn } from '../common/Button';
 import { Divide } from '../common/Divide';
-import RegisterWith from './RegisterIdPw';
 import { APP_HEADER_HEIGHT } from 'src/constants';
 import Link from 'next/link';
 import router from 'next/router';
+import RegisterWith from './RegisterWith';
 
 const Container = styled.div`
   display: flex;
@@ -46,7 +46,7 @@ enum RegisterType {
 }
 
 const Register = () => {
-  const { query } = router;
+  const query = process.browser ? router.query : null;
   const [idPwRegister, setIdPwRegister] = useState(false);
   const [socialRegister, setSocialRegister] = useState(false);
 
@@ -59,7 +59,7 @@ const Register = () => {
   }, []);
 
   useEffect(() => {
-    if (query['type']) {
+    if (query) {
       if (query['type'] === RegisterType.IDPW) {
         setIdPwRegister(true);
       }
