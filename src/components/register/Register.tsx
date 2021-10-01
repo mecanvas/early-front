@@ -1,9 +1,11 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { Btn } from '../common/Button';
 import { Divide } from '../common/Divide';
 import RegisterWith from './RegisterIdPw';
 import { APP_HEADER_HEIGHT } from 'src/constants';
+import Link from 'next/link';
+import router from 'next/router';
 
 const Container = styled.div`
   display: flex;
@@ -37,7 +39,14 @@ const DivideWrapper = styled.div`
   margin: 0 auto;
 `;
 
+enum RegisterType {
+  IDPW = '1',
+  KAKAO = '2',
+  NAVER = '3',
+}
+
 const Register = () => {
+  const { query } = router;
   const [idPwRegister, setIdPwRegister] = useState(false);
   const [socialRegister, setSocialRegister] = useState(false);
 
@@ -49,9 +58,22 @@ const Register = () => {
     setSocialRegister(true);
   }, []);
 
-  const handleIdPwRegister = useCallback(() => {
-    setIdPwRegister(true);
-  }, []);
+  useEffect(() => {
+    if (query['type']) {
+      if (query['type'] === RegisterType.IDPW) {
+        setIdPwRegister(true);
+      }
+      if (query['type'] === RegisterType.KAKAO) {
+        setSocialRegister(true);
+      }
+      if (query['type'] === RegisterType.NAVER) {
+        setSocialRegister(true);
+      }
+    } else {
+      setIdPwRegister(false);
+      setSocialRegister(false);
+    }
+  }, [query]);
 
   return (
     <Container>
@@ -61,10 +83,14 @@ const Register = () => {
             <h4>간편 회원가입</h4>
             <div>
               <div onClick={handleNaverRegister}>
-                <Btn>네이버</Btn>
+                <Link href={`/register?type=${RegisterType.NAVER}`}>
+                  <Btn>네이버</Btn>
+                </Link>
               </div>
               <div onClick={handleKakaoRegister}>
-                <Btn>카카오</Btn>
+                <Link href={`/register?type=${RegisterType.KAKAO}`}>
+                  <Btn>카카오</Btn>
+                </Link>
               </div>
             </div>
           </SocialRegister>
@@ -75,8 +101,10 @@ const Register = () => {
 
           <SocialRegister>
             <h4>ID, PW 회원가입</h4>
-            <div onClick={handleIdPwRegister}>
-              <Btn>회원가입</Btn>
+            <div>
+              <Link href={`/register?type=${RegisterType.IDPW}`}>
+                <Btn>회원가입</Btn>
+              </Link>
             </div>
           </SocialRegister>
         </>
