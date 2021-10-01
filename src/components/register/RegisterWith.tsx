@@ -78,12 +78,12 @@ const RegisterWith = () => {
   const [form, setForm] = useState<Register>({ id: '', password: '', password2: '', phone: '', email: '' });
   const [isTrySubmit] = useState(false);
 
-  const checkVaildation = useCallback(
+  const checkValidation = useCallback(
     (name: RegisterFormVaild) => {
       if (isTrySubmit) {
         return form[name] !== '';
       } else {
-        return false;
+        return true;
       }
     },
     [form, isTrySubmit],
@@ -102,7 +102,7 @@ const RegisterWith = () => {
         <RegisterForm onChange={handleRegisterForm}>
           <RegisterInput>
             {/* <input autoComplete="off" type="text" placeholder="아이디" /> */}
-            <EarlyInput name="id" isRequire valid={checkVaildation('id')} placeholder="아이디" />
+            <EarlyInput name="id" isRequire valid={checkValidation('id')} placeholder="아이디" />
           </RegisterInput>
 
           <RegisterInput>
@@ -110,7 +110,7 @@ const RegisterWith = () => {
               name="password"
               type="password"
               isRequire
-              valid={checkVaildation('password')}
+              valid={checkValidation('password')}
               placeholder="비밀번호"
             />
             {/* <input autoComplete="off" type="text" placeholder="비밀번호" /> */}
@@ -121,18 +121,18 @@ const RegisterWith = () => {
               name="password2"
               type="password"
               isRequire
-              valid={checkVaildation('password2')}
+              valid={checkValidation('password2')}
               placeholder="비밀번호확인"
             />
             {/* <input autoComplete="off" type="text" placeholder="비밀번호 확인" /> */}
           </RegisterInput>
 
           <RegisterInput>
-            <EarlyInput name="phone" isRequire valid={checkVaildation('phone')} placeholder="연락처" />
+            <EarlyInput name="phone" isRequire valid={checkValidation('phone')} placeholder="연락처" />
           </RegisterInput>
 
           <RegisterInput>
-            <EarlyInput name="email" isRequire valid={checkVaildation('email')} placeholder="이메일" />
+            <EarlyInput name="email" isRequire valid={checkValidation('email')} placeholder="이메일" />
 
             {/* <input autoComplete="off" type="text" placeholder="이메일" /> */}
           </RegisterInput>

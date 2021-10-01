@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { APP_HEADER_HEIGHT } from 'src/constants';
 import styled from '@emotion/styled';
 import { Btn } from '../common/Button';
 import Link from 'next/link';
 import { Divide } from '../common/Divide';
+import EarlyInput from '../common/EarlyInput';
 
 const Container = styled.div`
   display: flex;
@@ -32,6 +33,7 @@ const LoginForm = styled.form`
 `;
 
 const LoginInput = styled.div`
+  text-align: center;
   align-items: center;
   display: flex;
   margin-bottom: 1em;
@@ -41,15 +43,6 @@ const LoginInput = styled.div`
   @media all and (max-width: ${({ theme }) => theme.size.xs}) {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  label {
-    text-align: left;
-    width: 60px;
-    @media all and (max-width: ${({ theme }) => theme.size.xs}) {
-      margin-left: 0.6em;
-      margin-bottom: 0.7em;
-    }
   }
 
   input {
@@ -103,17 +96,45 @@ const Register = styled.div`
   }
 `;
 
+interface LoginProps {
+  id: '';
+  password: '';
+}
+
 const Login = () => {
+  const [form, setForm] = useState<LoginProps>({ id: '', password: '' });
+  const [isTrySubmit] = useState(false);
+
+  const checkValidation = useCallback(
+    (name: 'id' | 'password') => {
+      if (isTrySubmit) {
+        return form[name] !== '';
+      } else {
+        return true;
+      }
+    },
+    [form, isTrySubmit],
+  );
+
+  const handleRegisterForm = useCallback((e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  }, []);
+
   return (
     <Container>
-      <LoginForm>
+      <LoginForm onChange={handleRegisterForm}>
         <LoginInput>
-          <label htmlFor="id">아이디</label>
-          <input id="id" name="id" type="text" placeholder="ID" />
+          <EarlyInput isRequire valid={checkValidation('id')} name="id" placeholder="아이디" />
         </LoginInput>
         <LoginInput>
-          <label htmlFor="password">비밀번호</label>
-          <input id="password" name="password" type="password" placeholder="PASSWORD" />
+          <EarlyInput
+            isRequire
+            valid={checkValidation('password')}
+            name="password"
+            type="password"
+            placeholder="비밀번호"
+          />
         </LoginInput>
 
         <Btn type="submit">로그인</Btn>

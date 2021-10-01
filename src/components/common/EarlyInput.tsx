@@ -59,7 +59,9 @@ const EarlyInput = ({ isRequire = false, valid = false, failMessage = '필수 �
       });
       vaildMessageApi.start();
     }
-  }, [passOrFail, vaildMessageApi]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [passOrFail]);
 
   return (
     <Container>
