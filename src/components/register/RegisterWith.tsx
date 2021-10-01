@@ -1,7 +1,9 @@
 import styled from '@emotion/styled';
 import { Divider } from 'antd';
+import { useCallback, useState } from 'react';
 import { APP_HEADER_HEIGHT } from 'src/constants';
 import { Btn } from '../common/Button';
+import EarlyInput from '../common/EarlyInput';
 import TermsAgree from './TermsAgree';
 
 const Container = styled.div`
@@ -44,6 +46,7 @@ const RegisterInput = styled.div`
   input {
     border: 1px solid ${({ theme }) => theme.color.gray300};
     padding: 0.5em 1.5em;
+    font-size: 14px;
     width: 93%;
     margin-left: 0.5em;
     border-radius: 8px;
@@ -61,31 +64,77 @@ const FinishForm = styled.div`
   margin-bottom: 1em;
 `;
 
+interface Register {
+  id: string;
+  password: string;
+  password2: string;
+  phone: string;
+  email: string;
+}
+
+type RegisterFormVaild = 'id' | 'password' | 'password2' | 'phone' | 'email';
+
 const RegisterWith = () => {
+  const [form, setForm] = useState<Register>({ id: '', password: '', password2: '', phone: '', email: '' });
+  const [isTrySubmit] = useState(false);
+
+  const checkVaildation = useCallback(
+    (name: RegisterFormVaild) => {
+      if (isTrySubmit) {
+        return form[name] !== '';
+      } else {
+        return false;
+      }
+    },
+    [form, isTrySubmit],
+  );
+
+  const handleRegisterForm = useCallback((e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  }, []);
+
   return (
     <Container>
       <h3>회원가입</h3>
 
       <div>
-        <RegisterForm>
+        <RegisterForm onChange={handleRegisterForm}>
           <RegisterInput>
-            <input autoComplete="off" type="text" placeholder="아이디" />
+            {/* <input autoComplete="off" type="text" placeholder="아이디" /> */}
+            <EarlyInput name="id" isRequire valid={checkVaildation('id')} placeholder="아이디" />
           </RegisterInput>
 
           <RegisterInput>
-            <input autoComplete="off" type="text" placeholder="비밀번호" />
+            <EarlyInput
+              name="password"
+              type="password"
+              isRequire
+              valid={checkVaildation('password')}
+              placeholder="비밀번호"
+            />
+            {/* <input autoComplete="off" type="text" placeholder="비밀번호" /> */}
           </RegisterInput>
 
           <RegisterInput>
-            <input autoComplete="off" type="text" placeholder="비밀번호 확인" />
+            <EarlyInput
+              name="password2"
+              type="password"
+              isRequire
+              valid={checkVaildation('password2')}
+              placeholder="비밀번호확인"
+            />
+            {/* <input autoComplete="off" type="text" placeholder="비밀번호 확인" /> */}
           </RegisterInput>
 
           <RegisterInput>
-            <input autoComplete="off" type="text" placeholder="연락처" />
+            <EarlyInput name="phone" isRequire valid={checkVaildation('phone')} placeholder="연락처" />
           </RegisterInput>
 
           <RegisterInput>
-            <input autoComplete="off" type="text" placeholder="이메일" />
+            <EarlyInput name="email" isRequire valid={checkVaildation('email')} placeholder="이메일" />
+
+            {/* <input autoComplete="off" type="text" placeholder="이메일" /> */}
           </RegisterInput>
         </RegisterForm>
       </div>

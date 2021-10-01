@@ -60,6 +60,11 @@ const Register = () => {
 
   useEffect(() => {
     if (query) {
+      if (!query['type']) {
+        setIdPwRegister(false);
+        setSocialRegister(false);
+        return;
+      }
       if (query['type'] === RegisterType.IDPW) {
         setIdPwRegister(true);
       }
