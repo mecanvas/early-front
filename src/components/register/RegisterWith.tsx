@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import { Divider } from 'antd';
 import { useCallback, useState } from 'react';
 import { APP_HEADER_HEIGHT } from 'src/constants';
+import { emailReg, phoneReg } from 'src/constants/match';
 import { Btn } from '../common/Button';
 import EarlyInput from '../common/EarlyInput';
 import TermsAgree from './TermsAgree';
@@ -65,6 +66,7 @@ const FinishForm = styled.div`
 `;
 
 interface Register {
+  [key: string]: string;
   id: string;
   password: string;
   password2: string;
@@ -76,14 +78,41 @@ type RegisterFormVaild = 'id' | 'password' | 'password2' | 'phone' | 'email';
 
 const RegisterWith = () => {
   const [form, setForm] = useState<Register>({ id: '', password: '', password2: '', phone: '', email: '' });
-  const [isTrySubmit] = useState(false);
+  const [isTrySubmit, setIsTrySubmit] = useState(false);
+
+  const checkRule = useCallback(
+    (name: string, reg: RegExp, message: string) => {
+      if (!isTrySubmit) {
+        return '';
+      }
+
+      if (form[name]) {
+        const item = form[name];
+
+        if (!item.match(reg)) {
+          return message;
+        }
+      }
+    },
+    [form, isTrySubmit],
+  );
+
+  const emailRuleMessage = checkRule('email', emailReg, '올바른 이메일로 입력 부탁드립니다.');
+
+  const phoneRuleMessage = checkRule('phone', phoneReg, '-가 없는 올바른 번호를 입력해 주세요.');
 
   const checkValidation = useCallback(
     (name: RegisterFormVaild) => {
       if (isTrySubmit) {
-        return form[name] !== '';
+        const pass = form[name] !== '';
+        if (pass) {
+          return 'pass';
+        }
+        if (!pass) {
+          return 'fail';
+        }
       } else {
-        return true;
+        return 'pass';
       }
     },
     [form, isTrySubmit],
@@ -92,6 +121,10 @@ const RegisterWith = () => {
   const handleRegisterForm = useCallback((e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  }, []);
+
+  const handleRegisterSubmit = useCallback(() => {
+    setIsTrySubmit(true);
   }, []);
 
   return (
@@ -128,11 +161,25 @@ const RegisterWith = () => {
           </RegisterInput>
 
           <RegisterInput>
-            <EarlyInput name="phone" isRequire valid={checkValidation('phone')} placeholder="연락처" />
+            <EarlyInput
+              name="phone"
+              type="tel"
+              ruleMessage={phoneRuleMessage}
+              isRequire
+              valid={checkValidation('phone')}
+              placeholder="연락처"
+            />
           </RegisterInput>
 
           <RegisterInput>
-            <EarlyInput name="email" isRequire valid={checkValidation('email')} placeholder="이메일" />
+            <EarlyInput
+              name="email"
+              type="email"
+              ruleMessage={emailRuleMessage}
+              isRequire
+              valid={checkValidation('email')}
+              placeholder="이메일"
+            />
 
             {/* <input autoComplete="off" type="text" placeholder="이메일" /> */}
           </RegisterInput>
@@ -146,7 +193,9 @@ const RegisterWith = () => {
       <Divider />
 
       <FinishForm>
-        <Btn type="button">가입</Btn>
+        <Btn type="submit" onClick={handleRegisterSubmit}>
+          가입
+        </Btn>
       </FinishForm>
     </Container>
   );

@@ -15,6 +15,7 @@ const IsRequire = styled.span`
 
 const BasicInput = styled.input<{ required: boolean }>`
   ${({ required, theme }) =>
+    // pass = gray
     required
       ? css`
           border: 1px solid ${theme.color.gray300};
@@ -33,14 +34,28 @@ const FailMessage = styled.small`
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   isRequire?: boolean;
-  valid?: boolean;
+  valid?: 'pass' | 'fail';
   failMessage?: string;
+  ruleMessage?: string;
 }
 
-const EarlyInput = ({ isRequire = false, valid = false, failMessage = '필수 값입니다.', ...props }: Props) => {
+const EarlyInput = ({
+  isRequire = false,
+  valid = 'pass',
+  failMessage = '필수 값입니다.',
+  ruleMessage,
+  ...props
+}: Props) => {
   const passOrFail = useMemo(() => {
-    return isRequire && valid;
-  }, [isRequire, valid]);
+    if (ruleMessage) {
+      return 'fail';
+    }
+    if (isRequire) {
+      return valid;
+    } else {
+      return 'pass';
+    }
+  }, [isRequire, ruleMessage, valid]);
 
   const [vaildMessage, vaildMessageApi] = useSpring(() => {
     return {
@@ -51,7 +66,7 @@ const EarlyInput = ({ isRequire = false, valid = false, failMessage = '필수 �
   });
 
   useEffect(() => {
-    if (passOrFail) {
+    if (passOrFail === 'fail' || ruleMessage) {
       vaildMessageApi.update({
         from: { opacity: 0, translateY: -15 },
         to: { opacity: 1, translateY: 0 },
@@ -61,16 +76,16 @@ const EarlyInput = ({ isRequire = false, valid = false, failMessage = '필수 �
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [passOrFail]);
+  }, [passOrFail, ruleMessage]);
 
   return (
     <Container>
-      <BasicInput required={passOrFail} aria-required type="text" {...props} />
+      <BasicInput required={passOrFail === 'pass'} aria-required type="text" {...props} />
       {isRequire ? <IsRequire>*</IsRequire> : null}
 
-      {passOrFail || (
+      {passOrFail === 'fail' && (
         <animated.div style={vaildMessage}>
-          <FailMessage>{failMessage}</FailMessage>
+          <FailMessage>{ruleMessage ? ruleMessage : failMessage}</FailMessage>
         </animated.div>
       )}
     </Container>

@@ -103,38 +103,23 @@ interface LoginProps {
 
 const Login = () => {
   const [form, setForm] = useState<LoginProps>({ id: '', password: '' });
-  const [isTrySubmit] = useState(false);
-
-  const checkValidation = useCallback(
-    (name: 'id' | 'password') => {
-      if (isTrySubmit) {
-        return form[name] !== '';
-      } else {
-        return true;
-      }
-    },
-    [form, isTrySubmit],
-  );
 
   const handleRegisterForm = useCallback((e) => {
+    e.preventDefault();
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   }, []);
+
+  console.log(form);
 
   return (
     <Container>
       <LoginForm onChange={handleRegisterForm}>
         <LoginInput>
-          <EarlyInput isRequire valid={checkValidation('id')} name="id" placeholder="아이디" />
+          <EarlyInput name="id" placeholder="아이디" />
         </LoginInput>
         <LoginInput>
-          <EarlyInput
-            isRequire
-            valid={checkValidation('password')}
-            name="password"
-            type="password"
-            placeholder="비밀번호"
-          />
+          <EarlyInput name="password" type="password" placeholder="비밀번호" />
         </LoginInput>
 
         <Btn type="submit">로그인</Btn>
