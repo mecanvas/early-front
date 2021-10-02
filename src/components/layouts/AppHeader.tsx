@@ -117,9 +117,8 @@ const UserMyPageIcon = styled.div<{ openMyInfo?: boolean }>`
   cursor: pointer;
   display: flex;
   align-items: center;
-  width: 20px;
   svg {
-    font-size: 20px;
+    font-size: 22px;
   }
 
   ul {
@@ -140,6 +139,10 @@ const UserMyPageIcon = styled.div<{ openMyInfo?: boolean }>`
       }
     }
   }
+
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    display: none;
+  }
 `;
 
 const NotUserData = styled.ul`
@@ -153,6 +156,9 @@ const NotUserData = styled.ul`
     &:hover {
       opacity: 0.7;
     }
+  }
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    display: none;
   }
 `;
 
@@ -206,6 +212,7 @@ const AppHeader = () => {
   const { userData } = useAppSelector((state) => state.user);
   const [openNavi, setOpenNavi] = useState(false);
   const [openMyInfo, setOpenMyInfo] = useState(false);
+  const cartCount = 2;
 
   const handleMyInfo = useCallback((e) => {
     e.stopPropagation();
@@ -257,7 +264,7 @@ const AppHeader = () => {
               {userData ? (
                 <>
                   <LiSmall link="/me" txt="마이페이지" />
-                  <LiSmall link="/cart" txt="장바구니" />
+                  <LiSmall link="/cart" txt={`장바구니 ${cartCount}`} />
                   <LiSmall link="/delivery" txt="배송조회" />
                   <LiSmall link="/q" txt="문의하기" />
                   <LiSmall txt="로그아웃" onClick={handleLogout} />
@@ -274,10 +281,17 @@ const AppHeader = () => {
           </ul>
         </HeaderNavigation>
         <HeaderUser>
+          {/* 배송조회 아이콘? */}
           <UserMyPageIcon>
             {/* 장바구니 아이콘 */}
             <Link href="/cart">
-              <ShoppingCartOutlined />
+              <>
+                <ShoppingCartOutlined />
+
+                <span>
+                  <small>({cartCount})</small>
+                </span>
+              </>
             </Link>
           </UserMyPageIcon>
           {userData ? (
@@ -286,7 +300,7 @@ const AppHeader = () => {
                 <UserOutlined />
                 <ul>
                   <Li link="/me" txt="마이페이지" />
-                  <Li link="/cart" txt="장바구니" />
+                  <Li link="/cart" txt={`장바구니 (${cartCount})`} />
                   <Li link="/delivery" txt="배송조회" />
                   <Li link="/q" txt="문의하기" />
                   <Li txt="로그아웃" onClick={handleLogout} />
