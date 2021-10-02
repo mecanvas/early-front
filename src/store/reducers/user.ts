@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Address } from 'src/interfaces/OrderInterface';
+import { Cart } from 'src/interfaces/User';
 import { postUserLogin } from '../api/user/user';
 import { postUserLogout } from '../api/user/userLogout';
 
@@ -10,11 +11,17 @@ export type UserData = {
   username: string;
   phone: string;
   address: Address | null;
+  cart: Cart[] | null;
+};
+
+export type NoneUserData = {
+  id: string;
+  cart: Cart[] | null;
 };
 
 interface InitialState {
   userData: null | UserData;
-
+  noneUserData: NoneUserData;
   isUserLoad: boolean;
   isUserError: null | any;
   isUserDone: boolean;
@@ -26,7 +33,10 @@ interface InitialState {
 
 const initialState: InitialState = {
   userData: null,
-
+  noneUserData: {
+    id: '',
+    cart: null,
+  },
   isUserLoad: false,
   isUserError: null,
   isUserDone: false,
@@ -42,6 +52,13 @@ const user = createSlice({
   reducers: {
     getUser: (state, { payload }: PayloadAction<UserData>) => {
       state.userData = payload;
+    },
+    setUserCart: (state, { payload }: PayloadAction<Cart[]>) => {
+      if (state.userData) {
+        state.userData.cart = state.userData.cart ? [...state.userData.cart, ...payload] : payload;
+      } else {
+        state.noneUserData.cart = state.noneUserData.cart ? [...state.noneUserData.cart, ...payload] : payload;
+      }
     },
     logoutUser: (state) => {
       state.userData = null;
@@ -82,6 +99,6 @@ const user = createSlice({
       }),
 });
 
-export const { getUser, logoutUser } = user.actions;
+export const { getUser, setUserCart, logoutUser } = user.actions;
 
 export default user.reducer;

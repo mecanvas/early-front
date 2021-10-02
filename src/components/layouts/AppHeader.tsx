@@ -209,10 +209,10 @@ const Li = ({ link, txt, ...props }: { link?: string; txt: string } & React.Html
 const AppHeader = () => {
   const { exceptionRoute } = useExceptionRoute();
   const dispatch = useDispatch();
-  const { userData } = useAppSelector((state) => state.user);
+  const { userData, noneUserData } = useAppSelector((state) => state.user);
   const [openNavi, setOpenNavi] = useState(false);
   const [openMyInfo, setOpenMyInfo] = useState(false);
-  const cartCount = 2;
+  const cartCount = userData ? userData.cart?.length : noneUserData.cart?.length;
 
   const handleMyInfo = useCallback((e) => {
     e.stopPropagation();
@@ -264,7 +264,7 @@ const AppHeader = () => {
               {userData ? (
                 <>
                   <LiSmall link="/me" txt="마이페이지" />
-                  <LiSmall link="/cart" txt={`장바구니 (${cartCount})`} />
+                  <LiSmall link="/cart" txt={`장바구니 ${cartCount ? `(${cartCount})` : ''}`} />
                   <LiSmall link="/delivery" txt="배송조회" />
                   <LiSmall link="/q" txt="문의하기" />
                   <LiSmall txt="로그아웃" onClick={handleLogout} />
@@ -288,7 +288,7 @@ const AppHeader = () => {
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <ShoppingCartOutlined />
                 <span>
-                  <small>({cartCount})</small>
+                  <small>{cartCount ? `(${cartCount})` : ''}</small>
                 </span>
               </div>
             </Link>
@@ -299,7 +299,7 @@ const AppHeader = () => {
                 <UserOutlined />
                 <ul>
                   <Li link="/me" txt="마이페이지" />
-                  <Li link="/cart" txt={`장바구니 (${cartCount})`} />
+                  <Li link="/cart" txt={`장바구니 ${cartCount ? `(${cartCount})` : ''}`} />
                   <Li link="/delivery" txt="배송조회" />
                   <Li link="/q" txt="문의하기" />
                   <Li txt="로그아웃" onClick={handleLogout} />

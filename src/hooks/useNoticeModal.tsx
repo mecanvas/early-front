@@ -84,11 +84,11 @@ export const useNoticeModal = ({
   isPrevent,
   img,
 }: {
-  okUrl: string;
-  cancelUrl: string;
+  okUrl?: string;
+  cancelUrl?: string;
   bodyText: string;
   okText: string;
-  cancelText: string;
+  cancelText?: string;
   isPrevent?: boolean;
   img?: string;
 }) => {
@@ -170,14 +170,23 @@ export const useNoticeModal = ({
                   </div>
                 ) : null}
                 <PreventModalText>{bodyText}</PreventModalText>
-                <PreventModalButton>
-                  <Button type="default" onClick={handleCloseModal}>
-                    {cancelText}
-                  </Button>
-                  <Button type="primary" onClick={handleLeavePage}>
-                    {okText}
-                  </Button>
-                </PreventModalButton>
+                {cancelText && okText && (
+                  <PreventModalButton>
+                    <Button type="default" onClick={handleCloseModal}>
+                      {cancelText}
+                    </Button>
+                    <Button type="primary" onClick={handleLeavePage}>
+                      {okText}
+                    </Button>
+                  </PreventModalButton>
+                )}
+                {okText && !cancelText ? (
+                  <PreventModalButton>
+                    <Button style={{ width: '100px' }} type="primary" onClick={handleLeavePage}>
+                      {okText}
+                    </Button>
+                  </PreventModalButton>
+                ) : null}
               </>
             </PreventModalForm>
           </animated.div>
