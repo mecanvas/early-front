@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Address } from 'src/interfaces/OrderInterface';
 import { postUserLogin } from '../api/user/user';
 import { postUserLogout } from '../api/user/userLogout';
-import { Address } from './order';
 
 export type UserData = {
   id: number;
@@ -9,7 +9,7 @@ export type UserData = {
   role: 0 | 1; // 0 = 일반 1 = 어드민
   username: string;
   phone: string;
-  address: Address;
+  address: Address | null;
 };
 
 interface InitialState {
@@ -42,6 +42,9 @@ const user = createSlice({
   reducers: {
     getUser: (state, { payload }: PayloadAction<UserData>) => {
       state.userData = payload;
+    },
+    logoutUser: (state) => {
+      state.userData = null;
     },
   },
   extraReducers: (builder) =>
@@ -79,6 +82,6 @@ const user = createSlice({
       }),
 });
 
-export const { getUser } = user.actions;
+export const { getUser, logoutUser } = user.actions;
 
 export default user.reducer;

@@ -13,10 +13,10 @@ const IsRequire = styled.span`
   font-weight: bold;
 `;
 
-const BasicInput = styled.input<{ required: boolean }>`
-  ${({ required, theme }) =>
+const BasicInput = styled.input<{ isRequired: boolean }>`
+  ${({ isRequired, theme }) =>
     // pass = gray
-    required
+    isRequired
       ? css`
           border: 1px solid ${theme.color.gray300};
         `
@@ -80,7 +80,7 @@ const EarlyInput = ({
 
   return (
     <Container>
-      <BasicInput required={passOrFail === 'pass'} aria-required type="text" {...props} />
+      <BasicInput isRequired={passOrFail === 'pass'} type="text" {...props} />
       {isRequire ? <IsRequire>*</IsRequire> : null}
 
       {passOrFail === 'fail' && (

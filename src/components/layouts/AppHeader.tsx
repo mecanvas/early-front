@@ -7,6 +7,8 @@ import { CloseOutlined, MenuOutlined, ShoppingCartOutlined, UserOutlined } from 
 import { Divider } from 'antd';
 import Link from 'next/link';
 import { useAppSelector } from 'src/hooks/useRedux';
+import { useDispatch } from 'react-redux';
+import { logoutUser } from 'src/store/reducers/user';
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -124,12 +126,13 @@ const UserMyPageIcon = styled.div<{ openMyInfo?: boolean }>`
     display: ${({ openMyInfo }) => (openMyInfo ? 'block' : 'none')};
     width: 100px;
     position: absolute;
-    top: 40px;
+    top: 55px;
     right: 0;
     background-color: ${({ theme }) => theme.color.white};
     border: 1px solid ${({ theme }) => theme.color.gray500};
     text-align: center;
     li {
+      font-size: 0.9rem;
       padding: 0.3em;
 
       &:hover {
@@ -145,6 +148,7 @@ const NotUserData = styled.ul`
   li {
     cursor: pointer;
     margin-right: 0.5em;
+    font-size: 0.9rem;
 
     &:hover {
       opacity: 0.7;
@@ -168,12 +172,43 @@ const MobileMenuBar = styled.div<{ openNavi: boolean }>`
   }
 `;
 
+const LiSmall = ({ link, txt, ...props }: { link?: string; txt: string } & React.HtmlHTMLAttributes<HTMLElement>) => {
+  return (
+    <>
+      {link ? (
+        <Link href={link}>
+          <small {...props}>{txt}</small>
+        </Link>
+      ) : (
+        <small {...props}>{txt}</small>
+      )}
+    </>
+  );
+};
+
+const Li = ({ link, txt, ...props }: { link?: string; txt: string } & React.HtmlHTMLAttributes<HTMLLIElement>) => {
+  return (
+    <>
+      {link ? (
+        <Link href={link}>
+          <li {...props}>{txt}</li>
+        </Link>
+      ) : (
+        <li {...props}>{txt}</li>
+      )}
+    </>
+  );
+};
+
 const AppHeader = () => {
   const { exceptionRoute } = useExceptionRoute();
+  const dispatch = useDispatch();
   const { userData } = useAppSelector((state) => state.user);
   const [openNavi, setOpenNavi] = useState(false);
   const [openMyInfo, setOpenMyInfo] = useState(false);
-  const handleMyInfo = useCallback(() => {
+
+  const handleMyInfo = useCallback((e) => {
+    e.stopPropagation();
     setOpenMyInfo((prev) => !prev);
   }, []);
 
@@ -184,6 +219,10 @@ const AppHeader = () => {
   const handleCloseNavi = useCallback(() => {
     setOpenNavi(false);
   }, []);
+
+  const handleLogout = useCallback(() => {
+    dispatch(logoutUser());
+  }, [dispatch]);
 
   useEffect(() => {
     if (openMyInfo) {
@@ -199,20 +238,6 @@ const AppHeader = () => {
     return null;
   }
 
-  const Li = (props: { link?: string; txt: string }) => {
-    return (
-      <>
-        {props.link ? (
-          <Link href={props.link}>
-            <li>{props.txt}</li>
-          </Link>
-        ) : (
-          <li>{props.txt}</li>
-        )}
-      </>
-    );
-  };
-
   return (
     <HeaderContainer>
       <Header>
@@ -226,42 +251,51 @@ const AppHeader = () => {
             <Li link="/poster" txt="Poster" />
             <Li link="/about" txt="About" />
 
+            {/* 모바일 전용 */}
             <HeaderNavigationMobile openNavi={openNavi}>
               <Divider />
               {userData ? (
                 <>
-                  <small>마이페이지</small>
-                  <small>배송조회</small>
-                  <small>문의하기</small>
-                  <small>로그아웃</small>
+                  <LiSmall link="/me" txt="마이페이지" />
+                  <LiSmall link="/cart" txt="장바구니" />
+                  <LiSmall link="/delivery" txt="배송조회" />
+                  <LiSmall link="/q" txt="문의하기" />
+                  <LiSmall txt="로그아웃" onClick={handleLogout} />
                 </>
               ) : (
                 <>
-                  <small>로그인</small>
-                  <small>회원가입</small>
+                  <LiSmall link="/login" txt="로그인" />
+                  <LiSmall link="/register" txt="회원가입" />
+                  <LiSmall link="/cart" txt="장바구니" />
                 </>
               )}
             </HeaderNavigationMobile>
+            {/* 모바일 전용 끝 */}
           </ul>
         </HeaderNavigation>
         <HeaderUser>
           <UserMyPageIcon>
-            <ShoppingCartOutlined />
+            {/* 장바구니 아이콘 */}
+            <Link href="/cart">
+              <ShoppingCartOutlined />
+            </Link>
           </UserMyPageIcon>
-
           {userData ? (
-            <UserMyPageIcon onClick={handleMyInfo} openMyInfo={openMyInfo}>
-              <UserOutlined />
-              <ul>
-                <Li link="/me" txt="마이페이지" />
-                <Li link="/delivery" txt="배송조회" />
-                <Li link="/cart" txt="장바구니" />
-                <Li link="/q" txt="문의하기" />
-                <Li txt="로그아웃" />
-              </ul>
-            </UserMyPageIcon>
+            <>
+              <UserMyPageIcon onClick={handleMyInfo} openMyInfo={openMyInfo}>
+                <UserOutlined />
+                <ul>
+                  <Li link="/me" txt="마이페이지" />
+                  <Li link="/cart" txt="장바구니" />
+                  <Li link="/delivery" txt="배송조회" />
+                  <Li link="/q" txt="문의하기" />
+                  <Li txt="로그아웃" onClick={handleLogout} />
+                </ul>
+              </UserMyPageIcon>
+            </>
           ) : (
             <NotUserData>
+              {/* <Li txt="장바구니" /> */}
               <Li link="/login" txt="로그인"></Li>
               <Li link="/register" txt="회원가입"></Li>
             </NotUserData>

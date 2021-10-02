@@ -1,10 +1,14 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { APP_HEADER_HEIGHT } from 'src/constants';
 import styled from '@emotion/styled';
 import { Btn } from '../common/Button';
 import Link from 'next/link';
 import { Divide } from '../common/Divide';
 import EarlyInput from '../common/EarlyInput';
+import { useDispatch } from 'react-redux';
+import { getUser, UserData } from 'src/store/reducers/user';
+import { useAppSelector } from 'src/hooks/useRedux';
+import router from 'next/router';
 
 const Container = styled.div`
   display: flex;
@@ -103,18 +107,39 @@ interface LoginProps {
 
 const Login = () => {
   const [form, setForm] = useState<LoginProps>({ id: '', password: '' });
+  const dispatch = useDispatch();
+  const { userData } = useAppSelector((state) => state.user);
 
-  const handleRegisterForm = useCallback((e) => {
-    e.preventDefault();
+  const handleLoginChange = useCallback((e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   }, []);
 
-  console.log(form);
+  const handleLogin = useCallback(
+    (e) => {
+      e.preventDefault();
+      const mockUser: UserData = {
+        id: 1,
+        email: 'earlystudio21@gmail.com',
+        role: 0,
+        username: '얼리21',
+        phone: '01026299315',
+        address: null,
+      };
+      dispatch(getUser(mockUser));
+    },
+    [dispatch],
+  );
+
+  useEffect(() => {
+    if (userData) {
+      router.push('/');
+    }
+  }, [userData]);
 
   return (
     <Container>
-      <LoginForm onChange={handleRegisterForm}>
+      <LoginForm onChange={handleLoginChange} onSubmit={handleLogin}>
         <LoginInput>
           <EarlyInput name="id" placeholder="아이디" />
         </LoginInput>
