@@ -157,6 +157,8 @@ const ProductOrderItem = ({ title, meta, uploader, price, thumb, status, product
       )}
       {productOption.type === 2 && (
         <ProductOrderMutiOptions
+          title={title}
+          productId={productId as number}
           thumb={thumb}
           productOption={productOption}
           price={price}

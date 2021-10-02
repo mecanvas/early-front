@@ -5,6 +5,7 @@ import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { useAppSelector } from 'src/hooks/useRedux';
 import OrderProductList from '../order/OrderProductList';
+import { OptionType } from 'src/interfaces/ProductInterface';
 
 const Container = styled.div`
   padding: 2.5em 0;
@@ -69,13 +70,23 @@ const Pay = () => {
   const { productOrderInfo, deliveryOption } = useAppSelector((state) => state.order);
 
   const totalPrice = useMemo(() => {
-    return productOrderInfo.productOrder.reduce((acc, cur) => {
-      if (acc) {
-        acc += cur.price;
-        return acc;
-      }
-      return +cur.price;
-    }, 0);
+    return productOrderInfo.productOrder.map((lst) =>
+      lst.type === OptionType.MULTI
+        ? lst.optionSelect?.reduce((acc, cur) => {
+            if (acc) {
+              acc += cur.price;
+              return acc;
+            }
+            return cur.price;
+          }, 0)
+        : productOrderInfo.productOrder.reduce((acc, cur) => {
+            if (acc && cur.price) {
+              acc += cur.price;
+              return acc;
+            }
+            return cur.price || 0;
+          }, 0),
+    )[0];
   }, [productOrderInfo.productOrder]);
 
   const status = useMemo(() => {
@@ -125,7 +136,7 @@ const Pay = () => {
             <LabelAndText>
               <Label>결제금액</Label>
               <Text>
-                <div>{(totalPrice + deliveryOption.deliveryPrice).toLocaleString()}원</div>
+                <div>{((totalPrice || 0) + deliveryOption.deliveryPrice).toLocaleString()}원</div>
                 {deliveryOption.deliveryPrice ? (
                   <small>(배송비{deliveryOption.deliveryPrice.toLocaleString()}원 포함)</small>
                 ) : null}

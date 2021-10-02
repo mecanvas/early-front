@@ -4,6 +4,7 @@ import router from 'next/router';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from 'src/hooks/useRedux';
+import { OptionType } from 'src/interfaces/ProductInterface';
 import { setProductOrderInfo } from 'src/store/reducers/order';
 import { TotalPrice } from '../product/ProductOrderMutiOptions';
 import OrderProductList from './OrderProductList';
@@ -205,23 +206,43 @@ const OrderSheets = () => {
   }, [deliveryOption]);
 
   const totalQty = useMemo(() => {
-    return productOrder.reduce((acc, cur) => {
-      if (acc) {
-        acc += cur.qty;
-        return acc;
-      }
-      return cur.qty;
-    }, 0);
+    return productOrder.map((lst) =>
+      lst.type === OptionType.MULTI
+        ? lst.optionSelect?.reduce((acc, cur) => {
+            if (acc) {
+              acc += cur.qty;
+              return acc;
+            }
+            return cur.qty;
+          }, 0)
+        : productOrder.reduce((acc, cur) => {
+            if (acc && cur.qty) {
+              acc += cur.qty;
+              return acc;
+            }
+            return cur.qty || 0;
+          }, 0),
+    )[0];
   }, [productOrder]);
 
   const totalPrice = useMemo(() => {
-    return productOrder.reduce((acc, cur) => {
-      if (acc) {
-        acc += cur.price;
-        return acc;
-      }
-      return +cur.price;
-    }, 0);
+    return productOrder.map((lst) =>
+      lst.type === OptionType.MULTI
+        ? lst.optionSelect?.reduce((acc, cur) => {
+            if (acc) {
+              acc += cur.price;
+              return acc;
+            }
+            return cur.price;
+          }, 0)
+        : productOrder.reduce((acc, cur) => {
+            if (acc && cur.price) {
+              acc += cur.price;
+              return acc;
+            }
+            return cur.price || 0;
+          }, 0),
+    )[0];
   }, [productOrder]);
 
   const handlePayNow = useCallback(() => {
@@ -254,7 +275,7 @@ const OrderSheets = () => {
             총 상품 개수 <span>{totalQty}</span>개
           </span>
           <span>|</span>
-          <span>{totalPrice.toLocaleString()}원</span>
+          <span>{totalPrice?.toLocaleString()}원</span>
         </TotalPrice>
 
         <ProductDelivery>
@@ -271,7 +292,7 @@ const OrderSheets = () => {
                 <input
                   type="text"
                   placeholder="우편번호"
-                  value={userData ? userData.address.postCode : productOrderInfo.address.postCode}
+                  value={userData ? userData.address?.postCode : productOrderInfo.address.postCode}
                 />
                 <button onClick={handleAddress}>찾기</button>
               </div>
@@ -279,14 +300,14 @@ const OrderSheets = () => {
                 <input
                   type="text"
                   placeholder="주소"
-                  value={userData ? userData.address.address : productOrderInfo.address.address}
+                  value={userData ? userData.address?.address : productOrderInfo.address.address}
                 />
               </div>
               <div>
                 <input
                   type="text"
                   placeholder="상세주소"
-                  value={userData ? userData.address.addressDetail : productOrderInfo.address.addressDetail}
+                  value={userData ? userData.address?.addressDetail : productOrderInfo.address.addressDetail}
                   onChange={handleAddressDetail}
                 />
               </div>
@@ -319,7 +340,7 @@ const OrderSheets = () => {
           <h2>- 결제 진행</h2>
           <Divider />
           <div>
-            총 {(totalPrice + deliveryPrice).toLocaleString()}원에 대한 결제를 진행합니다.
+            총 {((totalPrice || 0) + deliveryPrice).toLocaleString()}원에 대한 결제를 진행합니다.
             <div>
               <small>(배송비 {deliveryPrice.toLocaleString()}원)</small>
             </div>

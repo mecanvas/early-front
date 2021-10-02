@@ -1,10 +1,17 @@
+import { ProductOptionSelectList } from './ProductInterface';
+
 export interface ProductOrder {
-  optionId: number;
-  productId: number;
+  type: 1 | 2; // 1= 단독 2= 조합
   thumb: string;
-  value: string;
-  qty: number;
-  price: number;
+  productId: number;
+  productTitle: string;
+
+  // 조합형일시
+  optionSelect: ProductOptionSelectList[] | null;
+
+  // 단일형일시
+  qty?: number;
+  price?: number;
 }
 
 export interface Address {

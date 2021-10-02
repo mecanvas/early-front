@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import React from 'react';
 import { ProductOrder } from 'src/interfaces/OrderInterface';
+import { OptionType } from 'src/interfaces/ProductInterface';
 
 const ProductInfo = styled.div`
   display: flex;
@@ -40,18 +41,33 @@ interface Props {
 const OrderProductList = ({ productOrder }: Props) => {
   return (
     <ProductOrderList>
-      {productOrder.map((lst) => (
-        <ProductOrderList key={lst.value}>
-          <img src={lst.thumb} alt="상품 썸네일" />
-          <ProductInfo>
-            <h3>{lst.value}</h3>
-            <div>
-              <div>{lst.qty}개</div>
-              <div>{lst.price.toLocaleString()}원</div>
-            </div>
-          </ProductInfo>
-        </ProductOrderList>
-      ))}
+      {productOrder.map((order, i) =>
+        order.type === OptionType.MULTI && order.optionSelect ? (
+          order.optionSelect.map((lst) => (
+            <ProductOrderList key={lst.listId}>
+              <img src={order.thumb} alt="상품 썸네일" />
+              <ProductInfo>
+                <h3>{lst.optionAbbr.name}</h3>
+                <div>
+                  <div>{lst.qty}개</div>
+                  <div>{lst.price.toLocaleString()}원</div>
+                </div>
+              </ProductInfo>
+            </ProductOrderList>
+          ))
+        ) : (
+          <ProductOrderList key={i}>
+            <img src={order.thumb} alt="상품 썸네일" />
+            <ProductInfo>
+              <h3>{order.productTitle}</h3>
+              <div>
+                <div>{order.qty}개</div>
+                <div>{order.price?.toLocaleString()}원</div>
+              </div>
+            </ProductInfo>
+          </ProductOrderList>
+        ),
+      )}
     </ProductOrderList>
   );
 };

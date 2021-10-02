@@ -264,7 +264,7 @@ const AppHeader = () => {
               {userData ? (
                 <>
                   <LiSmall link="/me" txt="마이페이지" />
-                  <LiSmall link="/cart" txt={`장바구니 ${cartCount}`} />
+                  <LiSmall link="/cart" txt={`장바구니 (${cartCount})`} />
                   <LiSmall link="/delivery" txt="배송조회" />
                   <LiSmall link="/q" txt="문의하기" />
                   <LiSmall txt="로그아웃" onClick={handleLogout} />
@@ -285,13 +285,12 @@ const AppHeader = () => {
           <UserMyPageIcon>
             {/* 장바구니 아이콘 */}
             <Link href="/cart">
-              <>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
                 <ShoppingCartOutlined />
-
                 <span>
                   <small>({cartCount})</small>
                 </span>
-              </>
+              </div>
             </Link>
           </UserMyPageIcon>
           {userData ? (
