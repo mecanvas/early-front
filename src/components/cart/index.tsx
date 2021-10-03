@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
+import { useAppSelector } from 'src/hooks/useRedux';
+import { OptionType } from 'src/interfaces/ProductInterface';
 
 const Container = styled.div`
   max-width: 800px;
@@ -11,25 +13,51 @@ const Container = styled.div`
 `;
 
 const Cart = () => {
-  const productOrder = {
-    optionId: 1,
-    productId: 1,
-    thumb: 'https://shop-phinf.pstatic.net/20210729_267/1627557958996mnAfE_PNG/003.png?type=w860',
-    value: '모네',
-    qty: 1,
-    price: 3000,
-  };
+  const { userData, noneUserData } = useAppSelector((state) => state.user);
+  const cartList = useMemo(() => {
+    if (userData && userData.cart) {
+      const { cart } = userData;
+      return cart;
+    }
+    if (noneUserData && noneUserData.cart) {
+      const { cart } = noneUserData;
+      return cart;
+    }
+    return [];
+  }, [noneUserData, userData]);
+
   return (
     <Container>
-      <div>
+      {cartList.length ? (
         <div>
-          <img src={productOrder.thumb} />
+          {cartList.map(({ product, ...lst }) => (
+            <div key={lst.id}>
+              <div>{product.productTitle}</div>
+              <div>
+                <img src={product.thumb} alt="상품 썸네일" />
+              </div>
+              {product.type === OptionType.SINGLE ? (
+                <div>
+                  <div>{product.qty}개</div>
+                  <div>{product.price?.toLocaleString()}원</div>
+                </div>
+              ) : (
+                <div>
+                  {product.optionSelect?.map((select) => (
+                    <div key={select.listId}>
+                      <div>{select.optionAbbr.fullName}</div>
+                      <div>{select.qty}개</div>
+                      <div>{select.price.toLocaleString()}원</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-        <div>{productOrder.value}</div>
-        <button>
-          <div>{productOrder.qty}개</div>
-        </button>
-      </div>
+      ) : (
+        <div></div>
+      )}
     </Container>
   );
 };

@@ -128,10 +128,11 @@ const ProductOrderItem = ({ title, meta, uploader, price, thumb, status, product
       return alert('선택하신 상품이 없어요 :)');
     }
     setIsCart(true);
-    const cartList = productOrder.map((lst) => ({ id: Date.now(), product: lst }));
+
+    const cartList = productOrder.map((lst) => ({ id: productId, product: lst }));
     dispatch(setUserCart(cartList));
     dispatch(setModalVisible(true));
-  }, [dispatch, productOrder]);
+  }, [dispatch, productId, productOrder]);
 
   const handleOrder = useCallback(() => {
     const { productId } = router.query;
