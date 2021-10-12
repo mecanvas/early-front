@@ -4,6 +4,7 @@ import { Product } from 'src/interfaces/ProductInterface';
 import ProductDescription from './ProductDescription';
 import ProductOrderItem from './ProductOrderItem';
 import ProductThumb from './ProductThumb';
+import { useRouter } from 'next/router';
 
 const Container = styled.div`
   max-width: 1200px;
@@ -27,9 +28,11 @@ const ProductIntro = styled.div`
 `;
 
 const ProductDetail = () => {
+  const { query } = useRouter();
+
   const product: Product = {
-    id: 1,
-    title: '앙리 마티스',
+    id: parseInt(query.productId as string) || 1,
+    title: ('앙리 마티스' + query.productId) as string,
     meta: '이걸 외 안사? 이거만 붙여놔도 스타일링 끝임..;',
     price: 3900,
     thumb: 'https://shop-phinf.pstatic.net/20210729_267/1627557958996mnAfE_PNG/003.png?type=w860',

@@ -5,7 +5,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNoticeModal } from 'src/hooks/useNoticeModal';
 import { useAppSelector } from 'src/hooks/useRedux';
-import { DeliveryOption, ProductOption } from 'src/interfaces/ProductInterface';
+import { DeliveryOption, OptionType, ProductOption } from 'src/interfaces/ProductInterface';
 import { Uploader } from 'src/interfaces/User';
 import { setUserCart } from 'src/store/reducers/user';
 import { setModalVisible } from 'src/store/reducers/utils';
@@ -124,11 +124,11 @@ const ProductOrderItem = ({ title, meta, uploader, price, thumb, status, product
   const { NoticeModal } = useNoticeModal(notice);
 
   const handleSaveCart = useCallback(() => {
-    if (!productOrder.length) {
+    if (productOrder[0].type === OptionType.MULTI && !productOrder[0].optionSelect?.length) {
       return alert('선택하신 상품이 없어요 :)');
     }
-    setIsCart(true);
 
+    setIsCart(true);
     const cartList = productOrder.map((lst) => ({ id: productId, product: lst }));
     dispatch(setUserCart(cartList));
     dispatch(setModalVisible(true));

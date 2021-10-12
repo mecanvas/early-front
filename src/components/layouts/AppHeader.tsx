@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import { useExceptionRoute } from 'src/hooks/useExceptionRoute';
 import Logo from './Logo';
@@ -8,7 +8,8 @@ import { Divider } from 'antd';
 import Link from 'next/link';
 import { useAppSelector } from 'src/hooks/useRedux';
 import { useDispatch } from 'react-redux';
-import { logoutUser } from 'src/store/reducers/user';
+import { logoutUser, NoneUserData, UserData } from 'src/store/reducers/user';
+import { OptionType } from 'src/interfaces/ProductInterface';
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -212,7 +213,24 @@ const AppHeader = () => {
   const { userData, noneUserData } = useAppSelector((state) => state.user);
   const [openNavi, setOpenNavi] = useState(false);
   const [openMyInfo, setOpenMyInfo] = useState(false);
-  const cartCount = userData ? userData.cart?.length : noneUserData.cart?.length;
+  const cartCount = useMemo(() => {
+    const getCount = (user: UserData | NoneUserData) => {
+      if (user && user.cart) {
+        const cnt = user.cart.reduce((acc, cur) => {
+          const length = cur.product.type === OptionType.SINGLE ? 1 : cur.product.optionSelect?.length;
+          if (acc) {
+            acc += length || 0;
+            return acc;
+          }
+          acc = length || 0;
+          return acc;
+        }, 0);
+        return cnt;
+      }
+    };
+
+    return getCount(userData || noneUserData);
+  }, [userData, noneUserData]);
 
   const handleMyInfo = useCallback((e) => {
     e.stopPropagation();
