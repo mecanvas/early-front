@@ -206,7 +206,7 @@ const CartSingle = ({ product, id, allCheck }: CartSingleProps) => {
               +
             </button>
           </CartQtyCount>
-          <div>{product.price?.toLocaleString()}원</div>
+          <div>{((product?.qty || 1) * (product.price || 1))?.toLocaleString()}원</div>
         </CartMultiCount>
       </CartProductContainer>
       <DeleteCartItem>X</DeleteCartItem>
@@ -309,7 +309,7 @@ const CartMulti = ({ product, allCheck }: CartMultiProps) => {
                     +
                   </button>
                 </CartQtyCount>
-                <div>{select.price.toLocaleString()}원</div>
+                <div>{(select.qty * select.price).toLocaleString()}원</div>
               </>
             </CartMultiCount>
           </CartProductContainer>
@@ -322,6 +322,8 @@ const CartMulti = ({ product, allCheck }: CartMultiProps) => {
 
 const CartProduct = () => {
   const { userData, noneUserData } = useAppSelector((state) => state.user);
+  const { productOrder } = useAppSelector((state) => state.order);
+
   const cartList = useMemo(() => {
     const getCartList = (user: UserData | NoneUserData) => {
       const { cart } = user;
@@ -335,7 +337,7 @@ const CartProduct = () => {
   const dispatch = useDispatch();
 
   const totalPrice = useMemo(() => {
-    const p = cartList.map(({ product }) => {
+    const p = productOrder.map((product) => {
       let total = 0;
       if (product.type === OptionType.SINGLE) {
         if (!product.qty || !product.price) return;
@@ -356,6 +358,7 @@ const CartProduct = () => {
       }
       return total;
     });
+
     const num = p.reduce((acc, cur) => {
       if (!cur) {
         return;
@@ -370,7 +373,7 @@ const CartProduct = () => {
     }, 0);
 
     return num;
-  }, [cartList]);
+  }, [productOrder]);
 
   const handleAllCheck = useCallback(() => {
     setAllCheck(() => true);
@@ -384,6 +387,7 @@ const CartProduct = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    dispatch(setProductOrder([]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
