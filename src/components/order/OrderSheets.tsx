@@ -40,9 +40,11 @@ const DeliverySetting = styled.div`
   }
   input {
     outline: none;
-    border: 1px solid ${({ theme }) => theme.color.gray300};
+    border-radius: 4px;
+    border: 1px solid ${({ theme }) => theme.color.gray200};
     padding: 0.5em;
     margin-bottom: 0.5em;
+    font-size: 0.9rem;
   }
 `;
 
@@ -59,8 +61,10 @@ const DeliveryAddress = styled.div`
       margin-right: 2px;
     }
     button {
+      font-size: 0.9rem;
+      border-radius: 4px;
       margin-bottom: 0.5em;
-      padding: 0 1.5em;
+      padding: 0 1em;
       border: 1px solid ${({ theme }) => theme.color.gray300};
       &:hover {
         opacity: 0.5;
@@ -81,7 +85,9 @@ const DeliveryMemo = styled.div`
   margin-top: 2em;
 
   textarea {
-    border: 1px solid ${({ theme }) => theme.color.gray300};
+    border: 1px solid ${({ theme }) => theme.color.gray200};
+    border-radius: 4px;
+    font-size: 0.9rem;
     width: 90%;
     height: 100px;
     outline: none;
@@ -96,6 +102,11 @@ const DeliveryOrderPay = styled.div`
   div {
     text-align: center;
   }
+`;
+
+const TotalPay = styled.span`
+  font-weight: bold;
+  font-size: 1.1rem;
 `;
 
 const OrderPayButton = styled.div`
@@ -206,44 +217,38 @@ const OrderSheets = () => {
   }, [deliveryOption]);
 
   const totalQty = useMemo(() => {
-    return productOrder.map((lst) =>
-      lst.type === OptionType.MULTI
-        ? lst.optionSelect?.reduce((acc, cur) => {
-            if (acc) {
-              acc += cur.qty;
-              return acc;
-            }
-            return cur.qty;
-          }, 0)
-        : productOrder.reduce((acc, cur) => {
-            if (acc && cur.qty) {
-              acc += cur.qty;
-              return acc;
-            }
-            return cur.qty || 0;
-          }, 0),
-    )[0];
+    let qty = 0;
+    productOrder.forEach((order) => {
+      if (order.type === OptionType.MULTI) {
+        qty += order.optionSelect?.length || 0;
+      } else {
+        qty += 1;
+      }
+    });
+    return qty;
   }, [productOrder]);
 
   const totalPrice = useMemo(() => {
-    return productOrder.map((lst) =>
-      lst.type === OptionType.MULTI
-        ? lst.optionSelect?.reduce((acc, cur) => {
+    let price = 0;
+    productOrder.forEach((order) => {
+      if (order.type == OptionType.MULTI) {
+        price +=
+          order.optionSelect?.reduce((acc, cur) => {
             if (acc) {
-              acc += cur.price;
+              acc += cur.qty * cur.price;
               return acc;
             }
-            return cur.price;
-          }, 0)
-        : productOrder.reduce((acc, cur) => {
-            if (acc && cur.price) {
-              acc += cur.price;
-              return acc;
-            }
-            return cur.price || 0;
-          }, 0),
-    )[0];
-  }, [productOrder]);
+            return cur.qty * cur.price;
+          }, 0) || 0;
+      } else {
+        price += (order.qty || 0) * (order.price || 0);
+      }
+    });
+    if (price < deliveryOption.limit) {
+      return price + deliveryPrice;
+    }
+    return price;
+  }, [deliveryOption.limit, deliveryPrice, productOrder]);
 
   const handlePayNow = useCallback(() => {
     router.push('/pay?status=1');
@@ -260,34 +265,38 @@ const OrderSheets = () => {
     dispatch(setProductOrderInfo({ ...productOrderInfo, productOrder }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   return (
     <Container>
       <OrderTable>
-        <h2>- 주문 내역</h2>
+        <h2>주문 내역</h2>
         <Divider />
         <OrderProductList productOrder={productOrder} />
 
-        <Divider />
-
         <TotalPrice>
           <span>
-            총 상품 개수 <span>{totalQty}</span>개
+            총 결제 개수 <span>{totalQty}</span>개
           </span>
           <span>|</span>
           <span>{totalPrice?.toLocaleString()}원</span>
+          {deliveryOption.limit > totalPrice ? (
+            <div>
+              {deliveryOption.deliveryPrice ? `(배송비 ${deliveryOption.deliveryPrice.toLocaleString()}원 포함)` : ``}
+            </div>
+          ) : (
+            <></>
+          )}
         </TotalPrice>
 
         <ProductDelivery>
-          <h2>- 배송 정보 입력</h2>
+          <h2>배송 정보 입력</h2>
           <Divider />
           <DeliverySetting>
             <DeliveryReceiver>
-              <h5>수령인 :</h5>
+              <h5>수령인 정보</h5>
               <input type="text" placeholder="이름" onChange={handleDeliveryReceiver} />
             </DeliveryReceiver>
             <DeliveryAddress>
-              <h5>주소 입력 :</h5>
+              <h5>주소 입력</h5>
               <div>
                 <input
                   type="text"
@@ -314,7 +323,7 @@ const OrderSheets = () => {
             </DeliveryAddress>
 
             <DeliveryPhone>
-              <h5>연락처 :</h5>
+              <h5>연락처</h5>
               <div>
                 <input
                   type="text"
@@ -330,20 +339,24 @@ const OrderSheets = () => {
             </DeliveryPhone>
 
             <DeliveryMemo>
-              <h5>배송 메모 :</h5>
+              <h5>배송 메모</h5>
               <textarea placeholder="배송 메모를 입력하세요." onChange={handleDeliveryMemo} />
             </DeliveryMemo>
           </DeliverySetting>
         </ProductDelivery>
 
         <DeliveryOrderPay>
-          <h2>- 결제 진행</h2>
+          <h2>결제 진행</h2>
           <Divider />
           <div>
-            총 {((totalPrice || 0) + deliveryPrice).toLocaleString()}원에 대한 결제를 진행합니다.
-            <div>
-              <small>(배송비 {deliveryPrice.toLocaleString()}원)</small>
-            </div>
+            <TotalPay>총 {totalPrice.toLocaleString()}원</TotalPay>에 대한 결제를 진행합니다.
+            {deliveryOption.limit > totalPrice ? (
+              <div>
+                <small>(배송비 {deliveryPrice.toLocaleString()}원 포함)</small>
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
           <OrderPayButton>
             <button type="button" onClick={handlePayNow}>

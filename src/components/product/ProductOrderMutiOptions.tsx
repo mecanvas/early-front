@@ -115,7 +115,7 @@ export const TotalPrice = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  margin: 1.5em 0;
+  margin: 0.3em 0;
   span {
     margin-right: 0.5em;
 
@@ -131,6 +131,11 @@ export const TotalPrice = styled.div`
       font-weight: bold;
       font-size: 1.25rem;
     }
+  }
+
+  div {
+    font-size: 0.65rem;
+    color: ${({ theme }) => theme.color.gray700};
   }
 `;
 

@@ -3,34 +3,45 @@ import React from 'react';
 import { ProductOrder } from 'src/interfaces/OrderInterface';
 import { OptionType } from 'src/interfaces/ProductInterface';
 
+const ProductOrderContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const ProductOrderList = styled.div`
+  margin-bottom: 1em;
+  padding: 0.5em;
+  width: 100%;
+  border-bottom: 1px solid #dbdbdb;
+  display: flex;
+`;
+
+const ProductThumb = styled.div`
+  display: flex;
+  align-items: flex-start;
+
+  img {
+    max-width: 125px;
+    width: 100%;
+    object-fit: contain;
+  }
+`;
+
 const ProductInfo = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 1em;
   padding: 0.5em;
   width: 100%;
-
-  h3 {
-    margin-bottom: 2em;
-  }
-
-  div {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    font-size: 1.25rem;
-  }
 `;
 
-const ProductOrderList = styled.div`
-  padding: 0.5em 0;
-  width: 100%;
-
+const ProductInfoQty = styled.div`
+  margin: 0.2em 0;
+  display: flex;
   div {
-    display: flex;
-  }
-  img {
-    width: 200px;
+    font-size: 0.95rem;
+    color: ${({ theme }) => theme.color.gray700};
+    margin-right: 0.3em;
   }
 `;
 
@@ -40,35 +51,34 @@ interface Props {
 
 const OrderProductList = ({ productOrder }: Props) => {
   return (
-    <ProductOrderList>
-      {productOrder.map((order, i) =>
-        order.type === OptionType.MULTI && order.optionSelect ? (
-          order.optionSelect.map((lst) => (
-            <ProductOrderList key={lst.listId}>
-              <img src={order.thumb} alt="상품 썸네일" />
-              <ProductInfo>
-                <h3>{lst.optionAbbr.name}</h3>
-                <div>
-                  <div>{lst.qty}개</div>
-                  <div>{lst.price.toLocaleString()}원</div>
-                </div>
-              </ProductInfo>
-            </ProductOrderList>
-          ))
-        ) : (
-          <ProductOrderList key={i}>
+    <ProductOrderContainer>
+      {productOrder.map((order, i) => (
+        <ProductOrderList key={i}>
+          <ProductThumb>
             <img src={order.thumb} alt="상품 썸네일" />
-            <ProductInfo>
-              <h3>{order.productTitle}</h3>
-              <div>
+          </ProductThumb>
+          <ProductInfo>
+            <div>
+              <h5>{order.productTitle}</h5>
+            </div>
+            {order.type === OptionType.MULTI && order.optionSelect ? (
+              order.optionSelect.map((lst) => (
+                <ProductInfoQty>
+                  <div>{lst.optionAbbr.fullName} -</div>
+                  <div>{lst.qty}개</div>
+                  <div>{(lst.qty * lst.price).toLocaleString()}원</div>
+                </ProductInfoQty>
+              ))
+            ) : (
+              <ProductInfoQty>
                 <div>{order.qty}개</div>
-                <div>{order.price?.toLocaleString()}원</div>
-              </div>
-            </ProductInfo>
-          </ProductOrderList>
-        ),
-      )}
-    </ProductOrderList>
+                <div>{((order.qty || 0) * (order.price || 0))?.toLocaleString()}원</div>
+              </ProductInfoQty>
+            )}
+          </ProductInfo>
+        </ProductOrderList>
+      ))}
+    </ProductOrderContainer>
   );
 };
 
