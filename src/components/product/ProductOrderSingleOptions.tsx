@@ -49,6 +49,7 @@ const ProductOrderSingleOptions = ({
           thumb,
           qty: count,
           price: count * price,
+          deliveryOption,
         },
       ]),
     );

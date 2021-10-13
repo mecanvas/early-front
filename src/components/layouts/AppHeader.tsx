@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { useAppSelector } from 'src/hooks/useRedux';
 import { useDispatch } from 'react-redux';
 import { logoutUser, NoneUserData, UserData } from 'src/store/reducers/user';
-import { OptionType } from 'src/interfaces/ProductInterface';
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -216,16 +215,7 @@ const AppHeader = () => {
   const cartCount = useMemo(() => {
     const getCount = (user: UserData | NoneUserData) => {
       if (user && user.cart) {
-        const cnt = user.cart.reduce((acc, cur) => {
-          const length = cur.product.type === OptionType.SINGLE ? 1 : cur.product.optionSelect?.length;
-          if (acc) {
-            acc += length || 0;
-            return acc;
-          }
-          acc = length || 0;
-          return acc;
-        }, 0);
-        return cnt;
+        return user.cart.length;
       }
     };
 

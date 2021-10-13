@@ -2,15 +2,14 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import { useAppSelector } from 'src/hooks/useRedux';
 import { OptionType } from 'src/interfaces/ProductInterface';
-import { Cart } from 'src/interfaces/User';
 import Link from 'next/link';
 import { Btn } from '../common/Button';
 import { theme } from 'src/style/theme';
-import { ProductOrder } from 'src/interfaces/OrderInterface';
 import { useDispatch } from 'react-redux';
 import { setProductOrder } from 'src/store/reducers/order';
-import router from 'next/router';
-import { NoneUserData, setCartQty, UserData } from 'src/store/reducers/user';
+import { NoneUserData, UserData } from 'src/store/reducers/user';
+import CartMulti from './CartMulti';
+import CartSingle from './CartSingle';
 
 const CartEmpty = styled.div`
   width: 100%;
@@ -18,6 +17,11 @@ const CartEmpty = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+const CartTotalPrice = styled.div`
+  width: 100%;
+  text-align: right;
 `;
 
 const Container = styled.div`
@@ -32,7 +36,7 @@ const CartSelectBtn = styled.div`
   margin-bottom: 3em;
 `;
 
-const CartProductContainer = styled.div`
+export const CartProductContainer = styled.div`
   width: 100%;
   max-width: 800px;
   margin: 0.8em auto;
@@ -42,7 +46,7 @@ const CartProductContainer = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
 `;
 
-const CartListContainer = styled.div`
+export const CartListContainer = styled.div`
   display: flex;
   align-items: center;
   height: 100%;
@@ -57,7 +61,7 @@ const CartListContainer = styled.div`
   }
 `;
 
-const CartProductImg = styled.div`
+export const CartProductImg = styled.div`
   max-width: 100px;
   cursor: pointer;
   img {
@@ -65,35 +69,40 @@ const CartProductImg = styled.div`
   }
 `;
 
-const CartText = styled.div`
+export const CartText = styled.div`
   display: flex;
   align-items: center;
   cursor: pointer;
   width: 100%;
   padding-left: 0.8em;
-  & > div {
-    flex: 1;
-  }
+  flex: 1;
 `;
 
-const CartMultiCount = styled.div`
+export const CartOption = styled.div`
   display: flex;
-  flex: 1;
+  flex-direction: column;
+  margin-right: 2em;
+`;
+
+export const CartMultiCount = styled.div`
+  margin: 0.5em 0;
+  display: flex;
+  align-items: center;
   width: 100%;
-  justify-content: flex-end;
+  justify-content: flex-start;
   text-align: right;
   * {
     color: ${({ theme }) => theme.color.gray700};
+    font-size: 0.85rem;
   }
 `;
 
-const CartQtyCount = styled.div`
+export const CartQtyCount = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   button {
     border: 1px solid ${({ theme }) => theme.color.gray300};
-    padding: 0.2em 0.5em;
     &:nth-of-type(2) {
       margin-right: 0.7em;
     }
@@ -104,15 +113,14 @@ const CartQtyCount = styled.div`
   }
 `;
 
-const CartOptionAbbr = styled.div`
-  font-size: 0.65rem;
-
+export const CartOptionAbbr = styled.div`
   * {
-    font-size: 0.65rem;
+    font-weight: 600;
+    font-size: 0.85rem;
   }
 `;
 
-const DeleteCartItem = styled.div`
+export const DeleteCartItem = styled.div`
   position: absolute;
   cursor: pointer;
   top: 5px;
@@ -125,200 +133,6 @@ const DeleteCartItem = styled.div`
     opacity: 0.6;
   }
 `;
-
-interface CartSingleProps extends Cart {
-  allCheck: boolean;
-}
-
-interface CartMultiProps {
-  product: ProductOrder;
-  allCheck: boolean;
-}
-
-const CartSingle = ({ product, id, allCheck }: CartSingleProps) => {
-  const [values, setValues] = useState<number[]>([]);
-  const dispatch = useDispatch();
-
-  const handleGoToProduct = useCallback((e) => {
-    const { productid: productId } = e.currentTarget.dataset;
-    if (productId) {
-      router.push(`/product/${productId}`);
-    }
-  }, []);
-
-  const handleChecked = useCallback((e) => {
-    const { value } = e.target;
-    setValues((prev) => {
-      if (!prev.length) {
-        return [+value];
-      }
-      if (prev.find((lst) => lst === +value)) {
-        return prev.filter((lst) => lst !== +value);
-      } else {
-        return [...prev, +value];
-      }
-    });
-  }, []);
-
-  const handleQtyCount = useCallback(
-    (e) => {
-      const { value } = e.target;
-      const { productid: productId } = e.currentTarget.dataset;
-
-      if (productId && value) {
-        dispatch(setCartQty({ productId: +productId, type: value as '-' | '+' }));
-      }
-    },
-    [dispatch],
-  );
-
-  useEffect(() => {
-    if (!allCheck) {
-      setValues([]);
-    } else {
-      setValues([id]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allCheck]);
-
-  return (
-    <CartListContainer>
-      <div>
-        <input type="checkbox" value={id} onChange={handleChecked} checked={values.includes(id)} />
-      </div>
-      <CartProductContainer>
-        <CartProductImg data-productid={product.productId} onClick={handleGoToProduct}>
-          <img src={product.thumb} alt="상품 썸네일" />
-        </CartProductImg>
-
-        <CartText data-productid={product.productId} onClick={handleGoToProduct}>
-          <div>
-            <h5>{product.productTitle}</h5>
-          </div>
-        </CartText>
-        <CartMultiCount>
-          <CartQtyCount>
-            <button type="button" value="-" data-productid={product.productId} onClick={handleQtyCount}>
-              -
-            </button>
-            <div>{product.qty}개</div>
-            <button type="button" value="+" data-productid={product.productId} onClick={handleQtyCount}>
-              +
-            </button>
-          </CartQtyCount>
-          <div>{((product?.qty || 1) * (product.price || 1))?.toLocaleString()}원</div>
-        </CartMultiCount>
-      </CartProductContainer>
-      <DeleteCartItem>X</DeleteCartItem>
-    </CartListContainer>
-  );
-};
-
-const CartMulti = ({ product, allCheck }: CartMultiProps) => {
-  const [values, setValues] = useState<number[]>([]);
-  const dispatch = useDispatch();
-
-  const handleGoToProduct = useCallback((e) => {
-    const { productid: productId } = e.currentTarget.dataset;
-    if (productId) {
-      router.push(`/product/${productId}`);
-    }
-  }, []);
-
-  const handleQtyCount = useCallback(
-    (e) => {
-      const { value } = e.target;
-      const { productid: productId, listid: listId } = e.currentTarget.dataset;
-
-      if (productId && listId && value) {
-        dispatch(setCartQty({ productId: +productId, listId: +listId, type: value as '-' | '+' }));
-      }
-    },
-    [dispatch],
-  );
-
-  const handleChecked = useCallback((e) => {
-    const { value } = e.target;
-    setValues((prev) => {
-      if (!prev.length) {
-        return [+value];
-      }
-      if (prev.find((lst) => lst === +value)) {
-        return prev.filter((lst) => lst !== +value);
-      } else {
-        return [...prev, +value];
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!allCheck) {
-      setValues([]);
-    } else {
-      setValues(product.optionSelect?.map((select) => select.listId) || []);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allCheck]);
-
-  return (
-    <>
-      {product.optionSelect?.map((select, index) => (
-        <CartListContainer key={select.listId}>
-          <div>
-            <input
-              type="checkbox"
-              data-index={select.listId}
-              onChange={handleChecked}
-              value={select.listId}
-              checked={values.includes(select.listId)}
-            />
-          </div>
-          <CartProductContainer>
-            <CartProductImg data-productid={product.productId} onClick={handleGoToProduct}>
-              <img src={product.thumb} alt="상품 썸네일" />
-            </CartProductImg>
-
-            <CartText data-productid={product.productId} onClick={handleGoToProduct}>
-              <div>
-                <h5>{product.productTitle}</h5>
-                <CartOptionAbbr>
-                  <div key={index}>{select.optionAbbr.fullName}</div>
-                </CartOptionAbbr>
-              </div>
-            </CartText>
-            <CartMultiCount>
-              <>
-                <CartQtyCount>
-                  <button
-                    type="button"
-                    value="-"
-                    data-productid={product.productId}
-                    data-listid={select.listId}
-                    onClick={handleQtyCount}
-                  >
-                    -
-                  </button>
-                  <div>{select.qty}개</div>
-                  <button
-                    type="button"
-                    value="+"
-                    data-productid={product.productId}
-                    data-listid={select.listId}
-                    onClick={handleQtyCount}
-                  >
-                    +
-                  </button>
-                </CartQtyCount>
-                <div>{(select.qty * select.price).toLocaleString()}원</div>
-              </>
-            </CartMultiCount>
-          </CartProductContainer>
-          <DeleteCartItem>X</DeleteCartItem>
-        </CartListContainer>
-      ))}
-    </>
-  );
-};
 
 const CartProduct = () => {
   const { userData, noneUserData } = useAppSelector((state) => state.user);
@@ -333,7 +147,7 @@ const CartProduct = () => {
     return getCartList(userData || noneUserData);
   }, [noneUserData, userData]);
 
-  const [allCheck, setAllCheck] = useState(false);
+  const [allCheck, setAllCheck] = useState(true);
   const dispatch = useDispatch();
 
   const totalPrice = useMemo(() => {
@@ -387,7 +201,8 @@ const CartProduct = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(setProductOrder([]));
+    const order = cartList.map((lst) => lst.product);
+    dispatch(setProductOrder(order));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -416,16 +231,16 @@ const CartProduct = () => {
             </Btn>
           </CartSelectBtn>
 
-          {cartList.map(({ product, id }, i) =>
+          {cartList.map(({ product, id }, i, cartList) =>
             product.type === OptionType.SINGLE ? (
-              <CartSingle allCheck={allCheck} product={product} id={id} key={id + i} />
+              <CartSingle allCheck={allCheck} product={product} id={id} key={id + i} cartList={cartList} />
             ) : (
-              <CartMulti allCheck={allCheck} product={product} key={id - i} />
+              <CartMulti allCheck={allCheck} product={product} id={id} key={id - i} />
             ),
           )}
-          <div>
-            <h5>총 {totalPrice?.toLocaleString()}</h5>
-          </div>
+          <CartTotalPrice>
+            {totalPrice ? <h5>총 {totalPrice?.toLocaleString()}원</h5> : <h5>선택하신 상품이 없습니다.</h5>}
+          </CartTotalPrice>
 
           <div>
             <Link href={`/product/order/${Date.now()}`}>

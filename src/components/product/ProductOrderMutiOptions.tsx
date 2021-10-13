@@ -330,6 +330,7 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, 
         productTitle: title,
         thumb: thumb,
         optionSelect: selectList,
+        deliveryOption,
       },
     ];
 
