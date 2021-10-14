@@ -83,6 +83,7 @@ const SelectImage = styled.div`
   padding: 2em;
   img {
     width: 100%;
+    max-width: 150px;
   }
   @media all and (max-width: ${({ theme }) => theme.size.sm}) {
     width: 235px;
@@ -105,16 +106,14 @@ const FourthStep = () => {
         id: 2,
         title: '옆면-배경색',
         subTitle: '이미지의 배경색이 옆면으로 됩니다.',
-        exampleImg:
-          'https://shop-phinf.pstatic.net/20210925_22/1632563174673Hzam6_JPEG/SE-4e3bdc2c-c5d6-4f20-b7bf-b9fcca6b6a44.jpg?type=w860',
+        exampleImg: 'https://early21-assets.s3.ap-northeast-2.amazonaws.com/img/example/side2.png',
         isSelected: canvasOrder.scaleType ? canvasOrder.scaleType === 2 : false,
       },
       {
         id: 3,
         title: '옆면-좌우반전',
         subTitle: '이미지가 옆면으로 좌우반전되어 확장됩니다.',
-        exampleImg:
-          'https://shop-phinf.pstatic.net/20210925_255/1632567786905o7IKp_JPEG/SE-e4dd335c-8a4d-4aeb-a765-dafc0418630f.jpg?type=w860',
+        exampleImg: 'https://early21-assets.s3.ap-northeast-2.amazonaws.com/img/example/side3.png',
         isSelected: canvasOrder.scaleType ? canvasOrder.scaleType === 3 : false,
       },
     ];
