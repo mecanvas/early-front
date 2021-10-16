@@ -86,6 +86,7 @@ export const CartOption = styled.div`
 
 export const CartMultiCount = styled.div`
   margin: 0.5em 0;
+  flex: 1;
   display: flex;
   align-items: center;
   width: 100%;
@@ -136,7 +137,6 @@ export const DeleteCartItem = styled.div`
 
 const CartProduct = () => {
   const { userData, noneUserData } = useAppSelector((state) => state.user);
-  const { productOrder } = useAppSelector((state) => state.order);
 
   const userId = useMemo(() => {
     if (userData) {
@@ -158,11 +158,11 @@ const CartProduct = () => {
   const dispatch = useDispatch();
 
   const totalPrice = useMemo(() => {
-    const p = productOrder.map((product) => {
+    const p = cartList.map(({ product }) => {
       let total = 0;
       if (product.type === OptionType.SINGLE) {
         if (!product.qty || !product.price) return;
-        total += product.price;
+        total += product.qty * product.price;
       }
 
       if (product.type === OptionType.MULTI) {
@@ -180,6 +180,8 @@ const CartProduct = () => {
       return total;
     });
 
+    console.log(p);
+
     const num = p.reduce((acc, cur) => {
       if (!cur) {
         return;
@@ -194,7 +196,7 @@ const CartProduct = () => {
     }, 0);
 
     return num;
-  }, [productOrder]);
+  }, [cartList]);
 
   const handleAllCheck = useCallback(() => {
     setAllCheck(() => true);

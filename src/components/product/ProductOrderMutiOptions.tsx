@@ -381,7 +381,7 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, 
           <div>{selectedOptionValue[index]?.value || lst.optionName}</div>
           <SelectList>
             {lst.optionValues.map((optionValue) => {
-              const optionSoldOut = options.length === showOptionList && optionValue.stock <= 1;
+              const optionSoldOut = options.length === showOptionList && optionValue.stock <= 0;
               return lst.optionId === showOptionList ? (
                 <SelectLi
                   disabled={optionSoldOut}

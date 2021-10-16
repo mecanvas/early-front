@@ -138,7 +138,7 @@ const user = createSlice({
                   ...c,
                   product: {
                     ...c.product,
-                    qty: c.product.qty && c.product.qty > 1 ? c.product.qty + 1 : c.product.qty,
+                    qty: c.product.qty ? c.product.qty + 1 : c.product.qty,
                   },
                 };
               }

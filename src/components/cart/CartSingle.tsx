@@ -13,6 +13,7 @@ import {
   CartQtyCount,
   DeleteCartItem,
   CartProductContainer,
+  CartOption,
 } from '.';
 
 interface CartSingleProps extends Cart {
@@ -91,18 +92,20 @@ const CartSingle = ({ product, id, allCheck }: CartSingleProps) => {
             <h5>{product.productTitle}</h5>
           </div>
         </CartText>
-        <CartMultiCount>
-          <CartQtyCount>
-            <button type="button" value="-" data-productid={product.productId} onClick={handleQtyCount}>
-              -
-            </button>
-            <div>{product.qty}개</div>
-            <button type="button" value="+" data-productid={product.productId} onClick={handleQtyCount}>
-              +
-            </button>
-          </CartQtyCount>
-          <div>{((product?.qty || 1) * (product.price || 1))?.toLocaleString()}원</div>
-        </CartMultiCount>
+        <CartOption>
+          <CartMultiCount>
+            <CartQtyCount>
+              <button type="button" value="-" data-productid={product.productId} onClick={handleQtyCount}>
+                -
+              </button>
+              <div>{product.qty}개</div>
+              <button type="button" value="+" data-productid={product.productId} onClick={handleQtyCount}>
+                +
+              </button>
+            </CartQtyCount>
+            <div>{((product?.qty || 1) * (product.price || 1))?.toLocaleString()}원</div>
+          </CartMultiCount>
+        </CartOption>
       </CartProductContainer>
       <DeleteCartItem>X</DeleteCartItem>
     </CartListContainer>
