@@ -153,7 +153,10 @@ const user = createSlice({
                     optionSelect: c.product.optionSelect
                       ? c.product.optionSelect.map((lst) => ({
                           ...lst,
-                          qty: lst.listId === listId && lst.qty > 1 ? lst.qty - 1 : lst.qty,
+                          qty:
+                            c.product.productId === productId && lst.listId === listId && lst.qty > 1
+                              ? lst.qty - 1
+                              : lst.qty,
                         }))
                       : null,
                   },
@@ -167,7 +170,7 @@ const user = createSlice({
                     optionSelect: c.product.optionSelect
                       ? c.product.optionSelect.map((lst) => ({
                           ...lst,
-                          qty: lst.listId === listId ? lst.qty + 1 : lst.qty,
+                          qty: c.product.productId === productId && lst.listId === listId ? lst.qty + 1 : lst.qty,
                         }))
                       : null,
                   },

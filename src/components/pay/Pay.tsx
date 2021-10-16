@@ -128,7 +128,7 @@ const Pay = () => {
                 <Text>{productOrderInfo.phone}</Text>
               </LabelAndText>
             </div>
-            <LabelAndText>
+            <LabelAndText style={{ marginBottom: '2.5em' }}>
               <Label>배송메모</Label>
               <Text>{productOrderInfo.memo}</Text>
             </LabelAndText>

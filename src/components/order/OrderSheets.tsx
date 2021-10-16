@@ -305,7 +305,7 @@ const OrderSheets = () => {
           )}
         </TotalPrice>
 
-        <ProductDeliveryForm>
+        <ProductDeliveryForm onSubmit={handlePayNow}>
           <h2>배송 정보 입력</h2>
           <Divider />
           <DeliverySetting>
@@ -384,9 +384,7 @@ const OrderSheets = () => {
               )}
             </div>
             <OrderPayButton>
-              <button type="submit" onSubmit={handlePayNow}>
-                결제
-              </button>
+              <button type="submit">결제</button>
             </OrderPayButton>
           </DeliveryOrderPay>
         </ProductDeliveryForm>

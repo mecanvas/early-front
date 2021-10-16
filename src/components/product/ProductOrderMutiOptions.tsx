@@ -170,7 +170,6 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, 
   const [lastSelect, setLastSelect] = useState(false);
   const [showOptionList, setShowOptionList] = useState(0);
   const [selectedOptionValue, setSelectedOptionValue] = useState<SelectedOptionValue[]>([]);
-  const [lastOptionValueId, setLastOptionValueId] = useState(0);
 
   const totalQty = useMemo(() => {
     return selectList.reduce((acc, cur) => {
@@ -271,8 +270,7 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, 
             },
           ];
         });
-        // 마지막 옵션값까지 골랐을때
-        setLastOptionValueId(+optionId);
+
         setLastSelect(last);
       }
     },
@@ -318,7 +316,7 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, 
           return [
             ...prev,
             {
-              listId: lastOptionValueId,
+              listId: Date.now(),
               optionAbbr,
               qty: 1,
               price: 1 * (price + totalAddition),
@@ -329,7 +327,7 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, 
           // 새롭게 생성
           return [
             {
-              listId: lastOptionValueId,
+              listId: Date.now(),
               optionAbbr,
               qty: 1,
               price: 1 * (price + totalAddition),
