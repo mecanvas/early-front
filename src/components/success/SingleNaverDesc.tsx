@@ -22,7 +22,13 @@ const SingleNaverDesc = () => {
         <h3>- 1 -</h3>
         <p>먼저 아래의 링크로 얼리21 스마트스토어에 들어가 주세요.</p>
         {redirect.naver && url ? (
-          <ImgLinker target="_blank" href={`https://smartstore.naver.com/early21/${url.replace('=', '/')}`}>
+          <ImgLinker
+            target="_blank"
+            href={`https://smartstore.naver.com/early21/${url.replace(
+              '=',
+              '/',
+            )}?NaPm=ct%3Dkutrypfk%7Cci%3Dea93aeb5abf709cb6c86e147e133f0cefa423f86%7Ctr%3Dslsl%7Csn%3D4152719%7Chk%3D063de5e2093f86df4ead233fad5f2691382167d4`}
+          >
             <img
               src="https://shop-phinf.pstatic.net/20210818_251/16292744909008aQoM_PNG/30410318680101258_485478705.png?type=o640"
               alt="스마트스토어링크이미지"
