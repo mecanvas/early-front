@@ -12,6 +12,7 @@ import ProductOrderDeliver from './ProductOrderDeliver';
 import { css } from '@emotion/react';
 import { useDispatch } from 'react-redux';
 import { setProductDeliveryOption, setProductOrder } from 'src/store/reducers/order';
+import SoldOut from '../common/SoldOut';
 
 export const OrderOptionContainer = styled.div``;
 
@@ -41,14 +42,26 @@ const SelectBox = styled.div<{ disabled: boolean }>`
 
 const SelectList = styled.ul`
   border-top: 1px solid ${({ theme }) => theme.color.gray300};
-  li {
-    padding: 0.7em;
-    &:hover {
-      background-color: ${({ theme }) => theme.color.gray100};
-    }
-  }
+  cursor: default;
+
   li ~ li {
     border-top: 1px solid ${({ theme }) => theme.color.gray300};
+  }
+`;
+
+const SelectLi = styled.li<{ disabled: boolean }>`
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      pointer-events: none;
+      opacity: 0.5;
+      cursor: default;
+      z-index: 1;
+    `}
+  cursor: pointer;
+  padding: 0.7em;
+  &:hover {
+    background-color: ${({ theme }) => theme.color.gray100};
   }
 `;
 
@@ -146,9 +159,10 @@ interface Props {
   thumb: string;
   title: string;
   productId: number;
+  status: 1 | 2;
 }
 
-const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, title, productId }: Props) => {
+const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, title, productId, status }: Props) => {
   const dispatch = useDispatch();
 
   const { options } = productOption;
@@ -156,6 +170,7 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, 
   const [lastSelect, setLastSelect] = useState(false);
   const [showOptionList, setShowOptionList] = useState(0);
   const [selectedOptionValue, setSelectedOptionValue] = useState<SelectedOptionValue[]>([]);
+  const [lastOptionValueId, setLastOptionValueId] = useState(0);
 
   const totalQty = useMemo(() => {
     return selectList.reduce((acc, cur) => {
@@ -257,6 +272,7 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, 
           ];
         });
         // 마지막 옵션값까지 골랐을때
+        setLastOptionValueId(+optionId);
         setLastSelect(last);
       }
     },
@@ -302,7 +318,7 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, 
           return [
             ...prev,
             {
-              listId: Date.now(),
+              listId: lastOptionValueId,
               optionAbbr,
               qty: 1,
               price: 1 * (price + totalAddition),
@@ -313,7 +329,7 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, 
           // 새롭게 생성
           return [
             {
-              listId: Date.now(),
+              listId: lastOptionValueId,
               optionAbbr,
               qty: 1,
               price: 1 * (price + totalAddition),
@@ -349,6 +365,10 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  if (status === 2) {
+    return <SoldOut />;
+  }
+
   return (
     <OrderOptionContainer>
       {options?.map((lst, index) => (
@@ -360,9 +380,11 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, 
         >
           <div>{selectedOptionValue[index]?.value || lst.optionName}</div>
           <SelectList>
-            {lst.optionValues.map((optionValue) =>
-              lst.optionId === showOptionList ? (
-                <li
+            {lst.optionValues.map((optionValue) => {
+              const optionSoldOut = options.length === showOptionList && optionValue.stock <= 1;
+              return lst.optionId === showOptionList ? (
+                <SelectLi
+                  disabled={optionSoldOut}
                   onClick={handleOptionSelect}
                   key={optionValue.optionValueId}
                   data-stock={optionValue.stock}
@@ -374,9 +396,10 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, 
                 >
                   {optionValue.value}{' '}
                   {optionValue.additionalPrice ? `(+${optionValue.additionalPrice.toLocaleString()})` : ''}
-                </li>
-              ) : null,
-            )}
+                  {optionSoldOut ? <small>(재고없음)</small> : ''}
+                </SelectLi>
+              ) : null;
+            })}
           </SelectList>
           <span>
             <DownOutlined />

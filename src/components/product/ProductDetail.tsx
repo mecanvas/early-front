@@ -36,7 +36,7 @@ const ProductDetail = () => {
     meta: '이걸 외 안사? 이거만 붙여놔도 스타일링 끝임..;',
     price: 3900,
     thumb: 'https://shop-phinf.pstatic.net/20210729_267/1627557958996mnAfE_PNG/003.png?type=w860',
-    status: 1,
+    status: 2,
     subThumb: [
       'https://shop-phinf.pstatic.net/20210729_267/1627557958996mnAfE_PNG/003.png?type=w860',
       'https://shop-phinf.pstatic.net/20210729_43/1627557958907cEuFf_PNG/002.png?type=w860',
@@ -65,8 +65,8 @@ const ProductDetail = () => {
           optionName: '사이즈 선택',
           optionValues: [
             { optionValueId: 1, value: 'A4', additionalPrice: 0, stock: 1 },
-            { optionValueId: 2, value: 'A3', additionalPrice: 100, stock: 1 },
-            { optionValueId: 3, value: 'A2', additionalPrice: 300, stock: 1 },
+            { optionValueId: 2, value: 'A3', additionalPrice: 100, stock: 2 },
+            { optionValueId: 3, value: 'A2', additionalPrice: 300, stock: 3 },
           ],
         },
       ],

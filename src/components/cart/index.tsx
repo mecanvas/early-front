@@ -138,6 +138,13 @@ const CartProduct = () => {
   const { userData, noneUserData } = useAppSelector((state) => state.user);
   const { productOrder } = useAppSelector((state) => state.order);
 
+  const userId = useMemo(() => {
+    if (userData) {
+      return userData.id;
+    }
+    return noneUserData.id;
+  }, [userData, noneUserData]);
+
   const cartList = useMemo(() => {
     const getCartList = (user: UserData | NoneUserData) => {
       const { cart } = user;
@@ -243,7 +250,7 @@ const CartProduct = () => {
           </CartTotalPrice>
 
           <div>
-            <Link href={`/product/order/${Date.now()}`}>
+            <Link href={`/product/order/${Date.now()}?user=${userId}`}>
               <Btn type="button">결제하기</Btn>
             </Link>
           </div>

@@ -171,6 +171,7 @@ const ProductOrderItem = ({ title, meta, uploader, price, thumb, status, product
       {productOption.type === 1 && (
         <ProductOrderSingleOptions
           thumb={thumb}
+          status={status}
           productId={productId as number}
           title={title}
           price={price}
@@ -180,6 +181,7 @@ const ProductOrderItem = ({ title, meta, uploader, price, thumb, status, product
       {productOption.type === 2 && (
         <ProductOrderMutiOptions
           title={title}
+          status={status}
           productId={productId as number}
           thumb={thumb}
           productOption={productOption}

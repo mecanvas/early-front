@@ -14,6 +14,7 @@ export interface ProductOrder {
   // 단일형일시
   qty?: number;
   price?: number;
+  stock?: number;
 }
 
 export interface Address {
