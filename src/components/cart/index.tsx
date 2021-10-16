@@ -180,8 +180,6 @@ const CartProduct = () => {
       return total;
     });
 
-    console.log(p);
-
     const num = p.reduce((acc, cur) => {
       if (!cur) {
         return;
