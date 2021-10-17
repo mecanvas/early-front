@@ -286,7 +286,7 @@ const OrderSheets = () => {
   return (
     <Container>
       <OrderTable>
-        <h2>주문 내역</h2>
+        <h2>주문내역</h2>
         <Divider />
         <OrderProductList productOrder={productOrder} />
 

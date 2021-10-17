@@ -271,16 +271,17 @@ const AppHeader = () => {
               <Divider />
               {userData ? (
                 <>
-                  <LiSmall link="/me" txt="마이페이지" />
-                  <LiSmall link="/cart" txt={`장바구니 ${cartCount ? `(${cartCount})` : ''}`} />
-                  <LiSmall link="/delivery" txt="배송조회" />
-                  <LiSmall link="/q" txt="문의하기" />
+                  <LiSmall link="/me" txt="내정보" />
+                  <LiSmall link="/me/order" txt="주문내역" />
+                  <LiSmall link="/me/cart" txt={`장바구니 ${cartCount ? `(${cartCount})` : ''}`} />
+                  <LiSmall link="/me/q" txt="문의하기" />
                   <LiSmall txt="로그아웃" onClick={handleLogout} />
                 </>
               ) : (
                 <>
                   <LiSmall link="/login" txt="로그인" />
                   <LiSmall link="/register" txt="회원가입" />
+                  <LiSmall link="/nouser/order" txt="주문확인" />
                   <LiSmall link="/cart" txt="장바구니" />
                 </>
               )}
@@ -306,17 +307,17 @@ const AppHeader = () => {
               <UserMyPageIcon onClick={handleMyInfo} openMyInfo={openMyInfo}>
                 <UserOutlined />
                 <ul>
-                  <Li link="/me" txt="마이페이지" />
-                  <Li link="/cart" txt={`장바구니 ${cartCount ? `(${cartCount})` : ''}`} />
-                  <Li link="/delivery" txt="배송조회" />
-                  <Li link="/q" txt="문의하기" />
+                  <Li link="/me" txt="내정보" />
+                  <Li link="/me/order" txt="주문내역" />
+                  <Li link="/me/cart" txt={`장바구니 ${cartCount ? `(${cartCount})` : ''}`} />
+                  <Li link="/me/q" txt="문의하기" />
                   <Li txt="로그아웃" onClick={handleLogout} />
                 </ul>
               </UserMyPageIcon>
             </>
           ) : (
             <NotUserData>
-              {/* <Li txt="장바구니" /> */}
+              <Li link="/nouser/order" txt="주문확인" />
               <Li link="/login" txt="로그인"></Li>
               <Li link="/register" txt="회원가입"></Li>
             </NotUserData>

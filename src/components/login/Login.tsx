@@ -122,9 +122,16 @@ const Login = () => {
         id: 1,
         email: 'earlystudio21@gmail.com',
         role: 0,
+        cart: [],
         username: '얼리21',
         phone: '01026299315',
-        address: null,
+        address: {
+          sido: '경기도',
+          sigungu: '성남시 분당구',
+          postCode: '1234',
+          address: '경기도 성남시 분당구 서현로 181, 103동 1001호',
+          addressDetail: '103동 1001호',
+        },
       };
       dispatch(getUser(mockUser));
     },
@@ -141,7 +148,7 @@ const Login = () => {
     <Container>
       <LoginForm onChange={handleLoginChange} onSubmit={handleLogin}>
         <LoginInput>
-          <EarlyInput name="id" placeholder="아이디" />
+          <EarlyInput name="email" placeholder="아이디" />
         </LoginInput>
         <LoginInput>
           <EarlyInput name="password" type="password" placeholder="비밀번호" />
