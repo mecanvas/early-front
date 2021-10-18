@@ -49,7 +49,7 @@ export const createExpandCanvas = (selectedFrame: SelectedFrame[], expandType: 1
       const scaleX = naturalWidth / imgW;
       const scaleY = naturalHeight / imgH;
       const crop = { x: info.x, y: info.y };
-      const SIDE_EXPAND_CM = 4;
+      const SIDE_EXPAND_CM = 2;
 
       const cmPxX = (cm: number) => cmToPx(cm) * scaleX;
       const cmPxY = (cm: number) => cmToPx(cm) * scaleY;
