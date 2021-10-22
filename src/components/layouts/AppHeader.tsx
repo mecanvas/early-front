@@ -271,10 +271,10 @@ const AppHeader = () => {
               <Divider />
               {userData ? (
                 <>
-                  <LiSmall link="/me" txt="내정보" />
                   <LiSmall link="/me/order" txt="주문내역" />
                   <LiSmall link="/me/cart" txt={`장바구니 ${cartCount ? `(${cartCount})` : ''}`} />
                   <LiSmall link="/me/q" txt="문의하기" />
+                  <LiSmall link="/me" txt="내정보" />
                   <LiSmall txt="로그아웃" onClick={handleLogout} />
                 </>
               ) : (
@@ -307,10 +307,10 @@ const AppHeader = () => {
               <UserMyPageIcon onClick={handleMyInfo} openMyInfo={openMyInfo}>
                 <UserOutlined />
                 <ul>
-                  <Li link="/me" txt="내정보" />
                   <Li link="/me/order" txt="주문내역" />
                   <Li link="/me/cart" txt={`장바구니 ${cartCount ? `(${cartCount})` : ''}`} />
                   <Li link="/me/q" txt="문의하기" />
+                  <Li link="/me" txt="내정보" />
                   <Li txt="로그아웃" onClick={handleLogout} />
                 </ul>
               </UserMyPageIcon>

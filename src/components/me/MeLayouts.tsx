@@ -36,10 +36,10 @@ const MeLayouts = ({ children }: Props) => {
     <Container>
       <UserSider>
         <ul>
-          <Li link="/me" txt="내정보" />
           <Li link="/me/order" txt="주문내역" />
           <Li link="/me/cart" txt="장바구니" />
           <Li link="/me/q" txt="문의하기" />
+          <Li link="/me" txt="내정보" />
         </ul>
       </UserSider>
       <>{children}</>
