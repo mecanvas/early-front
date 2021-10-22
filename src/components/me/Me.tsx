@@ -6,6 +6,7 @@ import Link from 'next/link';
 import MeLayouts from './MeLayouts';
 import { Button, Form, Input } from 'antd';
 import { Address } from 'src/interfaces/OrderInterface';
+import { useNotification } from 'src/hooks/useNotification';
 
 const UserProfile = styled.div`
   h4 {
@@ -61,6 +62,7 @@ const UserAddressPostCode = styled(Input)`
 const Me = () => {
   const { userData } = useAppSelector((state) => state.user);
   const [addressData, setAddressData] = useState<Address | null>(userData?.address || null);
+  const { checkNotification } = useNotification();
 
   const handleAddress = useCallback(() => {
     if (process.browser) {
@@ -116,6 +118,20 @@ const Me = () => {
     });
   }, []);
 
+  const handleChangeAddress = useCallback(() => {
+    if (!addressData) {
+      checkNotification('error');
+      return;
+    }
+    if (!addressData.addressDetail) {
+      checkNotification('error');
+      return;
+    }
+
+    checkNotification('success');
+    console.log(addressData);
+  }, [addressData, checkNotification]);
+
   if (!userData) {
     return (
       <UserEmpty>
@@ -163,7 +179,7 @@ const Me = () => {
             </div>
           </UserAddress>
 
-          <Btn type="submit" width={100} padding={'.5em'}>
+          <Btn onClick={handleChangeAddress} width={100} padding={'.5em'}>
             저장
           </Btn>
         </UserForm>
