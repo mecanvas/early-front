@@ -1,11 +1,18 @@
 import { CloseCircleOutlined, DownOutlined } from '@ant-design/icons';
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { ProductOption, DeliveryOption, ProductOptionList } from 'src/interfaces/ProductInterface';
+import {
+  ProductOption,
+  DeliveryOption,
+  ProductOptionSelectList,
+  SelectedOptionValue,
+  OptionType,
+} from 'src/interfaces/ProductInterface';
 import styled from '@emotion/styled';
 import ProductOrderDeliver from './ProductOrderDeliver';
 import { css } from '@emotion/react';
 import { useDispatch } from 'react-redux';
 import { setProductDeliveryOption, setProductOrder } from 'src/store/reducers/order';
+import SoldOut from '../common/SoldOut';
 
 export const OrderOptionContainer = styled.div``;
 
@@ -35,14 +42,26 @@ const SelectBox = styled.div<{ disabled: boolean }>`
 
 const SelectList = styled.ul`
   border-top: 1px solid ${({ theme }) => theme.color.gray300};
-  li {
-    padding: 0.7em;
-    &:hover {
-      background-color: ${({ theme }) => theme.color.gray100};
-    }
-  }
+  cursor: default;
+
   li ~ li {
     border-top: 1px solid ${({ theme }) => theme.color.gray300};
+  }
+`;
+
+const SelectLi = styled.li<{ disabled: boolean }>`
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      pointer-events: none;
+      opacity: 0.5;
+      cursor: default;
+      z-index: 1;
+    `}
+  cursor: pointer;
+  padding: 0.7em;
+  &:hover {
+    background-color: ${({ theme }) => theme.color.gray100};
   }
 `;
 
@@ -99,11 +118,17 @@ export const SelectItemQty = styled.div`
   }
 `;
 
+export const SelectItemPrice = styled.div`
+  font-size: 14px;
+  width: 80px;
+  text-align: center;
+`;
+
 export const TotalPrice = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  margin: 1.5em 0;
+  margin: 0.3em 0;
   span {
     margin-right: 0.5em;
 
@@ -120,6 +145,11 @@ export const TotalPrice = styled.div`
       font-size: 1.25rem;
     }
   }
+
+  div {
+    font-size: 0.65rem;
+    color: ${({ theme }) => theme.color.gray700};
+  }
 `;
 
 interface Props {
@@ -127,69 +157,73 @@ interface Props {
   deliveryOption: DeliveryOption;
   price: number;
   thumb: string;
+  title: string;
+  productId: number;
+  status: 1 | 2;
 }
 
-const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb }: Props) => {
+const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb, title, productId, status }: Props) => {
   const dispatch = useDispatch();
 
   const { options } = productOption;
-  const [orderList, setOrderList] = useState<ProductOptionList[]>([]);
+  const [selectList, setSelectList] = useState<ProductOptionSelectList[]>([]);
+  const [lastSelect, setLastSelect] = useState(false);
   const [showOptionList, setShowOptionList] = useState(0);
-  const [selectedOptionValue, setSelectedOptionValue] = useState<string[]>([]);
+  const [selectedOptionValue, setSelectedOptionValue] = useState<SelectedOptionValue[]>([]);
 
   const totalQty = useMemo(() => {
-    return orderList.reduce((acc, cur) => {
+    return selectList.reduce((acc, cur) => {
       if (acc) {
         acc += cur.qty;
         return acc;
       }
       return cur.qty;
     }, 0);
-  }, [orderList]);
+  }, [selectList]);
 
   const totalPrice = useMemo(() => {
-    return orderList.reduce((acc, cur) => {
+    return selectList.reduce((acc, cur) => {
       if (acc) {
-        acc += cur.qty * (price + cur.additionalPrice);
+        acc += cur.qty * cur.price;
         return acc;
       }
-      return cur.qty * (price + cur.additionalPrice);
+      return cur.qty * cur.price;
     }, 0);
-  }, [orderList, price]);
+  }, [selectList]);
 
-  const handleCount = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const { type, optionid: optionId, value } = e.currentTarget.dataset;
+  const handleCount = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const { type, id } = e.currentTarget.dataset;
 
-    if (type === '-' && optionId) {
-      setOrderList((prev) =>
+    if (type === '-' && id) {
+      setSelectList((prev) =>
         prev.map((item) => ({
           ...item,
-          qty: item.optionId === +optionId && item.value === value && item.qty > 1 ? item.qty - 1 : item.qty,
+          qty: item.listId === +id && item.qty > 1 ? item.qty - 1 : item.qty,
         })),
       );
     }
-    if (type === '+' && optionId) {
-      setOrderList((prev) =>
+    if (type === '+' && id) {
+      setSelectList((prev) =>
         prev.map((item) => ({
           ...item,
-          qty: item.optionId === +optionId && item.value === value ? item.qty + 1 : item.qty,
+          qty: item.listId === +id ? item.qty + 1 : item.qty,
         })),
       );
     }
-  };
+  }, []);
 
   const handleDelete = useCallback((e: React.MouseEvent<HTMLSpanElement>) => {
-    const { value } = e.currentTarget.dataset;
+    const { id } = e.currentTarget.dataset;
 
-    if (value) {
-      setOrderList((prev) => prev.filter((item) => item.value !== value));
+    if (id) {
+      setSelectList((prev) => prev.filter((item) => item.listId !== +id));
     }
   }, []);
 
   const handleOptionSelectStart = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const { id } = e.currentTarget.dataset;
-    if (id) {
-      setShowOptionList((prev) => (prev === +id ? 0 : +id));
+    const { optionid: optionId } = e.currentTarget.dataset;
+    if (optionId) {
+      setShowOptionList((prev) => (prev === +optionId ? 0 : +optionId));
     }
   }, []);
 
@@ -199,94 +233,172 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb }
       const {
         optionname: optionName,
         value,
-        optionid: optionId,
+        stock,
+        optionvalueid: optionValueId,
         additionalprice: additionalPrice,
-        productid: productId,
+        optionid: optionId,
       } = e.currentTarget.dataset;
+
       setShowOptionList(0);
 
-      if (optionName && value && optionId && additionalPrice && productId) {
-        const last = options?.length === +productId;
+      if (optionName && value && optionValueId && additionalPrice && optionId && stock) {
+        const last = options?.length === +optionId;
+
+        const checkOptionId = (id: number) => {
+          return id === +optionId;
+        };
 
         setSelectedOptionValue((prev) => {
-          if (prev) {
-            if (prev[+productId - 1]) {
-              prev[+productId - 1] = value;
-              return prev;
-            }
-            return [...prev, value];
+          if (prev.find((lst) => lst.optionId === +optionId)) {
+            return prev.map((lst) => ({
+              ...lst,
+              additionalPrice: checkOptionId(lst.optionId) ? +additionalPrice : lst.additionalPrice,
+              optionValueId: checkOptionId(lst.optionId) ? +optionValueId : lst.optionValueId,
+              value: checkOptionId(lst.optionId) ? value : lst.value,
+              stock: checkOptionId(lst.optionId) ? +stock : lst.stock,
+            }));
           }
-          return [value];
+          return [
+            ...prev,
+            {
+              optionId: +optionId,
+              optionName: optionName,
+              optionValueId: +optionValueId,
+              value: value,
+              additionalPrice: +additionalPrice,
+              stock: +stock,
+            },
+          ];
         });
 
-        // 마지막 옵션값까지 골랐을때
-        if (last) {
-          setOrderList((prev) => {
-            const txt = selectedOptionValue ? `${selectedOptionValue.join(', ')}, ${value}` : value;
-            if (prev.length) {
-              if (prev.find((lst) => lst.optionId === +optionId && lst.value === txt)) {
-                alert('이미 추가 되었습니다 :)');
-                return prev;
-              }
-
-              return [
-                ...prev,
-                { optionId: +optionId, productId: +productId, value: txt, qty: 1, additionalPrice: +additionalPrice },
-              ];
-            } else {
-              return [
-                { optionId: +optionId, productId: +productId, value: txt, qty: 1, additionalPrice: +additionalPrice },
-              ];
-            }
-          });
-          setSelectedOptionValue([]);
-        }
+        setLastSelect(last);
       }
     },
-    [options?.length, selectedOptionValue],
+    [options?.length],
   );
 
   useEffect(() => {
-    const productOrder = orderList.map((lst) => ({
-      optionId: lst.optionId,
-      productId: lst.productId,
-      thumb: thumb,
-      value: lst.value,
-      qty: lst.qty,
-      price: lst.qty * (price + lst.additionalPrice),
-    }));
+    if (!selectedOptionValue.length) return;
+    if (lastSelect) {
+      const totalAddition = selectedOptionValue.reduce((acc, cur) => {
+        if (acc) {
+          acc += cur.additionalPrice;
+        } else {
+          acc = cur.additionalPrice;
+        }
+        return acc;
+      }, 0);
+
+      // 고른 옵션 축약
+      const optionAbbr = selectedOptionValue.reduce(
+        (acc, cur) => {
+          const desc = cur.optionName;
+          const name = cur.value;
+
+          acc['fullName'] = acc['fullName'] ? `${acc['fullName']} / ${desc} : ${name}` : `${desc} : ${name}`;
+          acc['name'] = acc['name'] ? `${acc['name']} / ${name}` : `${name}`;
+
+          return acc;
+        },
+        { fullName: '', name: '' },
+      );
+
+      setSelectList((prev) => {
+        if (prev.length) {
+          // 중복 처리
+
+          if (prev.find((lst) => lst.optionAbbr?.fullName === optionAbbr.fullName)) {
+            alert('이미 추가 되었습니다 :)');
+            return prev;
+          }
+
+          // 추가
+          return [
+            ...prev,
+            {
+              listId: Date.now(),
+              optionAbbr,
+              qty: 1,
+              price: 1 * (price + totalAddition),
+              options: selectedOptionValue,
+            },
+          ];
+        } else {
+          // 새롭게 생성
+          return [
+            {
+              listId: Date.now(),
+              optionAbbr,
+              qty: 1,
+              price: 1 * (price + totalAddition),
+              options: selectedOptionValue,
+            },
+          ];
+        }
+      });
+      setSelectedOptionValue([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedOptionValue]);
+
+  useEffect(() => {
+    const productOrder = [
+      {
+        type: OptionType.MULTI,
+        productId: productId,
+        productTitle: title,
+        thumb: thumb,
+        optionSelect: selectList,
+        deliveryOption,
+      },
+    ];
+
     dispatch(setProductOrder(productOrder));
-    dispatch(setProductDeliveryOption(deliveryOption));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderList]);
+  }, [selectList]);
+
+  useEffect(() => {
+    dispatch(setProductDeliveryOption(deliveryOption));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (status === 2) {
+    return <SoldOut />;
+  }
 
   return (
     <OrderOptionContainer>
       {options?.map((lst, index) => (
         <SelectBox
           disabled={index > 0 ? (selectedOptionValue[index - 1] ? false : true) : false}
-          key={lst.id}
-          data-id={lst.id}
+          key={lst.optionId}
+          data-optionid={lst.optionId}
           onClick={handleOptionSelectStart}
         >
-          <div>{selectedOptionValue[index] || lst.optionName}</div>
-          {lst.value.map((value) =>
-            lst.id === showOptionList ? (
-              <SelectList key={value.id}>
-                <li
+          <div>{selectedOptionValue[index]?.value || lst.optionName}</div>
+          <SelectList>
+            {lst.optionValues.map((optionValue) => {
+              const optionSoldOut = options.length === showOptionList && optionValue.stock <= 0;
+              return lst.optionId === showOptionList ? (
+                <SelectLi
+                  disabled={optionSoldOut}
                   onClick={handleOptionSelect}
-                  data-additionalprice={value.additionalPrice}
-                  data-productid={lst.id}
-                  data-optionid={value.id}
+                  key={optionValue.optionValueId}
+                  data-stock={optionValue.stock}
+                  data-additionalprice={optionValue.additionalPrice}
+                  data-optionid={lst.optionId}
+                  data-optionvalueid={optionValue.optionValueId}
                   data-optionname={lst.optionName}
-                  data-value={value.text}
+                  data-value={optionValue.value}
                 >
-                  {value.text} {value.additionalPrice ? `(+${value.additionalPrice.toLocaleString()})` : ''}
-                </li>
-              </SelectList>
-            ) : null,
-          )}
+                  {optionValue.value}{' '}
+                  {optionValue.additionalPrice ? `(+${optionValue.additionalPrice.toLocaleString()})` : ''}
+                  {optionSoldOut ? <small>(재고없음)</small> : ''}
+                </SelectLi>
+              ) : null;
+            })}
+          </SelectList>
           <span>
             <DownOutlined />
           </span>
@@ -295,30 +407,28 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb }
 
       <ProductOrderDeliver deliveryOption={deliveryOption} />
 
-      {orderList.length ? (
+      {selectList.length ? (
         <div>
-          {orderList.map((item) => (
-            <SelectItemList key={item.value}>
+          {selectList.map((item) => (
+            <SelectItemList key={item.listId}>
               <SelecItemTitle>
-                {item.value}{' '}
-                <span onClick={handleDelete} data-value={item.value}>
+                {item.optionAbbr.name}{' '}
+                <span onClick={handleDelete} data-id={item.listId}>
                   <CloseCircleOutlined />
                 </span>
               </SelecItemTitle>
 
               <SelectItemPriceSetting>
                 <SelectItemQty>
-                  <button onClick={handleCount} data-value={item.value} data-optionid={item.optionId} data-type="-">
+                  <button onClick={handleCount} data-id={item.listId} data-type="-">
                     -
                   </button>
                   <span>{item.qty}</span>
-                  <button onClick={handleCount} data-value={item.value} data-optionid={item.optionId} data-type="+">
+                  <button onClick={handleCount} data-id={item.listId} data-type="+">
                     +
                   </button>
                 </SelectItemQty>
-                <div>
-                  {item.additionalPrice ? `${(price + item.additionalPrice).toLocaleString()}원` : `${price}원`}
-                </div>
+                <SelectItemPrice>{(item.qty * item.price).toLocaleString()}원</SelectItemPrice>
               </SelectItemPriceSetting>
             </SelectItemList>
           ))}
@@ -327,7 +437,7 @@ const ProductOrderMutiOptions = ({ productOption, deliveryOption, price, thumb }
         <EmptyTitle>선택하신 상품이 없어요 :) 얼른 담아주세요.</EmptyTitle>
       )}
 
-      {orderList.length ? (
+      {selectList.length ? (
         <TotalPrice>
           <span>
             총 상품 개수 <span>{totalQty}</span>개

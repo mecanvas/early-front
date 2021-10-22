@@ -1,8 +1,9 @@
 import { Divider } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { DeliveryOption } from 'src/interfaces/ProductInterface';
+import { DeliveryOption, OptionType } from 'src/interfaces/ProductInterface';
 import { setProductDeliveryOption, setProductOrder } from 'src/store/reducers/order';
+import SoldOut from '../common/SoldOut';
 import ProductOrderDeliver from './ProductOrderDeliver';
 import { SelectItemQty, TotalPrice } from './ProductOrderMutiOptions';
 
@@ -12,12 +13,14 @@ const ProductOrderSingleOptions = ({
   price,
   productId,
   thumb,
+  status,
 }: {
   title: string;
   deliveryOption: DeliveryOption;
   productId: number;
   thumb: string;
   price: number;
+  status: number;
 }) => {
   const dispatch = useDispatch();
   const [count, setCount] = useState(1);
@@ -39,10 +42,31 @@ const ProductOrderSingleOptions = ({
   };
 
   useEffect(() => {
-    dispatch(setProductOrder([{ optionId: 0, productId, thumb, value: title, qty: count, price: count * price }]));
-    dispatch(setProductDeliveryOption(deliveryOption));
+    dispatch(
+      setProductOrder([
+        {
+          type: OptionType.SINGLE,
+          optionSelect: null,
+          productId,
+          productTitle: title,
+          thumb,
+          qty: count,
+          price: count * price,
+          deliveryOption,
+        },
+      ]),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
+
+  useEffect(() => {
+    dispatch(setProductDeliveryOption(deliveryOption));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (status === 2) {
+    return <SoldOut />;
+  }
 
   return (
     <div>

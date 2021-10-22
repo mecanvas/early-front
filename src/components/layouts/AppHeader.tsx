@@ -1,13 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import { useExceptionRoute } from 'src/hooks/useExceptionRoute';
 import Logo from './Logo';
 import { APP_HEADER_HEIGHT } from 'src/constants';
-import { CloseOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBox } from '@fortawesome/free-solid-svg-icons';
+import { CloseOutlined, MenuOutlined, ShoppingCartOutlined, UserOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
 import Link from 'next/link';
+import { useAppSelector } from 'src/hooks/useRedux';
+import { useDispatch } from 'react-redux';
+import { logoutUser, NoneUserData, UserData } from 'src/store/reducers/user';
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -114,27 +115,50 @@ const HeaderUser = styled.div`
 const UserMyPageIcon = styled.div<{ openMyInfo?: boolean }>`
   margin: 0 0.4em;
   cursor: pointer;
-  width: 20px;
+  display: flex;
+  align-items: center;
   svg {
-    font-size: 20px;
+    font-size: 22px;
   }
 
   ul {
     display: ${({ openMyInfo }) => (openMyInfo ? 'block' : 'none')};
     width: 100px;
     position: absolute;
-    top: 40px;
+    top: 55px;
     right: 0;
     background-color: ${({ theme }) => theme.color.white};
     border: 1px solid ${({ theme }) => theme.color.gray500};
     text-align: center;
     li {
+      font-size: 0.9rem;
       padding: 0.3em;
 
       &:hover {
         color: ${({ theme }) => theme.color.gray600};
       }
     }
+  }
+
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    display: none;
+  }
+`;
+
+const NotUserData = styled.ul`
+  display: flex;
+  align-items: center;
+  li {
+    cursor: pointer;
+    margin-right: 0.5em;
+    font-size: 0.9rem;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+  @media all and (max-width: ${({ theme }) => theme.size.sm}) {
+    display: none;
   }
 `;
 
@@ -154,12 +178,52 @@ const MobileMenuBar = styled.div<{ openNavi: boolean }>`
   }
 `;
 
+const LiSmall = ({ link, txt, ...props }: { link?: string; txt: string } & React.HtmlHTMLAttributes<HTMLElement>) => {
+  return (
+    <>
+      {link ? (
+        <Link href={link}>
+          <small {...props}>{txt}</small>
+        </Link>
+      ) : (
+        <small {...props}>{txt}</small>
+      )}
+    </>
+  );
+};
+
+const Li = ({ link, txt, ...props }: { link?: string; txt: string } & React.HtmlHTMLAttributes<HTMLLIElement>) => {
+  return (
+    <>
+      {link ? (
+        <Link href={link}>
+          <li {...props}>{txt}</li>
+        </Link>
+      ) : (
+        <li {...props}>{txt}</li>
+      )}
+    </>
+  );
+};
+
 const AppHeader = () => {
   const { exceptionRoute } = useExceptionRoute();
-
+  const dispatch = useDispatch();
+  const { userData, noneUserData } = useAppSelector((state) => state.user);
   const [openNavi, setOpenNavi] = useState(false);
   const [openMyInfo, setOpenMyInfo] = useState(false);
-  const handleMyInfo = useCallback(() => {
+  const cartCount = useMemo(() => {
+    const getCount = (user: UserData | NoneUserData) => {
+      if (user && user.cart) {
+        return user.cart.length;
+      }
+    };
+
+    return getCount(userData || noneUserData);
+  }, [userData, noneUserData]);
+
+  const handleMyInfo = useCallback((e) => {
+    e.stopPropagation();
     setOpenMyInfo((prev) => !prev);
   }, []);
 
@@ -170,6 +234,10 @@ const AppHeader = () => {
   const handleCloseNavi = useCallback(() => {
     setOpenNavi(false);
   }, []);
+
+  const handleLogout = useCallback(() => {
+    dispatch(logoutUser());
+  }, [dispatch]);
 
   useEffect(() => {
     if (openMyInfo) {
@@ -185,20 +253,6 @@ const AppHeader = () => {
     return null;
   }
 
-  const Li = (props: { link?: string; txt: string }) => {
-    return (
-      <>
-        {props.link ? (
-          <Link href={props.link}>
-            <li>{props.txt}</li>
-          </Link>
-        ) : (
-          <li>{props.txt}</li>
-        )}
-      </>
-    );
-  };
-
   return (
     <HeaderContainer>
       <Header>
@@ -212,28 +266,62 @@ const AppHeader = () => {
             <Li link="/poster" txt="Poster" />
             <Li link="/about" txt="About" />
 
+            {/* 모바일 전용 */}
             <HeaderNavigationMobile openNavi={openNavi}>
               <Divider />
-              <small>마이페이지</small>
-              <small>배송조회</small>
-              <small>문의하기</small>
-              <small>로그아웃</small>
+              {userData ? (
+                <>
+                  <LiSmall link="/me/order" txt="주문내역" />
+                  <LiSmall link="/me/cart" txt={`장바구니 ${cartCount ? `(${cartCount})` : ''}`} />
+                  <LiSmall link="/me/q" txt="문의하기" />
+                  <LiSmall link="/me" txt="내정보" />
+                  <LiSmall txt="로그아웃" onClick={handleLogout} />
+                </>
+              ) : (
+                <>
+                  <LiSmall link="/login" txt="로그인" />
+                  <LiSmall link="/register" txt="회원가입" />
+                  <LiSmall link="/nouser/order" txt="주문확인" />
+                  <LiSmall link="/cart" txt="장바구니" />
+                </>
+              )}
             </HeaderNavigationMobile>
+            {/* 모바일 전용 끝 */}
           </ul>
         </HeaderNavigation>
         <HeaderUser>
+          {/* 배송조회 아이콘? */}
           <UserMyPageIcon>
-            <FontAwesomeIcon icon={faBox} />
+            {/* 장바구니 아이콘 */}
+            <Link href="/cart">
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <ShoppingCartOutlined />
+                <span>
+                  <small>{cartCount ? `(${cartCount})` : ''}</small>
+                </span>
+              </div>
+            </Link>
           </UserMyPageIcon>
-          <UserMyPageIcon onClick={handleMyInfo} openMyInfo={openMyInfo}>
-            <UserOutlined />
-            <ul>
-              <Li link="/me" txt="마이페이지" />
-              <Li link="/delivery" txt="배송조회" />
-              <Li link="/q" txt="문의하기" />
-              <Li txt="로그아웃" />
-            </ul>
-          </UserMyPageIcon>
+          {userData ? (
+            <>
+              <UserMyPageIcon onClick={handleMyInfo} openMyInfo={openMyInfo}>
+                <UserOutlined />
+                <ul>
+                  <Li link="/me/order" txt="주문내역" />
+                  <Li link="/me/cart" txt={`장바구니 ${cartCount ? `(${cartCount})` : ''}`} />
+                  <Li link="/me/q" txt="문의하기" />
+                  <Li link="/me" txt="내정보" />
+                  <Li txt="로그아웃" onClick={handleLogout} />
+                </ul>
+              </UserMyPageIcon>
+            </>
+          ) : (
+            <NotUserData>
+              <Li link="/nouser/order" txt="주문확인" />
+              <Li link="/login" txt="로그인"></Li>
+              <Li link="/register" txt="회원가입"></Li>
+            </NotUserData>
+          )}
         </HeaderUser>
         <MobileMenuBar openNavi={openNavi} onClick={handleOpenNavi}>
           <MenuOutlined />

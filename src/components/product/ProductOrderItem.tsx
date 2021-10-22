@@ -1,12 +1,13 @@
 import styled from '@emotion/styled';
 import { Divider } from 'antd';
 import router from 'next/router';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNoticeModal } from 'src/hooks/useNoticeModal';
 import { useAppSelector } from 'src/hooks/useRedux';
-import { DeliveryOption, ProductOption } from 'src/interfaces/ProductInterface';
+import { DeliveryOption, OptionType, ProductOption } from 'src/interfaces/ProductInterface';
 import { Uploader } from 'src/interfaces/User';
+import { setUserCart } from 'src/store/reducers/user';
 import { setModalVisible } from 'src/store/reducers/utils';
 import ProductOrderMutiOptions from './ProductOrderMutiOptions';
 import ProductOrderSingleOptions from './ProductOrderSingleOptions';
@@ -99,25 +100,46 @@ const ProductOrderItem = ({ title, meta, uploader, price, thumb, status, product
     return 0;
   }, []);
 
-  const { NoticeModal } = useNoticeModal({
-    bodyText: '비회원으로 구매하시면 적립 혜택을 받으실 수 없어요 :)',
-    okText: '계속하기',
-    cancelText: '로그인',
-    okUrl: process.browser ? `/product/order/${router.query.productId}` : '',
-    cancelUrl: '/login',
-  });
+  const [isCart, setIsCart] = useState(false);
+
+  const notice = useMemo(() => {
+    if (isCart) {
+      const cartNotice = {
+        bodyText: '성공적으로 저장되었습니다.',
+        okText: '확인',
+      };
+      return cartNotice;
+    } else {
+      const orderNotice = {
+        bodyText: '비회원으로 구매하시면 적립 혜택을 받으실 수 없어요 :)',
+        okText: '계속하기',
+        cancelText: '로그인',
+        okUrl: process.browser ? `/product/order/${router.query.productId}` : '',
+        cancelUrl: '/login',
+      };
+      return orderNotice;
+    }
+  }, [isCart]);
+
+  const { NoticeModal } = useNoticeModal(notice);
 
   const handleSaveCart = useCallback(() => {
-    if (!productOrder.length) {
+    if (productOrder[0].type === OptionType.MULTI && !productOrder[0].optionSelect?.length) {
       return alert('선택하신 상품이 없어요 :)');
     }
-  }, [productOrder.length]);
+
+    setIsCart(true);
+    const cartList = productOrder.map((lst) => ({ id: productId, product: lst }));
+    dispatch(setUserCart(cartList));
+    dispatch(setModalVisible(true));
+  }, [dispatch, productId, productOrder]);
 
   const handleOrder = useCallback(() => {
     const { productId } = router.query;
     if (!productOrder.length) {
       return alert('선택하신 상품이 없어요 :)');
     }
+    setIsCart(false);
     if (!userData) {
       dispatch(setModalVisible(true));
       return;
@@ -149,6 +171,7 @@ const ProductOrderItem = ({ title, meta, uploader, price, thumb, status, product
       {productOption.type === 1 && (
         <ProductOrderSingleOptions
           thumb={thumb}
+          status={status}
           productId={productId as number}
           title={title}
           price={price}
@@ -157,6 +180,9 @@ const ProductOrderItem = ({ title, meta, uploader, price, thumb, status, product
       )}
       {productOption.type === 2 && (
         <ProductOrderMutiOptions
+          title={title}
+          status={status}
+          productId={productId as number}
           thumb={thumb}
           productOption={productOption}
           price={price}

@@ -1,4 +1,4 @@
-import { ProductList } from './ProductInterface';
+import { ProductOrder } from './OrderInterface';
 
 export interface Coupon {
   id: number;
@@ -8,17 +8,9 @@ export interface Coupon {
   expired: Date;
 }
 
-export interface Order {
-  id: number;
-  orderNo: number;
-  deliveryStatus: 1 | 2 | 3 | 4;
-  product: ProductList;
-  createAt: string;
-}
-
 export interface Cart {
   id: number;
-  product: ProductList[];
+  product: ProductOrder;
 }
 
 export interface Uploader {

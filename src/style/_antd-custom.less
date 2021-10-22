@@ -18,3 +18,43 @@
   font-size: 15px;
   cursor: pointer;
 }
+
+// notification
+
+.ant-notification {
+  svg {
+    path {
+      display: none;
+    }
+  }
+}
+
+.notification-error {
+  max-width: 200px;
+  color: @normal-color;
+  background-color: @error-color;
+  text-align: center;
+
+  .ant-notification-notice-message {
+    margin: 0 auto;
+    padding: 0;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+}
+
+.notification-success {
+  max-width: 200px;
+  color: @normal-color;
+  background-color: @success-color;
+  text-align: center;
+
+  .ant-notification-notice-message {
+    margin: 0 auto;
+    padding: 0;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+}
