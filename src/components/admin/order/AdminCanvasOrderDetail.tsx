@@ -72,6 +72,25 @@ const AdminOrderDetail = () => {
     [data],
   );
 
+  const checkScaleType = useCallback((scaleType: number | string) => {
+    if (!scaleType) {
+      return;
+    }
+
+    const type = +scaleType;
+
+    if (type === 1) {
+      return '옆면 흰색';
+    }
+    if (type === 2) {
+      return '옆면 배경색';
+    }
+
+    if (type === 3) {
+      return '옆면 좌우반전';
+    }
+  }, []);
+
   if (!data) {
     return <Loading loading={!data} />;
   }
@@ -135,6 +154,7 @@ const AdminOrderDetail = () => {
         <Descriptions.Item label="주문 번호">{data.orderNo}</Descriptions.Item>
         <Descriptions.Item label="이름">{data.username}</Descriptions.Item>
         <Descriptions.Item label="연락처">{data.phone}</Descriptions.Item>
+        <Descriptions.Item label="옆면여부">{checkScaleType(data.scaleType || '')}</Descriptions.Item>
         <Descriptions.Item label="원본 사진">
           <Img src={data.originImgUrl} alt="고객님의 원본 사진" />
         </Descriptions.Item>

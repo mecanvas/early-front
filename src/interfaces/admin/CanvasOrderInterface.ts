@@ -3,6 +3,7 @@ export interface CanvasOrderList {
   orderNo: number;
   username: string;
   phone: number;
+  scaleType?: number;
   originImgUrl: string;
   paperNames: string[];
   createdAt: string;
