@@ -201,7 +201,9 @@ const MobileSingleTool = () => {
 
     const file = dataURLtoFile(
       dataUrl,
-      `${new Date().toLocaleDateString()}_${order.username}_${frame.name}_${frame.widthCm}px_${frame.heightCm}.png`,
+      `${new Date().toLocaleDateString()}_${order.username}_${frame.name}_${frame.widthCm}px_${
+        frame.heightCm
+      }_${new Date().getTime()}.png`,
     );
 
     if (!file) {
