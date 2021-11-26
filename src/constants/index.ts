@@ -52,7 +52,7 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
     name: 'F-2호',
     widthCm: 17.9,
     heightCm: 25.8,
-    price: 12800,
+    price: 11800,
     size: {
       width: cmToPx(17.9),
       height: cmToPx(25.8),
@@ -66,22 +66,9 @@ export const frameRectangleMoreHeightThanWidth: FrameInfoList[] = [
     name: 'F-4호',
     widthCm: 24.2,
     heightCm: 33.4,
-    price: 16700,
+    price: 15800,
     size: {
       width: cmToPx(24.2),
-      height: cmToPx(33.4),
-    },
-    recommand: false,
-  },
-  {
-    id: 4,
-    type: 2,
-    name: 'P-4호',
-    widthCm: 21.2,
-    heightCm: 33.4,
-    price: 16700,
-    size: {
-      width: cmToPx(21.2),
       height: cmToPx(33.4),
     },
     recommand: false,
@@ -104,25 +91,12 @@ export const frameSquare: FrameInfoList[] = [
     recommand: false,
   },
   {
-    id: 2,
-    type: 1,
-    name: 'S-1호',
-    widthCm: 15.8,
-    heightCm: 15.8,
-    price: 10800,
-    size: {
-      width: cmToPx(15.8),
-      height: cmToPx(15.8),
-    },
-    recommand: false,
-  },
-  {
     id: 3,
     type: 1,
     name: 'S-2호',
     widthCm: 17.9,
     heightCm: 17.9,
-    price: 12800,
+    price: 11800,
     size: {
       width: cmToPx(17.9),
       height: cmToPx(17.9),
@@ -135,7 +109,7 @@ export const frameSquare: FrameInfoList[] = [
     name: 'S-4호',
     widthCm: 24.2,
     heightCm: 24.2,
-    price: 16700,
+    price: 15800,
     size: {
       width: cmToPx(24.2),
       height: cmToPx(24.2),
@@ -146,16 +120,6 @@ export const frameSquare: FrameInfoList[] = [
 
 export const frameSize = (changeVertical?: boolean): FrameSize[] => [
   {
-    name: 'S-1호',
-    attribute: '정방',
-    cm: '15.8cm X 15.8cm',
-    size: {
-      width: `${cmToPx(15.8)}px`,
-      height: `${cmToPx(15.8)}px`,
-    },
-    price: 10800,
-  },
-  {
     name: 'S-2호',
     attribute: '정방',
     cm: '17.9cm X 17.9cm',
@@ -163,7 +127,7 @@ export const frameSize = (changeVertical?: boolean): FrameSize[] => [
       width: `${cmToPx(17.9)}px`,
       height: `${cmToPx(17.9)}px`,
     },
-    price: 12800,
+    price: 11800,
   },
   {
     name: 'S-4호',
@@ -173,27 +137,7 @@ export const frameSize = (changeVertical?: boolean): FrameSize[] => [
       width: `${cmToPx(24.2)}px`,
       height: `${cmToPx(24.2)}px`,
     },
-    price: 16700,
-  },
-  {
-    name: 'P-2호',
-    attribute: '풍경',
-    cm: !changeVertical ? '16cm X 25.8cm' : '25.8cm X 16cm',
-    size: {
-      width: `${cmToPx(!changeVertical ? 16 : 25.8)}px`,
-      height: `${cmToPx(!changeVertical ? 25.8 : 16)}px`,
-    },
-    price: 12800,
-  },
-  {
-    name: 'P-4호',
-    attribute: '풍경',
-    cm: !changeVertical ? '21.2cm X 33.4cm' : '33.4cm X 21.2cm',
-    size: {
-      width: `${cmToPx(!changeVertical ? 21.2 : 33.4)}px`,
-      height: `${cmToPx(!changeVertical ? 33.4 : 21.2)}px`,
-    },
-    price: 16700,
+    price: 15800,
   },
   {
     name: 'F-2호',
@@ -203,7 +147,7 @@ export const frameSize = (changeVertical?: boolean): FrameSize[] => [
       width: `${cmToPx(!changeVertical ? 17.9 : 25.8)}px`,
       height: `${cmToPx(!changeVertical ? 25.8 : 17.9)}px`,
     },
-    price: 12800,
+    price: 11800,
   },
   {
     name: 'F-4호',
@@ -213,6 +157,6 @@ export const frameSize = (changeVertical?: boolean): FrameSize[] => [
       width: `${cmToPx(!changeVertical ? 24.2 : 33.4)}px`,
       height: `${cmToPx(!changeVertical ? 33.4 : 24.2)}px`,
     },
-    price: 16700,
+    price: 15800,
   },
 ];
