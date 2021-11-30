@@ -160,7 +160,10 @@ const KeywordItem = styled.td<{ comp?: string; cvr?: string; bid?: string }>`
 `;
 
 const AdminGoldenKeywords = () => {
-  const { data } = useSWR<KeywordsResult>('https://early-slack.herokuapp.com/kw');
+  const URL =
+    process.env.NODE_ENV === 'production' ? 'https://early-slack.herokuapp.com/kw' : 'http://localhost:5000/kw';
+
+  const { data } = useSWR<KeywordsResult>(URL, { revalidateOnFocus: false });
   const head = ['카테고리', '키워드', '경쟁률', '쇼핑전환', '광고비', '검색량', '상품량', '평균가격'];
   const [resKw, setResKw] = useState<ExtractKeywordTable[]>(data?.res || []);
   const [filter, setFilter] = useState('모두');
@@ -168,6 +171,8 @@ const AdminGoldenKeywords = () => {
   const [isSortArrow, setIsSortArrow] = useState(true);
   const [categoryMenu, setCategoryMenu] = useState<string[]>([]);
   const [isNew, setIsNew] = useState(false);
+  const [limit] = useState(200);
+  const [moreCnt, setMoreCnt] = useState(1);
 
   const replaceSpotToNumber = (str: string) => +str.replace(/,/g, '');
 
@@ -228,6 +233,7 @@ const AdminGoldenKeywords = () => {
     if (sortCmd === '키워드 ' || sortCmd === '카테고리') {
       return resKw;
     }
+
     return resKw.sort(sorter);
   }, [resKw, sorter, sortCmd, isNew]);
 
@@ -252,6 +258,10 @@ const AdminGoldenKeywords = () => {
     setIsNew((prev) => !prev);
   }, []);
 
+  const handleMore = useCallback(() => {
+    setMoreCnt((prev) => prev + 1);
+  }, []);
+
   useEffect(() => {
     if (!data) return;
 
@@ -261,6 +271,7 @@ const AdminGoldenKeywords = () => {
     }
 
     setResKw(data.res.filter((lst) => lst.firstCate === filter));
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
@@ -323,7 +334,7 @@ const AdminGoldenKeywords = () => {
 
           <tbody>
             {newData.length ? (
-              newData.map((kw, j) => (
+              newData.slice(0, limit * moreCnt).map((kw, j) => (
                 <KeywordBodyTable key={j}>
                   <KeywordItem>
                     <div>{kw.firstCate}</div>
@@ -349,6 +360,7 @@ const AdminGoldenKeywords = () => {
             )}
           </tbody>
         </KeywordsTableContainer>
+        <Button onClick={handleMore}>더보기</Button>
       </Container>
     </>
   );
