@@ -98,6 +98,8 @@ const AdminLayout = ({ children }: Props) => {
           <Button type="default" onClick={handleLogout}>
             로그아웃
           </Button>
+
+          {/* 메뉴 */}
           <Menu mode="horizontal" theme="light" defaultSelectedKeys={['/']} selectedKeys={[router.pathname]}>
             <SubMenu key="/admin/order/divided" title="주문 목록" onTitleClick={handleTitleClick}>
               <Menu.Item key="/admin/order/divided">
