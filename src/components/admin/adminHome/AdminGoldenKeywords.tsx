@@ -3,7 +3,7 @@ import { ExtractKeywordTable, KeywordsResult } from 'src/interfaces/admin/Keywor
 import useSWR from 'swr';
 import Loading from 'src/components/common/Loading';
 import styled from '@emotion/styled';
-import { Select } from 'antd';
+import { Button, Empty, Select } from 'antd';
 import { SelectValue } from 'antd/lib/select';
 import { css } from '@emotion/react';
 import { APP_HEADER_HEIGHT } from 'src/constants';
@@ -166,8 +166,10 @@ const AdminGoldenKeywords = () => {
   const [filter, setFilter] = useState('모두');
   const [sortCmd, setSortCmd] = useState<any>('');
   const [isSortArrow, setIsSortArrow] = useState(true);
-  const replaceSpotToNumber = (str: string) => +str.replace(/,/, '');
   const [categoryMenu, setCategoryMenu] = useState<string[]>([]);
+  const [isNew, setIsNew] = useState(false);
+
+  const replaceSpotToNumber = (str: string) => +str.replace(/,/g, '');
 
   const sorter = useCallback(
     (a: ExtractKeywordTable, b: ExtractKeywordTable) => {
@@ -214,11 +216,20 @@ const AdminGoldenKeywords = () => {
   );
 
   const newData = useMemo(() => {
+    if (isNew) {
+      if (sortCmd) {
+        if (sortCmd === '키워드 ' || sortCmd === '카테고리') {
+          return resKw.filter((lst) => lst.isNew === isNew);
+        }
+        return resKw.filter((lst) => lst.isNew === isNew).sort(sorter);
+      }
+      return resKw.filter((lst) => lst.isNew === isNew);
+    }
     if (sortCmd === '키워드 ' || sortCmd === '카테고리') {
       return resKw;
     }
     return resKw.sort(sorter);
-  }, [resKw, sorter, sortCmd]);
+  }, [resKw, sorter, sortCmd, isNew]);
 
   const handleSort = useCallback((e) => {
     const { sort } = e.currentTarget.dataset;
@@ -235,6 +246,10 @@ const AdminGoldenKeywords = () => {
     }
 
     setFilter(cate as string);
+  }, []);
+
+  const handleNewKw = useCallback(() => {
+    setIsNew((prev) => !prev);
   }, []);
 
   useEffect(() => {
@@ -289,6 +304,12 @@ const AdminGoldenKeywords = () => {
           ))}
         </CategoryMenuBtn>
 
+        <div style={{ margin: '1em auto 1em 0' }}>
+          <Button type={isNew ? 'primary' : 'default'} onClick={handleNewKw}>
+            전날 없었던 키워드
+          </Button>
+        </div>
+
         <KeywordsTableContainer>
           <KeywordHeadTable>
             {head.map((h) => (
@@ -301,25 +322,31 @@ const AdminGoldenKeywords = () => {
           </KeywordHeadTable>
 
           <tbody>
-            {newData.map((kw, j) => (
-              <KeywordBodyTable key={j}>
-                <KeywordItem>
-                  <div>{kw.firstCate}</div>
-                  <div>{kw.secondCate}</div>
-                </KeywordItem>
-                <KeywordItem>
-                  <a href={`https://pandarank.net/search/detail?keyword=${kw.keyword}`} target="blank">
-                    {kw.keyword}
-                  </a>
-                </KeywordItem>
-                <KeywordItem comp={kw.comp}>{kw.comp}</KeywordItem>
-                <KeywordItem cvr={kw.cvr}>{kw.cvr}</KeywordItem>
-                <KeywordItem bid={kw.bid}>{kw.bid}</KeywordItem>
-                <KeywordItem>{kw.searchCnt}</KeywordItem>
-                <KeywordItem>{kw.prodCnt}</KeywordItem>
-                <KeywordItem>{kw.prodPrcAvg}</KeywordItem>
-              </KeywordBodyTable>
-            ))}
+            {newData.length ? (
+              newData.map((kw, j) => (
+                <KeywordBodyTable key={j}>
+                  <KeywordItem>
+                    <div>{kw.firstCate}</div>
+                    <div>{kw.secondCate}</div>
+                  </KeywordItem>
+                  <KeywordItem>
+                    <a href={`https://pandarank.net/search/detail?keyword=${kw.keyword}`} target="blank">
+                      {kw.keyword}
+                    </a>
+                  </KeywordItem>
+                  <KeywordItem comp={kw.comp}>{kw.comp}</KeywordItem>
+                  <KeywordItem cvr={kw.cvr}>{kw.cvr}</KeywordItem>
+                  <KeywordItem bid={kw.bid}>{kw.bid}</KeywordItem>
+                  <KeywordItem>{kw.searchCnt}</KeywordItem>
+                  <KeywordItem>{kw.prodCnt}</KeywordItem>
+                  <KeywordItem>{kw.prodPrcAvg}</KeywordItem>
+                </KeywordBodyTable>
+              ))
+            ) : (
+              <div style={{ padding: '3em' }}>
+                <Empty description="데이터가 없습니다." />
+              </div>
+            )}
           </tbody>
         </KeywordsTableContainer>
       </Container>

@@ -14,6 +14,9 @@ export interface ExtractKeywordTable {
   prodCnt: string;
   // 평균가격
   prodPrcAvg: string;
+
+  // 전날없던 키워드
+  isNew: boolean;
 }
 
 export interface KeywordsResult {
