@@ -167,6 +167,7 @@ const AdminGoldenKeywords = () => {
   const [sortCmd, setSortCmd] = useState<any>('');
   const [isSortArrow, setIsSortArrow] = useState(true);
   const replaceSpotToNumber = (str: string) => +str.replace(/,/, '');
+  const [categoryMenu, setCategoryMenu] = useState<string[]>([]);
 
   const sorter = useCallback(
     (a: ExtractKeywordTable, b: ExtractKeywordTable) => {
@@ -228,16 +229,6 @@ const AdminGoldenKeywords = () => {
     setIsSortArrow((prev) => !prev);
   }, []);
 
-  const categoryMenu = useMemo(() => {
-    if (!data || !resKw) {
-      return [];
-    }
-
-    const arr = resKw.map((lst) => lst.firstCate);
-
-    return ['모두', ...new Set(arr)];
-  }, [data, resKw]);
-
   const handleFilter = useCallback((cate: SelectValue) => {
     if (!cate) {
       return;
@@ -259,6 +250,20 @@ const AdminGoldenKeywords = () => {
   }, [filter]);
 
   useEffect(() => {
+    if (categoryMenu.length) {
+      return;
+    }
+    if (!data || !resKw) {
+      return;
+    }
+
+    const arr = resKw.map((lst) => lst.firstCate);
+    const menu = ['모두', ...new Set(arr)];
+    setCategoryMenu(menu);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resKw]);
+
+  useEffect(() => {
     if (data) {
       setResKw(data.res);
     }
@@ -272,14 +277,16 @@ const AdminGoldenKeywords = () => {
     <Container>
       <CategoryMenuBtn defaultValue={'모두'} onChange={handleFilter}>
         {categoryMenu.map((nm) => (
-          <Select.Option value={nm}>{nm}</Select.Option>
+          <Select.Option key={nm} value={nm}>
+            {nm}
+          </Select.Option>
         ))}
       </CategoryMenuBtn>
 
       <KeywordsTableContainer>
         <KeywordHeadTable>
           {head.map((h) => (
-            <KeywordHead selected={sortCmd !== '카테고리' && sortCmd !== '키워드' ? h === sortCmd : false}>
+            <KeywordHead key={h} selected={sortCmd !== '카테고리' && sortCmd !== '키워드' ? h === sortCmd : false}>
               <span onClick={handleSort} data-sort={h}>
                 {h}
               </span>
@@ -309,7 +316,6 @@ const AdminGoldenKeywords = () => {
           ))}
         </tbody>
       </KeywordsTableContainer>
-      {/* <KeywordsTable data={resKw.length ? resKw : data} /> */}
     </Container>
   );
 };
