@@ -1,5 +1,6 @@
 import React from 'react';
 import { UserData } from 'src/store/reducers/user';
+import AdminGoldenKeywords from './AdminGoldenKeywords';
 
 interface Props {
   user?: UserData;
@@ -8,7 +9,11 @@ interface Props {
 const AdminHome = ({ user }: Props) => {
   console.log(user);
 
-  return <div>g2</div>;
+  return (
+    <div>
+      <AdminGoldenKeywords />
+    </div>
+  );
 };
 
 export default AdminHome;

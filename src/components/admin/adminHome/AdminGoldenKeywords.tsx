@@ -146,7 +146,7 @@ const KeywordItem = styled.td<{ comp?: string; cvr?: string; bid?: string }>`
   }}
 `;
 
-const Kw = () => {
+const AdminGoldenKeywords = () => {
   const { data } = useSWR<KeywordsResult>('https://early-slack.herokuapp.com/kw');
   const head = ['카테고리', '키워드', '경쟁률', '쇼핑전환', '광고비', '검색량', '상품량', '평균가격'];
   const [resKw, setResKw] = useState<ExtractKeywordTable[]>(data?.res || []);
@@ -299,4 +299,4 @@ const Kw = () => {
   );
 };
 
-export default Kw;
+export default AdminGoldenKeywords;
