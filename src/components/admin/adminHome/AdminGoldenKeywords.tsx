@@ -6,6 +6,7 @@ import styled from '@emotion/styled';
 import { Select } from 'antd';
 import { SelectValue } from 'antd/lib/select';
 import { css } from '@emotion/react';
+import { APP_HEADER_HEIGHT } from 'src/constants';
 
 const Container = styled.div`
   width: 100%;
@@ -28,10 +29,15 @@ const KeywordsTableContainer = styled.table`
 
 const KeywordHeadTable = styled.thead`
   display: grid;
+  position: sticky;
+  padding: 0.4em 0;
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
+  border-top: 1px solid ${({ theme }) => theme.color.gray300};
+  background-color: ${({ theme }) => theme.color.white};
+  top: ${APP_HEADER_HEIGHT}px;
   grid-template-columns: repeat(8, 1fr);
   width: 100%;
   text-align: center;
-
   div {
     max-width: 120px;
   }
@@ -53,10 +59,8 @@ const KeywordHead = styled.th<{ selected: boolean }>`
   width: 100%;
   text-align: center;
   font-weight: bold;
-  padding: 0.8em 0em;
   margin: 1em 0;
   border-right: 1px solid ${({ theme }) => theme.color.gray300};
-  border-bottom: 1px solid ${({ theme }) => theme.color.gray300};
   align-items: center;
   justify-content: center;
 
@@ -76,6 +80,15 @@ const KeywordHead = styled.th<{ selected: boolean }>`
 `;
 
 const KeywordItem = styled.td<{ comp?: string; cvr?: string; bid?: string }>`
+  a {
+    text-align: center;
+    color: ${({ theme }) => theme.color.black};
+    text-decoration: underline;
+
+    &:hover {
+      color: ${({ theme }) => theme.color.gray500};
+    }
+  }
   margin-bottom: 0.4em;
   padding: 0.8em 0em;
   display: flex;
@@ -153,7 +166,6 @@ const AdminGoldenKeywords = () => {
   const [filter, setFilter] = useState('모두');
   const [sortCmd, setSortCmd] = useState<any>('');
   const [isSortArrow, setIsSortArrow] = useState(true);
-
   const replaceSpotToNumber = (str: string) => +str.replace(/,/, '');
 
   const sorter = useCallback(
@@ -241,7 +253,6 @@ const AdminGoldenKeywords = () => {
       setResKw(data.res);
       return;
     }
-    console.log(filter);
 
     setResKw(data.res.filter((lst) => lst.firstCate === filter));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -256,7 +267,7 @@ const AdminGoldenKeywords = () => {
   if (!data || !resKw) {
     return <Loading loading text="불러오는 중" />;
   }
-  console.log(isSortArrow);
+
   return (
     <Container>
       <CategoryMenuBtn defaultValue={'모두'} onChange={handleFilter}>
@@ -283,7 +294,11 @@ const AdminGoldenKeywords = () => {
                 <div>{kw.firstCate}</div>
                 <div>{kw.secondCate}</div>
               </KeywordItem>
-              <KeywordItem>{kw.keyword}</KeywordItem>
+              <KeywordItem>
+                <a href={`https://pandarank.net/search/detail?keyword=${kw.keyword}`} target="blank">
+                  {kw.keyword}
+                </a>
+              </KeywordItem>
               <KeywordItem comp={kw.comp}>{kw.comp}</KeywordItem>
               <KeywordItem cvr={kw.cvr}>{kw.cvr}</KeywordItem>
               <KeywordItem bid={kw.bid}>{kw.bid}</KeywordItem>
