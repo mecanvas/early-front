@@ -274,49 +274,56 @@ const AdminGoldenKeywords = () => {
   }
 
   return (
-    <Container>
-      <CategoryMenuBtn defaultValue={'모두'} onChange={handleFilter}>
-        {categoryMenu.map((nm) => (
-          <Select.Option key={nm} value={nm}>
-            {nm}
-          </Select.Option>
-        ))}
-      </CategoryMenuBtn>
+    <>
+      <h2>{data.date} 황금키워드 목록</h2>
 
-      <KeywordsTableContainer>
-        <KeywordHeadTable>
-          {head.map((h) => (
-            <KeywordHead key={h} selected={sortCmd !== '카테고리' && sortCmd !== '키워드' ? h === sortCmd : false}>
-              <span onClick={handleSort} data-sort={h}>
-                {h}
+      <Container>
+        <CategoryMenuBtn defaultValue={'모두'} onChange={handleFilter}>
+          {categoryMenu.map((nm) => (
+            <Select.Option key={nm} value={nm}>
+              {nm}
+              <span style={{ marginLeft: '.3em' }}>
+                ({nm === '모두' ? `${data.res.length}개` : `${data.res.filter((kw) => kw.firstCate === nm).length}개`})
               </span>
-            </KeywordHead>
+            </Select.Option>
           ))}
-        </KeywordHeadTable>
+        </CategoryMenuBtn>
 
-        <tbody>
-          {newData.map((kw, j) => (
-            <KeywordBodyTable key={j}>
-              <KeywordItem>
-                <div>{kw.firstCate}</div>
-                <div>{kw.secondCate}</div>
-              </KeywordItem>
-              <KeywordItem>
-                <a href={`https://pandarank.net/search/detail?keyword=${kw.keyword}`} target="blank">
-                  {kw.keyword}
-                </a>
-              </KeywordItem>
-              <KeywordItem comp={kw.comp}>{kw.comp}</KeywordItem>
-              <KeywordItem cvr={kw.cvr}>{kw.cvr}</KeywordItem>
-              <KeywordItem bid={kw.bid}>{kw.bid}</KeywordItem>
-              <KeywordItem>{kw.searchCnt}</KeywordItem>
-              <KeywordItem>{kw.prodCnt}</KeywordItem>
-              <KeywordItem>{kw.prodPrcAvg}</KeywordItem>
-            </KeywordBodyTable>
-          ))}
-        </tbody>
-      </KeywordsTableContainer>
-    </Container>
+        <KeywordsTableContainer>
+          <KeywordHeadTable>
+            {head.map((h) => (
+              <KeywordHead key={h} selected={sortCmd !== '카테고리' && sortCmd !== '키워드' ? h === sortCmd : false}>
+                <span onClick={handleSort} data-sort={h}>
+                  {h}
+                </span>
+              </KeywordHead>
+            ))}
+          </KeywordHeadTable>
+
+          <tbody>
+            {newData.map((kw, j) => (
+              <KeywordBodyTable key={j}>
+                <KeywordItem>
+                  <div>{kw.firstCate}</div>
+                  <div>{kw.secondCate}</div>
+                </KeywordItem>
+                <KeywordItem>
+                  <a href={`https://pandarank.net/search/detail?keyword=${kw.keyword}`} target="blank">
+                    {kw.keyword}
+                  </a>
+                </KeywordItem>
+                <KeywordItem comp={kw.comp}>{kw.comp}</KeywordItem>
+                <KeywordItem cvr={kw.cvr}>{kw.cvr}</KeywordItem>
+                <KeywordItem bid={kw.bid}>{kw.bid}</KeywordItem>
+                <KeywordItem>{kw.searchCnt}</KeywordItem>
+                <KeywordItem>{kw.prodCnt}</KeywordItem>
+                <KeywordItem>{kw.prodPrcAvg}</KeywordItem>
+              </KeywordBodyTable>
+            ))}
+          </tbody>
+        </KeywordsTableContainer>
+      </Container>
+    </>
   );
 };
 
