@@ -1,6 +1,5 @@
 import { Button, Upload, Popover } from 'antd';
 import { RcFile } from 'antd/lib/upload';
-import axios from 'axios';
 import React, { useCallback } from 'react';
 import { ColorResult } from 'react-color';
 import { useGlobalState } from 'src/hooks';
@@ -12,6 +11,7 @@ import ToolImageResizerModal from './DividedToolImageResizerModal';
 import ToolColorPalette from './DividedToolColorPalette';
 import { FactoryTool, FrameTool } from './DividedToolStyle';
 import { icons } from 'public/icons';
+import { mockPostImageUpload } from 'src/utils';
 
 interface Props {
   croppedList: CroppedFrame[];
@@ -47,11 +47,9 @@ const ToolFactory = ({ croppedList, setCroppedList }: Props) => {
       try {
         const fd = new FormData();
         fd.append('image', file);
-        await axios
-          .post('/canvas/divided/upload', fd, {
-            onUploadProgress: getProgressGage,
-          })
-          .then((res) => setImgUploadUrl(res.data || ''));
+        await mockPostImageUpload(file, getProgressGage).then((res) => {
+          setImgUploadUrl(res || '');
+        });
       } catch (err) {
         alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
         console.error(err);
