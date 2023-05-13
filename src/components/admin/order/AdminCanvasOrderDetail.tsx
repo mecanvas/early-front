@@ -1,16 +1,16 @@
-import { useRouter } from 'next/router';
-import React, { useCallback, useMemo, useState } from 'react';
-import { Descriptions, Tag, Button } from 'antd';
-import useSWR from 'swr';
-import { adminGetFetcher } from 'src/fetcher';
-import { CanvasOrderDetail } from 'src/interfaces/admin/CanvasOrderInterface';
-import Loading from 'src/components/common/Loading';
-import Img from 'src/components/common/Img';
-import { dateFormat } from 'src/utils/dateFormat';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Button, Descriptions, Tag } from 'antd';
+import { useRouter } from 'next/router';
+import { useCallback, useMemo, useState } from 'react';
+import Img from 'src/components/common/Img';
+import Loading from 'src/components/common/Loading';
+import { adminOrderDetailFetcher } from 'src/fetcher';
+import { CanvasOrderDetail } from 'src/interfaces/admin/CanvasOrderInterface';
 import { theme } from 'src/style/theme';
 import { ImgToDataURL } from 'src/utils/ImgToDataURL';
+import { dateFormat } from 'src/utils/dateFormat';
+import useSWR from 'swr';
 
 const AdminOrderDetail = () => {
   const router = useRouter();
@@ -27,7 +27,7 @@ const AdminOrderDetail = () => {
       .join('/');
   }, [pathname]);
 
-  const { data } = useSWR<CanvasOrderDetail>(canvasOrderId ? `/${path}/${canvasOrderId}` : null, adminGetFetcher);
+  const { data } = useSWR<CanvasOrderDetail>(canvasOrderId ? canvasOrderId : null, adminOrderDetailFetcher);
 
   const [loading, setLoading] = useState(false);
   const handleImgDownload = useCallback(

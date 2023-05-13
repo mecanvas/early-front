@@ -4,7 +4,7 @@ import { Tabs } from 'antd';
 import { useMoveTab } from 'src/hooks/useMoveTab';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
-import { adminGetFetcher } from 'src/fetcher';
+import { adminOrderListFetcher } from 'src/fetcher';
 import { ColumnsType } from 'antd/lib/table';
 import { useGetQueryString } from 'src/hooks/useGetQueryString';
 import { dateFormat } from 'src/utils/dateFormat';
@@ -18,7 +18,7 @@ const AdminOrderList = () => {
   const { defaultTab, handleTabKey, setDefaultTab } = useMoveTab('order/divided');
   const [columns, setColumns] = useState<ColumnsType<any>>([]);
   const { queryStringify } = useGetQueryString();
-  const { data } = useSWR(`/${defaultTab}/?${queryStringify() || `page=1&per_page=10`}` || null, adminGetFetcher);
+  const { data } = useSWR(`/${defaultTab}/?${queryStringify() || `page=1&per_page=10`}` || null, adminOrderListFetcher);
 
   useEffect(() => {
     if (pathname === '/admin/order/divided') {
