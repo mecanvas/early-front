@@ -1,19 +1,14 @@
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import AdminHome from 'src/components/admin/adminHome/AdminHome';
-import axios from 'axios';
+import { mockAuthLogin } from 'src/utils';
 
 export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const cookie = ctx.req.headers.cookie || '';
+  const cookie = ctx.req.headers.cookie?.includes('mockAuth=hi') || '';
+
   let user = null;
 
   if (cookie) {
-    user = await axios
-      .get('/auth', {
-        headers: {
-          cookie,
-        },
-      })
-      .then((res) => res.data);
+    user = await mockAuthLogin().then((data) => data);
   }
 
   if (user?.role === 1) {

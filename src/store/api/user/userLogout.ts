@@ -1,11 +1,9 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-import { UserData } from 'src/store/reducers/user';
+import { mockAuthLogout } from 'src/utils';
 
 export const postUserLogout = createAsyncThunk<any>('user/postUserLogout', async (_, { rejectWithValue }) => {
   try {
-    await axios.post<UserData>(`/auth/logout`).then((res) => res.data);
-    window.location.href = '/';
+    await mockAuthLogout();
   } catch (err: any) {
     return rejectWithValue(err.response.data);
   }

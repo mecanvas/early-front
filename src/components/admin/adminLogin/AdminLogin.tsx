@@ -28,10 +28,11 @@ const Container = styled.div`
 
 const AdminLogin = () => {
   const dispatch = useAppDispatch();
-  const { isUserLoad, isUserDone, userData } = useAppSelector((state) => state.user);
+  const { isUserLoad, userData } = useAppSelector((state) => state.user);
   const handleLogin = useCallback(
     (values: { email: string; password: string }) => {
       dispatch(postUserLogin(values));
+      router.push('/admin');
     },
     [dispatch],
   );
@@ -45,12 +46,6 @@ const AdminLogin = () => {
     }
   }, [userData, userData?.role]);
 
-  useEffect(() => {
-    if (isUserDone) {
-      router.push('/admin');
-    }
-  }, [isUserDone]);
-
   return (
     <Container>
       <Loading loading={isUserLoad} />
@@ -63,7 +58,7 @@ const AdminLogin = () => {
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">
-            화긴ㄴ
+            확인
           </Button>
         </Form.Item>
       </Form>
