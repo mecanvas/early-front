@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import useSWR, { SWRResponse } from 'swr';
 import { notification } from 'antd';
+import { useCallback, useEffect, useState } from 'react';
 import { OrderInfo } from 'src/components/tool/ToolSave';
+import { mockPostCanvasSave } from 'src/utils';
+import useSWR, { SWRResponse } from 'swr';
 
 export const useGetCursorPosition = (isSelected: boolean) => {
   const [windowX, setWindowX] = useState(0);
@@ -147,11 +147,14 @@ export const useCanvasToServer = () => {
     if (!isSave || !toolType) return;
     const saveCanvas = async (canvasType: 'single' | 'divided') => {
       const fd = new FormData();
+
       fd.append('username', username);
       fd.append('phone', phone);
       fd.append('orderRoute', orderRoute);
       fd.append('type', '1');
-      fileList.forEach((file) => fd.append('image', file));
+      fileList.forEach((file) => {
+        fd.append('image', file);
+      });
       fd.append('paperNames', paperSize.join());
       if (canvasType === 'single') {
         if (!singleImgUploadUrl) return;
@@ -161,12 +164,7 @@ export const useCanvasToServer = () => {
         fd.append('originImgUrl', imgUploadUrl);
       }
 
-      await axios
-        .post(`/canvas/${canvasType}/save`, fd, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
+      await mockPostCanvasSave(fd.getAll('image') as File[])
         .then(() => {
           setIsDone(true);
         })

@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import dynamic from 'next/dynamic';
+import { mockAuthLogin } from 'src/utils';
 const AdminCanvasOrderList = dynamic(() => import('src/components/admin/order/AdminCanvasOrderList'));
 
 export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSidePropsContext) => {
@@ -8,13 +8,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
   let user = null;
 
   if (cookie) {
-    user = await axios
-      .get('/auth', {
-        headers: {
-          cookie,
-        },
-      })
-      .then((res) => res.data);
+    user = await mockAuthLogin().then((res) => res);
   }
 
   if (user?.role === 1) {

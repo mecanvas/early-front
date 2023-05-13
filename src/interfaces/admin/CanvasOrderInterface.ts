@@ -2,7 +2,8 @@ export interface CanvasOrderList {
   id: number;
   orderNo: number;
   username: string;
-  phone: number;
+  phone: string;
+  orderRoute: number;
   scaleType?: number;
   originImgUrl: string;
   paperNames: string[];

@@ -1,41 +1,41 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import ToolHeader from '../ToolHeader';
-import { Button, Popover } from 'antd';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { imgSizeChecker } from 'src/utils/imgSizeChecker';
-import axios from 'axios';
-import { useProgress } from 'src/hooks/useProgress';
-import Loading from 'src/components/common/Loading';
-import Upload, { RcFile } from 'antd/lib/upload';
 import { faChevronCircleDown, faChevronCircleUp } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Button, Popover } from 'antd';
+import Upload, { RcFile } from 'antd/lib/upload';
+import { icons } from 'public/icons';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ColorResult } from 'react-color';
+import ImageDropZone from 'src/components/common/ImageDropZone';
+import Loading from 'src/components/common/Loading';
 import SingleImgSizeController from 'src/components/tool/single/SingleImgSizeController';
+import { HEADER_HEIGHT, frameSize } from 'src/constants';
+import { PreventPageLeave } from 'src/hoc/PreventPageLeave';
 import { useGlobalState } from 'src/hooks';
+import { useProgress } from 'src/hooks/useProgress';
 import { FramePrice, ResizeCmd } from 'src/interfaces/ToolInterface';
-import { getOriginRatio } from 'src/utils/getOriginRatio';
-import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
-import { frameSize, HEADER_HEIGHT } from 'src/constants';
-import { FrameSizeName } from '../divided/DividedToolStyle';
-import { replacePx } from 'src/utils/replacePx';
+import { theme } from 'src/style/theme';
+import { mockPostImageUpload } from 'src/utils';
 import { cmToPx } from 'src/utils/cmToPx';
+import { filterOverMaxHeight } from 'src/utils/filterOverMaxHeight';
+import { getOriginRatio } from 'src/utils/getOriginRatio';
+import { imgSizeChecker } from 'src/utils/imgSizeChecker';
+import { replacePx } from 'src/utils/replacePx';
+import ToolHeader from '../ToolHeader';
+import ToolColorPalette from '../divided/DividedToolColorPalette';
+import { FrameSizeName } from '../divided/DividedToolStyle';
 import {
-  SingleToolContainer,
-  SingleToolFactory,
-  SingleFrameListHeader,
-  SingleFrameListGrid,
-  SingleFrameList,
   FrameListGridHideButton,
   PreviewCanvasWrapper,
   SingleCanvasField,
-  SingleWrapper,
-  SingleSelectedFrame,
+  SingleFrameList,
+  SingleFrameListGrid,
+  SingleFrameListHeader,
   SingleImageWrapper,
+  SingleSelectedFrame,
+  SingleToolContainer,
+  SingleToolFactory,
+  SingleWrapper,
 } from './SingleToolStyle';
-import ToolColorPalette from '../divided/DividedToolColorPalette';
-import { theme } from 'src/style/theme';
-import { ColorResult } from 'react-color';
-import ImageDropZone from 'src/components/common/ImageDropZone';
-import { icons } from 'public/icons';
-import { PreventPageLeave } from 'src/hoc/PreventPageLeave';
 
 const SingleTool = () => {
   const singleWrapperRef = useRef<HTMLDivElement>(null);
@@ -337,13 +337,9 @@ const SingleTool = () => {
         const fd = new FormData();
         fd.append('image', file);
 
-        await axios
-          .post('/canvas/single/upload', fd, {
-            onUploadProgress: getProgressGage,
-          })
-          .then((res) => {
-            setSingleimgUploadUrl(res.data || '');
-          });
+        await mockPostImageUpload(file, getProgressGage).then((res) => {
+          setSingleimgUploadUrl(res || '');
+        });
       } catch (err) {
         alert('이미지 업로드 실패, 다시 시도해 주세요.');
         console.error(err);
@@ -381,13 +377,9 @@ const SingleTool = () => {
         const fd = new FormData();
         fd.append('image', file);
 
-        await axios
-          .post('/canvas/single/upload', fd, {
-            onUploadProgress: getProgressGage,
-          })
-          .then((res) => {
-            setSingleimgUploadUrl(res.data || '');
-          });
+        await mockPostImageUpload(file, getProgressGage).then((res) => {
+          setSingleimgUploadUrl(res || '');
+        });
       } catch (err) {
         alert('이미지 업로드 실패, 다시 시도해 주세요.');
         console.error(err);

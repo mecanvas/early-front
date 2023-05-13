@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useGetScollPosition, useGlobalState } from 'src/hooks';
-import axios from 'axios';
 import { ToolContainer, ImageWrapper, ImgController, CroppedWrapper, ToolHeaderWrapper } from './DividedToolStyle';
 import { Button } from 'antd';
 import { theme } from 'src/style/theme';
@@ -28,6 +27,7 @@ import ImageDropZone from 'src/components/common/ImageDropZone';
 import { getOriginRatio } from 'src/utils/getOriginRatio';
 import { PreventPageLeave } from 'src/hoc/PreventPageLeave';
 import { isMobile } from 'react-device-detect';
+import { mockPostImageUpload } from 'src/utils';
 
 const Tool = () => {
   const [changeVertical, setChangeVertical] = useState(false);
@@ -291,13 +291,9 @@ const Tool = () => {
           const fd = new FormData();
           fd.append('image', file);
 
-          await axios
-            .post('/canvas/divided/upload', fd, {
-              onUploadProgress: getProgressGage,
-            })
-            .then((res) => {
-              setImgUploadUrl(res.data || '');
-            });
+          await mockPostImageUpload(file, getProgressGage).then((res) => {
+            setImgUploadUrl(res || '');
+          });
         }
       } catch (err) {
         alert('이미지 업로드 실패, 괜찮아 다시 시도 ㄱㄱ, 3번시도 부탁');
@@ -374,6 +370,8 @@ const Tool = () => {
       (oCtx as CanvasRenderingContext2D).imageSmoothingQuality = 'high';
 
       if (!oCtx) return;
+
+      console.log(scaleX, scaleY);
 
       oCtx?.drawImage(
         image,
@@ -711,6 +709,7 @@ const Tool = () => {
   return (
     <>
       {imgUploadUrl && isGridGuideLine && !isPreview && (
+        // 눈금자
         <div
           style={{
             position: 'fixed',
@@ -785,20 +784,6 @@ const Tool = () => {
           onMouseLeave={isDragDrop ? handleDropCancel : handleImgResizeEnd}
           cmd={resizeCmd}
         >
-          {/* {isPreview && (
-            <PreviewBg
-              ref={previewBgRef}
-              isPreviewBgRemove={!isPreviewBgRemove}
-            >
-              <Switch
-                checkedChildren="배경"
-                unCheckedChildren="배경"
-                checked={isPreviewBgRemove}
-                onChange={handlePreviewBgRemove}
-              />
-              <img src={BgPreview} alt="미리보기배경" />
-            </PreviewBg>
-          )} */}
           <CroppedWrapper
             isPreview={isPreview || false}
             top={framePreviewMode?.top}

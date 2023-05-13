@@ -136,7 +136,7 @@ const ToolSave = ({ yourPriceList, totalPrice }: Props) => {
     //   return setOrderRouteEmpty({ ...orderRouteEmpty, isRequired: true, extra: '주문 경로를 선택해 주세요!' });
 
     canvasToImage(selectedFrameList, { ...info, orderRoute: '1' });
-  }, [selectedFrameList, info, userNameEmpty, phoneEmpty, orderRouteEmpty, canvasToImage]);
+  }, [selectedFrameList, info, userNameEmpty, phoneEmpty, canvasToImage, orderRouteEmpty]);
 
   useEffect(() => {
     if (isDone) {

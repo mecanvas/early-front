@@ -74,6 +74,7 @@ const user = createSlice({
         state.isUserLoad = false;
         state.isUserError = null;
         state.isUserDone = false;
+        state.userData = null;
       })
       .addCase(postUserLogout.rejected, (state, { payload }) => {
         state.isLogoutLoad = false;

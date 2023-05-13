@@ -83,8 +83,9 @@ const AdminLayout = ({ children }: Props) => {
   const handleLogout = useCallback(() => {
     if (userData) {
       dispatch(postUserLogout());
+      router.push('/admin/login');
     }
-  }, [dispatch, userData]);
+  }, [dispatch, router, userData]);
 
   return (
     <Layout>
